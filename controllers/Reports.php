@@ -1,7 +1,7 @@
 <?php
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class MyExtension extends Auth_Controller
+class Reports extends Auth_Controller
 {
 	/**
 	 * Constructor
@@ -21,7 +21,7 @@ class MyExtension extends Auth_Controller
 	public function index()
 	{
 		$this->load->library('WidgetLib');
-		$this->load->view('extensions/FHC-Core-Extension/MyExtension');
+		$this->load->view('extensions/FHC-Core-Personalverwaltung/reports/home');
 	}
 }
 

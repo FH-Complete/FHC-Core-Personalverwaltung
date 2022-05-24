@@ -1,13 +1,49 @@
 <?php
 // Add Header-Menu-Entry to all Pages
-$config['navigation_header']['*']['MyExtension'] = array(
-		'link' => site_url('extensions/FHC-Core-Extension/MyExtension'),
-		'icon' => '',
-		'description' => 'MyExtension',
-		'sort' => 1
-	);
+$config['navigation_header']['*']['Personen']['children']['PV21'] = array(
+	'link' => site_url('extensions/FHC-Core-Personalverwaltung/Home'),
+	'sort' => 25,
+	'description' => 'PV21',
+	'expand' => false,
+	'requiredPermissions' => 'extension/budget_verwaltung:r'
+);
+
+$config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
+	'Dashboard' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Home'),
+		'description' => 'Home',
+		'icon' => 'home'
+	),
+	'Budgetanträge OE Übersicht' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Employees'),
+		'description' => 'Mitarbeiter',
+		'icon' => 'users'
+	),
+	'Organigramm' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Organization'),
+		'description' => 'Organigramm',
+		'icon' => 'sitemap'
+	),
+	'Berichte' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/BI'),
+		'description' => 'Berichte',
+		'icon' => 'file-text-o'
+	),
+	'Dokumente' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Doc'),
+		'description' => 'Dokumente',
+		'icon' => 'line-chart'
+	),
+	'Einstellungen' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Setup'),
+		'description' => 'Einstellungen',
+		'icon' => 'cog',
+		'requiredPermissions' => 'extension/budget_freigabe:r'
+	)
+);
 
 // Add Header-Menu-Entry to Extension Page with DropDown
+/*
 $config['navigation_header']['extensions/FHC-Core-Extension/MyExtension/index'] = array(
 		'FHC-Core-Extension-Advanced-Menu' => array(
 		'link' => '#',
@@ -54,4 +90,4 @@ $config['navigation_menu']['extensions/FHC-Core-Extension/MyExtension/index'] = 
 		'description' => 'Dashboard',
 		'icon' => 'dashboard'
 	)
-);
+);*/

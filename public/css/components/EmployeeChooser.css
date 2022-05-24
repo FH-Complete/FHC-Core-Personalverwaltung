@@ -1,0 +1,37 @@
+#sdropdown {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+  
+  .searchResultItem {
+    display: contents;
+    padding: 10px;
+  }
+  
+  .searchResultItem:hover {
+    background: #f5f5f5;
+    transition: 200ms;
+  }
+  
+  .searchResultName {
+    font-weight: bold;
+    font-size: 1.4em;
+  }
+  
+  .searchResultCell {
+    padding: 3px;
+  }
+  
+  .foto {
+    display: flex;
+    align-items: flex-start;
+  }
+  
+  .searchResultCell > table {
+    border-spacing: 3px 0px;
+    border-collapse: separate;
+  }
+  
+  th {
+    text-align: left;
+  }
