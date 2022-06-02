@@ -6,3 +6,7 @@
 .announcement-text {
     margin: 0;
 }
+
+label.required.form-label:after {
+    content:"*";color:blue;
+}

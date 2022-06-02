@@ -77,7 +77,7 @@ const EmployeePerson = {
                     :class="{ active: isActive(items[1]) }"
                     role="tabpanel"
                 >
-                <employee-data></employee-data>
+                <employee-data editMode :personID="personid"></employee-data>
                 </div>
                 <div
                     class="tab-pane"
@@ -91,7 +91,7 @@ const EmployeePerson = {
                     :class="{ active: isActive(items[3]) }"
                     role="tabpanel"
                 >
-                <bank-data></bank-data>
+                <bank-data editMode :personID="personid"></bank-data>
                 </div>
                 
             </div>

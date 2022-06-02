@@ -1,0 +1,8 @@
+.toast {
+    width: 400px;
+    font-weight: bold;
+}
+
+.toast-container {
+    z-index: 2000;
+}

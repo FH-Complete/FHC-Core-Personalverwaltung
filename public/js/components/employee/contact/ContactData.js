@@ -30,8 +30,19 @@ const ContactData = {
         }
     },
     template: `
+        <div class="row">
+
+            <div class="d-flex bd-highlight">
+                <div class="flex-grow-1 bd-highlight"><h4>Kontaktdaten</h4></div>        
+                <div class="p-2 bd-highlight">                   
+
+                </div>
+            </div>
+
+
+        </div>
         <div class="col-md-12 d-flex flex-column align-items-start pt-3 pb-2 mb-3">
-            <ul class="nav nav-tabs">
+            <ul class="nav nav-tabs" style="width: 100%">
                 <li class="nav-item">
                     <a
                     class="nav-link"

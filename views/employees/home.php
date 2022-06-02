@@ -12,13 +12,16 @@
 			'navigationwidget' => false,
       'vue3' => true,      
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
+                       'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/verticalsplit.css',
+                       'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
                       ],       
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Modal.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/ModalDialog.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/verticalsplit.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeNav.js',
@@ -91,8 +94,19 @@
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
                 
-          <employee-table id="employee-table" :minimized="isEditorOpen" @person-selected="personSelectedHandler" :fields="['uid','nachname','vorname','titelpre','telefonklappe','lektor','fixangestellt','lastupdate']"  :tabledata="tabledata"></employee-table>
-          <employee-editor :personid="currentPersonID" :open="isEditorOpen" @close-editor="closeEditorHandler"></employee-editor>
+
+          <verticalsplit id="macombined">
+              <template #top>
+                <employee-table id="employee-table" :minimized="isEditorOpen" @person-selected="personSelectedHandler" :fields="['uid','nachname','vorname','titelpre','telefonklappe','lektor','fixangestellt','lastupdate']"  :tabledata="tabledata"></employee-table>
+              </template>
+              <template #bottom>
+                <employee-editor :personid="currentPersonID" :open="isEditorOpen" @close-editor="closeEditorHandler"></employee-editor>
+              </template>
+          </verticalsplit> 
+
+
+          
+          
       </main>
     </div>
   </div>
