@@ -193,6 +193,10 @@ const BaseData = {
 
                 console.log("form invalid");
 
+            } else if (!hasChanged.value) {
+
+                console.log("no changes detected. nothing to save.");
+
             } else {
 
                 // submit
@@ -225,6 +229,7 @@ const BaseData = {
                 isFetching.value = false;
 
                 showToast();
+                currentValue.value = response.retval[0];
                 preservedValue.value = currentValue.value;
                 toggleMode();
             }
@@ -312,17 +317,15 @@ const BaseData = {
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="ersatzkennzeichen" v-model="currentValue.ersatzkennzeichen">
             </div>
             <div class="col-md-3">
-                <label for="status" class="form-label">Status</label>
-                <div v-if="!readonly" class="form-check">
-                    <label for="aktiv" class="form-check-label">Aktiv</label>
-                    <input class="form-check-input" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
-                </div>
-                <div v-if="readonly" class="form-label">
-                    
-                    <input v-if="currentValue.aktiv" type="text" readonly class="form-control-sm form-control-plaintext" id="statusField" value="aktiv">
-                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="statusField" value="">
-                    
-                </div>
+                <label for="sprache" class="form-label">Sprache</label><br>
+                <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                    <option value="">-- keine Auswahl --</option>
+                    <option v-for="(item, index) in sprache" :value="item.sprache">
+                        {{ item.sprache }}
+                    </option>         
+                </select>
+                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" v-model="currentValue.sprache">
+
             </div>
             <div class="col-md-3"></div>
             <!-- Anrede -->
@@ -380,14 +383,7 @@ const BaseData = {
             </div>
 
             <div class="col-md-3">
-                <label for="sprache" class="form-label">Sprache</label><br>
-                <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in sprache" :value="item.sprache">
-                        {{ item.sprache }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" v-model="currentValue.sprache">
+                
             </div>
             
             
@@ -397,6 +393,11 @@ const BaseData = {
                 <label for="inputAddress" class="form-label">Anmerkung</label>
                 <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkungen" v-model="currentValue.anmerkung">
                 </textarea>
+            </div>
+            
+            <!-- changes -->
+            <div class="col-8">
+                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
             </div>
             
 

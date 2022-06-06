@@ -90,6 +90,28 @@ class Api extends FHC_Controller
         $this->outputJsonSuccess($data);
     }
 
+    function getGemeinden()
+    {
+        $plz = $this->input->get('plz', TRUE);
+
+        if (!is_numeric($plz))
+			show_error("plz '$plz' is not numeric!'");
+
+        $data = $this->ApiModel->getGemeinden($plz);
+        $this->outputJsonSuccess($data); 
+    }
+
+    function getOrtschaften()
+    {
+        $plz = $this->input->get('plz', TRUE);
+
+        if (!is_numeric($plz))
+			show_error('plz is not numeric!');
+
+        $data = $this->ApiModel->getOrtschaften($plz);
+        $this->outputJsonSuccess($data); 
+    }
+
     /**
      * get basic data of a person (name, foto, job, ...)
      */

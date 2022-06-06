@@ -67,6 +67,7 @@ const EmployeeData= {
                 bismelden: true,
                 standort_id: null,
                 kleriker: false,
+                aktiv: false,
                 insertamum: "",
                 insertvon: "",
                 updatevon: "",
@@ -142,6 +143,10 @@ const EmployeeData= {
             return !!n && n.trim() != "";
         }
 
+        const readonlyBlocker = (e) => {
+            if (readonly.value) e.preventDefault();
+        }
+
         const save = async () => {
             console.log('haschanged: ', hasChanged);
             console.log('frmState: ', frmState);
@@ -149,6 +154,10 @@ const EmployeeData= {
             if (!employeeDataFrm.value.checkValidity()) {
 
                 console.log("form invalid");
+
+            } else if (!hasChanged.value) {
+
+                    console.log("no changes detected. nothing to save.");                
 
             } else {
 
@@ -182,6 +191,7 @@ const EmployeeData= {
                 isFetching.value = false;
 
                 showToast();
+                currentValue.value = response.retval[0];
                 preservedValue.value = currentValue.value;
                 toggleMode();
             }
@@ -230,6 +240,7 @@ const EmployeeData= {
             validNachname,    
             getAusbildungbez,
             getStandortbez,
+            readonlyBlocker,
         }
 
     },
@@ -326,19 +337,29 @@ const EmployeeData= {
             <div class="col-4">
                 <label for="status" class="form-label">Status</label>
                 <div class="form-check">
+                    <label for="aktiv" class="form-check-label">Aktiv</label>
+                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
+                </div>
+                <div class="form-check">
                     <label for="lektor" class="form-check-label">LektorIn</label>
-                    <input class="form-check-input" type="checkbox" id="lektor" v-model="currentValue.lektor">
+                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
                 </div>
                 <div class="form-check">
                     <label for="fixangestellt" class="form-check-label">Fixangestellt</label>
-                    <input class="form-check-input" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
+                    <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
                 </div>
                 <div class="form-check">
-                    <label for="bismelden" class="form-check-label">Bismelden</label>
-                    <input class="form-check-input" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
+                    <label for="bismelden" class="form-check-label" >Bismelden</label>
+                    <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
                 </div>
             </div>
+            <div class="col-4"></div>
+            <!-- changes -->
+            <div class="col-8">
+                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
+            </div>
         </form>
+        
     </div>
 
 

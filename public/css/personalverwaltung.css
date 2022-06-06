@@ -10,3 +10,8 @@
 label.required.form-label:after {
     content:"*";color:blue;
 }
+
+.modificationdate {
+    font-style: italic;
+    font-size: 0.8em;
+}

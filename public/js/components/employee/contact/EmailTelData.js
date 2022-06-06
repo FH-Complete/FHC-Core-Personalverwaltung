@@ -332,9 +332,7 @@ const EmailTelData = {
                     <div class="col-md-8">
                         <label for="anmerkung" class="form-label">Anmerkung</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkung" maxlength="64" v-model="currentContact.anmerkung">
-                    </div>
-                    
-                    
+                    </div>                                                            
 
                 </form>        
 

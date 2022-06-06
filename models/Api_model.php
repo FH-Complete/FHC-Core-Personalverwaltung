@@ -64,12 +64,38 @@ class Api_model extends DB_Model
             p.foto,
             p.updateamum AS lastupdate
         FROM tbl_person p
-            LEFT JOIN tbl_benutzer ON (p.person_id=tbl_benutzer.person_id)
-            LEFT JOIN tbl_mitarbeiter ON tbl_benutzer.uid::text = tbl_mitarbeiter.mitarbeiter_uid::text
+             JOIN tbl_benutzer ON (p.person_id=tbl_benutzer.person_id)
+             JOIN tbl_mitarbeiter ON tbl_benutzer.uid::text = tbl_mitarbeiter.mitarbeiter_uid::text
         WHERE p.person_id=?
         ";
 
         return $this->execQuery($qry, array($person_id));
+    }
+
+    function getGemeinden($plz)
+    {
+        $qry = "
+        SELECT           
+            distinct g.name
+        FROM bis.tbl_gemeinde g             
+        WHERE g.plz=?
+        ORDER BY g.name
+        ";
+
+        return $this->execQuery($qry, array($plz));
+    }
+
+    function getOrtschaften($plz)
+    {
+        $qry = "
+        SELECT distinct 
+            g.ortschaftsname
+        FROM bis.tbl_gemeinde g             
+        WHERE g.plz=?
+        ORDER BY g.ortschaftsname
+        ";
+
+        return $this->execQuery($qry, array($plz));
     }
 
 
@@ -95,7 +121,10 @@ class Api_model extends DB_Model
             p.svnr,
             p.anmerkung,
             p.ersatzkennzeichen,
-            p.updateamum AS lastupdate
+            p.insertamum,
+            p.insertvon,
+            p.updatevon,
+            p.updateamum 
         FROM tbl_person p
         WHERE p.person_id=?
         ";
@@ -107,7 +136,7 @@ class Api_model extends DB_Model
     function updatePersonBaseData($personJson)
     {
         unset($personJson['uids']);
-        unset($personJson['lastupdate']);
+        unset($personJson['insertamum']);
         // set empty values to null
         if ($personJson['sprache'] == '')
         {
@@ -124,13 +153,21 @@ class Api_model extends DB_Model
             return error($result->msg, EXIT_ERROR);
         }
 
-        return success($personJson['person_id']);
+        $result = $this->getPersonBaseData($personJson['person_id']);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return $result;
     }
 
     function insertPersonBaseData($personJson)
     {
         unset($personJson['uids']);
-        unset($personJson['lastupdate']);
+        unset($personJson['updateamum']);
+        unset($personJson['updatevon']);
         // set empty values to null
         if ($personJson['sprache'] == '')
         {
@@ -162,6 +199,7 @@ class Api_model extends DB_Model
     {
         $qry = "
         SELECT
+            b.person_id,
             p.mitarbeiter_uid,
             p.personalnummer,
             p.telefonklappe,
@@ -177,6 +215,7 @@ class Api_model extends DB_Model
             p.standort_id,
             p.kleriker,
             b.alias,
+            b.aktiv,
             p.insertamum,
             p.insertvon,
             p.updatevon,
@@ -195,6 +234,10 @@ class Api_model extends DB_Model
 
         $alias = $employeeDataJson['alias'];
         unset($employeeDataJson['alias']); 
+        $aktiv = $employeeDataJson['aktiv'];
+        unset($employeeDataJson['aktiv']);
+        $person_id = $employeeDataJson['person_id'];
+        unset($employeeDataJson['person_id']);
 
         if ($employeeDataJson['standort_id'] == 0)
         {
@@ -208,8 +251,8 @@ class Api_model extends DB_Model
             return error($result->msg, EXIT_ERROR);
         }
 
-        // update alias
-        // TODO check for duplicates!!!
+        // update alias and aktiv flag 
+        // TODO check for alias duplicates!!!
         $result = $this->BenutzerModel->load($employeeDataJson['mitarbeiter_uid']);
 
         if (isError($result))
@@ -219,11 +262,20 @@ class Api_model extends DB_Model
 
         $userData = $result->retval[0];
         $userData->alias = $alias;
+        $userData->aktiv = $aktiv;
         $userData->updatevon = getAuthUID();
         $userData->updateamum = $this->escape('NOW()');
         $this->BenutzerModel->update($employeeDataJson['mitarbeiter_uid'], $userData);
 
-        return success($employeeDataJson['mitarbeiter_uid']);
+        $result = $this->getPersonEmployeeData($person_id);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return $result;
+        //return success($employeeDataJson['mitarbeiter_uid']);
     }
 
 

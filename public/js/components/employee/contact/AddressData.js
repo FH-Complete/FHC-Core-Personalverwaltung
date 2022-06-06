@@ -27,11 +27,17 @@ const AddressData = {
 
         const nations = Vue.inject('nations');
 
+        const gemeinden = Vue.ref([]);
+
+        const ortschaften = Vue.ref([]);
+
         Vue.watch(personID, (currentValue, oldValue) => {
             console.log('AddressData watch',currentValue);
             urlAddressData.value = generateAddressDataEndpointURL(currentValue);
             fetchData();
         });
+
+        
 
         const generateAddressDataEndpointURL = (person_id) => {
             let full =
@@ -62,6 +68,58 @@ const AddressData = {
               isFetching.value = false
             }
           }
+
+        const fetchGemeinden = async () => {
+            try {
+                let full =
+                (location.port == "3000" ? "https://" : location.protocol) +
+                "//" +
+                location.hostname +
+                ":" +
+                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+              const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getGemeinden?plz=${currentAddress.value.plz}`;
+        
+              const res = await fetch(url)
+              let response = await res.json()              
+              return response.retval;
+            } catch (error) {
+              console.log(error)              
+            }		
+        }
+
+        const fetchOrtschaften = async () => {
+            try {
+                let full =
+                (location.port == "3000" ? "https://" : location.protocol) +
+                "//" +
+                location.hostname +
+                ":" +
+                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+              const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrtschaften?plz=${currentAddress.value.plz}`;
+        
+              const res = await fetch(url)
+              let response = await res.json()              
+              return response.retval;
+            } catch (error) {
+              console.log(error)              
+            }		
+        }
+
+        Vue.watchEffect(async () => {
+            if (currentAddress?.value?.nation == 'A') {
+                const response = await fetchGemeinden();
+                gemeinden.value = response.retval;
+                console.log('gemeinden: ',response);
+            }            
+        })
+
+        Vue.watchEffect(async () => {
+            if (currentAddress?.value?.nation == 'A') {
+                const response = await fetchOrtschaften();
+                ortschaften.value = response.retval;
+                console.log('ortschaften: ',response);
+            }            
+        })
 
         Vue.onMounted(() => {
             console.log('AddressData mounted', props.personID);            
@@ -270,6 +328,7 @@ const AddressData = {
             addressList, addressListArray, isEditActive, showAddModal, 
             showDeleteModal, showEditModal, confirmDeleteRef, currentAddress, 
             modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
+            gemeinden, ortschaften,
             // form handling
             validOrt, validPLZ, frmState, addressDataFrm, 
         }
@@ -351,20 +410,7 @@ const AddressData = {
                         <label for="strasse" class="form-label">Strasse</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" >
                     </div>
-                    <div class="col-md-2">
-                        <label for="plz" class="required form-label" >PLZ</label>
-                        <input type="text" required :readonly="readonly" @blur="frmState.plzBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validPLZ(currentAddress.plz) && frmState.plzBlured}" id="plz" maxlength="16" v-model="currentAddress.plz" >
-                    </div>
-                    <div class="col-md-4">
-                        <label for="ort" class="required form-label">Ort</label>
-                        <input type="text" required :readonly="readonly" @blur="frmState.ortBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validOrt(currentAddress.ort) && frmState.ortBlured}" id="ort" maxlength="256" v-model="currentAddress.ort" >
-                    </div>
-                    <!-- Gemeinde -->
-                    <div class="col-md-4">
-                        <label for="gemeinde" class="form-label">Gemeinde</label>
-                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="11" v-model="currentAddress.gemeinde">
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label for="nation" class="form-label">Nation</label>
                         <select  id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.nation" >
                             <option v-for="(item, index) in nations" :value="item.nation_code">
@@ -372,6 +418,38 @@ const AddressData = {
                             </option>
                         </select>
                     </div>
+                    <div class="col-md-2">
+                        <label for="plz" class="required form-label" >PLZ</label>
+                        <input type="text" required :readonly="readonly" @blur="frmState.plzBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validPLZ(currentAddress.plz) && frmState.plzBlured}" id="plz" maxlength="16" v-model="currentAddress.plz" >
+                    </div>
+                    <div class="col-md-4">
+                        <label for="ort" class="required form-label">Ort</label>
+                        <input v-if="currentAddress.nation!='A'" type="text" required :readonly="readonly" @blur="frmState.ortBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validOrt(currentAddress.ort) && frmState.ortBlured}" id="ort" maxlength="256" v-model="currentAddress.ort" >
+                        <select  v-if="currentAddress.nation=='A'" id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.ort" >
+                            <option v-for="(item, index) in ortschaften" :value="item.ortschaftsname">
+                                {{ item.ortschaftsname }}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Gemeinde -->
+                    <div class="col-md-6">
+                        <label for="gemeinde" class="form-label">Gemeinde</label>
+                        <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="11" v-model="currentAddress.gemeinde">
+                        <select  v-if="currentAddress.nation=='A'" id="gemeinde" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.gemeinde" >
+                            <option v-for="(item, index) in gemeinden" :value="item.name">
+                                {{ item.name }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- c/o -->
+                    <div class="col-md-6">
+                        <label for="co_name" class="form-label">Abweich.Empfänger. (c/o)</label>
+                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="11" v-model="currentAddress.co_name">
+                    </div>
+
+                    <div class="col-md-2">    </div>
+                    
                     <div class="col-md-2">                                             
                         <label for="heimatadresse" class="form-label">Heimatadresse</label>
                         <div>
@@ -384,13 +462,11 @@ const AddressData = {
                             <input class="form-check-input" type="checkbox" id="zustelladresse" v-model="currentAddress.zustelladresse">
                         </div>                        
                     </div>
-                    <!-- c/o -->
-                    <div class="col-md-6">
-                        <label for="co_name" class="form-label">Abweich.Empfänger. (c/o)</label>
-                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="11" v-model="currentAddress.co_name">
-                    </div>
                     
-
+                    
+                    <div class="col-8" v-if="currentAddress.adresse_id != 0">
+                        <div class="modificationdate">{{ currentAddress.insertamum }}/{{ currentAddress.insertvon }}, {{ currentAddress.updateamum }}/{{ currentAddress.updatevon }}</div>
+                    </div>
                 </form>        
 
             </template>
