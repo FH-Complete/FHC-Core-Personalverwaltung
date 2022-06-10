@@ -288,14 +288,49 @@ class Api_model extends DB_Model
         $bankDataJson['updatevon'] = getAuthUID();
         $bankDataJson['updateamum'] = $this->escape('NOW()');
 
-        $result = $this->BankverbindungModel->update($bankDataJson['person_id'], $bankDataJson);
+        $result = $this->BankverbindungModel->update($bankDataJson['bankverbindung_id'], $bankDataJson);
 
         if (isError($result))
         {
             return error($result->msg, EXIT_ERROR);
         }
 
-        return success($bankDataJson['person_id']);
+        $result = $this->BankverbindungModel->load($bankDataJson['bankverbindung_id']);
+
+        return $result;
+    }
+
+    function insertPersonBankData($bankDataJson)
+    {
+        unset($bankDataJson['bankverbindung_id']);
+        unset($bankDataJson['updateamum']);
+        unset($bankDataJson['orgform_kurzbz']);
+        unset($bankDataJson['oe_kurzbz']);
+        $bankDataJson['insertvon'] = getAuthUID();
+        $bankDataJson['insertamum'] = $this->escape('NOW()');
+
+        $result = $this->BankverbindungModel->insert($bankDataJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        $record = $this->BankverbindungModel->load($result->retval);
+
+        return $record;
+    }
+
+    function deletePersonBankData($bankverbindung_id)
+    {
+        $result = $this->BankverbindungModel->delete($bankverbindung_id);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($bankverbindung_id);
     }
 
 
@@ -513,6 +548,10 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, $parametersArray);
     }
 
+    // -----------------------------------
+    // Foto
+    // -----------------------------------
+
     function getFoto($person_id)
     {
         $qry = "
@@ -523,6 +562,32 @@ class Api_model extends DB_Model
         ";
 
         $result= $this->execQuery($qry, array($person_id));
+        return $result;
+    }
+
+    function updateFoto($person_id, $foto)
+    {            
+        $personJson['foto'] = $foto;
+        $result = $this->PersonModel->update($person_id, $personJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return $result;
+    }
+
+    function deleteFoto($person_id)
+    {
+        $personJson['foto'] = null;
+        $result = $this->PersonModel->update($person_id, $personJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
         return $result;
     }
 

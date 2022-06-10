@@ -1,5 +1,6 @@
 const EmployeeHeader = {
     components: {
+        Toast,
 		Modal,
         ModalDialog,
 	},	
@@ -13,6 +14,9 @@ const EmployeeHeader = {
         const employee = Vue.ref();
 
         const url = Vue.ref("");
+
+        const fileInput = Vue.ref();
+        const previewImage = Vue.ref();
 
         const isFetching = Vue.ref(false);
 
@@ -46,6 +50,8 @@ const EmployeeHeader = {
             console.log('EmployeeHeaderData watch',currentValue);
             url.value = generateEndpointURL(currentValue);
             fetchData();
+            previewImage.value = null;
+            fileInput.value.value = null;
         });
 
         Vue.onMounted(() => {
@@ -53,6 +59,99 @@ const EmployeeHeader = {
             url.value = generateEndpointURL(props.personID);
             fetchData();
         })
+
+        // Toast 
+        const toastRef = Vue.ref();
+        const toastDeleteRef = Vue.ref();
+        
+        const showToast = () => {
+            toastRef.value.show();
+        }
+
+        const showDeleteToast = () => {
+            toastDeleteRef.value.show();
+        }
+
+        const pickFile = () => {
+            let input = fileInput.value
+            let file = input.files
+            if (file && file[0]) {
+                let reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.value = e.target.result
+                }
+                reader.readAsDataURL(file[0])
+            }
+        }
+
+        const postFile = async () => {
+            isFetching.value = true
+                let full =
+                    (location.port == "3000" ? "https://" : location.protocol) +
+                    "//" +
+                    location.hostname +
+                    ":" +
+                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+
+                const endpoint =
+                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/uploadPersonEmployeeFoto`;
+
+                
+
+                const res = await fetch(endpoint,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({person_id: props.personID,imagedata: previewImage.value}),
+                });    
+
+                if (!res.ok) {
+                    isFetching.value = false;
+                    const message = `An error has occured: ${res.status}`;
+                    throw new Error(message);
+                }
+                let response = await res.json();
+
+                fetchData();
+                showToast();
+            
+                isFetching.value = false;
+        }
+
+
+        const postDeleteFile = async () => {
+            isFetching.value = true
+                let full =
+                    (location.port == "3000" ? "https://" : location.protocol) +
+                    "//" +
+                    location.hostname +
+                    ":" +
+                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+
+                const endpoint =
+                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/deletePersonEmployeeFoto`;
+
+                const res = await fetch(endpoint,{
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({person_id: props.personID}),
+                });    
+
+                if (!res.ok) {
+                    isFetching.value = false;
+                    const message = `An error has occured: ${res.status}`;
+                    throw new Error(message);
+                }
+                let response = await res.json();
+
+                fetchData();
+                showDeleteToast();
+            
+                isFetching.value = false;
+        }
 
         // Modal 
         let modalRef = Vue.ref();
@@ -72,9 +171,16 @@ const EmployeeHeader = {
             const ok = await confirmDeleteRef.value.show();
             
             if (ok) {
-              // TODO Foto löschen              
+              postDeleteFile();            
             }
           }
+
+        const okHandler = () => {
+            console.log("previewImage: ", previewImage.value);
+            postFile();
+            hideModal();
+        }
+        
 
         return {
             showModal,
@@ -82,11 +188,26 @@ const EmployeeHeader = {
             modalRef,
             showDeleteModal,
             confirmDeleteRef,
+            pickFile,
+            okHandler,
+            toastRef,toastDeleteRef,
 
             employee,
+            fileInput,
+            previewImage,
         }
     },
     template: `
+        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+            <Toast ref="toastRef">
+                <template #body><h4>Foto gespeichert.</h4></template>
+            </Toast>
+
+            <Toast ref="toastDeleteRef">
+                <template #body><h4>Foto gelöscht.</h4></template>
+            </Toast>
+        </div>
+
         <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >
         <div class="d-flex align-items-center" >
         
@@ -130,14 +251,19 @@ const EmployeeHeader = {
         <Modal title="Foto" ref="modalRef">
             <template #body>
                 <div class="mb-3">
-                <label for="formFile" class="form-label">Foto upload</label>
-                <input class="form-control" type="file" id="formFile">
+                    <label for="formFile" class="form-label">Foto upload</label>
+                    <input class="form-control" type="file" id="formFile" ref="fileInput" @input="pickFile" accept="image/*">
+                </div>
+                <div class="mb-3">
+                    <div class="imagePreviewWrapper" >
+                        <img class="preview" :src="previewImage" />                        
+                    </div>
                 </div>
 
             </template>
             <template #footer>
                 <button class="btn btn-secondary"  @click="hideModal()">Abbrechen</button>
-                <button class="btn btn-primary"  @click="hideModal()">OK</button>
+                <button class="btn btn-primary"  @click="okHandler()">OK</button>
             </template>
         </Modal>
         
