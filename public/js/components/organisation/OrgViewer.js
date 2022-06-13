@@ -8,115 +8,70 @@ const OrgViewer = {
     setup( props ) {
         let { oe } = Vue.toRefs(props);
 
-        const chartOptions = Vue.reactive({            
+        const chartData = Vue.ref([]);
+        const chartNodes = Vue.ref([]);
+
+        const chartOptions = Vue.computed(() => ({          
             chart: {
-                height: 600,
+                height: 3900, // 3900
                 inverted: true
               },
             
               title: {
-                text: 'Technikum Wien'
+                text: ''
               },
-            
 
               series: [{
                 type: 'organization',
                 name: 'Technikum Wien',
                 animation: false,
                 keys: ['from', 'to'],
-                data: [
-                  ['Shareholders', 'Board'],
-                  ['Board', 'CEO'],
-                  ['CEO', 'CTO'],
-                  ['CEO', 'CPO'],
-                  ['CEO', 'CSO'],
-                  ['CEO', 'HR'],
-                  ['CTO', 'Product'],
-                  ['CTO', 'Web'],
-                  ['CSO', 'Sales'],
-                  ['HR', 'Market'],
-                  ['CSO', 'Market'],
-                  ['HR', 'Market'],
-                  ['CTO', 'Market']
-                ],
+                data: chartData.value,
                 levels: [{
                   level: 0,
                   color: 'silver',
                   dataLabels: {
                     color: 'black'
                   },
-                  height: 125
+                  height: 35
                 }, {
                   level: 1,
-                  color: 'red',
+                  //color: 'red',
                   dataLabels: {
-                    color: 'black',
+                    color: 'white',
                     useHTML: true
                   },
-                  height: 125
+                  height: 35
                 }, {
                   level: 2,
                   color: '#980104'
                 }, {
                   level: 4,
                   color: '#359154'
-                }],
-                nodes: [{
-                  id: 'Shareholders'
-                }, {
-                  id: 'Board',
-                  info: 'sadf asdfas<br> asdfsd asdf<br> asdfsd asdf<br> asdfsd asdf<br> asdfsd asdf<br> asdfsd asdf'
-                }, {
-                  id: 'CEO',
-                  title: 'CEO',
-                  name: 'Grethe Hjetland',
-                  image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131126/Highsoft_03862_.jpg',
-                  info: '',
-                }, {
-                  id: 'HR',
-                  title: 'HR/CFO',
-                  name: 'Anne Jorunn Fjærestad',
-                  color: '#007ad0',
-                  image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131210/Highsoft_04045_.jpg'
-                }, {
-                  id: 'CTO',
-                  title: 'CTO',
-                  name: 'Christer Vasseng',
-                  image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131120/Highsoft_04074_.jpg'
-                }, {
-                  id: 'CPO',
-                  title: 'CPO',
-                  name: 'Torstein Hønsi',
-                  image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131213/Highsoft_03998_.jpg'
-                }, {
-                  id: 'CSO',
-                  title: 'CSO',
-                  name: 'Anita Nesse',
-                  image: 'https://wp-assets.highcharts.com/www-highcharts-com/blog/wp-content/uploads/2020/03/17131156/Highsoft_03834_.jpg'
-                }, {
-                  id: 'Product',
-                  name: 'Product developers'
-                }, {
-                  id: 'Web',
-                  name: 'Web devs, sys admin',
-                  description: 'Lorem ipsum<br>lorem ipsum<br>lorem ipsum',
-                }, {
-                  id: 'Sales',
-                  name: 'Sales team'
-                }, {
-                  id: 'Market',
-                  name: 'Marketing team',
-                  column: 5
-                }],
+                },{
+                    level: 5,
+                    color: '#659154'
+                  },
+
+                ],
+                nodes: chartNodes.value,
                 colorByPoint: false,
                 color: '#007ad0',
                 linkColor: "#ccc",
                 linkLineWidth: 2,
                 dataLabels: {
-                  color: 'white'
+                  color: 'white',
+                  nodeFormatter() {
+                        // There seems to be a bug with larger datasets which prevents the dataLabels style option from overriding the default h4 font size, so I format the nodes here instead
+                        const html = (Highcharts.defaultOptions.plotOptions.organization.dataLabels).nodeFormatter.call(this);
+                        return html.replace(
+                            '<h4 style="',
+                            '<h4 style="font-size: 0.8rem;margin:0"'
+                        );
+                    }
                 },
                 borderColor: 'white',
-                nodeWidth: 65
+                nodeWidth: 55
               }],
               tooltip: {
                 outside: true,
@@ -132,7 +87,8 @@ const OrgViewer = {
 
 
             
-        });
+          })
+        );
 
         const fetchOrg = async (oe) => {
             try {
@@ -146,15 +102,132 @@ const OrgViewer = {
         
               const res = await fetch(url)
               let response = await res.json()              
-              console.log(response.retval);	  
-              return response.retval;
+              console.log(response.retval);	 
+              nodeLevel = 0;
+              const seriesdata = flattenDeep2(response); 
+              const nodes = flattenDeep(response);
+              return { seriesdata: seriesdata, nodes: nodes};
             } catch (error) {
               console.log(error)              
             }	
         }
 
+        
+
+        const isLeaf = (node) => {
+            if (Array.isArray(node.children)) return true;
+            return false;
+        }
+
+        /**
+         * 
+    {"gmbh": {
+        "unit": {
+            "oe_kurzbz": "gmbh",
+            "oe_parent_kurzbz": null,
+            "bezeichnung": "Technikum Wien GMBH",
+            "organisationseinheittyp_kurzbz": "Abteilung",
+            "aktiv": true,
+            "mailverteiler": false,
+            "freigabegrenze": "3000.00",
+            "kurzzeichen": "GMB",
+            "lehre": false,
+            "standort": null,
+            "warn_semesterstunden_frei": null,
+            "warn_semesterstunden_fix": null,
+            "standort_id": 0
+        },
+        "children": {
+            "finconqm": {
+                "unit": {
+                    "oe_kurzbz": "finconqm",
+                    "oe_parent_kurzbz": "gmbh",
+                    "bezeichnung": "Finance & Controlling,QM & Prozessmanagement",
+                    "organisationseinheittyp_kurzbz": "Team",
+                    "aktiv": false,
+                    "mailverteiler": false,
+                    "freigabegrenze": null,
+                    "kurzzeichen": null,
+                    "lehre": false,
+                    "standort": null,
+                    "warn_semesterstunden_frei": null,
+                    "warn_semesterstunden_fix": null,
+                    "standort_id": 0
+                },
+                "children": []
+            },}  
+         * @returns 
+         */
+        const flattenDeep2 = (tree) => {
+            const keys = Object.keys(tree);
+            return keys.reduce((acc, oe) => {
+                    if (!isLeaf(tree[oe])) {
+                        const children_keys = Object.keys(tree[oe].children);
+                        const links = children_keys.reduce(
+                            (subacc, sub_oe) => { 
+                                subacc.push([oe, sub_oe]); 
+                                const child = tree[oe].children[sub_oe];
+                                if (!isLeaf(child)) {
+                                    const flat_child = flattenDeep2({[sub_oe]: child});
+                                    subacc = subacc.concat(flat_child); 
+                                }
+                                
+                                return subacc; 
+                            },
+                            []
+                        );
+                        return acc.concat(links);
+                    }  
+                    return acc;                    
+                }, []
+            );
+         }
+
+        var nodeLevel = 0;
+        const flattenDeep = (tree) => {
+            const keys = Object.keys(tree);
+            nodeLevel++;
+            return keys.reduce((acc, oe) => {
+                    if (nodeLevel > 1 && !isLeaf(tree[oe])) {
+                        if (Object.keys(tree[oe].children).length>0) 
+                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz, layout: 'hanging'}); 
+                        else
+                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz}); 
+                    } else {
+                        acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz}); 
+                    }
+                    
+
+                    if (!isLeaf(tree[oe])) {
+                        const children_keys = Object.keys(tree[oe].children);
+                        const links = children_keys.reduce(
+                            (subacc, sub_oe) => {                                 
+                                const child = tree[oe].children[sub_oe];
+                                if (isLeaf(child)) {
+                                    subacc.push({ id: sub_oe, name: child.unit.bezeichnung, title: child.unit.organisationseinheittyp_kurzbz, layout: 'hanging'}); 
+                                } else {
+                                    const flat_child = flattenDeep({[sub_oe]: child});
+                                    subacc = subacc.concat(flat_child); 
+                                }
+                                
+                                return subacc; 
+                            },
+                            []
+                        );
+                        return acc.concat(links);
+                    }  
+                    return acc;                    
+                }, []
+            );
+         }
+
         Vue.watch(oe, (currentVal, oldVal) => {            
-            fetchOrg(currentVal);         
+            const result = fetchOrg(currentVal).then((data) => {
+                chartData.value = data.seriesdata;
+                chartNodes.value = data.nodes;
+                }
+            )
+            
         });
       
 
@@ -165,9 +238,8 @@ const OrgViewer = {
         return { chartOptions }
     },
     template: `
-    
-        OrgViewer ({{ oe }})
-        <figure style="width:100%">
+
+        <figure style="min-width:100%;">
             <highcharts class="chart" :options="chartOptions"></highcharts>
         </figure>
     `
