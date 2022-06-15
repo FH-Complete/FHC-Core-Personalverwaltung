@@ -81,6 +81,7 @@ const verticalsplit = {
             window.addEventListener('mousemove', this.drag);
             this.resize = true;
             this.mousePosY = e.clientY;
+            e.preventDefault();
         },
         drag: function(e) {
             if( !this.resize ) {
@@ -102,6 +103,7 @@ const verticalsplit = {
             window.removeEventListener('mouseup', this.dragEnd);
             this.resize = false;
             this.mousePosY = e.clientY;
+            e.preventDefault();
         },
         trackVerticalSplitterOffsetTop: function() {
             this.vsplitterOffset = this.vsplitter.offsetTop;

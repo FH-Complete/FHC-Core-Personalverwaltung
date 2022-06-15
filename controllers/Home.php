@@ -12,6 +12,8 @@ class Home extends Auth_Controller
 			'index'=>'admin:rw'
 			)
 		);
+
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
 	}
 
 	/**
@@ -20,8 +22,10 @@ class Home extends Auth_Controller
 	 */
 	public function index()
 	{
+		$cList = $this->ApiModel->getContractExpireIn30Days();
+
 		$this->load->library('WidgetLib');
-		$this->load->view('extensions/FHC-Core-Personalverwaltung/home');
+		$this->load->view('extensions/FHC-Core-Personalverwaltung/home', array('contracts' => $cList->retval));
 	}
 }
 

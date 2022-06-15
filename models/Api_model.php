@@ -98,6 +98,23 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, array($plz));
     }
 
+    // ------------------------------------
+    // Fristen (BisVerwendung)
+    // ------------------------------------
+    function getContractExpireIn30Days()
+    {
+
+        $qry="
+        select m.personalnummer, b.uid, p.nachname || ', ' || coalesce(p.vorname,'') || ' ' || coalesce(p.titelpre,'') as name,bv.mitarbeiter_uid,bv.beginn,bv.ende, m.fixangestellt, bv.vertragsstunden,bv.dv_art,bv.hauptberuflich 
+        from bis.tbl_bisverwendung bv join public.tbl_benutzer b on  (bv.mitarbeiter_uid=b.uid)  join public.tbl_person p using(person_id)
+        join public.tbl_mitarbeiter m  on (b.uid=m.mitarbeiter_uid)
+        where bv.ende>=now() and bv.ende<=(now()+interval '30 days')
+        order by ende asc
+        ";
+
+        return $this->execQuery($qry);
+    }
+
 
     // -------------------------------------
     // PersonBaseData

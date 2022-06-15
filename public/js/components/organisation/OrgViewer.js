@@ -71,7 +71,7 @@ const OrgViewer = {
                     }
                 },
                 borderColor: 'white',
-                nodeWidth: 55
+                nodeWidth: 65
               }],
               tooltip: {
                 outside: true,
@@ -188,15 +188,17 @@ const OrgViewer = {
             const keys = Object.keys(tree);
             nodeLevel++;
             return keys.reduce((acc, oe) => {
-                    if (nodeLevel > 1 && !isLeaf(tree[oe])) {
-                        if (Object.keys(tree[oe].children).length>0) 
-                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz, layout: 'hanging'}); 
+                /*
+                    if (nodeLevel==6 && !isLeaf(tree[oe])) {
+                        if (Object.keys(tree[oe].children).length>2) 
+                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz , layout: 'hanging'}); 
                         else
-                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz}); 
+                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz }); 
                     } else {
-                        acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz}); 
+                        acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz }); 
                     }
-                    
+                    */
+                    acc.push({ id: oe, name: tree[oe].unit.bezeichnung /* title: oe tree[oe].unit.organisationseinheittyp_kurzbz*/, color: '#ff0000'}); 
 
                     if (!isLeaf(tree[oe])) {
                         const children_keys = Object.keys(tree[oe].children);
@@ -239,8 +241,10 @@ const OrgViewer = {
     },
     template: `
 
-        <figure style="min-width:100%;">
-            <highcharts class="chart" :options="chartOptions"></highcharts>
-        </figure>
+        <div style="width:100%;height:100%;overflow:auto">
+            <figure style="min-width:500%;">
+                <highcharts class="chart" :options="chartOptions"></highcharts>
+            </figure>
+        </div>
     `
 }

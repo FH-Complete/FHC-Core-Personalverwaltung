@@ -22,7 +22,7 @@ class Api extends FHC_Controller
         $this->load->model('ressource/Mitarbeiter_model', 'EmployeeModel');
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Organisationseinheit_model', 'OrganisationseinheitModel');
-
+        $this->load->model('codex/bisverwendung_model', 'BisverwendungModel');
     }
 
     function index()
@@ -130,6 +130,16 @@ class Api extends FHC_Controller
         $data = $this->OrganisationseinheitModel->getOrgStructure($oe);
         return $this->outputJson($data); 
     }
+    
+    // -----------------------------------------
+    // contracts about to expire (bisverwendung)
+    // -----------------------------------------
+    function getContractExpireIn30Days()
+    {
+        $data = $this->ApiModel->getContractExpireIn30Days();
+        $this->outputJson($data); 
+    }
+
 
     /**
      * get basic data of a person (name, foto, job, ...)
