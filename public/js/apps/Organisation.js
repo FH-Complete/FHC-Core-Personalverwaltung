@@ -11,7 +11,7 @@ const pvApp = Vue.createApp(	{
 		return 	{
 			isEditorOpen: false,
 			currentPersonID: null,	
-			currentOrg: null,
+			currentOrg: '',
 		}
 	},
 	methods: {
@@ -30,7 +30,9 @@ const pvApp = Vue.createApp(	{
 	},
 });
 
-pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+// 	pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+pvApp.use(primevue.config.default);
+pvApp.use(primevue.toastservice);
 
 const fetchNations = async () => {
 	try {

@@ -11,7 +11,7 @@
 			'ajaxlib' => true,
 			'navigationwidget' => false,
       'vue3' => true,  
-      'highcharts' => true,    
+      'primevue3' => true,    
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',  
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
@@ -23,8 +23,6 @@
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgViewer.js',
-                  //    'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/chartdemo.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/highchartsVue.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'                    
                     ],
       /*
@@ -35,6 +33,48 @@
 		)
 	);
 ?>
+
+<!-- chart styles -->
+<style>
+      .p-organizationchart .p-person {
+        padding: 0;
+        border: 0 none;
+      }
+
+      .p-organizationchart .node-header,
+      .p-organizationchart .node-content {
+        padding: 0.5em 0.7rem;
+      }
+
+      .p-organizationchart .node-header {
+        background-color: #495ebb;
+        color: #ffffff;
+      }
+
+      .p-organizationchart .node-content {
+        text-align: center;
+        border: 1px solid #495ebb;
+      }
+
+      .p-organizationchart .node-content img {
+        border-radius: 50%;
+      }
+
+      .p-organizationchart .department-cfo {
+        background-color: #7247bc;
+        color: #ffffff;
+      }
+
+      .p-organizationchart .department-coo {
+        background-color: #a534b6;
+        color: #ffffff;
+      }
+
+      .p-organizationchart .department-cto {
+        background-color: #e9286f;
+        color: #ffffff;
+      }
+</style>
 
 <div id="wrapper">
 

@@ -1,18 +1,94 @@
 const OrgViewer = {
     components: {
         Modal,
-        "p-organizationchart": primevue.organizationchart,
     },
     props: {
        oe:  { type: String, required: true },
     },
     setup( props ) {
+        let { oe } = Vue.toRefs(props);
 
-        const { toRefs, ref } = Vue;
-        let { oe } = toRefs(props);
-        const selection = ref({});
+        const chartData = Vue.ref([]);
+        const chartNodes = Vue.ref([]);
 
-        const chartData = ref({});
+        const chartOptions = Vue.computed(() => ({          
+            chart: {
+                height: 3900, // 3900
+                inverted: true
+              },
+            
+              title: {
+                text: ''
+              },
+
+              series: [{
+                type: 'organization',
+                name: 'Technikum Wien',
+                animation: false,
+                keys: ['from', 'to'],
+                data: chartData.value,
+                levels: [{
+                  level: 0,
+                  color: 'silver',
+                  dataLabels: {
+                    color: 'black'
+                  },
+                  height: 35
+                }, {
+                  level: 1,
+                  //color: 'red',
+                  dataLabels: {
+                    color: 'white',
+                    useHTML: true
+                  },
+                  height: 35
+                }, {
+                  level: 2,
+                  color: '#980104'
+                }, {
+                  level: 4,
+                  color: '#359154'
+                },{
+                    level: 5,
+                    color: '#659154'
+                  },
+
+                ],
+                nodes: chartNodes.value,
+                colorByPoint: false,
+                color: '#007ad0',
+                linkColor: "#ccc",
+                linkLineWidth: 2,
+                dataLabels: {
+                  color: 'white',
+                  nodeFormatter() {
+                        // There seems to be a bug with larger datasets which prevents the dataLabels style option from overriding the default h4 font size, so I format the nodes here instead
+                        const html = (Highcharts.defaultOptions.plotOptions.organization.dataLabels).nodeFormatter.call(this);
+                        return html.replace(
+                            '<h4 style="',
+                            '<h4 style="font-size: 0.8rem;margin:0"'
+                        );
+                    }
+                },
+                borderColor: 'white',
+                nodeWidth: 65
+              }],
+              tooltip: {
+                outside: true,
+                formatter: function() {
+                    return this.point.info;
+                }
+              },
+              exporting: {
+                allowHTML: true,
+                sourceWidth: 800,
+                sourceHeight: 600
+              }
+
+
+            
+          })
+        );
 
         const fetchOrg = async (oe) => {
             try {
@@ -25,8 +101,12 @@ const OrgViewer = {
               const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrgStructure?oe=${oe}`;
         
               const res = await fetch(url)
-              let response = await res.json()                            
-              return { response };
+              let response = await res.json()              
+              console.log(response.retval);	 
+              nodeLevel = 0;
+              const seriesdata = flattenDeep2(response); 
+              const nodes = flattenDeep(response);
+              return { seriesdata: seriesdata, nodes: nodes};
             } catch (error) {
               console.log(error)              
             }	
@@ -145,8 +225,9 @@ const OrgViewer = {
 
         Vue.watch(oe, (currentVal, oldVal) => {            
             const result = fetchOrg(currentVal).then((data) => {
-                chartData.value = data.response;
-              }
+                chartData.value = data.seriesdata;
+                chartNodes.value = data.nodes;
+                }
             )
             
         });
@@ -156,129 +237,14 @@ const OrgViewer = {
             console.log('OrgViewer organisation mounted');
         })
 
-        const data1 = ref({
-            key: "0",
-            type: "person",
-            styleClass: "p-person",
-            data: { label: "CEO", name: "Walter White", avatar: "walter.jpg" },
-            children: [
-              {
-                key: "0_0",
-                type: "person",
-                styleClass: "p-person",
-                data: {
-                  label: "CFO",
-                  name: "Saul Goodman",
-                  avatar: "saul.jpg"
-                },
-                children: [
-                  {
-                    key: "0_0_0",
-                    data: { label: "Tax" },
-                    selectable: false,
-                    styleClass: "department-cfo"
-                  },
-                  {
-                    key: "0_0_1",
-                    data: { label: "Legal" },
-                    selectable: false,
-                    styleClass: "department-cfo"
-                  }
-                ]
-              },
-              {
-                key: "0_1",
-                type: "person",
-                styleClass: "p-person",
-                data: { label: "COO", name: "Mike E.", avatar: "mike.jpg" },
-                children: [
-                  {
-                    key: "0_1_0",
-                    data: { label: "Operations" },
-                    selectable: false,
-                    styleClass: "department-coo"
-                  }
-                ]
-              },
-              {
-                key: "0_2",
-                type: "person",
-                styleClass: "p-person",
-                data: {
-                  label: "CTO",
-                  name: "Jesse Pinkman",
-                  avatar: "jesse.jpg"
-                },
-                children: [
-                  {
-                    key: "0_2_0",
-                    data: { label: "Development" },
-                    selectable: false,
-                    styleClass: "department-cto",
-                    children: [
-                      {
-                        key: "0_2_0_0",
-                        data: { label: "Analysis" },
-                        selectable: false,
-                        styleClass: "department-cto"
-                      },
-                      {
-                        key: "0_2_0_1",
-                        data: { label: "Front End" },
-                        selectable: false,
-                        styleClass: "department-cto"
-                      },
-                      {
-                        key: "0_2_0_2",
-                        data: { label: "Back End" },
-                        selectable: false,
-                        styleClass: "department-cto"
-                      }
-                    ]
-                  },
-                  {
-                    key: "0_2_1",
-                    data: { label: "QA" },
-                    selectable: false,
-                    styleClass: "department-cto"
-                  },
-                  {
-                    key: "0_2_2",
-                    data: { label: "R&D" },
-                    selectable: false,
-                    styleClass: "department-cto"
-                  }
-                ]
-              }
-            ]
-          });
-
-        return { chartData, selection, data1 }
+        return { chartOptions }
     },
     template: `
-    
-    <p-organizationchart
-        :value="chartData"
-        :collapsible="true"
-        class="company"
-        selection-mode="single"
-        v-model:selection-keys="selection"        
-    >
-        <template #person="slotProps">
-            <div class="node-header ui-corner-top">
-            {{slotProps.node.data.oe_kurzbz}}
-            </div>
-            <div class="node-content">
-            <img
-                src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png"
-                width="32"
-            />
-            <div>{{slotProps.node.data.organisationseinheittyp_kurzbz}}</div>
-            </div>
-        </template>
-        <template #default="slotProps">
-            <span v-if="slotProps.node.data != undefined" >{{slotProps.node.data.bezeichnung}}</span>
-        </template>
-    </p-organizationchart>
+
+        <div style="width:100%;height:100%;overflow:auto">
+            <figure style="min-width:500%;">
+                <highcharts class="chart" :options="chartOptions"></highcharts>
+            </figure>
+        </div>
     `
 }
