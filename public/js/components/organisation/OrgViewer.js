@@ -1,7 +1,9 @@
 const OrgViewer = {
     components: {
         Modal,
-        "p-organizationchart": primevue.organizationchart,
+        "p-treetable": primevue.treetable,
+        "p-column": primevue.column,
+        "p-inputtext": primevue.inputtext,
     },
     props: {
        oe:  { type: String, required: true },
@@ -11,8 +13,11 @@ const OrgViewer = {
         const { toRefs, ref } = Vue;
         let { oe } = toRefs(props);
         const selection = ref({});
+        const filters1 = ref({});
+        const filters2 = ref({});
 
-        const chartData = ref({});
+        const nodes = ref({});
+        const expandedKeys = ref({});
 
         const fetchOrg = async (oe) => {
             try {
@@ -30,122 +35,35 @@ const OrgViewer = {
             } catch (error) {
               console.log(error)              
             }	
+        }        
+
+        const expandAll = () => {
+            for (let node of nodes.value) {
+                expandNode(node);
+            }
+
+            expandedKeys.value = {...expandedKeys.value};
         }
 
+        const collapseAll = () => {
+            expandedKeys.value = {};
+        }
         
+        const expandNode = (node) => {
+            if (node.children && node.children.length) {
+                expandedKeys.value[node.key] = true;
 
-        const isLeaf = (node) => {
-            if (Array.isArray(node.children)) return true;
-            return false;
-        }
-
-        /**
-         * 
-    {"gmbh": {
-        "unit": {
-            "oe_kurzbz": "gmbh",
-            "oe_parent_kurzbz": null,
-            "bezeichnung": "Technikum Wien GMBH",
-            "organisationseinheittyp_kurzbz": "Abteilung",
-            "aktiv": true,
-            "mailverteiler": false,
-            "freigabegrenze": "3000.00",
-            "kurzzeichen": "GMB",
-            "lehre": false,
-            "standort": null,
-            "warn_semesterstunden_frei": null,
-            "warn_semesterstunden_fix": null,
-            "standort_id": 0
-        },
-        "children": {
-            "finconqm": {
-                "unit": {
-                    "oe_kurzbz": "finconqm",
-                    "oe_parent_kurzbz": "gmbh",
-                    "bezeichnung": "Finance & Controlling,QM & Prozessmanagement",
-                    "organisationseinheittyp_kurzbz": "Team",
-                    "aktiv": false,
-                    "mailverteiler": false,
-                    "freigabegrenze": null,
-                    "kurzzeichen": null,
-                    "lehre": false,
-                    "standort": null,
-                    "warn_semesterstunden_frei": null,
-                    "warn_semesterstunden_fix": null,
-                    "standort_id": 0
-                },
-                "children": []
-            },}  
-         * @returns 
-         */
-        const flattenDeep2 = (tree) => {
-            const keys = Object.keys(tree);
-            return keys.reduce((acc, oe) => {
-                    if (!isLeaf(tree[oe])) {
-                        const children_keys = Object.keys(tree[oe].children);
-                        const links = children_keys.reduce(
-                            (subacc, sub_oe) => { 
-                                subacc.push([oe, sub_oe]); 
-                                const child = tree[oe].children[sub_oe];
-                                if (!isLeaf(child)) {
-                                    const flat_child = flattenDeep2({[sub_oe]: child});
-                                    subacc = subacc.concat(flat_child); 
-                                }
-                                
-                                return subacc; 
-                            },
-                            []
-                        );
-                        return acc.concat(links);
-                    }  
-                    return acc;                    
-                }, []
-            );
-         }
-
-        var nodeLevel = 0;
-        const flattenDeep = (tree) => {
-            const keys = Object.keys(tree);
-            nodeLevel++;
-            return keys.reduce((acc, oe) => {
-                /*
-                    if (nodeLevel==6 && !isLeaf(tree[oe])) {
-                        if (Object.keys(tree[oe].children).length>2) 
-                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz , layout: 'hanging'}); 
-                        else
-                            acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz }); 
-                    } else {
-                        acc.push({ id: oe, name: tree[oe].unit.bezeichnung, title: tree[oe].unit.organisationseinheittyp_kurzbz }); 
-                    }
-                    */
-                    acc.push({ id: oe, name: tree[oe].unit.bezeichnung /* title: oe tree[oe].unit.organisationseinheittyp_kurzbz*/, color: '#ff0000'}); 
-
-                    if (!isLeaf(tree[oe])) {
-                        const children_keys = Object.keys(tree[oe].children);
-                        const links = children_keys.reduce(
-                            (subacc, sub_oe) => {                                 
-                                const child = tree[oe].children[sub_oe];
-                                if (isLeaf(child)) {
-                                    subacc.push({ id: sub_oe, name: child.unit.bezeichnung, title: child.unit.organisationseinheittyp_kurzbz, layout: 'hanging'}); 
-                                } else {
-                                    const flat_child = flattenDeep({[sub_oe]: child});
-                                    subacc = subacc.concat(flat_child); 
-                                }
-                                
-                                return subacc; 
-                            },
-                            []
-                        );
-                        return acc.concat(links);
-                    }  
-                    return acc;                    
-                }, []
-            );
-         }
+                for (let child of node.children) {
+                    expandNode(child);
+                }
+            }
+        }       
 
         Vue.watch(oe, (currentVal, oldVal) => {            
             const result = fetchOrg(currentVal).then((data) => {
-                chartData.value = data.response;
+                nodes.value = [data.response];
+                expandedKeys.value[nodes.value[0].key] = true;
+                
               }
             )
             
@@ -156,129 +74,37 @@ const OrgViewer = {
             console.log('OrgViewer organisation mounted');
         })
 
-        const data1 = ref({
-            key: "0",
-            type: "person",
-            styleClass: "p-person",
-            data: { label: "CEO", name: "Walter White", avatar: "walter.jpg" },
-            children: [
-              {
-                key: "0_0",
-                type: "person",
-                styleClass: "p-person",
-                data: {
-                  label: "CFO",
-                  name: "Saul Goodman",
-                  avatar: "saul.jpg"
-                },
-                children: [
-                  {
-                    key: "0_0_0",
-                    data: { label: "Tax" },
-                    selectable: false,
-                    styleClass: "department-cfo"
-                  },
-                  {
-                    key: "0_0_1",
-                    data: { label: "Legal" },
-                    selectable: false,
-                    styleClass: "department-cfo"
-                  }
-                ]
-              },
-              {
-                key: "0_1",
-                type: "person",
-                styleClass: "p-person",
-                data: { label: "COO", name: "Mike E.", avatar: "mike.jpg" },
-                children: [
-                  {
-                    key: "0_1_0",
-                    data: { label: "Operations" },
-                    selectable: false,
-                    styleClass: "department-coo"
-                  }
-                ]
-              },
-              {
-                key: "0_2",
-                type: "person",
-                styleClass: "p-person",
-                data: {
-                  label: "CTO",
-                  name: "Jesse Pinkman",
-                  avatar: "jesse.jpg"
-                },
-                children: [
-                  {
-                    key: "0_2_0",
-                    data: { label: "Development" },
-                    selectable: false,
-                    styleClass: "department-cto",
-                    children: [
-                      {
-                        key: "0_2_0_0",
-                        data: { label: "Analysis" },
-                        selectable: false,
-                        styleClass: "department-cto"
-                      },
-                      {
-                        key: "0_2_0_1",
-                        data: { label: "Front End" },
-                        selectable: false,
-                        styleClass: "department-cto"
-                      },
-                      {
-                        key: "0_2_0_2",
-                        data: { label: "Back End" },
-                        selectable: false,
-                        styleClass: "department-cto"
-                      }
-                    ]
-                  },
-                  {
-                    key: "0_2_1",
-                    data: { label: "QA" },
-                    selectable: false,
-                    styleClass: "department-cto"
-                  },
-                  {
-                    key: "0_2_2",
-                    data: { label: "R&D" },
-                    selectable: false,
-                    styleClass: "department-cto"
-                  }
-                ]
-              }
-            ]
-          });
+        
 
-        return { chartData, selection, data1 }
+        return { nodes, selection, filters1, filters2, expandedKeys }
     },
     template: `
     
-    <p-organizationchart
-        :value="chartData"
-        :collapsible="true"
-        class="company"
-        selection-mode="single"
-        v-model:selection-keys="selection"        
-    >
-        <template #person="slotProps">
-            <div class="node-header ui-corner-top">
-            {{slotProps.node.data.oe_kurzbz}}
+    <p-treetable :value="nodes" :filters="filters1"  :expandedKeys="expandedKeys" class="p-treetable-sm" filter-mode="lenient" >
+        <!--template #header>
+            <div class="text-right">
+                <div class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <p-inputtext v-model="filters1['global']" placeholder="Global Search" size="50"></p-inputtext>
+                </div>
             </div>
-            <div class="node-content">
-            <img
-                src="https://www.primefaces.org/wp-content/uploads/2020/05/placeholder.png"
-                width="32"
-            />
-            <div>{{slotProps.node.data.organisationseinheittyp_kurzbz}}</div>
-            </div>
-        </template>
-        <template #default="slotProps">
-            <span v-if="slotProps.node.data != undefined" >{{slotProps.node.data.bezeichnung}}</span>
-        </template>
-    </p-organizationchart>
+        </template-->
+        <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:300px">>
+            <template #filter>
+                <p-inputtext type="text" v-model="filters1['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
+            </template>
+        </p-column>
+        <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:300px">>
+            <template #filter>
+                <p-inputtext type="text" v-model="filters1['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ"></p-inputtext>
+            </template>
+        </p-column>
+        <p-column field="leitung" header="Leitung" style="width:300px">>
+            <template #filter>
+                <p-inputtext type="text" v-model="filters1['leitung']" class="p-column-filter" placeholder="Filter by Leitung"></p-inputtext>
+            </template>
+        </p-column>
+        
+    </p-treetable>
     `
 }

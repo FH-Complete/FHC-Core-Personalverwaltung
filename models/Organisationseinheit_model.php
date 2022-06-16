@@ -34,6 +34,9 @@ class Organisationseinheit_model extends DB_Model
     public function getOrgStructure($oe_kurzbz)
     {
         $head = $this->load($oe_kurzbz);        
+        $leitung = $this->getLeitung($oe_kurzbz);
+        $leitung_str = $this->formatLeitungen($leitung);
+        $head->retval[0]->leitung = $leitung_str;
         return array("key" => $oe_kurzbz, "type" => "person", "class" => "p-person", "data" => $head->retval[0], "children" => $this->getChilds($oe_kurzbz));   
     }
 
@@ -43,9 +46,36 @@ class Organisationseinheit_model extends DB_Model
         $arr = array();
         $arr1 = $this->getDirectChilds($oe_kurzbz);
         foreach ($arr1->retval as $value)
+        {
+            $leitung = $this->getLeitung($value->oe_kurzbz);
+            $leitung_str = $this->formatLeitungen($leitung);
+            $value->leitung = $leitung_str;
             $arr[]=array("key" => $value->oe_kurzbz, "type" => "person", "class" => "p-person", "data" => $value, "children" => $this->getChilds($value->oe_kurzbz));
+        }
 
         return $arr;
+    }
+
+    private function formatLeitungen($leitung)
+    {        
+        $l = array();
+        foreach ($leitung->retval as $p)
+            $l[] = $p->nachname.', '.$p->vorname;
+        $leitung_str = implode(' | ',$l);
+        return $leitung_str;
+    }
+
+    public function getLeitung($oe_kurzbz)
+    {        
+        $query = 'SELECT distinct p.person_id,b.uid,p.titelpre,p.titelpost,p.nachname,p.vorname FROM public.tbl_benutzerfunktion bf JOIN public.tbl_benutzer b using(uid) JOIN tbl_person p using(person_id)
+        WHERE bf.funktion_kurzbz=\'Leitung\'
+        AND (bf.datum_bis >= now() OR bf.datum_bis IS NULL)
+        AND (bf.datum_von <= now() OR bf.datum_von IS NULL)
+        AND bf.oe_kurzbz=?
+        ORDER BY p.nachname';
+
+		$result = $this->execQuery($query, array($oe_kurzbz));
+        return $result;
     }
 
 
