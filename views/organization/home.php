@@ -106,13 +106,19 @@
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Organisation</h1>
-          <div class="btn-toolbar mb-2 mb-md-0">            
+          <div class="btn-toolbar mb-2 mb-md-0">        
+                      
+            <div class="btn-group me-2">
+              <button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler">Expand</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler">Collapse</button>
+            </div>
+
             <org-chooser  @org-selected="orgSelectedHandler" ></org-chooser>
           </div>
-        </div>
-        
+        </div>                
+
         <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >         
-          <org-viewer :oe="currentOrg"></org-viewer>
+          <org-viewer :oe="currentOrg" ref="orgviewer" ></org-viewer>
         </div>    
         
       </main>

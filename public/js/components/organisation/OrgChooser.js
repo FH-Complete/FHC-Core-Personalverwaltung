@@ -51,7 +51,7 @@ const OrgChooser = {
 
     },
     template: `
-    <select  id="orgHeadChooser"  v-model="selected" @change="orgSelected" class="form-select form-select-sm" aria-label=".form-select-sm " >
+    <select  id="orgHeadChooser"  v-model="selected" @change="orgSelected"  aria-label=".form-select-sm " >
         <option v-for="(item, index) in orgList" :value="item.oe_kurzbz"  :key="item.oe_kurzbz">
             {{ item.bezeichnung }}
         </option>         

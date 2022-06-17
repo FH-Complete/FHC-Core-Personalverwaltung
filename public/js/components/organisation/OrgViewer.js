@@ -8,16 +8,16 @@ const OrgViewer = {
     props: {
        oe:  { type: String, required: true },
     },
-    setup( props ) {
+    setup( props, context ) {
 
         const { toRefs, ref } = Vue;
         let { oe } = toRefs(props);
         const selection = ref({});
-        const filters1 = ref({});
-        const filters2 = ref({});
+        const filters = ref({});
 
         const nodes = ref({});
         const expandedKeys = ref({});
+        const isFetching = ref(false);
 
         const fetchOrg = async (oe) => {
             try {
@@ -29,11 +29,14 @@ const OrgViewer = {
 
               const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrgStructure?oe=${oe}`;
         
+              isFetching.value = true  
               const res = await fetch(url)
-              let response = await res.json()                            
+              let response = await res.json()    
+              isFetching.value = false                          
               return { response };
             } catch (error) {
-              console.log(error)              
+              console.log(error)        
+              isFetching.value = false        
             }	
         }        
 
@@ -74,34 +77,27 @@ const OrgViewer = {
             console.log('OrgViewer organisation mounted');
         })
 
+        context.expose({ expandAll, collapseAll })
         
-
-        return { nodes, selection, filters1, filters2, expandedKeys }
+        return { nodes, selection, filters, expandedKeys, expandAll, collapseAll, isFetching }
     },
     template: `
     
-    <p-treetable :value="nodes" :filters="filters1"  :expandedKeys="expandedKeys" class="p-treetable-sm" filter-mode="lenient" >
-        <!--template #header>
-            <div class="text-right">
-                <div class="p-input-icon-left">
-                    <i class="pi pi-search"></i>
-                    <p-inputtext v-model="filters1['global']" placeholder="Global Search" size="50"></p-inputtext>
-                </div>
-            </div>
-        </template-->
-        <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:300px">>
+    
+    <p-treetable :value="nodes" :filters="filters"  :expandedKeys="expandedKeys" class="p-treetable-sm" filterMode="strict" v-if="!isFetching" >
+        <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:300px" filterMatchMode="contains" >
             <template #filter>
-                <p-inputtext type="text" v-model="filters1['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
             </template>
         </p-column>
-        <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:300px">>
+        <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:300px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters1['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ"></p-inputtext>
             </template>
         </p-column>
-        <p-column field="leitung" header="Leitung" style="width:300px">>
+        <p-column field="leitung" header="Leitung" style="width:300px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters1['leitung']" class="p-column-filter" placeholder="Filter by Leitung"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter" placeholder="Filter by Leitung"></p-inputtext>
             </template>
         </p-column>
         

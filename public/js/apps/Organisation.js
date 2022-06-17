@@ -19,6 +19,12 @@ const pvApp = Vue.createApp(	{
 			console.log('org selected:', oeKurzbz);
 			this.currentOrg = oeKurzbz;
 		},
+		expandAllHandler() {
+			this.$refs.orgviewer.expandAll();
+		},
+		collapseAllHandler() {
+			this.$refs.orgviewer.collapseAll();
+		},
 		personSelectedHandler(id) {
 			console.log('personSelected: ', id);
 			this.isEditorOpen=true;
