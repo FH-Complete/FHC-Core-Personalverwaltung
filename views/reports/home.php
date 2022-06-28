@@ -10,12 +10,14 @@
 			'sbadmintemplate' => false,
 			'ajaxlib' => true,
 			'navigationwidget' => false,
-      'vue3' => true,      
+      'vue3' => true, 
+      'primevue3' => true,
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css'],       
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'],
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/report/PivotReport.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/apps/Report.js'],
       /*
       'vueSFCs' => [[
         "vendor" => "public/extensions/FHC-Core-Personalverwaltung/js/vendor.3239befe.js", 
@@ -23,6 +25,17 @@
 				"css" => "public/extensions/FHC-Core-Personalverwaltung/css/index.c5353a60.css", ]]*/
 		)
 	);
+
+
+  function printStatistikLink($kurzbz)
+  {
+    echo APP_ROOT.'addons/reports/cis/vorschau.php?statistik_kurzbz='.$kurzbz;
+  }
+
+  function printChartLink($chartID)
+  {
+    echo APP_ROOT.'addons/reports/cis/vorschau.php?chart_id='.$chartID;
+  }
 ?>
 
 <div id="wrapper">
@@ -55,211 +68,83 @@
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Berichte</h1>
-          <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-              <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-              <span data-feather="calendar"></span>
-              This week
-            </button>
+          <div class="btn-toolbar mb-2 mb-md-0">        
+                      
+            
           </div>
-        </div>
-        
+        </div>                
 
-    
-        <div class="table-responsive">
-          <table class="table table-striped table-sm">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-                <th scope="col">Header</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1,001</td>
-                <td>random</td>
-                <td>data</td>
-                <td>placeholder</td>
-                <td>text</td>
-              </tr>
-              <tr>
-                <td>1,002</td>
-                <td>placeholder</td>
-                <td>irrelevant</td>
-                <td>visual</td>
-                <td>layout</td>
-              </tr>
-              <tr>
-                <td>1,003</td>
-                <td>data</td>
-                <td>rich</td>
-                <td>dashboard</td>
-                <td>tabular</td>
-              </tr>
-              <tr>
-                <td>1,003</td>
-                <td>information</td>
-                <td>placeholder</td>
-                <td>illustrative</td>
-                <td>data</td>
-              </tr>
-              <tr>
-                <td>1,004</td>
-                <td>text</td>
-                <td>random</td>
-                <td>layout</td>
-                <td>dashboard</td>
-              </tr>
-              <tr>
-                <td>1,005</td>
-                <td>dashboard</td>
-                <td>irrelevant</td>
-                <td>text</td>
-                <td>placeholder</td>
-              </tr>
-              <tr>
-                <td>1,006</td>
-                <td>dashboard</td>
-                <td>illustrative</td>
-                <td>rich</td>
-                <td>data</td>
-              </tr>
-              <tr>
-                <td>1,007</td>
-                <td>placeholder</td>
-                <td>tabular</td>
-                <td>information</td>
-                <td>irrelevant</td>
-              </tr>
-              <tr>
-                <td>1,008</td>
-                <td>random</td>
-                <td>data</td>
-                <td>placeholder</td>
-                <td>text</td>
-              </tr>
-              <tr>
-                <td>1,009</td>
-                <td>placeholder</td>
-                <td>irrelevant</td>
-                <td>visual</td>
-                <td>layout</td>
-              </tr>
-              <tr>
-                <td>1,010</td>
-                <td>data</td>
-                <td>rich</td>
-                <td>dashboard</td>
-                <td>tabular</td>
-              </tr>
-              <tr>
-                <td>1,011</td>
-                <td>information</td>
-                <td>placeholder</td>
-                <td>illustrative</td>
-                <td>data</td>
-              </tr>
-              <tr>
-                <td>1,012</td>
-                <td>text</td>
-                <td>placeholder</td>
-                <td>layout</td>
-                <td>dashboard</td>
-              </tr>
-              <tr>
-                <td>1,013</td>
-                <td>dashboard</td>
-                <td>irrelevant</td>
-                <td>text</td>
-                <td>visual</td>
-              </tr>
-              <tr>
-                <td>1,014</td>
-                <td>dashboard</td>
-                <td>illustrative</td>
-                <td>rich</td>
-                <td>data</td>
-              </tr>
-              <tr>
-                <td>1,015</td>
-                <td>random</td>
-                <td>tabular</td>
-                <td>information</td>
-                <td>text</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="list-group">            
+            <a class="list-group-item list-group-item-action"
+              href="<?php printStatistikLink('HomeofficetageMitarbeiterInnen') ?>" target="_blank">
+              Homeoffice Tage
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printStatistikLink('MitarbeiterInnenFunktionen') ?>" target="_blank">
+              MitarbeiterInnen nach Funktionen
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printStatistikLink('MitarbeiterAltersverteilung') ?>" target="_blank">
+              Mitarbeiter nach Altersverteilung
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printStatistikLink('MitarbeiterGesamtdaten') ?>" target="_blank">
+              Mitarbeiterdaten gesamt
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printStatistikLink('Zeitaufzeichnung') ?>" target="_blank">
+              Zeitaufzeichnung
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printStatistikLink('MitarbeiterVerwendung') ?>" target="_blank">
+              Mitarbeiter je Verwendung
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+            
         </div>
+
+        <br/>
+        <div class="list-group">            
+            <a class="list-group-item list-group-item-action"
+              href="<?php printChartLink(50) ?>" target="_blank">
+              Lehrauftragstunden je Department/Kompetenzfeld
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printChartLink(64) ?>" target="_blank">
+              Interessenten pro Fakultät
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+            <a class="list-group-item list-group-item-action"
+              href="<?php printChartLink(65) ?>" target="_blank">
+              Studierende pro Fakultät
+              <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+
+        </div>
+
+
+        
+        
+            
       </main>
     </div>
   </div>
 	
 </div>
 
-
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js" integrity="sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha" crossorigin="anonymous"></script>
-<script >
-/* globals Chart:false, feather:false */
-
-(function () {
-  'use strict'
-
-  // Graphs
-  var ctx = document.getElementById('myChart')
-  // eslint-disable-next-line no-unused-vars
-  var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: [
-        'Sunday',
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday'
-      ],
-      datasets: [{
-        data: [
-          15339,
-          21345,
-          18483,
-          24003,
-          23489,
-          24092,
-          12034
-        ],
-        lineTension: 0,
-        backgroundColor: 'transparent',
-        borderColor: '#007bff',
-        borderWidth: 4,
-        pointBackgroundColor: '#007bff'
-      }]
-    },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: false
-          }
-        }]
-      },
-      legend: {
-        display: false
-      }
-    }
-  })
-})()
-
-
-</script>
 
 
 <script>

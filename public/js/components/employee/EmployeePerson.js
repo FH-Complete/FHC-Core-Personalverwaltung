@@ -5,13 +5,14 @@ const EmployeePerson = {
 		BankData,
 		ContactData,
         EmailTelData,
+        MaterialExpensesData,
 	},	
     props: {
         personid: { type: Number, default: 0 }
     },
     setup() {
 
-        const items = ["base", "employee", "contact", "bank"];
+        const items = ["base", "employee", "contact", "bank", "material"];
         const activeItem = Vue.ref("base");
        // const { personID } = Vue.toRefs(props);
 
@@ -63,6 +64,13 @@ const EmployeePerson = {
                     href="#bank"
                     >Bankdaten</a
                 >
+                <a
+                    class="nav-link"
+                    :class="{ active: isActive(items[4]) }"
+                    @click.prevent="setActive(items[4])"
+                    href="#bank"
+                    >Sachaufwand</a
+                >
             </nav>
             <div class="tab-content col-md-10" id="nav-tabContent">
                 <div
@@ -92,6 +100,13 @@ const EmployeePerson = {
                     role="tabpanel"
                 >
                 <bank-data editMode :personID="personid"></bank-data>
+                </div>
+                <div
+                    class="tab-pane"
+                    :class="{ active: isActive(items[4]) }"
+                    role="tabpanel"
+                >
+                <material-expenses-data editMode :personID="personid"></material-expenses-data>
                 </div>
                 
             </div>

@@ -23,6 +23,9 @@ class Api extends FHC_Controller
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Organisationseinheit_model', 'OrganisationseinheitModel');
         $this->load->model('codex/bisverwendung_model', 'BisverwendungModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Statistik_model', 'StatistikModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwandtyp_model', 'SachaufwandtypModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
     }
 
     function index()
@@ -43,6 +46,22 @@ class Api extends FHC_Controller
 		}
 
         $this->outputJsonSuccess($spracheRes);
+    }
+
+
+    function getSachaufwandtyp()
+    {    
+        $this->SachaufwandtypModel->addSelect("sachaufwandtyp_kurzbz, bezeichnung, sort, aktiv");
+		$this->SachaufwandtypModel->addOrder("bezeichnung");
+		$sachaufwandTypRes = $this->SachaufwandtypModel->load();
+
+		if (isError($sachaufwandTypRes))
+		{
+			$this->outputJsonError(getError($sachaufwandTypRes));
+			exit;
+		}
+
+        $this->outputJsonSuccess($sachaufwandTypRes); 
     }
 
     function getNations()
@@ -113,6 +132,82 @@ class Api extends FHC_Controller
         $this->outputJsonSuccess($data); 
     }
 
+    // ---------------------------------------
+    // material expenses (=Sachaufwand)
+    // ---------------------------------------
+
+    function personMaterialExpenses()
+    {
+        $person_id = $this->input->get('person_id', TRUE);
+
+        if (!is_numeric($person_id))
+			show_error('person id is not numeric!');
+
+        $data = $this->SachaufwandModel->getByPersonID($person_id);
+        $this->_remapData('sachaufwand_id',$data);
+        return $this->outputJson($data); 
+    }
+
+    function upsertPersonMaterialExpenses()
+    {
+        if($this->input->method() === 'post'){
+
+            // TODO Permissions
+            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
+		    //{
+
+            $inputJSON = file_get_contents('php://input');
+            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+
+            if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
+                show_error('sachaufwand_id is not numeric!');
+
+            if (!isset($payload['sachaufwandtyp_kurzbz']) || (isset($payload['sachaufwandtyp_kurzbz']) && $payload['sachaufwandtyp_kurzbz'] == ''))
+                show_error('sachaufwandtyp_kurzbz is empty!');   
+            
+            if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
+                show_error('mitarbeiter_uid is empty!');    
+
+            if ($payload['sachaufwand_id'] == 0)
+            {
+                $result = $this->SachaufwandModel->insertPersonSachaufwand($payload);
+            } else {
+                $result = $this->SachaufwandModel->updatePersonSachaufwand($payload);
+            }
+            
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when updating material expenses');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+    function deletePersonMaterialExpenses()
+    {
+        if($this->input->method() === 'post')
+        {
+            $inputJSON = file_get_contents('php://input');
+            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+
+            if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
+                show_error('sachaufwand_id is not numeric!');
+
+            $result = $this->SachaufwandModel->deletePersonSachaufwand($payload['sachaufwand_id']);
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when deleting bank data');
+
+        } else {
+            $this->output->set_status_header('405');
+        }        
+
+    }
+
+
     // -----------------------------
     // Organisation
     // -----------------------------
@@ -134,10 +229,70 @@ class Api extends FHC_Controller
     // -----------------------------------------
     // contracts about to expire (bisverwendung)
     // -----------------------------------------
-    function getContractExpireIn30Days()
+    function getContractExpire()
     {
-        $data = $this->ApiModel->getContractExpireIn30Days();
+        $year = $this->input->get('year', TRUE);
+
+        if (!is_numeric($year))
+			show_error('year is not numeric!');
+
+        $month = $this->input->get('month', TRUE);
+
+        if (!is_numeric($month))
+			show_error('month is not numeric!');
+
+        $data = $this->ApiModel->getContractExpire($year, $month);
         $this->outputJson($data); 
+    }
+
+    function getContractNew()
+    {        
+        $year = $this->input->get('year', TRUE);
+
+        if (!is_numeric($year))
+			show_error('year is not numeric!');
+
+        $month = $this->input->get('month', TRUE);
+
+        if (!is_numeric($month))
+			show_error('month is not numeric!');
+
+        $data = $this->ApiModel->getContractNew($year, $month);
+        $this->outputJson($data); 
+    }
+
+    function getBirthdays()
+    {
+        $date = $this->input->get('date', TRUE);
+        $data = $this->ApiModel->getBirthdays($date);
+        $this->outputJson($data); 
+    }
+
+    // --------------------------------------
+    // Report
+    // --------------------------------------
+
+    /**
+     * execute statistik report
+     * expects a payload like this:
+     * {
+     *  "report":"HomeofficetageMitarbeiterInnen",
+     *  "filter":[{"name":"DatumVon","value":"2022-05-01"},{"name":"DatumBis","value":"2022-05-31"}]
+     * }
+     */
+    function getReportData()
+    {
+        if($this->input->method() === 'post'){
+            $inputJSON = file_get_contents('php://input');
+            $payload = json_decode($inputJSON, TRUE);
+
+            // TODO validate param
+
+            $result = $this->StatistikModel->load($payload['report']);
+            $this->outputJson($this->ApiModel->runReport($result->retval[0]->sql, $payload['filter']));
+        }  else {
+            $this->output->set_status_header('405');
+        }
     }
 
 
@@ -152,6 +307,26 @@ class Api extends FHC_Controller
 			show_error('person id is not numeric!');
 
         $data = $this->ApiModel->getPersonHeaderData($person_id);
+        return $this->outputJson($data); 
+    }
+
+    /**
+     * get disciplinary 'Abteilung' of a person
+     */
+    function personAbteilung()
+    {
+        $uid = $this->input->get('uid', TRUE);        
+
+        $data = $this->ApiModel->getPersonAbteilung($uid);
+
+        $dataSupervisor = $this->ApiModel->getLeitungOrg($data->retval[0]->oe_kurzbz);
+
+        if ($dataSupervisor->retval[0]->uid == $uid)
+        {
+            $dataSupervisor = $this->ApiModel->getLeitungOrg($data->retval[0]->oe_kurzbz);
+        }
+
+        $data->retval[0]->supervisor = $dataSupervisor->retval[0];
         return $this->outputJson($data); 
     }
 
@@ -641,6 +816,24 @@ class Api extends FHC_Controller
 
         return $this->output->set_content_type('jpeg')->set_output(base64_decode($data->retval[0]->foto));            
     }
+
+    /**
+     * get uid by person_id
+     */
+    function uidByPerson()
+    {
+        $person_id = $this->input->get('person_id', TRUE);
+
+        if (!is_numeric($person_id))
+			show_error('person id is not numeric!');
+
+        $data = $this->ApiModel->getUID($person_id);
+        
+        return $this->outputJson($data);                   
+    }
+
+
+
 
 /*
        public function user_get(){

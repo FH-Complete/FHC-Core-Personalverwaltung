@@ -3,28 +3,25 @@ const pvApp = Vue.createApp(	{
 	components: {
 		EmployeeChooser,
 		Sidebar,
-		EmployeeEditor,
-		EmployeeTable,
-		verticalsplit,
+		PivotReport,
 	},
 	data() {
 		return 	{
-			tabledata: tableData,
 			isEditorOpen: false,
 			currentPersonID: null,	
+			currentOrg: '',
 		}
 	},
-	methods: {
-		personSelectedHandler(id) {
-			console.log('personSelected: ', id);
-			this.isEditorOpen=true;
-			this.currentPersonID = id;
-		},
+	methods: {		
 		closeEditorHandler() {
 			this.isEditorOpen=false;
 		},			
 	},
 });
+
+// 	pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+pvApp.use(primevue.config.default);
+pvApp.use(primevue.toastservice);
 
 const fetchNations = async () => {
 	try {
@@ -43,25 +40,6 @@ const fetchNations = async () => {
 	} catch (error) {
 	  console.log(error)              
 	}		
-}
-
-const fetchSachaufwandTyp = async () => {
-	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandTyp`;
-
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  console.log(response.retval);	  
-	  return response.retval;
-	} catch (error) {
-		console.log(error)              
-	}	
 }
 
 const fetchKontakttyp = async () => {
@@ -178,10 +156,6 @@ fetchStandorteIntern().then((r) => {
 
 fetchOrte().then((r) => {
 	pvApp.provide("orte",r.retval);
-})
-
-fetchSachaufwandTyp().then((r) => {
-	pvApp.provide("sachaufwandtyp",r.retval);
 })
 
 pvApp.mount('#wrapper');

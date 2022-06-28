@@ -85,12 +85,12 @@ const OrgViewer = {
     
     
     <p-treetable :value="nodes" :filters="filters"  :expandedKeys="expandedKeys" class="p-treetable-sm" filterMode="strict" v-if="!isFetching" >
-        <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:300px" filterMatchMode="contains" >
+        <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:400px" filterMatchMode="contains" >
             <template #filter>
                 <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
             </template>
         </p-column>
-        <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:300px" filterMatchMode="contains">
+        <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:200px" filterMatchMode="contains">
             <template #filter>
                 <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ"></p-inputtext>
             </template>

@@ -18,6 +18,10 @@
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsExpiring.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsNew.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'],
        
       // VUE APP build:      
@@ -71,12 +75,36 @@
         </div-->
       </div>
 
+      <div class="row">
 
-      <h3>Verträge auslaufend ({{ contractDataExpiring.length }})</h3>
+        <div class="col">
+          <contract-count-card ></contract-count-card>
+        </div>          
 
-      <contract-expiring :columns="['personalnummer','name','beginn','ende']" :data="contractDataExpiring"></contract-expiring>
+        <div class="col">
+          <contract-count-card show-new></contract-count-card>
+        </div>
 
-      
+        <div class="col">
+          <birthday-count-card></birthday-count-card>
+        </div>
+
+      </div>
+
+      <div class="row">
+          <deadline-issue-table></deadline-issue-table>
+      </div>
+
+      <!--div class="d-flex bd-highlight">
+        <div class="p-2 flex-fill bd-highlight">
+          <h3>Verträge neu ({{ contractDataNew.length }})</h3>
+          <contract-new :columns="['personalnummer','name','beginn','ende']" :data="contractDataNew"></contract-new>
+        </div>
+        <div class="p-2 flex-fill bd-highlight">
+          <h3>Verträge auslaufend ({{ contractDataExpiring.length }})</h3>
+          <contract-expiring :columns="['personalnummer','name','beginn','ende']" :data="contractDataExpiring"></contract-expiring>
+        </div>
+      </div-->
       
     </main>
   </div>

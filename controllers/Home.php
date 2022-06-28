@@ -22,10 +22,10 @@ class Home extends Auth_Controller
 	 */
 	public function index()
 	{
-		$cList = $this->ApiModel->getContractExpireIn30Days();
+		//$cList = $this->ApiModel->getContractExpireIn30Days();
 
 		$this->load->library('WidgetLib');
-		$this->load->view('extensions/FHC-Core-Personalverwaltung/home', array('contracts' => $cList->retval));
+		$this->load->view('extensions/FHC-Core-Personalverwaltung/home'/*, array('contracts' => $cList->retval)*/);
 	}
 }
 

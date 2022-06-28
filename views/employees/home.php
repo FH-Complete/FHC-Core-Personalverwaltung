@@ -28,6 +28,7 @@
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BaseData.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeData.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BankData.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/MaterialExpensesData.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/AddressData.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/EmailTelData.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/ContactData.js',
@@ -94,19 +95,15 @@
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
                 
-
           <verticalsplit id="macombined">
               <template #top>
                 <employee-table id="employee-table" :minimized="isEditorOpen" @person-selected="personSelectedHandler" :fields="['uid','nachname','vorname','titelpre','telefonklappe','lektor','fixangestellt','lastupdate']"  :tabledata="tabledata"></employee-table>
               </template>
               <template #bottom>
-                <employee-editor :personid="currentPersonID" :open="isEditorOpen" @close-editor="closeEditorHandler"></employee-editor>
+                <employee-editor :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>
               </template>
           </verticalsplit> 
-
-
-          
-          
+                    
       </main>
     </div>
   </div>

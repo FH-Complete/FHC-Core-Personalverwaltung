@@ -9,11 +9,14 @@ const EmployeeEditor = {
         open: Boolean,
         isNew:  Boolean        
     },
-    setup() {
-
+    setup( props, {emit }) {
+        const redirect = (person_id) => {
+            emit('personSelected', person_id);
+        }
+        return { redirect }
     },
     template: `      
-        <EmployeeHeader v-if="open" :personID="personid" :edit-mode="true" ></EmployeeHeader> 
+        <EmployeeHeader v-if="open" :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
         <EmployeeNav v-if="open" :personID="personid" :edit-mode="true" ></EmployeeNav> 
         <employee-person v-if="open" :personid="personid"></employee-person>
     `

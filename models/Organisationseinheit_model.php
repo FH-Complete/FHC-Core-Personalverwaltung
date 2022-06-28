@@ -60,14 +60,16 @@ class Organisationseinheit_model extends DB_Model
     {        
         $l = array();
         foreach ($leitung->retval as $p)
-            $l[] = $p->nachname.', '.$p->vorname;
+            $l[] = $p->nachname.', '.$p->vorname; // .' (DW '.$p->telefonklappe.')';
         $leitung_str = implode(' | ',$l);
         return $leitung_str;
     }
 
     public function getLeitung($oe_kurzbz)
     {        
-        $query = 'SELECT distinct p.person_id,b.uid,p.titelpre,p.titelpost,p.nachname,p.vorname FROM public.tbl_benutzerfunktion bf JOIN public.tbl_benutzer b using(uid) JOIN tbl_person p using(person_id)
+        $query = 'SELECT distinct p.person_id,b.uid,p.titelpre,p.titelpost,p.nachname,p.vorname, m.ort_kurzbz, m.telefonklappe FROM public.tbl_benutzerfunktion bf JOIN public.tbl_benutzer b using(uid) 
+            JOIN tbl_person p using(person_id)
+            JOIN tbl_mitarbeiter m ON m.mitarbeiter_uid::text = b.uid::text
         WHERE bf.funktion_kurzbz=\'Leitung\'
         AND (bf.datum_bis >= now() OR bf.datum_bis IS NULL)
         AND (bf.datum_von <= now() OR bf.datum_von IS NULL)

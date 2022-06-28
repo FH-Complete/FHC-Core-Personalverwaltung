@@ -7,13 +7,13 @@ const EmployeeHeader = {
     props: {
         personID: { type: Number, default: 0 }
     },
-    setup(props) {
+    setup(props, { emit }) {
 
         const { personID } = Vue.toRefs(props);
 
         const employee = Vue.ref();
 
-        const url = Vue.ref("");
+        const headerUrl = Vue.ref("");
 
         const fileInput = Vue.ref();
         const previewImage = Vue.ref();
@@ -32,13 +32,19 @@ const EmployeeHeader = {
 
         //const credentials = btoa(import.meta.env.VITE_FH_CREDENTIALS);
 
-        const fetchData = async () => {
+        const fetchHeaderData = async () => {
             isFetching.value = true;
             try {
-                console.log("url", url.value);
-                const res = await fetch(url.value);
+                // fetch header data
+                const res = await fetch(headerUrl.value);
                 let response = await res.json();
                 employee.value = response.retval[0];
+                // fetch abteilung
+                let full = location.protocol + "//" + location.hostname + ":" + location.port; 
+                const abteilungUrl = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
+                const resAbteilung = await fetch(abteilungUrl);
+                response = await resAbteilung.json();
+                employee.value = { ...employee.value, ...{ abteilung: response.retval[0] } };
                 isFetching.value = false;
             } catch (error) {
                 console.log(error);
@@ -48,16 +54,16 @@ const EmployeeHeader = {
 
         Vue.watch(personID, (currentValue, oldValue) => {
             console.log('EmployeeHeaderData watch',currentValue);
-            url.value = generateEndpointURL(currentValue);
-            fetchData();
+            headerUrl.value = generateEndpointURL(currentValue);
+            fetchHeaderData();
             previewImage.value = null;
             fileInput.value.value = null;
         });
 
         Vue.onMounted(() => {
             console.log("BaseData mounted", props.personID);
-            url.value = generateEndpointURL(props.personID);
-            fetchData();
+            headerUrl.value = generateEndpointURL(props.personID);
+            fetchHeaderData();
         })
 
         // Toast 
@@ -180,6 +186,12 @@ const EmployeeHeader = {
             postFile();
             hideModal();
         }
+
+        const redirect = (person_id) => {
+            console.log('person_id', person_id);
+            emit('personSelected', person_id);
+            // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
+          }
         
 
         return {
@@ -191,6 +203,7 @@ const EmployeeHeader = {
             pickFile,
             okHandler,
             toastRef,toastDeleteRef,
+            redirect,
 
             employee,
             fileInput,
@@ -238,7 +251,12 @@ const EmployeeHeader = {
             
             <div class="ms-3">
                 <h2 class="h2">{{ employee?.nachname }}, {{ employee?.vorname }} {{ employee?.titelpre }}</h2>
-                <h6 class="mb-2 text-muted">Funktion, Abteilung</h6>  
+                <h6 v-if="employee?.abteilung" class="mb-2 text-muted">
+                    <b>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</b> {{ employee?.abteilung?.bezeichnung }},
+                    <b>Vorgesetze(r) </b> <a href="#" @click="redirect(employee?.abteilung?.supervisor?.person_id)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
+                </h6>  
+                
+                <h6 class="mb-2 text-muted"><b>Email</b> <a href="mailto:{{  employee?.uid }}@technikum-wien.at">{{  employee?.uid }}@technikum-wien.at</a> <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <b>DW</b> {{  employee?.telefonklappe }}</span>  </h6>  
             </div>
         </div>
         <div>
