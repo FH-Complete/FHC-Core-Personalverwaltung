@@ -10,19 +10,21 @@
 			'fontawesome6' => true,
 			'sbadmintemplate' => false,
       'vue3' => true,   
-			'ajaxlib' => false,
+			'ajaxlib' => true,
 			'navigationwidget' => false,      
 			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',],       
-      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
+                       'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',       
+                       'public/css/components/searchbar.css'],
+      'customJSs' => ['vendor/axios/axios/axios.min.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsExpiring.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsNew.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'],
+                      ],
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'),
        
       // VUE APP build:      
 			// 'vueSFCs' => [[
@@ -35,12 +37,12 @@
 ?>
 <div id="wrapper">
 <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-	<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">FHComplete [PV21]</a>
+	<a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="<?php echo APP_ROOT ?>/">FHComplete [PV21]</a>
 	<button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
 		<span class="navbar-toggler-icon"></span>
 	</button>
-  <div id="chooser" class=" form-control-dark w-100">
-    <employee-chooser placeholder="MA suchen..."></employee-chooser>
+  <div id="chooser" class="w-100">
+    <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>				
   </div>
 	<div class="navbar-nav">
 		<div class="nav-item dropdown">
