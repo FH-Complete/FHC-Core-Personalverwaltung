@@ -13,6 +13,9 @@ const pvApp = Vue.createApp(	{
 	},
 	setup() {
 
+		const protocol_host = location.protocol +	"//" +
+			location.hostname +	":" + location.port; 
+
 		const searchbaroptions = {
 			"types": [
 			  "person",
@@ -30,7 +33,7 @@ const pvApp = Vue.createApp(	{
 					  "type": "link",
 					  "action": function(data) { 
 						//alert('person defaultaction ' + JSON.stringify(data)); 
-						//window.location.href = data.profil;
+						//window.location.href = data.profil;						
 						return data.profil;
 					  }
 					},
@@ -82,8 +85,8 @@ const pvApp = Vue.createApp(	{
 				"employee": {
 					"defaultaction": {
 					  "type": "function",
-					  "action": function(data) { 
-						alert('employee defaultaction ' + JSON.stringify(data)); 
+					  "action": function(data) { 						
+						window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees?person_id=${data.person_id}`;
 					  }
 					},
 					"childactions": [

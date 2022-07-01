@@ -9,13 +9,24 @@ class Employees extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct(array(
-			'index'=>'admin:rw',
+			'index'=>'admin:rw'	,
 			'person'=>'admin:rw',
 			'summary'=>'admin:rw',
 			)
 		);
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
-		//$this->load->model('person/Person_model', 'PersonModel');
+		
+		// Loads WidgetLib
+		$this->load->library('WidgetLib');
+
+		// Loads phrases system
+		$this->loadPhrases(
+			array(
+				'global',
+				'ui',
+				'filter'
+			)
+		);
 	}
 
 	/**

@@ -4,6 +4,7 @@ const OrgViewer = {
         "p-treetable": primevue.treetable,
         "p-column": primevue.column,
         "p-inputtext": primevue.inputtext,
+        "p-skeleton": primevue.skeleton,
     },
     props: {
        oe:  { type: String, required: true },
@@ -81,23 +82,31 @@ const OrgViewer = {
         
         return { nodes, selection, filters, expandedKeys, expandAll, collapseAll, isFetching }
     },
-    template: `
+    template: `    
     
-    
-    <p-treetable :value="nodes" :filters="filters"  :expandedKeys="expandedKeys" class="p-treetable-sm" filterMode="strict" v-if="!isFetching" >
+    <p-treetable :value="nodes" :filters="filters"  :expandedKeys="expandedKeys" class="p-treetable-sm" filterMode="strict" >
         <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:400px" filterMatchMode="contains" >
             <template #filter>
                 <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
+            </template>
+            <template #body  v-if="isFetching">
+                <p-skeleton style="display: inline-block; width:80%"></p-skeleton>
             </template>
         </p-column>
         <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:200px" filterMatchMode="contains">
             <template #filter>
                 <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ"></p-inputtext>
             </template>
+            <template #body  v-if="isFetching">
+                <p-skeleton></p-skeleton>
+            </template>
         </p-column>
         <p-column field="leitung" header="Leitung" style="width:300px" filterMatchMode="contains">
             <template #filter>
                 <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter" placeholder="Filter by Leitung"></p-inputtext>
+            </template>
+            <template #body  v-if="isFetching">
+                <p-skeleton></p-skeleton>
             </template>
         </p-column>
         
