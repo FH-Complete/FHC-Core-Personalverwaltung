@@ -72,71 +72,147 @@
                       
             
           </div>
-        </div>                
+        </div>  
+        
+        <div class="row  gy-3">
 
-        <div class="list-group">            
-            <a class="list-group-item list-group-item-action"
-              href="<?php printStatistikLink('HomeofficetageMitarbeiterInnen') ?>" target="_blank">
-              Homeoffice Tage
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printStatistikLink('HomeofficetageMitarbeiterInnen') ?>" target="_blank">
+                  Homeoffice Tage
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-table fa-3x"></i>
+              </div>
+            </div>
+          </div>          
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printStatistikLink('MitarbeiterInnenFunktionen') ?>" target="_blank">
-              MitarbeiterInnen nach Funktionen
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printStatistikLink('MitarbeiterInnenFunktionen') ?>" target="_blank">
+                  MitarbeiterInnen nach Funktionen
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-table fa-3x"></i>
+              </div>
+            </div>
+          </div>      
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printStatistikLink('MitarbeiterAltersverteilung') ?>" target="_blank">
-              Mitarbeiter nach Altersverteilung
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printStatistikLink('MitarbeiterAltersverteilung') ?>" target="_blank">
+                  Mitarbeiter nach Altersverteilung
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-table fa-3x"></i>
+              </div>
+            </div>
+          </div>      
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printStatistikLink('MitarbeiterGesamtdaten') ?>" target="_blank">
-              Mitarbeiterdaten gesamt
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printStatistikLink('MitarbeiterGesamtdaten') ?>" target="_blank">
+                  Mitarbeiterdaten gesamt
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-table fa-3x"></i>
+              </div>
+            </div>
+          </div>      
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printStatistikLink('Zeitaufzeichnung') ?>" target="_blank">
-              Zeitaufzeichnung
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printStatistikLink('Zeitaufzeichnung') ?>" target="_blank">
+                  Zeitaufzeichnung
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-table fa-3x"></i>
+              </div>
+            </div>
+          </div>     
+          
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printStatistikLink('MitarbeiterVerwendung') ?>" target="_blank">
+                  Mitarbeiter je Verwendung
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-table fa-3x"></i>
+              </div>
+            </div>
+          </div>      
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printStatistikLink('MitarbeiterVerwendung') ?>" target="_blank">
-              Mitarbeiter je Verwendung
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-            
         </div>
+
+       
 
         <br/>
-        <div class="list-group">            
-            <a class="list-group-item list-group-item-action"
-              href="<?php printChartLink(50) ?>" target="_blank">
-              Lehrauftragstunden je Department/Kompetenzfeld
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printChartLink(64) ?>" target="_blank">
-              Interessenten pro Fakultät
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+        <div class="row  gy-3">
 
-            <a class="list-group-item list-group-item-action"
-              href="<?php printChartLink(65) ?>" target="_blank">
-              Studierende pro Fakultät
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printChartLink(50) ?>" target="_blank">
+                  Lehrauftragstunden je Department/Kompetenzfeld
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-chart-pie fa-3x"></i>
+              </div>
+            </div>
+          </div>       
+          
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printChartLink(64) ?>" target="_blank">
+                  Interessenten pro Fakultät
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-chart-pie fa-3x"></i>
+              </div>
+            </div>
+          </div>      
+
+          <div class="col-md-4 col-sm-6">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">
+                  <a  href="<?php printChartLink(65) ?>" target="_blank">
+                  Studierende pro Fakultät
+                </a></h5> 
+              </div>
+              <div class="card-body" style="text-align: center;">
+                <i class="fa-solid fa-chart-pie fa-3x"></i>
+              </div>
+            </div>
+          </div>      
+
 
         </div>
 
-
-        
         
             
       </main>

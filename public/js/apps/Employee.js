@@ -162,6 +162,9 @@ const pvApp = Vue.createApp(	{
 		},
 		searchfunctiondummy: function(searchsettings) {
 			return Vue.$fhcapi.Search.searchdummy(searchsettings);  
+		},
+		selectRecordHandler(r) {
+			this.personSelectedHandler(r.PersonId);
 		}
 	},
 	mounted() {

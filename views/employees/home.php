@@ -100,7 +100,7 @@
         
       <!--sidebar :active="1"></sidebar-->
 
-      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" noheader custom-nav-styles="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries"   noheader custom-nav-styles="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
                 
@@ -117,7 +117,7 @@
                   </div>
                 </div>
                 <!-- Filter component -->
-    						<core-filter-cmpt filter-type="EmployeeViewer" @nw-new-entry="newSideMenuEntryHandler"></core-filter-cmpt>
+    						<core-filter-cmpt filter-type="EmployeeViewer" @nw-new-entry="newSideMenuEntryHandler" @select-record="selectRecordHandler"></core-filter-cmpt>
               </template>
               <template #bottom>
                 <employee-editor :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>

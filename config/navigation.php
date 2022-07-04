@@ -5,40 +5,35 @@ $config['navigation_header']['*']['Personen']['children']['PV21'] = array(
 	'sort' => 25,
 	'description' => 'PV21',
 	'expand' => false,
-	'requiredPermissions' => 'extension/budget_verwaltung:r'
+	'requiredPermissions' => 'admin:r'
 );
 
+
 $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
+	'Back' => array(
+		'link' => site_url(),
+		'description' => 'Zurück',
+		'icon' => 'angle-left'
+	),
 	'Dashboard' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Home'),
 		'description' => 'Home',
 		'icon' => 'home'
 	),
-	'Budgetanträge OE Übersicht' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Employees'),
+	'Mitarbeiter' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Employees/index'),
 		'description' => 'Mitarbeiter',
 		'icon' => 'users'
 	),
 	'Organigramm' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Organization'),
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Organisation'),
 		'description' => 'Organigramm',
 		'icon' => 'sitemap'
 	),
 	'Berichte' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/BI'),
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Reports'),
 		'description' => 'Berichte',
 		'icon' => 'file-text-o'
-	),
-	'Dokumente' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Doc'),
-		'description' => 'Dokumente',
-		'icon' => 'line-chart'
-	),
-	'Einstellungen' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Setup'),
-		'description' => 'Einstellungen',
-		'icon' => 'cog',
-		'requiredPermissions' => 'extension/budget_freigabe:r'
 	)
 );
 
