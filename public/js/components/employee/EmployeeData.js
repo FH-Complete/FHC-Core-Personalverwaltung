@@ -28,13 +28,8 @@ export const EmployeeData= {
         const orte = Vue.inject('orte');
 
         const generateEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personEmployeeData?person_id=${person_id}`;
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personEmployeeData?person_id=${person_id}`;
         };
 
         const fetchData = async () => {
@@ -166,15 +161,10 @@ export const EmployeeData= {
 
                 // submit
                 isFetching.value = true
-                let full =
-                    (location.port == "3000" ? "https://" : location.protocol) +
-                    "//" +
-                    location.hostname +
-                    ":" +
-                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
                 const endpoint =
-                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/updatePersonEmployeeData`;
+                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonEmployeeData`;
 
                 const res = await fetch(endpoint,{
                     method: "POST",

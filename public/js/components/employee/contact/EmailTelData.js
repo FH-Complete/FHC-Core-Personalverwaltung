@@ -36,13 +36,8 @@ export const EmailTelData = {
         });
 
         const generateContactDataEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personContactData?person_id=${person_id}`;
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personContactData?person_id=${person_id}`;
         };
 
         const fetchData = async () => {
@@ -130,14 +125,9 @@ export const EmailTelData = {
 
         const postData = async () => {
             isFetching.value = true
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/upsertPersonContactData`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonContactData`;
 
             const res = await fetch(endpoint,{
                 method: "POST",
@@ -162,14 +152,9 @@ export const EmailTelData = {
 
         const postDelete = async (id) => {
             isFetching.value = true
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/deletePersonContactData`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonContactData`;
 
             const res = await fetch(endpoint,{
                 method: "POST",

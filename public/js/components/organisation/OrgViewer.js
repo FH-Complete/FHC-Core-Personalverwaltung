@@ -22,12 +22,9 @@ const OrgViewer = {
         const fetchOrg = async (oe) => {
             try {
        
-              let protocol_host =
-                location.protocol + "//" +
-                location.hostname + ":" +
-                location.port;                 
+              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
 
-              const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrgStructure?oe=${oe}`;
+              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrgStructure?oe=${oe}`;
         
               isFetching.value = true  
               const res = await fetch(url)

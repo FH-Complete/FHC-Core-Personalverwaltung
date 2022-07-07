@@ -32,13 +32,8 @@ export const BaseData = {
             u: 'unbekannt'};
 
         const generateEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personBaseData?person_id=${person_id}`;
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personBaseData?person_id=${person_id}`;
         };
 
         const fetchData = async () => {
@@ -204,15 +199,10 @@ export const BaseData = {
 
                 // submit
                 isFetching.value = true
-                let full =
-                    (location.port == "3000" ? "https://" : location.protocol) +
-                    "//" +
-                    location.hostname +
-                    ":" +
-                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
                 const endpoint =
-                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/updatePersonBaseData`;
+                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonBaseData`;
 
                 const res = await fetch(endpoint,{
                     method: "POST",

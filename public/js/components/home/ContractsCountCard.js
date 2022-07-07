@@ -22,15 +22,14 @@ const ContractCountCard = {
         
         const fetchContractsNew = async () => {
 			try {
-				let full = location.protocol +	"//" +
-					location.hostname +	":" + location.port; 
+			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;  
               
               let method = "getContractNew";
               if (!props.showNew) {
                 method = "getContractExpire";
                 title.value = "Dienstaustritte";
               }
-			  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/${method}?month=${currentMonth.value}&year=${currentYear.value}`;
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/${method}?month=${currentMonth.value}&year=${currentYear.value}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();

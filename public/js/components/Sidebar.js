@@ -3,23 +3,25 @@ const Sidebar = {
       active: Number,
     },
     setup() {   
+
+        let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const links = [ {
-                url: '/index.ci.php/extensions/FHC-Core-Personalverwaltung/Home ',
+                url: full + '/extensions/FHC-Core-Personalverwaltung/Home ',
                 label: 'Home',
                 icon: 'fa-dashboard',
             },
             {
-                url: '/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees',
+                url: full + '/extensions/FHC-Core-Personalverwaltung/Employees',
                 label: 'Mitarbeiter',
                 icon: 'fa-user-group',
             },
             {
-                url: '/index.ci.php/extensions/FHC-Core-Personalverwaltung/Organisation',
+                url: full + '/extensions/FHC-Core-Personalverwaltung/Organisation',
                 label: 'Organisation',
                 icon: 'fa-sitemap',
             },
             {
-                url: '/index.ci.php/extensions/FHC-Core-Personalverwaltung/Reports',
+                url: full + '/extensions/FHC-Core-Personalverwaltung/Reports',
                 label: 'Berichte',
                 icon: 'fa-chart-pie',
             }

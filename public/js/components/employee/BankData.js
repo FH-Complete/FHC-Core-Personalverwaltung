@@ -28,13 +28,8 @@ export const BankData = {
         const bankdataList = Vue.ref([]);
 
         const generateEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personBankData?person_id=${person_id}`;
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personBankData?person_id=${person_id}`;
         };
 
         const fetchData = async () => {
@@ -232,15 +227,10 @@ export const BankData = {
 
                 // submit
                 isFetching.value = true
-                let full =
-                    (location.port == "3000" ? "https://" : location.protocol) +
-                    "//" +
-                    location.hostname +
-                    ":" +
-                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
                 const endpoint =
-                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/upsertPersonBankData`;
+                    `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonBankData`;
 
                 const res = await fetch(endpoint,{
                     method: "POST",
@@ -270,14 +260,9 @@ export const BankData = {
 
         const postDelete = async (id) => {
             isFetching.value = true
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/deletePersonBankData`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonBankData`;
 
             const res = await fetch(endpoint,{
                 method: "POST",

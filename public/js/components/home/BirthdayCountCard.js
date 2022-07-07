@@ -16,11 +16,10 @@ const BirthdayCountCard = {
 
         const fetchBirthdays = async () => {
 			try {
-				let full = location.protocol +	"//" +
-					location.hostname +	":" + location.port; 
+			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
               
               let ts = Math.round(currentDate.value.getTime() / 1000);  // unix timestamp
-			  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getBirthdays?date=${ts}`;
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getBirthdays?date=${ts}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();

@@ -31,14 +31,10 @@ export const MaterialExpensesData = {
 
         const types = Vue.inject('sachaufwandtyp');
 
-        const generateEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${person_id}`;
+        const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+
+        const generateEndpointURL = (person_id) => {           
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${person_id}`;
         };
 
         const fetchData = async () => {
@@ -47,14 +43,9 @@ export const MaterialExpensesData = {
                 return;
             }
             isFetching.value = true
-
-            let full =
-                location.protocol +
-                "//" +
-                location.hostname +
-                ":" + location.port 
-            const urlMaterial = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${personID.value}`;
-            const urlUID = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${personID.value}`;
+ 
+            const urlMaterial = `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${personID.value}`;
+            const urlUID = `${full}/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${personID.value}`;
             try {
               const res = await fetch(urlMaterial);
               let response = await res.json()              
@@ -207,13 +198,10 @@ export const MaterialExpensesData = {
             console.log('frmState: ', frmState);
 
             // submit
-            isFetching.value = true
-            let full =
-                location.protocol + "//" +
-                location.hostname + ":" + location.port;
+            isFetching.value = true;
 
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/upsertPersonMaterialExpenses`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonMaterialExpenses`;
 
             const res = await fetch(endpoint,{
                 method: "POST",
@@ -241,14 +229,9 @@ export const MaterialExpensesData = {
 
         const postDelete = async (id) => {
             isFetching.value = true
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/deletePersonMaterialExpenses`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonMaterialExpenses`;
 
             const res = await fetch(endpoint,{
                 method: "POST",

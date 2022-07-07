@@ -25,13 +25,8 @@ export const EmployeeHeader = {
         const isFetching = Vue.ref(false);
 
         const generateEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}`;
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}`;
         };
 
         const fetchHeaderData = async () => {
@@ -42,8 +37,8 @@ export const EmployeeHeader = {
                 let response = await res.json();
                 employee.value = response.retval[0];
                 // fetch abteilung
-                let full = location.protocol + "//" + location.hostname + ":" + location.port; 
-                const abteilungUrl = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
+                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
+                const abteilungUrl = `${full}/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
                 const resAbteilung = await fetch(abteilungUrl);
                 response = await resAbteilung.json();
                 employee.value = { ...employee.value, ...{ abteilung: response.retval[0] } };
@@ -94,15 +89,10 @@ export const EmployeeHeader = {
 
         const postFile = async () => {
             isFetching.value = true
-                let full =
-                    (location.port == "3000" ? "https://" : location.protocol) +
-                    "//" +
-                    location.hostname +
-                    ":" +
-                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
                 const endpoint =
-                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/uploadPersonEmployeeFoto`;
+                    `${full}/extensions/FHC-Core-Personalverwaltung/api/uploadPersonEmployeeFoto`;
 
                 
 
@@ -130,15 +120,10 @@ export const EmployeeHeader = {
 
         const postDeleteFile = async () => {
             isFetching.value = true
-                let full =
-                    (location.port == "3000" ? "https://" : location.protocol) +
-                    "//" +
-                    location.hostname +
-                    ":" +
-                    (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
                 const endpoint =
-                    `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/deletePersonEmployeeFoto`;
+                    `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonEmployeeFoto`;
 
                 const res = await fetch(endpoint,{
                     method: "POST",

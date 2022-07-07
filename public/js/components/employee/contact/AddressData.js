@@ -44,13 +44,8 @@ export const AddressData = {
         
 
         const generateAddressDataEndpointURL = (person_id) => {
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-            return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personAddressData?person_id=${person_id}`;
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personAddressData?person_id=${person_id}`;
         };
 
 
@@ -75,13 +70,8 @@ export const AddressData = {
 
         const fetchGemeinden = async () => {
             try {
-                let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-              const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getGemeinden?plz=${currentAddress.value.plz}`;
+              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getGemeinden?plz=${currentAddress.value.plz}`;
         
               const res = await fetch(url)
               let response = await res.json()              
@@ -93,13 +83,8 @@ export const AddressData = {
 
         const fetchOrtschaften = async () => {
             try {
-                let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
-              const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrtschaften?plz=${currentAddress.value.plz}`;
+              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrtschaften?plz=${currentAddress.value.plz}`;
         
               const res = await fetch(url)
               let response = await res.json()              
@@ -201,14 +186,9 @@ export const AddressData = {
 
         const postData = async () => {
             isFetching.value = true
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/upsertPersonAddressData`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonAddressData`;
 
             const res = await fetch(endpoint,{
                 method: "POST",
@@ -233,14 +213,9 @@ export const AddressData = {
 
         const postDelete = async (id) => {
             isFetching.value = true
-            let full =
-                (location.port == "3000" ? "https://" : location.protocol) +
-                "//" +
-                location.hostname +
-                ":" +
-                (location.port == "3000" ? 8080 : location.port); // hack for dev mode
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const endpoint =
-                `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/deletePersonAddressData`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonAddressData`;
 
             const res = await fetch(endpoint,{
                 method: "POST",
