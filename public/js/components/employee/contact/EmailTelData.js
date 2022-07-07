@@ -1,4 +1,8 @@
-const EmailTelData = {
+import { Modal } from '../../Modal.js';
+import { ModalDialog } from '../../ModalDialog.js';
+import { Toast } from '../../Toast.js';
+
+export const EmailTelData = {
     components: {
         Modal,
         ModalDialog,

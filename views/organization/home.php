@@ -17,19 +17,11 @@
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css'],     
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Modal.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/ModalDialog.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgViewer.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'                    
                     ],
-      /*
-      'vueSFCs' => [[
-        "vendor" => "public/extensions/FHC-Core-Personalverwaltung/js/vendor.3239befe.js", 
-				"js" => "public/extensions/FHC-Core-Personalverwaltung/js/index.ccd9a95a.js", 
-				"css" => "public/extensions/FHC-Core-Personalverwaltung/css/index.c5353a60.css", ]]*/
 		)
 	);
 ?>

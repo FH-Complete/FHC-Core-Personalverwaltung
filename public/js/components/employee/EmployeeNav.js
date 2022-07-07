@@ -1,4 +1,4 @@
-const EmployeeNav = {
+export const EmployeeNav = {
     props: {
         personID: Number,
     },

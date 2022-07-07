@@ -1,4 +1,8 @@
-const MaterialExpensesData = {
+import { Modal } from '../Modal.js';
+import { ModalDialog } from '../ModalDialog.js';
+import { Toast } from '../Toast.js';
+
+export const MaterialExpensesData = {
     components: {
         Modal,
         ModalDialog,

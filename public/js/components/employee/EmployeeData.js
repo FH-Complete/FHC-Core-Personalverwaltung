@@ -1,4 +1,7 @@
-const EmployeeData= {
+import { ModalDialog } from '../ModalDialog.js';
+import { Toast } from '../Toast.js';
+
+export const EmployeeData= {
     components: {
         ModalDialog,
         Toast,

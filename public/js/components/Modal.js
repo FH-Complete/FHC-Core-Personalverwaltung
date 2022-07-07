@@ -1,4 +1,4 @@
-const Modal = {
+export const Modal = {
     props: {
         type: String,
         title: String,

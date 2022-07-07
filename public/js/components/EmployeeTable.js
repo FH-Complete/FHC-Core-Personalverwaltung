@@ -1,6 +1,8 @@
 
         
-
+/**
+ * @deprecated replaced by filter widget
+ */
 const EmployeeTable = {    
     props: {
         fields: { type: Array, required: true},

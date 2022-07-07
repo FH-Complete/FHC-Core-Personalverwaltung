@@ -1,4 +1,8 @@
-const EmployeeHeader = {
+import { Modal } from '../Modal.js';
+import { Toast } from '../Toast.js';
+import { ModalDialog } from '../ModalDialog.js';
+
+export const EmployeeHeader = {
     components: {
         Toast,
 		Modal,
@@ -29,8 +33,6 @@ const EmployeeHeader = {
                 (location.port == "3000" ? 8080 : location.port); // hack for dev mode
             return `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}`;
         };
-
-        //const credentials = btoa(import.meta.env.VITE_FH_CREDENTIALS);
 
         const fetchHeaderData = async () => {
             isFetching.value = true;

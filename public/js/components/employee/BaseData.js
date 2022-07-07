@@ -1,4 +1,7 @@
-const BaseData = {
+import { ModalDialog } from '../ModalDialog.js';
+import { Toast } from '../Toast.js';
+
+export const BaseData = {
     components: {
         ModalDialog,
         Toast,

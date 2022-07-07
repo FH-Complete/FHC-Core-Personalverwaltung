@@ -1,6 +1,5 @@
 const OrgViewer = {
     components: {
-        Modal,
         "p-treetable": primevue.treetable,
         "p-column": primevue.column,
         "p-inputtext": primevue.inputtext,

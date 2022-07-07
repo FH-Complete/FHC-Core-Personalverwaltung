@@ -1,10 +1,15 @@
-const EmployeePerson = {
+import { BaseData } from './BaseData.js';
+import { EmployeeData } from './EmployeeData.js';
+import { BankData } from './BankData.js';
+import { ContactData } from './contact/ContactData.js';
+import { MaterialExpensesData } from './MaterialExpensesData.js';
+
+export const EmployeePerson = {
     components: {
 		BaseData,
 		EmployeeData,
 		BankData,
 		ContactData,
-        EmailTelData,
         MaterialExpensesData,
 	},	
     props: {

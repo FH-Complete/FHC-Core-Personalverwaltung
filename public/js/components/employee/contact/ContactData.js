@@ -1,4 +1,7 @@
-const ContactData = {
+import { AddressData } from "./AddressData.js";
+import { EmailTelData } from "./EmailTelData.js";
+
+export const ContactData = {
     components: {
         AddressData,
 		EmailTelData,

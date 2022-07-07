@@ -4,6 +4,7 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import verticalsplit from "../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import EmployeeEditor from "../components/employee/EmployeeEditor.js";
 
 Vue.$fhcapi = fhcapifactory;
 
@@ -14,8 +15,7 @@ const pvApp = Vue.createApp(	{
 		Sidebar,
 		CoreNavigationCmpt,
     	CoreFilterCmpt,
-		EmployeeEditor,
-		EmployeeTable,
+		EmployeeEditor,		
 		verticalsplit,
 		searchbar,
 	},

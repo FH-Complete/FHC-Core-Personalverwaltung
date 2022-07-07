@@ -27,52 +27,30 @@
                        'public/css/components/searchbar.css',
                       ],       
       'customJSs' => ['vendor/axios/axios/axios.min.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Modal.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/ModalDialog.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/verticalsplit.js',
+                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/Modal.js',
+                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/ModalDialog.js',
+                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
+                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/verticalsplit.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeNav.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BaseData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BankData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/MaterialExpensesData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/AddressData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/EmailTelData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/ContactData.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeHeader.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeePerson.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeEditor.js',                      
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeTable.js'],
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeNav.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BaseData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BankData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/MaterialExpensesData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/AddressData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/EmailTelData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/ContactData.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeHeader.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeePerson.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeEditor.js',                      
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeTable.js'
+                    ],
       'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js'],                      
-      /*
-      'vueSFCs' => [[
-        "vendor" => "public/extensions/FHC-Core-Personalverwaltung/js/vendor.3239befe.js", 
-				"js" => "public/extensions/FHC-Core-Personalverwaltung/js/index.ccd9a95a.js", 
-				"css" => "public/extensions/FHC-Core-Personalverwaltung/css/index.c5353a60.css", ]]*/
+
 		)
 	);
 ?>
 
-<script>
-
-  
-  var tableData = [
-<?php 
-  foreach ($employeeList as $value) {
-    echo json_encode($value).",\n";
-    //echo "{ID:'".$value->uid."', Name: '".$value->nachname.', Vorname: "'.$value->vorname.' '.$value->titelpre."', Course:'Computer Science', Gender:'Female', Age:'17'},\n";
-  }
-
-?>
-   /* {ID:"01", Name: "Abiola Esther", Course:"Computer Science", Gender:"Female", Age:"17"},
-    {ID:"02", Name: "Robert V. Kratz", Course:"Philosophy", Gender:"Male", Age:'19'},
-    {ID:"03", Name: "Kristen Anderson", Course:"Economics", Gender:"Female", Age:'20'},
-    {ID:"04", Name: "Adam Simon", Course:"Food science", Gender:"Male", Age:'21'},
-    {ID:"05", Name: "Daisy Katherine", Course:"Business studies", Gender:"Female", Age:'22'}, */ 
-  ];
-
-</script>
 
 <div id="wrapper">
 
@@ -107,7 +85,6 @@
                 
           <verticalsplit id="macombined">
               <template #top>
-                <!--employee-table id="employee-table" :minimized="isEditorOpen" @person-selected="personSelectedHandler" :fields="['uid','nachname','vorname','titelpre','telefonklappe','lektor','fixangestellt','lastupdate']"  :tabledata="tabledata"></employee-table-->
                 <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                           
                   <div class="flex-fill align-self-center">

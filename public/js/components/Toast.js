@@ -1,4 +1,4 @@
-const Toast = {
+export const Toast = {
     props: {
         title: {
             text: String,

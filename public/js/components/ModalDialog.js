@@ -1,4 +1,4 @@
-const ModalDialog = {
+export const ModalDialog = {
     props: {
         type: String,
         title: String,
