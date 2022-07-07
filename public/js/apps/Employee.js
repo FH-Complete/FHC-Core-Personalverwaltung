@@ -209,7 +209,6 @@ const fetchNations = async () => {
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
-	  console.log(response.retval);	  
 	  return response.retval;
 	} catch (error) {
 	  console.log(error)              
@@ -221,7 +220,6 @@ const fetchSachaufwandTyp = async () => {
 	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp`;
 	  const res = await fetch(url)
 	  let response = await res.json()              
-	  console.log(response.retval);	  
 	  return response.retval;
 	} catch (error) {
 		console.log(error)              
@@ -233,7 +231,6 @@ const fetchKontakttyp = async () => {
 	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getKontakttyp`;
 	  const res = await fetch(url)
 	  let response = await res.json()              
-	  console.log(response.retval);	  
 	  return response.retval;
 	} catch (error) {
 	  console.log(error)              
@@ -246,7 +243,6 @@ const fetchSprache = async () => {
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
-	  console.log(response.retval);	  
 	  return response.retval;
 	} catch (error) {
 	  console.log(error)              
