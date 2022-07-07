@@ -2,10 +2,55 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 
-class Api extends FHC_Controller
+class Api extends Auth_Controller
 {
+    private const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+
     public function __construct() {
-        parent::__construct();
+        
+        parent::__construct(
+			array(
+				'index' => Api::DEFAULT_PERMISSION,
+				'getSprache' => Api::DEFAULT_PERMISSION,
+				'getSachaufwandtyp' => Api::DEFAULT_PERMISSION,
+				'getNations' => Api::DEFAULT_PERMISSION,
+				'getAusbildung' => Api::DEFAULT_PERMISSION,
+				'getStandorteIntern' => Api::DEFAULT_PERMISSION,
+                'getOrte' => Api::DEFAULT_PERMISSION,
+                'getGemeinden' => Api::DEFAULT_PERMISSION,
+                'getOrtschaften' => Api::DEFAULT_PERMISSION,
+                'personMaterialExpenses' => Api::DEFAULT_PERMISSION,
+                'upsertPersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
+                'deletePersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
+                'getOrgHeads' => Api::DEFAULT_PERMISSION,
+                'getOrgStructure' => Api::DEFAULT_PERMISSION,
+                'getContractExpire' => Api::DEFAULT_PERMISSION,
+                'getContractNew' => Api::DEFAULT_PERMISSION,
+                'getBirthdays' => Api::DEFAULT_PERMISSION,
+                'getReportData' => Api::DEFAULT_PERMISSION,
+                'personHeaderData' => Api::DEFAULT_PERMISSION,
+                'personAbteilung' => Api::DEFAULT_PERMISSION,
+                'uploadPersonEmployeeFoto' => Api::DEFAULT_PERMISSION,
+                'deletePersonEmployeeFoto' => Api::DEFAULT_PERMISSION,
+                'personBankData' => Api::DEFAULT_PERMISSION,
+                'upsertPersonBankData' => Api::DEFAULT_PERMISSION,
+                'deletePersonBankData' => Api::DEFAULT_PERMISSION,
+                'personBaseData' => Api::DEFAULT_PERMISSION,
+                'updatePersonBaseData' => Api::DEFAULT_PERMISSION,
+                'personEmployeeData' => Api::DEFAULT_PERMISSION,
+                'updatePersonEmployeeData' => Api::DEFAULT_PERMISSION,
+                'personAddressData' => Api::DEFAULT_PERMISSION,
+                'upsertPersonAddressData' => Api::DEFAULT_PERMISSION,
+                'deletePersonAddressData' => Api::DEFAULT_PERMISSION,
+                'personContactData' => Api::DEFAULT_PERMISSION,
+                'upsertPersonContactData' => Api::DEFAULT_PERMISSION,
+                'deletePersonContactData' => Api::DEFAULT_PERMISSION,
+                'getKontakttyp' => Api::DEFAULT_PERMISSION,
+                'foto' => Api::DEFAULT_PERMISSION,
+                'uidByPerson' => Api::DEFAULT_PERMISSION
+			)
+		);
+
 
 		// Loads authentication library and starts authentication
 		$this->load->library('AuthLib');
@@ -819,38 +864,4 @@ class Api extends FHC_Controller
         return $this->outputJson($data);                   
     }
 
-
-
-
-/*
-       public function user_get(){
-           $r = $this->user_model->read();
-           $this->response($r); 
-       }
-
-       public function user_put(){
-           $id = $this->uri->segment(3);
-           $data = array('name' => $this->input->get('name'),
-           'pass' => $this->input->get('pass'),
-           'type' => $this->input->get('type')
-           );
-            $r = $this->user_model->update($id,$data);
-               $this->response($r); 
-       }
-
-       public function user_post(){
-           $data = array('name' => $this->input->post('name'),
-           'pass' => $this->input->post('pass'),
-           'type' => $this->input->post('type')
-           );
-           $r = $this->user_model->insert($data);
-           $this->response($r); 
-       }
-
-       public function user_delete(){
-           $id = $this->uri->segment(3);
-           $r = $this->user_model->delete($id);
-           $this->response($r); 
-       }
-  */  
 }
