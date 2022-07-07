@@ -10,6 +10,7 @@
       'tablesorter2' => true,
 			'sbadmintemplate' => false,
 			'ajaxlib' => true,
+      'restclient' => true,
 			'filtercomponent' => true,
       'navigationcomponent' => true,
       'phrases' => array(

@@ -80,7 +80,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printStatistikLink('HomeofficetageMitarbeiterInnen') ?>" target="_blank">
+                  <a  href="<?php printStatistikLink('HomeofficetageMitarbeiterInnen') ?>" class="stretched-link" target="_blank">
                   Homeoffice Tage
                 </a></h5> 
               </div>
@@ -94,7 +94,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printStatistikLink('MitarbeiterInnenFunktionen') ?>" target="_blank">
+                  <a  href="<?php printStatistikLink('MitarbeiterInnenFunktionen') ?>" class="stretched-link" target="_blank">
                   MitarbeiterInnen nach Funktionen
                 </a></h5> 
               </div>
@@ -108,7 +108,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printStatistikLink('MitarbeiterAltersverteilung') ?>" target="_blank">
+                  <a  href="<?php printStatistikLink('MitarbeiterAltersverteilung') ?>" class="stretched-link" target="_blank">
                   Mitarbeiter nach Altersverteilung
                 </a></h5> 
               </div>
@@ -122,7 +122,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printStatistikLink('MitarbeiterGesamtdaten') ?>" target="_blank">
+                  <a  href="<?php printStatistikLink('MitarbeiterGesamtdaten') ?>" class="stretched-link" target="_blank">
                   Mitarbeiterdaten gesamt
                 </a></h5> 
               </div>
@@ -136,7 +136,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printStatistikLink('Zeitaufzeichnung') ?>" target="_blank">
+                  <a  href="<?php printStatistikLink('Zeitaufzeichnung') ?>" class="stretched-link" target="_blank">
                   Zeitaufzeichnung
                 </a></h5> 
               </div>
@@ -150,7 +150,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printStatistikLink('MitarbeiterVerwendung') ?>" target="_blank">
+                  <a  href="<?php printStatistikLink('MitarbeiterVerwendung') ?>" class="stretched-link" target="_blank">
                   Mitarbeiter je Verwendung
                 </a></h5> 
               </div>
@@ -172,7 +172,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printChartLink(50) ?>" target="_blank">
+                  <a  href="<?php printChartLink(50) ?>" class="stretched-link" target="_blank">
                   Lehrauftragstunden je Department/Kompetenzfeld
                 </a></h5> 
               </div>
@@ -186,7 +186,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printChartLink(64) ?>" target="_blank">
+                  <a  href="<?php printChartLink(64) ?>" class="stretched-link" target="_blank">
                   Interessenten pro Fakultät
                 </a></h5> 
               </div>
@@ -200,7 +200,7 @@
             <div class="card">
               <div class="card-header">
                 <h5 class="mb-0">
-                  <a  href="<?php printChartLink(65) ?>" target="_blank">
+                  <a  href="<?php printChartLink(65) ?>" class="stretched-link" target="_blank">
                   Studierende pro Fakultät
                 </a></h5> 
               </div>
