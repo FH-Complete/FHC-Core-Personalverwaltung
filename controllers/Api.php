@@ -156,8 +156,7 @@ class Api extends FHC_Controller
             //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
 		    //{
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
                 show_error('sachaufwand_id is not numeric!');
@@ -188,8 +187,7 @@ class Api extends FHC_Controller
     {
         if($this->input->method() === 'post')
         {
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
                 show_error('sachaufwand_id is not numeric!');
@@ -283,8 +281,7 @@ class Api extends FHC_Controller
     function getReportData()
     {
         if($this->input->method() === 'post'){
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE);
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             // TODO validate param
 
@@ -334,8 +331,7 @@ class Api extends FHC_Controller
     {
         if($this->input->method() === 'post'){
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
             $image = $payload['imagedata'];
             $person_id = $payload['person_id'];
 
@@ -421,8 +417,7 @@ class Api extends FHC_Controller
     {
         if($this->input->method() === 'post'){
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
             $person_id = $payload['person_id'];
 
             if (!is_numeric($person_id))
@@ -497,8 +492,7 @@ class Api extends FHC_Controller
     {
         if($this->input->method() === 'post')
         {
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['bankverbindung_id']) && !is_numeric($payload['bankverbindung_id']))
                 show_error('bankverbindung_id is not numeric!');
@@ -544,8 +538,7 @@ class Api extends FHC_Controller
             //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
 		    //{
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
                 show_error('person id is not numeric!');
@@ -587,8 +580,7 @@ class Api extends FHC_Controller
             //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
 		    //{
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
                 show_error('person id is not numeric!'); 
@@ -631,8 +623,7 @@ class Api extends FHC_Controller
             //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
 		    //{
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
                 show_error('person id is not numeric!');
@@ -661,8 +652,7 @@ class Api extends FHC_Controller
     {
         if($this->input->method() === 'post')
         {
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['adresse_id']) && !is_numeric($payload['adresse_id']))
                 show_error('adresse_id is not numeric!');
@@ -714,8 +704,7 @@ class Api extends FHC_Controller
             //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
 		    //{
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
                 show_error('person id is not numeric!');
@@ -744,8 +733,7 @@ class Api extends FHC_Controller
     {
         if($this->input->method() === 'post')
         {
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['kontakt_id']) && !is_numeric($payload['kontakt_id']))
                 show_error('kontakt_id is not numeric!');
