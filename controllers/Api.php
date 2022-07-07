@@ -463,8 +463,7 @@ class Api extends FHC_Controller
             //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
 		    //{
 
-            $inputJSON = file_get_contents('php://input');
-            $payload = json_decode($inputJSON, TRUE); //convert JSON into array
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
                 show_error('person id is not numeric!');
