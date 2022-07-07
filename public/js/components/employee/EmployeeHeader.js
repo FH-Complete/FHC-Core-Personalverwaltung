@@ -119,7 +119,7 @@ const EmployeeHeader = {
                 }
                 let response = await res.json();
 
-                fetchData();
+                fetchHeaderData();
                 showToast();
             
                 isFetching.value = false;
@@ -153,7 +153,7 @@ const EmployeeHeader = {
                 }
                 let response = await res.json();
 
-                fetchData();
+                fetchHeaderData();
                 showDeleteToast();
             
                 isFetching.value = false;
