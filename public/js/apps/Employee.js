@@ -218,7 +218,7 @@ const fetchNations = async () => {
 
 const fetchSachaufwandTyp = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandTyp`;
+	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp`;
 	  const res = await fetch(url)
 	  let response = await res.json()              
 	  console.log(response.retval);	  
