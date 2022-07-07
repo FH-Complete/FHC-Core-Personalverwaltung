@@ -3,13 +3,16 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Home extends Auth_Controller
 {
+
+	private const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
 		parent::__construct(array(
-			'index'=>'admin:rw'
+			'index'=> Home::DEFAULT_PERMISSION
 			)
 		);
 
@@ -22,10 +25,8 @@ class Home extends Auth_Controller
 	 */
 	public function index()
 	{
-		//$cList = $this->ApiModel->getContractExpireIn30Days();
-
 		$this->load->library('WidgetLib');
-		$this->load->view('extensions/FHC-Core-Personalverwaltung/home'/*, array('contracts' => $cList->retval)*/);
+		$this->load->view('extensions/FHC-Core-Personalverwaltung/home');
 	}
 }
 

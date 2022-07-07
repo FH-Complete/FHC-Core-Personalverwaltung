@@ -3,13 +3,16 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class Organisation extends Auth_Controller
 {
+
+	private const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+
 	/**
 	 * Constructor
 	 */
 	public function __construct()
 	{
 		parent::__construct(array(
-			'index'=>'admin:rw'
+			'index'=> Organisation::DEFAULT_PERMISSION
 			)
 		);
 	}
