@@ -1,6 +1,7 @@
 
 import {CoreFilterCmpt} from '../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
+import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import verticalsplit from "../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
@@ -202,12 +203,12 @@ const pvApp = Vue.createApp(	{
 
 });
 
-const protocol_host = location.protocol +	"//" +
-			location.hostname +	":" + location.port; 
+
+let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;			
 
 const fetchNations = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getNations`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getNations`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -219,7 +220,7 @@ const fetchNations = async () => {
 
 const fetchSachaufwandTyp = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp`;
 	  const res = await fetch(url)
 	  let response = await res.json()              
 	  return response.retval;
@@ -230,7 +231,7 @@ const fetchSachaufwandTyp = async () => {
 
 const fetchKontakttyp = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getKontakttyp`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getKontakttyp`;
 	  const res = await fetch(url)
 	  let response = await res.json()              
 	  return response.retval;
@@ -241,7 +242,7 @@ const fetchKontakttyp = async () => {
 
 const fetchSprache = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSprache`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getSprache`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -253,7 +254,7 @@ const fetchSprache = async () => {
 
 const fetchAusbildung = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getAusbildung`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getAusbildung`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -265,7 +266,7 @@ const fetchAusbildung = async () => {
 
 const fetchStandorteIntern = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -277,7 +278,7 @@ const fetchStandorteIntern = async () => {
 
 const fetchOrte = async () => {
 	try {
-	  const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrte`;
+	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getOrte`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              

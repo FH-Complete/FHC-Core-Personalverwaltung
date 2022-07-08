@@ -160,10 +160,12 @@ class Api extends Auth_Controller
         $plz = $this->input->get('plz', TRUE);
 
         if (!is_numeric($plz))
-			show_error("plz '$plz' is not numeric!'");
-
-        $data = $this->ApiModel->getGemeinden($plz);
-        $this->outputJsonSuccess($data); 
+        {
+            $this->outputJsonError("plz '$plz' is not numeric!'");            
+        } else {
+            $data = $this->ApiModel->getGemeinden($plz);
+            $this->outputJsonSuccess($data); 
+        }
     }
 
     function getOrtschaften()

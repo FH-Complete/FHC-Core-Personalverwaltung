@@ -13,8 +13,7 @@ const pvApp = Vue.createApp(	{
 	},
 	setup() {
 
-		const protocol_host = location.protocol +	"//" +
-			location.hostname +	":" + location.port; 
+		let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	 
 
 		const searchbaroptions = {
 			"types": [
@@ -86,7 +85,7 @@ const pvApp = Vue.createApp(	{
 					"defaultaction": {
 					  "type": "function",
 					  "action": function(data) { 						
-						window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees?person_id=${data.person_id}`;
+						window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees?person_id=${data.person_id}`;
 					  }
 					},
 					"childactions": [

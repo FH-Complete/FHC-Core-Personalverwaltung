@@ -25,13 +25,8 @@ pvApp.use(primevue.toastservice);
 
 const fetchNations = async () => {
 	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getNations`;
+	  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+	  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getNations`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -44,13 +39,8 @@ const fetchNations = async () => {
 
 const fetchKontakttyp = async () => {
 	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getKontakttyp`;
+	  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+	  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getKontakttyp`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -63,13 +53,8 @@ const fetchKontakttyp = async () => {
 
 const fetchSprache = async () => {
 	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getSprache`;
+	  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+	  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getSprache`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -82,13 +67,8 @@ const fetchSprache = async () => {
 
 const fetchAusbildung = async () => {
 	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getAusbildung`;
+	  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+	  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getAusbildung`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -100,13 +80,8 @@ const fetchAusbildung = async () => {
 
 const fetchStandorteIntern = async () => {
 	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern`;
+	  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+	  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
@@ -118,13 +93,8 @@ const fetchStandorteIntern = async () => {
 
 const fetchOrte = async () => {
 	try {
-		let full =
-		(location.port == "3000" ? "https://" : location.protocol) +
-		"//" +
-		location.hostname +
-		":" +
-		(location.port == "3000" ? 8080 : location.port); // hack for dev mode
-	  const url = `${full}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrte`;
+	  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+	  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrte`;
 
 	  const res = await fetch(url)
 	  let response = await res.json()              
