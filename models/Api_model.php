@@ -61,6 +61,7 @@ class Api_model extends DB_Model
         SELECT
             p.person_id,
             tbl_benutzer.uid,
+            tbl_benutzer.alias,
             tbl_mitarbeiter.personalnummer,
             tbl_mitarbeiter.kurzbz,
             tbl_mitarbeiter.telefonklappe,

@@ -7,6 +7,7 @@ export const EmployeeHeader = {
         Toast,
 		Modal,
         ModalDialog,
+        "p-skeleton": primevue.skeleton,
 	},	
     props: {
         personID: { type: Number, default: 0 }
@@ -22,7 +23,8 @@ export const EmployeeHeader = {
         const fileInput = Vue.ref();
         const previewImage = Vue.ref();
 
-        const isFetching = Vue.ref(false);
+        const isFetching = Vue.ref(false);        
+        const isFetchingName = Vue.ref(false);        
 
         const generateEndpointURL = (person_id) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -31,12 +33,14 @@ export const EmployeeHeader = {
 
         const fetchHeaderData = async () => {
             isFetching.value = true;
+            isFetchingName.value = true;
             try {
                 // fetch header data
                 const res = await fetch(headerUrl.value);
                 let response = await res.json();
                 employee.value = response.retval[0];
-                // fetch abteilung
+                isFetchingName.value = false;
+                // fetch abteilung (needs uid from previous fetch!)
                 let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
                 const abteilungUrl = `${full}/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
                 const resAbteilung = await fetch(abteilungUrl);
@@ -46,6 +50,7 @@ export const EmployeeHeader = {
             } catch (error) {
                 console.log(error);
                 isFetching.value = false;
+                isFetchingName.value = false;
             }
         };
 
@@ -93,9 +98,7 @@ export const EmployeeHeader = {
 
                 const endpoint =
                     `${full}/extensions/FHC-Core-Personalverwaltung/api/uploadPersonEmployeeFoto`;
-
                 
-
                 const res = await fetch(endpoint,{
                     method: "POST",
                     headers: {
@@ -195,6 +198,8 @@ export const EmployeeHeader = {
             employee,
             fileInput,
             previewImage,
+            isFetching,
+            isFetchingName,
         }
     },
     template: `
@@ -209,25 +214,25 @@ export const EmployeeHeader = {
         </div>
 
         <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >
-        <div class="d-flex align-items-center" >
+        <div class="d-flex align-items-center flex-fill" >
         
-            <div class="fotocontainer">
-            <img v-if="employee?.foto" class="img-thumbnail " style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
-            <div v-if="employee?.foto" class="fotobutton">
-                <div class="d-grid gap-2 d-md-flex ">
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal">
-                            <i class="fa fa-pen"></i>
-                        </button>
+            <div class="fotocontainer" v-if="!isFetchingName">
+                <img v-if="employee?.foto" class="img-thumbnail " style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
+                <div v-if="employee?.foto" class="fotobutton">
+                    <div class="d-grid gap-2 d-md-flex ">
+                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal">
+                                <i class="fa fa-pen"></i>
+                            </button>
+                    </div>
                 </div>
             </div>
-            </div>
 
-            <div v-if="employee?.foto==undefined" style="position:relative">
+            <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
                 <svg  class="bd-placeholder-img img-thumbnail" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
-                <div class="fotobutton-visible">
+                <div class="fotobutton-visible" v-if="!isFetchingName">
                     <div class="d-grid gap-2 d-md-flex ">                      
                         <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
                             <i class="fa fa-pen"></i>
@@ -236,14 +241,27 @@ export const EmployeeHeader = {
                 </div>
             </div>                             
             
-            <div class="ms-3">
-                <h2 class="h2">{{ employee?.nachname }}, {{ employee?.vorname }} {{ employee?.titelpre }}</h2>
-                <h6 v-if="employee?.abteilung" class="mb-2 text-muted">
+            <div class="ms-3 flex-fill" >
+
+                <h2 class="h2" v-if="!isFetchingName">{{ employee?.nachname }}, {{ employee?.vorname }} {{ employee?.titelpre }}</h2>
+                <h2 class="h2" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
+
+                <h6 v-if="employee?.abteilung && !isFetching" class="mb-2 text-muted">
                     <b>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</b> {{ employee?.abteilung?.bezeichnung }},
                     <b>Vorgesetze(r) </b> <a href="#" @click="redirect(employee?.abteilung?.supervisor?.person_id)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
                 </h6>  
+                <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>                
                 
-                <h6 class="mb-2 text-muted"><b>Email</b> <a href="mailto:{{  employee?.uid }}@technikum-wien.at">{{  employee?.uid }}@technikum-wien.at</a> <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <b>DW</b> {{  employee?.telefonklappe }}</span>  </h6>  
+                <h6 v-if="!isFetchingName" class="mb-2 text-muted">
+                    <b>Email</b>&nbsp; 
+                    <a :href="'mailto:'+employee?.uid+'@technikum-wien.at'">{{  employee?.uid }}@technikum-wien.at</a>
+                    <span v-if="employee?.alias">,  
+                        <a :href="'mailto:'+employee?.alias+'@technikum-wien.at'">{{  employee?.alias }}@technikum-wien.at</a> 
+                    </span>
+                    <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <b>DW</b> {{  employee?.telefonklappe }}</span>  
+                </h6>  
+                <h6 v-else class="mb-2"><p-skeleton  style="width:35%"></p-skeleton></h6> 
+
             </div>
         </div>
         <div>

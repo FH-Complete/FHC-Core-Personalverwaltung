@@ -147,7 +147,9 @@ const pvApp = Vue.createApp(	{
 			console.log('personSelected: ', id);
 			isEditorOpen.value=true;
 			currentPersonID.value = id;
-			history.pushState({}, "", "/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees?person_id="+id);
+			let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+			let url = `${full}/extensions/FHC-Core-Personalverwaltung/Employees?person_id=${id}`
+			history.pushState({}, "", url);
 		}
 
 		personSelectedRef.callback = personSelectedHandler;

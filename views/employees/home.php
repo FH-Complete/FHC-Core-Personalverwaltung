@@ -9,8 +9,9 @@
 			'fontawesome6' => true,
       'tablesorter2' => true,
 			'sbadmintemplate' => false,
+      'primevue3' => true,
 			'ajaxlib' => true,
-                        'axios027' => true,
+      'axios027' => true,
       'restclient' => true,
 			'filtercomponent' => true,
       'navigationcomponent' => true,
@@ -27,24 +28,8 @@
                        'public/css/components/verticalsplit.css',
                        'public/css/components/searchbar.css',
                       ],       
-      'customJSs' => [
-                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/Modal.js',
-                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/ModalDialog.js',
-                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
-                     // 'public/extensions/FHC-Core-Personalverwaltung/js/components/verticalsplit.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeNav.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BaseData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BankData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/MaterialExpensesData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/AddressData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/EmailTelData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/ContactData.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeHeader.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeePerson.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeEditor.js',                      
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeTable.js'
+      'customJSs' => ['vendor/axios/axios/axios.min.js',                     
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
                     ],
       'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js'],                      
 
@@ -56,7 +41,7 @@
 <div id="wrapper">
 
   <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="<?php echo APP_ROOT ?>/">FHComplete [PV21]</a>
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="<?php echo APP_ROOT ?>index.ci.php">FHComplete [PV21]</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
