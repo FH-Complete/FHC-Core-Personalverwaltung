@@ -10,6 +10,7 @@
       'tablesorter2' => true,
 			'sbadmintemplate' => false,
 			'ajaxlib' => true,
+                        'axios027' => true,
       'restclient' => true,
 			'filtercomponent' => true,
       'navigationcomponent' => true,
@@ -26,7 +27,7 @@
                        'public/css/components/verticalsplit.css',
                        'public/css/components/searchbar.css',
                       ],       
-      'customJSs' => ['vendor/axios/axios/axios.min.js',
+      'customJSs' => [
                      // 'public/extensions/FHC-Core-Personalverwaltung/js/components/Modal.js',
                      // 'public/extensions/FHC-Core-Personalverwaltung/js/components/ModalDialog.js',
                      // 'public/extensions/FHC-Core-Personalverwaltung/js/components/Toast.js',
