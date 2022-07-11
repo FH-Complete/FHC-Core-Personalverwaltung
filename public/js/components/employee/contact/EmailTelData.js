@@ -113,6 +113,7 @@ export const EmailTelData = {
                     .then((r) => {
                         if (r.error == 0) {
                             delete contactList.value[id];
+                            showDeleteToast();
                         }
                     });
                 
@@ -220,15 +221,20 @@ export const EmailTelData = {
 
         // Toast 
         const toastRef = Vue.ref();
+        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
             toastRef.value.show();
         }
 
+        const showDeleteToast = () => {
+            deleteToastRef.value.show();
+        }
+
         return {
             contactList, contactListArray, 
             currentContact, showEditModal, showAddModal, showDeleteModal, hideModal, modalRef,
-            kontakttyp, confirmDeleteRef, okHandler, toastRef,
+            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef,
             // form handling
             validKontakt, frmState, contactDataFrm, 
         }
@@ -239,6 +245,12 @@ export const EmailTelData = {
                 <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                     <Toast ref="toastRef">
                         <template #body><h4>Kontaktdaten gespeichert.</h4></template>
+                    </Toast>
+                </div>
+
+                <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+                    <Toast ref="deleteToastRef">
+                        <template #body><h4>Kontaktdaten gelöscht.</h4></template>
                     </Toast>
                 </div>
 
