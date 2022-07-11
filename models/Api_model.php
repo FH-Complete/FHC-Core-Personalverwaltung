@@ -596,6 +596,24 @@ class Api_model extends DB_Model
         {
             $contactDataJson['standort_id'] = null;
         }
+        // remove data introduced by the join with tbl_firma and tbl_standort
+        unset($contactDataJson['firma_id']);
+        unset($contactDataJson['adresse_id']);
+        unset($contactDataJson['aktiv']);
+        unset($contactDataJson['bezeichnung']);
+        unset($contactDataJson['code']);
+        unset($contactDataJson['kurzbz']);
+        unset($contactDataJson['finanzamt']);
+        unset($contactDataJson['firmentyp_kurzbz']);
+        unset($contactDataJson['gesperrt']);
+        unset($contactDataJson['insertamum']);
+        unset($contactDataJson['insertvon']);
+        unset($contactDataJson['lieferant']);
+        unset($contactDataJson['lieferbedingungen']);
+        unset($contactDataJson['name']);
+        unset($contactDataJson['partner_code']);
+        unset($contactDataJson['schule']);
+        unset($contactDataJson['steuernummer']);
 
         $result = $this->KontaktModel->update($contactDataJson['kontakt_id'], $contactDataJson);
 
