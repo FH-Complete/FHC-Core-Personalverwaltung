@@ -622,17 +622,57 @@ class Api extends Auth_Controller
     {
         if($this->input->method() === 'post'){
 
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
-
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
-                show_error('person id is not numeric!'); 
+            {
+                $this->outputJsonError('person id is not numeric!'); 
+                exit();
+            }
                        
+            //$result = $this->ApiModel->updatePersonEmployeeData($payload);
 
-            $result = $this->ApiModel->updatePersonEmployeeData($payload);
+            $payload['updatevon'] = getAuthUID();
+            $payload['updateamum'] = 'NOW()';
+
+            $alias = $payload['alias'];
+            unset($payload['alias']);
+            $aktiv = $payload['aktiv'];
+            unset($payload['aktiv']);
+            $person_id = $payload['person_id'];
+            unset($payload['person_id']);
+
+            if ($payload['standort_id'] == 0)
+            {
+                $payload['standort_id'] = null;
+            }
+
+            $result = $this->EmployeeModel->update($payload['mitarbeiter_uid'], $payload);
+
+            if (isError($result))
+            {
+                return error($result->msg, EXIT_ERROR);
+            }
+
+            // update alias and aktiv flag
+            // TODO check for alias duplicates!!!
+            $result = $this->BenutzerModel->load($payload['mitarbeiter_uid']);
+
+            if (isError($result))
+            {
+                return error($result->msg, EXIT_ERROR);
+            }
+
+            $userData = $result->retval[0];
+            $userData->alias = $alias;
+            $userData->aktiv = $aktiv;
+            $userData->updatevon = getAuthUID();
+            $userData->updateamum = 'NOW()';
+            $this->BenutzerModel->update($payload['mitarbeiter_uid'], $userData);
+
+            $result = $this->ApiModel->getPersonEmployeeData($person_id);
+
+
             if (isSuccess($result))
             {                
 			    $this->outputJsonSuccess($result->retval);
