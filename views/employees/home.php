@@ -28,7 +28,7 @@
                        'public/css/components/verticalsplit.css',
                        'public/css/components/searchbar.css',
                       ],       
-      'customJSs' => ['vendor/axios/axios/axios.min.js',                     
+      'customJSs' => [                     
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
                     ],
       'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js'],                      
