@@ -4,7 +4,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Api extends Auth_Controller
 {
-    private const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+    const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 
     public function __construct() {
         

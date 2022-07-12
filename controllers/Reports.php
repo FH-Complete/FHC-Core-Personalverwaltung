@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Reports extends Auth_Controller
 {
 
-	private const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 
 	/**
 	 * Constructor
