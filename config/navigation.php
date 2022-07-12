@@ -33,7 +33,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 	'Berichte' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Reports'),
 		'description' => 'Berichte',
-		'icon' => 'file-text-o'
+		'icon' => 'file-text'
 	)
 );
 
