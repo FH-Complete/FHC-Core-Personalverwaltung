@@ -656,7 +656,7 @@ class Api extends Auth_Controller
 
             // update alias and aktiv flag
             // TODO check for alias duplicates!!!
-            $result = $this->BenutzerModel->load($payload['mitarbeiter_uid']);
+            $result = $this->BenutzerModel->loadWhere(array('uid' => $payload['mitarbeiter_uid']));
 
             if (isError($result))
             {
