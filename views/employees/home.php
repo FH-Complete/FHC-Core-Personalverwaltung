@@ -3,40 +3,35 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Personalverwaltung',
-			'jquery3' => true,
-			'jqueryui1' => true,
 			'bootstrap5' => true,
 			'fontawesome6' => true,
-      'tablesorter2' => true,
-			'sbadmintemplate' => false,
-      'primevue3' => true,
-			'ajaxlib' => true,
-      'axios027' => true,
-      'restclient' => true,
+			'tabulator5' => true,
+			'primevue3' => true,
+			'axios027' => true,
+			'restclient' => true,
 			'filtercomponent' => true,
-      'navigationcomponent' => true,
-      'phrases' => array(
-        'global' => array('mailAnXversandt'),
-        'ui' => array('bitteEintragWaehlen')
-      ),
-      'vue3' => true,      
-      'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
-                       'public/css/components/verticalsplit.css',
-                       'public/css/components/searchbar.css',
-                      ],       
-      'customJSs' => [                     
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
-                    ],
-      'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js'],                      
-
+			'navigationcomponent' => true,
+			'phrases' => array(
+				'global' => array('mailAnXversandt'),
+				'ui' => array('bitteEintragWaehlen')
+			),
+			'vue3' => true,
+			'customCSSs' => [
+				'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
+				'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
+				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
+				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
+				'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
+				'public/css/components/verticalsplit.css',
+				'public/css/components/searchbar.css',
+			], 
+			'customJSs' => [
+				'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
+			],
+			'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js']
 		)
 	);
 ?>
-
 
 <div id="wrapper">
 
@@ -81,7 +76,12 @@
                   </div>
                 </div>
                 <!-- Filter component -->
-    						<core-filter-cmpt filter-type="EmployeeViewer" @nw-new-entry="newSideMenuEntryHandler" @select-record="selectRecordHandler"></core-filter-cmpt>
+		<core-filter-cmpt
+			filter-type="EmployeeViewer"
+			:tabulator-options="employeesTabulatorOptions"
+			:tabulator-events="employeesTabulatorEvents"
+			@nw-new-entry="newSideMenuEntryHandler">
+		</core-filter-cmpt>
               </template>
               <template #bottom>
                 <employee-editor :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>

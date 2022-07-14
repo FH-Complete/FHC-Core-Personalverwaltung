@@ -10,8 +10,9 @@ const OrgChooser = {
           location.hostname + ":" +
           location.port;
         
-      const url =
-        `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrgHeads`;
+      const url = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+			FHC_JS_DATA_STORAGE_OBJECT.ci_router + 
+			'/extensions/FHC-Core-Personalverwaltung/api/getOrgHeads';
 
       const orgList = Vue.ref([]);
       const isFetching = Vue.ref(false);

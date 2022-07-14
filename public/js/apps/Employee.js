@@ -171,9 +171,20 @@ const pvApp = Vue.createApp(	{
 			return Vue.$fhcapi.Search.searchdummy(searchsettings);  
 		}
 
-		const selectRecordHandler = (r) => {
-			personSelectedHandler(r.PersonId);
+		const selectRecordHandler = (e, row) => { // Tabulator handler for the rowClick event
+			personSelectedHandler(row.getData().PersonId);
 		}
+
+		const employeesTabulatorEvents = [
+			{
+				event: "rowClick",
+				handler: selectRecordHandler
+			}
+		];
+
+		const employeesTabulatorOptions = {
+			height: 600
+		};
 
 		Vue.onMounted(() => {
 		/*	let params = new URLSearchParams(document.location.search);
@@ -197,6 +208,8 @@ const pvApp = Vue.createApp(	{
 			currentPersonID,
 			appSideMenuEntries,
 			searchbaroptions,
+			employeesTabulatorEvents,
+			employeesTabulatorOptions
 		}
 
 	},
