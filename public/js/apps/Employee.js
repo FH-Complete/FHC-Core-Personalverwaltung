@@ -183,7 +183,31 @@ const pvApp = Vue.createApp(	{
 		];
 
 		const employeesTabulatorOptions = {
-			height: 600
+			height: 600,
+			layout: 'fitColumns',
+			columns: [
+				{title: "UID", field: "UID", headerFilter: true},
+				{title: "Person ID", field: "PersonId", headerFilter: true},
+				{title: "Personal nummer", field: "Personalnummer", headerFilter: true},
+				{title: "Kurzbz", field: "Kurzbz", headerFilter: true},
+				{title: "Vorname", field: "Vorname", headerFilter: true},
+				{title: "Vornamen", field: "Vornamen", headerFilter: true},
+				{title: "Nachname", field: "Nachname", headerFilter: true},
+				{title: "Titel pre", field: "TitelPre", headerFilter: true},
+				{title: "Titel post", field: "TitelPost", headerFilter: true},
+				{title: "Alias", field: "Alias", headerFilter: true},
+				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
+				{title: "Aktiv", field: "Aktiv", headerFilter: true},
+				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
+				{title: "SVNR", field: "SVNR", headerFilter: true},
+				{title: "Raum", field: "Raum", headerFilter: true},
+				{title: "Geschlecht", field: "Geschlecht", headerFilter: true},
+				{title: "DW", field: "DW", headerFilter: true},
+				{title: "Oe kurzbz", field: "OeKurzbz", headerFilter: true},
+				{title: "Oe parent", field: "OeParent", headerFilter: true},
+				{title: "Oe bezeichnung", field: "OeBezeichnung", headerFilter: true},
+				{title: "Oe typ", field: "OeTyp", headerFilter: true}
+			]
 		};
 
 		Vue.onMounted(() => {
