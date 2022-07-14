@@ -30,6 +30,6 @@
 			 WHERE bf.funktion_kurzbz=\'oezuordnung\' AND datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
 		 ORDER BY ma.nachname, ma.vorname
 		',
-		'requiredPermissions' => 'admin'
+		'requiredPermissions' => 'basis/mitarbeiter'
 	);
 
