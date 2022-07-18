@@ -3,26 +3,16 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Personalverwaltung',
-			'jquery' => true,
-			'jqueryui' => false,
 			'bootstrap5' => true,
 			'fontawesome6' => true,
-			'sbadmintemplate' => false,
-			'ajaxlib' => true,
-			'navigationwidget' => false,
+      'axios027' => true,
       'vue3' => true, 
       'primevue3' => true,
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css'],       
-      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/report/PivotReport.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/apps/Report.js'],
-      /*
-      'vueSFCs' => [[
-        "vendor" => "public/extensions/FHC-Core-Personalverwaltung/js/vendor.3239befe.js", 
-				"js" => "public/extensions/FHC-Core-Personalverwaltung/js/index.ccd9a95a.js", 
-				"css" => "public/extensions/FHC-Core-Personalverwaltung/css/index.c5353a60.css", ]]*/
+                       'public/css/components/searchbar.css'],       
+      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/report/PivotReport.js'],
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Report.js')
 		)
 	);
 
@@ -45,8 +35,8 @@
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div id="chooser" class=" form-control-dark w-100">
-      <employee-chooser placeholder="MA suchen..."></employee-chooser>
+    <div id="chooser" class="w-100">
+      <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>				
     </div>
     <div class="navbar-nav">
       <div class="nav-item dropdown">

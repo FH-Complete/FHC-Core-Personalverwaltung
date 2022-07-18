@@ -183,7 +183,7 @@ const pvApp = Vue.createApp(	{
 		];
 
 		const employeesTabulatorOptions = {
-			height: 600,
+			height: "600px",
 			layout: 'fitColumns',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},

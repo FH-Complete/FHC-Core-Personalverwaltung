@@ -2,26 +2,23 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Personalverwaltung',
-			'jquery' => true,
-			'jqueryui' => false,
+			'title' => 'Personalverwaltung',		
 			'bootstrap5' => true,
 			'fontawesome6' => true,
-			'sbadmintemplate' => false,
-			'ajaxlib' => true,
+      'axios027' => true,
 			'navigationwidget' => false,
       'vue3' => true,  
       'primevue3' => true,    
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',  
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css'],     
-      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
+                       'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
+                       'public/css/components/searchbar.css'],     
+      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgViewer.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'                    
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgViewer.js',                                          
                     ],
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'),
 		)
 	);
 ?>
@@ -75,8 +72,8 @@
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div id="chooser" class=" form-control-dark w-100">
-      <employee-chooser placeholder="MA suchen..."></employee-chooser>
+    <div id="chooser" class="w-100">
+      <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>				
     </div>
     <div class="navbar-nav">
       <div class="nav-item dropdown">
