@@ -138,3 +138,27 @@ div#collapseTable.minimized {
   font-size: 0.75em;
 }  
   
+
+/* tabulator */
+
+.tabulator-row .tabulator-cell{
+  padding:4px 12px;
+}
+
+.tabulator-row {
+  min-height: 30px;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content {
+  padding: 4px 12px;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input {
+  padding: 2px !important ;
+}
+
+
+/* filter padding */
+.filter-filter-options {
+  margin-bottom: 15px;
+} 
