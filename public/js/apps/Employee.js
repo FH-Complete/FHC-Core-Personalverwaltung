@@ -211,13 +211,13 @@ const pvApp = Vue.createApp(	{
 		};
 
 		Vue.onMounted(() => {
-		/*	let params = new URLSearchParams(document.location.search);
+			let params = new URLSearchParams(document.location.search);
 			let person_id = params.get("person_id");
 			console.log('EMPLOYEE APP CREATED; person_id=',person_id);
 			if (person_id != null) {
 				currentPersonID.value = parseInt(person_id);
-				//personSelectedHandler(parseInt(person_id));
-			}*/
+				personSelectedHandler(parseInt(person_id));
+			}
 		})
 
 		return {
@@ -240,125 +240,77 @@ const pvApp = Vue.createApp(	{
 
 });
 
-
-let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;			
-
 const fetchNations = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getNations`;
-
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-	  console.log(error)              
-	}		
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getNations');
+	return CoreRESTClient.getData(res.data);		
 }
 
 const fetchSachaufwandTyp = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp`;
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-		console.log(error)              
-	}	
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp');
+	return CoreRESTClient.getData(res.data);
 }
 
 const fetchKontakttyp = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getKontakttyp`;
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-	  console.log(error)              
-	}		
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getKontakttyp');
+	return CoreRESTClient.getData(res.data);
 }
 
 const fetchSprache = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getSprache`;
-
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-	  console.log(error)              
-	}		
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getSprache');
+	return CoreRESTClient.getData(res.data);		
 }
 
 const fetchAusbildung = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getAusbildung`;
-
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-	  console.log(error)              
-	}		
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getAusbildung');
+	return CoreRESTClient.getData(res.data);			
 }
 
 const fetchStandorteIntern = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern`;
-
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-	  console.log(error)              
-	}		
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern');
+	return CoreRESTClient.getData(res.data);		
 }
 
 const fetchOrte = async () => {
-	try {
-	  const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/api/getOrte`;
-
-	  const res = await fetch(url)
-	  let response = await res.json()              
-	  return response.retval;
-	} catch (error) {
-	  console.log(error)              
-	}		
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getOrte');
+	return CoreRESTClient.getData(res.data);		
 }
 
 fetchSprache().then((r) => {
-	pvApp.provide("sprache",r.retval);
+	pvApp.provide("sprache",r);
 })
 
 fetchNations().then((r) => {
-	pvApp.provide("nations",r.retval);
+	pvApp.provide("nations",r);
 })
 
 fetchKontakttyp().then((r) => {
-	pvApp.provide("kontakttyp",r.retval);
+	pvApp.provide("kontakttyp",r);
 })
 
 
 fetchAusbildung().then((r) => {
 	console.log('Ausbildung fetched');
-	pvApp.provide("ausbildung",r.retval);
+	pvApp.provide("ausbildung",r);
 })
 
 fetchStandorteIntern().then((r) => {
-	pvApp.provide("standorte",r.retval);
+	pvApp.provide("standorte",r);
 })
 
 fetchOrte().then((r) => {
-	pvApp.provide("orte",r.retval);
+	pvApp.provide("orte",r);
 })
 
 fetchSachaufwandTyp().then((r) => {
-	pvApp.provide("sachaufwandtyp",r.retval);
+	pvApp.provide("sachaufwandtyp",r);
 })
-
-async function fetchSelectionLists() {
-	var r = await fetchAusbildung()
-	pvApp.provide("ausbildung",r.retval);
-}
 
 
 pvApp.mount('#wrapper');

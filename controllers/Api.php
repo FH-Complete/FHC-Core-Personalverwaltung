@@ -90,7 +90,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($spracheRes);
+        $this->outputJson($spracheRes);
     }
 
 
@@ -106,7 +106,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($sachaufwandTypRes); 
+        $this->outputJson($sachaufwandTypRes); 
     }
 
     function getNations()
@@ -125,7 +125,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($nationRes); 
+        $this->outputJson($nationRes); 
     }
 
     function getAusbildung()
@@ -139,20 +139,20 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($result); 
+        $this->outputJson($result); 
     }
 
     function getStandorteIntern()
     {
         $data = $this->ApiModel->getStandorteIntern();
-        $this->outputJsonSuccess($data); 
+        $this->outputJson($data); 
     }
 
     function getOrte()
     {
         $this->OrtModel->addOrder("ort_kurzbz");
         $data = $this->OrtModel->load();
-        $this->outputJsonSuccess($data);
+        $this->outputJson($data);
     }
 
     function getGemeinden()
@@ -173,7 +173,7 @@ class Api extends Auth_Controller
         $plz = $this->input->get('plz', TRUE);
 
         if (!is_numeric($plz))
-			show_error('plz is not numeric!');
+            $this->outputJsonError("plz '$plz' is not numeric!'");     
 
         $data = $this->ApiModel->getOrtschaften($plz);
         $this->outputJsonSuccess($data); 
@@ -198,10 +198,6 @@ class Api extends Auth_Controller
     function upsertPersonMaterialExpenses()
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
@@ -853,7 +849,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($result); 
+        $this->outputJson($result); 
     }
 
     private function _remapData($attribute, &$data) {
