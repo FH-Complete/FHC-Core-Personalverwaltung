@@ -1,6 +1,7 @@
 
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
+import {OrgChooser} from "../components/organisation/OrgChooser.js";
 
 const pvApp = Vue.createApp(	{
 	components: {	
