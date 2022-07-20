@@ -10,15 +10,14 @@
       'vue3' => true,  
       'primevue3' => true,    
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',  
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
                        'public/css/components/searchbar.css'],     
-      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
+      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                                            
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgViewer.js',                                          
                     ],
-      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'),
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
+                                 'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'),
 		)
 	);
 ?>
