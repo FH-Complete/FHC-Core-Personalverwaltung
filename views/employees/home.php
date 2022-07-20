@@ -66,22 +66,24 @@
                 
           <verticalsplit id="macombined" ref="verticalsplitRef">
               <template #top>
-                <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                          
-                  <div class="flex-fill align-self-center">
-                    <h1 class="h2" style="margin-bottom:0" > Mitarbeiter</h1>
+                <div class="d-flex  flex-column" style="height:100%"  >
+                  <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            
+                    <div class="flex-fill align-self-center">
+                      <h1 class="h2" style="margin-bottom:0" > Mitarbeiter</h1>
+                    </div>
+                    <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
+                        <button type="button" class="btn btn-outline-secondary" ><i class="fa fa-plus"></i></button>
+                    </div>
                   </div>
-                  <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
-                      <button type="button" class="btn btn-outline-secondary" ><i class="fa fa-plus"></i></button>
-                  </div>
+                    <!-- Filter component -->
+                    <core-filter-cmpt
+                      filter-type="EmployeeViewer"
+                      :tabulator-options="employeesTabulatorOptions"
+                      :tabulator-events="employeesTabulatorEvents"
+                      @nw-new-entry="newSideMenuEntryHandler">
+                    </core-filter-cmpt>
                 </div>
-                <!-- Filter component -->
-		<core-filter-cmpt
-			filter-type="EmployeeViewer"
-			:tabulator-options="employeesTabulatorOptions"
-			:tabulator-events="employeesTabulatorEvents"
-			@nw-new-entry="newSideMenuEntryHandler">
-		</core-filter-cmpt>
               </template>
               <template #bottom>
                 <employee-editor :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>
