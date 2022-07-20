@@ -25,6 +25,7 @@ const pvApp = Vue.createApp(	{
 		const isEditorOpen = Vue.ref(false);
 		const currentPersonID = Vue.ref(null);
 		const appSideMenuEntries = Vue.ref({});
+		const verticalsplitRef = Vue.ref(null);
 
 		const searchbaroptions = Vue.ref({
 			types: [
@@ -146,7 +147,12 @@ const pvApp = Vue.createApp(	{
 
 		const personSelectedHandler = (id) => {
 			console.log('personSelected: ', id);
-			isEditorOpen.value=true;
+
+			if (!isEditorOpen.value) {
+				verticalsplitRef.value.showBoth();
+				isEditorOpen.value=true;
+			}
+
 			currentPersonID.value = id;
 			let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 			let url = `${full}/extensions/FHC-Core-Personalverwaltung/Employees?person_id=${id}`
@@ -183,7 +189,7 @@ const pvApp = Vue.createApp(	{
 		];
 
 		const employeesTabulatorOptions = {
-			height: "600px",
+			height: "100vh",
 			layout: 'fitColumns',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
@@ -217,6 +223,10 @@ const pvApp = Vue.createApp(	{
 			if (person_id != null) {
 				currentPersonID.value = parseInt(person_id);
 				personSelectedHandler(parseInt(person_id));
+				isEditorOpen.value = true;
+				verticalsplitRef.value.collapseTop();
+			} else {
+				verticalsplitRef.value.collapseBottom();
 			}
 		})
 
@@ -233,7 +243,8 @@ const pvApp = Vue.createApp(	{
 			appSideMenuEntries,
 			searchbaroptions,
 			employeesTabulatorEvents,
-			employeesTabulatorOptions
+			employeesTabulatorOptions,
+			verticalsplitRef
 		}
 
 	},
