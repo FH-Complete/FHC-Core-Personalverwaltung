@@ -664,7 +664,7 @@ class Api extends Auth_Controller
             $userData->aktiv = $aktiv;
             $userData->updatevon = getAuthUID();
             $userData->updateamum = 'NOW()';
-            $this->BenutzerModel->update($payload['mitarbeiter_uid'], $userData);
+            $this->BenutzerModel->update(array($payload['mitarbeiter_uid']), $userData);
 
             $result = $this->ApiModel->getPersonEmployeeData($person_id);
 
