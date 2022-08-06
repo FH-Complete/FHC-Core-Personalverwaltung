@@ -105,6 +105,14 @@ const OrgViewer = {
                 <p-skeleton></p-skeleton>
             </template>
         </p-column>
+        <p-column field="assistenz" header="Assistenz" style="width:300px" filterMatchMode="contains">
+            <template #filter>
+                <p-inputtext type="text" v-model="filters['assistenz']" class="p-column-filter" placeholder="Filter by Assistenz"></p-inputtext>
+            </template>
+            <template #body  v-if="isFetching">
+                <p-skeleton></p-skeleton>
+            </template>
+        </p-column>
         
     </p-treetable>
     `
