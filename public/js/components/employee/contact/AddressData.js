@@ -387,7 +387,7 @@ export const AddressData = {
                                 
                     <div class="col-md-6">
                         <label for="strasse" class="form-label">Strasse</label>
-                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" >
+                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" maxlength="256">
                     </div>
                     <div class="col-md-6">
                         <label for="nation" class="form-label">Nation</label>
@@ -413,7 +413,7 @@ export const AddressData = {
                     <!-- Gemeinde -->
                     <div class="col-md-6">
                         <label for="gemeinde" class="form-label">Gemeinde</label>
-                        <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="11" v-model="currentAddress.gemeinde">
+                        <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="256" v-model="currentAddress.gemeinde">
                         <select  v-if="currentAddress.nation=='A'" id="gemeinde" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.gemeinde" >
                             <option v-for="(item, index) in gemeinden" :value="item.name">
                                 {{ item.name }}
@@ -424,7 +424,7 @@ export const AddressData = {
                     <!-- c/o -->
                     <div class="col-md-6">
                         <label for="co_name" class="form-label">Abweich.Empfänger. (c/o)</label>
-                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="11" v-model="currentAddress.co_name">
+                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="256" v-model="currentAddress.co_name">
                     </div>
 
                     <div class="col-md-2">    </div>
