@@ -508,6 +508,7 @@ class Api_model extends DB_Model
         {
             $addressDataJson['nation'] = 'A';
         }
+        $addressDataJson['typ'] = 'h';
 
         $result = $this->AdresseModel->insert($addressDataJson);
 
