@@ -429,6 +429,7 @@ class Api_model extends DB_Model
         unset($bankDataJson['oe_kurzbz']);
         $bankDataJson['insertvon'] = getAuthUID();
         $bankDataJson['insertamum'] = $this->escape('NOW()');
+        $bankDataJson['typ']='p';
 
         $result = $this->BankverbindungModel->insert($bankDataJson);
 

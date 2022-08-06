@@ -356,7 +356,6 @@ export const BankData = {
                 <th scope="col">BIC</th>
                 <th scope="col">IBAN</th>
                 <th scope="col">Kontonr</th>
-                <th scope="col">Typ</th>
                 <th scope="col">Verrechnung</th>
                 <th scope="col">Aktion</th>
             </tr>
@@ -368,7 +367,6 @@ export const BankData = {
                 <td class="align-middle">{{ bankdata.bic }}</td>
                 <td class="align-middle">{{ bankdata.iban }}</td>
                 <td class="align-middle">{{ bankdata.kontonr }}</td>
-                <td class="align-middle">{{ bankdata.typ }}</td>
                 <td class="align-middle">{{ bankdata.verrechnung == true ? "X" : "" }}</td>
                 <td class="align-middle" width="5%">
                     <div class="d-grid gap-2 d-md-flex align-middle">
