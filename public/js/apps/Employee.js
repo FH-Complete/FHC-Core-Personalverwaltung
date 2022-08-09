@@ -95,7 +95,7 @@ const pvApp = Vue.createApp(	{
 					defaultaction: {
 					  type: "function",
 					  action: (data) =>  { 
-							return personSelectedHandler(data.person_id);
+							return personSelectedHandler(data.person_id, 'search');
 					  }
 					},
 					childactions: [
@@ -145,12 +145,17 @@ const pvApp = Vue.createApp(	{
 			}
 		});
 
-		const personSelectedHandler = (id) => {
+		const personSelectedHandler = (id, src) => {
 			console.log('personSelected: ', id);
 
-			if (!isEditorOpen.value) {
+                        src = (typeof src !=='undefined') ? src : 'unknown';
+			if (verticalsplitRef.value.isCollapsed() === 'bottom') {
+                            if( src === 'search' ) {
+                                verticalsplitRef.value.collapseTop();
+                            } else {
 				verticalsplitRef.value.showBoth();
-				isEditorOpen.value=true;
+                            }
+                            isEditorOpen.value=true;
 			}
 
 			currentPersonID.value = id;
