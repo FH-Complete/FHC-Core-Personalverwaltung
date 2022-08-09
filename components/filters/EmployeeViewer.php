@@ -25,9 +25,11 @@
 				oe.oe_parent_kurzbz as "OeParent",
 				oe.bezeichnung as "OeBezeichnung",
 				oe.organisationseinheittyp_kurzbz as "OeTyp"
-			 FROM campus.vw_mitarbeiter ma
-			   LEFT JOIN tbl_benutzerfunktion bf USING(uid) LEFT JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
-			 WHERE bf.funktion_kurzbz=\'oezuordnung\' AND datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
+			 FROM campus.vw_mitarbeiter ma			   
+			   LEFT JOIN (
+				SELECT bf.uid,oe_kurzbz,oe_parent_kurzbz,public.tbl_organisationseinheit.bezeichnung,organisationseinheittyp_kurzbz  
+				FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit using(oe_kurzbz)
+				WHERE funktion_kurzbz=\'oezuordnung\' and datum_von<=now() AND (datum_bis is null OR datum_bis>=now())) oe USING(uid)
 		 ORDER BY ma.nachname, ma.vorname
 		',
 		'requiredPermissions' => 'basis/mitarbeiter'
