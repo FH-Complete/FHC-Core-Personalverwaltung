@@ -21,7 +21,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	),
 	'Mitarbeiter' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Employees/index'),
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Employees'),
 		'description' => 'Mitarbeiter',
 		'icon' => 'users',
 		'requiredPermissions' => 'basis/mitarbeiter:r'
