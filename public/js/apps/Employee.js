@@ -19,7 +19,58 @@ const router = VueRouter.createRouter(
 	}
 );
 
-const pvApp = Vue.createApp({}).use(router);
+const pvApp = Vue.createApp({
+	setup() {
+		
+		// init shared data
+		const sprache = Vue.ref([]);
+		const nations = Vue.ref([]);
+		const standorte = Vue.ref([]);
+		const orte = Vue.ref([]);
+		const ausbildung = Vue.ref([]);
+		const kontakttyp = Vue.ref([]);
+		const sachaufwandtyp  = Vue.ref([]);
+
+		Vue.provide("sprache",sprache);
+		Vue.provide("nations",nations);
+		Vue.provide("standorte",standorte);
+		Vue.provide("orte",orte);
+		Vue.provide("ausbildung",ausbildung);
+		Vue.provide("kontakttyp",kontakttyp);
+		Vue.provide("sachaufwandtyp",sachaufwandtyp);
+
+		fetchSprache().then((r) => {
+			sprache.value = r;
+		})
+
+		fetchNations().then((r) => {
+			nations.value = r;
+		})
+
+		fetchAusbildung().then((r) => {
+			ausbildung.value = r;
+		})
+
+		fetchOrte().then((r) => {
+			orte.value = r;
+		})
+
+		fetchStandorteIntern().then((r) => {
+			standorte.value = r;
+		})
+
+
+		fetchKontakttyp().then((r) => {
+			kontakttyp.value = r;
+		})
+
+
+		fetchSachaufwandTyp().then((r) => {
+			sachaufwandtyp.value = r;
+		})
+
+	}
+}).use(router);
 
 const fetchNations = async () => {
 	const res = await CoreRESTClient.get(
@@ -62,37 +113,6 @@ const fetchOrte = async () => {
 		'extensions/FHC-Core-Personalverwaltung/api/getOrte');
 	return CoreRESTClient.getData(res.data);		
 }
-
-fetchSprache().then((r) => {
-	pvApp.provide("sprache",r);
-})
-
-fetchNations().then((r) => {
-	pvApp.provide("nations",r);
-})
-
-fetchKontakttyp().then((r) => {
-	pvApp.provide("kontakttyp",r);
-})
-
-
-fetchAusbildung().then((r) => {
-	console.log('Ausbildung fetched');
-	pvApp.provide("ausbildung",r);
-})
-
-fetchStandorteIntern().then((r) => {
-	pvApp.provide("standorte",r);
-})
-
-fetchOrte().then((r) => {
-	pvApp.provide("orte",r);
-})
-
-fetchSachaufwandTyp().then((r) => {
-	pvApp.provide("sachaufwandtyp",r);
-})
-
 
 pvApp.mount('#wrapper');
 

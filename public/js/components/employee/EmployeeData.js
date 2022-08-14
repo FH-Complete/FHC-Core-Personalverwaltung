@@ -109,7 +109,7 @@ export const EmployeeData= {
 
         const getAusbildungbez = (code) => {
             if (!code) return '';
-            let result = ausbildung?.filter((item) => item.ausbildungcode == code);
+            let result = ausbildung.value?.filter((item) => item.ausbildungcode == code);
             if (result?.length > 0)
                 return result[0].ausbildungbez;
             return '';
@@ -117,7 +117,7 @@ export const EmployeeData= {
 
         const getStandortbez = (standort_id) => {
             if (!standort_id) return '';
-            let result = standorte?.filter((item) => item.standort_id == standort_id);
+            let result = standorte.value?.filter((item) => item.standort_id == standort_id);
             if (result?.length > 0)
                 return result[0].bezeichnung;
             return '';
