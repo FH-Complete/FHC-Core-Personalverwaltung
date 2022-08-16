@@ -29,6 +29,7 @@ const pvApp = Vue.createApp({
 		const orte = Vue.ref([]);
 		const ausbildung = Vue.ref([]);
 		const kontakttyp = Vue.ref([]);
+		const adressentyp = Vue.ref([]);
 		const sachaufwandtyp  = Vue.ref([]);
 
 		Vue.provide("sprache",sprache);
@@ -37,6 +38,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("orte",orte);
 		Vue.provide("ausbildung",ausbildung);
 		Vue.provide("kontakttyp",kontakttyp);
+		Vue.provide("adressentyp",adressentyp);
 		Vue.provide("sachaufwandtyp",sachaufwandtyp);
 
 		fetchSprache().then((r) => {
@@ -64,6 +66,9 @@ const pvApp = Vue.createApp({
 			kontakttyp.value = r;
 		})
 
+		fetchAdressentyp().then((r) => {
+			adressentyp.value = r;
+		})
 
 		fetchSachaufwandTyp().then((r) => {
 			sachaufwandtyp.value = r;
@@ -87,6 +92,12 @@ const fetchSachaufwandTyp = async () => {
 const fetchKontakttyp = async () => {
 	const res = await CoreRESTClient.get(
 		'extensions/FHC-Core-Personalverwaltung/api/getKontakttyp');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchAdressentyp = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getAdressentyp');
 	return CoreRESTClient.getData(res.data);
 }
 

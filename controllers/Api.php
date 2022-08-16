@@ -47,7 +47,8 @@ class Api extends Auth_Controller
                 'deletePersonContactData' => Api::DEFAULT_PERMISSION,
                 'getKontakttyp' => Api::DEFAULT_PERMISSION,
                 'foto' => Api::DEFAULT_PERMISSION,
-                'uidByPerson' => Api::DEFAULT_PERMISSION
+                'uidByPerson' => Api::DEFAULT_PERMISSION,
+                'getAdressentyp' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -62,6 +63,7 @@ class Api extends Auth_Controller
         $this->load->model('codex/Nation_model', 'NationModel');
         $this->load->model('codex/Ausbildung_model', 'AusbildungModel');
         $this->load->model('person/kontakttyp_model', 'KontakttypModel');
+        $this->load->model('person/Adressentyp_model', 'AdressentypModel');
         $this->load->model('system/sprache_model', 'SpracheModel');
         $this->load->model('ressource/ort_model', 'OrtModel');
         $this->load->model('ressource/Mitarbeiter_model', 'EmployeeModel');
@@ -701,10 +703,6 @@ class Api extends Auth_Controller
     {
         if($this->input->method() === 'post'){
 
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
-
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
@@ -851,6 +849,25 @@ class Api extends Auth_Controller
 
         $this->outputJson($result); 
     }
+
+    //  ------------------------------------------
+    // Adressentyp
+    // -------------------------------------------
+
+    function getAdressentyp()
+    {
+		$this->AdressentypModel->addOrder("sort");
+		$result = $this->AdressentypModel->load();
+
+		if (isError($result))
+		{
+			$this->outputJsonError(getError($result));
+			exit;
+		}
+
+        $this->outputJson($result); 
+    }
+    
 
     private function _remapData($attribute, &$data) {
         $mappedData = new stdClass();
