@@ -193,33 +193,50 @@ const pvApp = Vue.createApp(	{
 			}
 		];
 
+                const sexformatter = function(cell, formatterParams, onRendered) {
+                    var value = cell.getValue();
+                    if( value === 'm') {
+                        return 'männlich';
+                    } else if( value === 'w' ) {
+                        return 'weiblich';
+                    } else if( value === 'x' ) {
+                        return 'divers';
+                    } else if( value === 'u' ) {
+                        return 'unbekannt';
+                    } else {
+                        return value;
+                    }
+                };
+                
+
 		const employeesTabulatorOptions = {
 			maxHeight: "100%",
 			minHeight: 50,
 			layout: 'fitColumns',
 			columns: [
-				{title: "UID", field: "UID", headerFilter: true},
-				{title: "Person ID", field: "PersonId", headerFilter: true},
-				{title: "Personal nummer", field: "Personalnummer", headerFilter: true},
-				{title: "Kurzbz", field: "Kurzbz", headerFilter: true},
-				{title: "Vorname", field: "Vorname", headerFilter: true},
-				{title: "Vornamen", field: "Vornamen", headerFilter: true},
-				{title: "Nachname", field: "Nachname", headerFilter: true},
-				{title: "Titel pre", field: "TitelPre", headerFilter: true},
-				{title: "Titel post", field: "TitelPost", headerFilter: true},
-				{title: "Alias", field: "Alias", headerFilter: true},
-				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
-				{title: "Aktiv", field: "Aktiv", headerFilter: true},
-				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
-				{title: "SVNR", field: "SVNR", headerFilter: true},
-				{title: "Raum", field: "Raum", headerFilter: true},
-				{title: "Geschlecht", field: "Geschlecht", headerFilter: true},
-				{title: "DW", field: "DW", headerFilter: true},
-				{title: "Oe kurzbz", field: "OeKurzbz", headerFilter: true},
-				{title: "Oe parent", field: "OeParent", headerFilter: true},
-				{title: "Oe bezeichnung", field: "OeBezeichnung", headerFilter: true},
-				{title: "Oe typ", field: "OeTyp", headerFilter: true}
-			]
+                            {title: "UID", field: "UID", headerFilter: true},
+                            {title: "Person ID", field: "PersonId", headerFilter: true},
+                            {title: "Personal nummer", field: "Personalnummer", headerFilter: true},
+                            {title: "Kurzbz", field: "Kurzbz", headerFilter: true},
+                            {title: "Vorname", field: "Vorname", headerFilter: true},
+                            {title: "Vornamen", field: "Vornamen", headerFilter: true},
+                            {title: "Nachname", field: "Nachname", headerFilter: true},
+                            {title: "Titel pre", field: "TitelPre", headerFilter: true},
+                            {title: "Titel post", field: "TitelPost", headerFilter: true},
+                            {title: "Alias", field: "Alias", headerFilter: true},
+                            {title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
+                            {title: "Aktiv", field: "Aktiv", formatter:"tickCross",  headerFilter:"tickCross", headerFilterParams:{"tristate":true,elementAttributes:{"value":"true"}}, headerFilterEmptyCheck:function(value){return value === null}},
+                            {title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
+                            {title: "SVNR", field: "SVNR", headerFilter: true},
+                            {title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
+                            {title: "Geschlecht", field: "Geschlecht", formatter:sexformatter, headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, autocomplete: true, sort: "asc"}},
+                            {title: "DW", field: "DW", headerFilter: true},
+                            {title: "Standard Kostenstelle", field: "StdKst", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
+                            {title: "Oe kurzbz", field: "OeKurzbz", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+                            {title: "Oe parent", field: "OeParent", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+                            {title: "Oe bezeichnung", field: "OeBezeichnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+                            {title: "Oe typ", field: "OeTyp", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}
+                        ]
 		};
 
 		Vue.onMounted(() => {
