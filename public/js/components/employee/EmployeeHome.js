@@ -196,6 +196,21 @@ export default {
 			}
 		];
 
+		const sexformatter = function(cell, formatterParams, onRendered) {
+			var value = cell.getValue();
+			if( value === 'm') {
+				return 'männlich';
+			} else if( value === 'w' ) {
+				return 'weiblich';
+			} else if( value === 'x' ) {
+				return 'divers';
+			} else if( value === 'u' ) {
+				return 'unbekannt';
+			} else {
+				return value;
+			}
+		};
+
 		const employeesTabulatorOptions = {
 			maxHeight: "100%",
 			minHeight: 50,
@@ -212,16 +227,17 @@ export default {
 				{title: "Titel post", field: "TitelPost", headerFilter: true},
 				{title: "Alias", field: "Alias", headerFilter: true},
 				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
-				{title: "Aktiv", field: "Aktiv", headerFilter: true},
+				{title: "Aktiv", field: "Aktiv", formatter:"tickCross",  headerFilter:"tickCross", headerFilterParams:{"tristate":true,elementAttributes:{"value":"true"}}, headerFilterEmptyCheck:function(value){return value === null}},
 				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
 				{title: "SVNR", field: "SVNR", headerFilter: true},
-				{title: "Raum", field: "Raum", headerFilter: true},
-				{title: "Geschlecht", field: "Geschlecht", headerFilter: true},
+				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
+				{title: "Geschlecht", field: "Geschlecht", formatter:sexformatter, headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, autocomplete: true, sort: "asc"}},
 				{title: "DW", field: "DW", headerFilter: true},
-				{title: "Oe kurzbz", field: "OeKurzbz", headerFilter: true},
-				{title: "Oe parent", field: "OeParent", headerFilter: true},
-				{title: "Oe bezeichnung", field: "OeBezeichnung", headerFilter: true},
-				{title: "Oe typ", field: "OeTyp", headerFilter: true}
+				{title: "Standard Kostenstelle", field: "StdKst", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
+				{title: "Oe kurzbz", field: "OeKurzbz", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "Oe parent", field: "OeParent", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "Oe bezeichnung", field: "OeBezeichnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "Oe typ", field: "OeTyp", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}
 			]
 		};
 
@@ -292,7 +308,7 @@ export default {
         <div class="container-fluid">
             <div class="row">
                 
-            <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  noheader custom-nav-styles="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+            <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
                         
