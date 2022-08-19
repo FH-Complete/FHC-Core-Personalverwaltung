@@ -8,6 +8,7 @@
       'axios027' => true,
       'vue3' => true, 
       'primevue3' => true,
+      'navigationcomponent' => true,
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/css/components/searchbar.css'],       
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
