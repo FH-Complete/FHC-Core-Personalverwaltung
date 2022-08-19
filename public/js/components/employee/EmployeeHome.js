@@ -318,7 +318,7 @@ export default {
                         <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                                     
                             <div class="flex-fill align-self-center">
-                            <h1 class="h2" style="margin-bottom:0" > Mitarbeiter {{ $route.params.id }}</h1>
+                            <h1 class="h2" style="margin-bottom:0" > Mitarbeiter </h1>
                             </div>
                             <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
                                 <button type="button" class="btn btn-outline-secondary" ><i class="fa fa-plus"></i></button>
