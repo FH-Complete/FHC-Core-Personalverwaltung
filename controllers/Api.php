@@ -763,12 +763,14 @@ class Api extends Auth_Controller
             if (!is_numeric($person_id))
                 show_error('person id is not numeric!');
 
-            $data = $this->KontaktModel->getWholeKontakt(null, $person_id);
-            $this->_remapData('kontakt_id',$data);
-
+		    $this->KontaktModel->addOrder("kontakt_id");
+		    $data = $this->KontaktModel->loadWhere(array('person_id'=>$person_id));
+           
             if (isSuccess($data))
+            {
+                $this->_remapData('kontakt_id',$data);
 			    $this->outputJsonSuccess($data->retval);
-		    else
+            } else
 			    $this->outputJsonError('Error when fetching contact data');
 
         } else {
@@ -779,10 +781,6 @@ class Api extends Auth_Controller
     function upsertPersonContactData()
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
