@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_sachaufwand (
 	sachaufwand_id bigint NOT NULL,
 	mitarbeiter_uid character varying(32),
 	sachaufwandtyp_kurzbz character varying(32),
---	dienstverhaeltnis_id integer, // Später
+	dienstverhaeltnis_id integer, -- neu
 	beginn date,
 	ende date,
 	anmerkung text,
@@ -30,8 +30,8 @@ END $$;
 
 DO $$
 BEGIN
-	ALTER TABLE hr.tbl_sachaufwand ADD CONSTRAINT tbl_mitarbeiter_fk FOREIGN KEY (mitarbeiter_uid)
-	REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
+	ALTER TABLE hr.tbl_sachaufwand ADD CONSTRAINT tbl_dienstverhaeltnis_fk FOREIGN KEY (dienstverhaeltnis_id)
+	REFERENCES hr.tbl_dienstverhaeltnis (dienstverhaeltnis_id) MATCH FULL
 	ON DELETE SET NULL ON UPDATE CASCADE;
  	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
