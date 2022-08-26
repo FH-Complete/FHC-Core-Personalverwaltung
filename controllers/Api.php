@@ -24,6 +24,7 @@ class Api extends Auth_Controller
                 'deletePersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'getOrgHeads' => Api::DEFAULT_PERMISSION,
                 'getOrgStructure' => Api::DEFAULT_PERMISSION,
+                'getOrgPersonen' => Api::DEFAULT_PERMISSION,
                 'getContractExpire' => Api::DEFAULT_PERMISSION,
                 'getContractNew' => Api::DEFAULT_PERMISSION,
                 'getBirthdays' => Api::DEFAULT_PERMISSION,
@@ -266,6 +267,14 @@ class Api extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getOrgStructure($oe);
+        return $this->outputJson($data); 
+    }
+
+    function getOrgPersonen()
+    {
+        $oe = $this->input->get('oe', TRUE);
+
+        $data = $this->OrganisationseinheitModel->getPersonen($oe);
         return $this->outputJson($data); 
     }
     
