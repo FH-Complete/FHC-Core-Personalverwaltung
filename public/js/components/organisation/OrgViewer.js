@@ -163,14 +163,14 @@ export const OrgViewer = {
                 <p-skeleton></p-skeleton>
             </template>
         </p-column>
-        <p-column headerStyle="width: 5rem" headerClass="text-center" bodyClass="text-center">
+        <p-column headerStyle="width: 3rem" headerClass="text-center" bodyClass="text-center">
                 <template #header>                    
                 </template>
                 <template #body="slotProps">
                     
-                    <p-button type="button" class="p-button-primary" style="margin-right: .1em" @click="showModal(slotProps.node.data)">
+                    <button type="button" class="btn btn-outline-dark "  @click="showModal(slotProps.node.data)">
                             <i class="fa fa-info"></i>
-                    </p-button>
+                    </button>
                 </template>
         </p-column>
         
