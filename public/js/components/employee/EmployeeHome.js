@@ -156,21 +156,19 @@ export default {
 		const personSelectedHandler = (id) => {
 			console.log('personSelected: ', id);
 
-			if (!isEditorOpen.value) {
+			if (verticalsplitRef.value.isCollapsed() == 'bottom') {
 				verticalsplitRef.value.showBoth();
-				isEditorOpen.value=true;
+				//isEditorOpen.value=true;
 			}
 
-			//currentPersonID.value = id;
 			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}`
 			router.push(url);
-			//history.pushState({}, "", url);
 		}
 
 		//personSelectedRef.callback = personSelectedHandler;
 
 		const closeEditorHandler = () => {
-			isEditorOpen.value=false;
+			//isEditorOpen.value=false;
 		}
 		
 		const newSideMenuEntryHandler = (payload) => {
