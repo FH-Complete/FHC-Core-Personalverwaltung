@@ -391,7 +391,7 @@ export const BankData = {
                             
                 <div class="col-md-8">
                     <label for="receiver" class="form-label">Empfänger</label>
-                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="receiver" v-model="currentValue.anschrift">
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="receiver" v-model="currentValue.anschrift" maxlength="128">
                 </div>
                 <div class="col-md-4"></div>
                 <!--  -->
@@ -408,18 +408,18 @@ export const BankData = {
                 <!-- -->
                 <div class="col-md-8">
                     <label for="uid" class="form-label">Bank</label>
-                    <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.name">
+                    <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" maxlength="64"  v-model="currentValue.name">
                 </div>
                 <div class="col-md-4">
                 </div>
                 <!-- -->
                 <div class="col-md-2">
                     <label for="blz" class="form-label">BLZ</label>
-                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="blz" v-model="currentValue.blz">
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="blz" maxlength="16"  v-model="currentValue.blz">
                 </div>
                 <div class="col-md-4">
                     <label for="kontonr" class="form-label">Kontonr</label>
-                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kontonr" v-model="currentValue.kontonr">
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kontonr" maxlength="16"  v-model="currentValue.kontonr">
                 </div>
                 <div class="col-md-2">
                     <label for="verrechnung" class="form-label">Verrechnung</label>

@@ -24,6 +24,7 @@ class Api extends Auth_Controller
                 'deletePersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'getOrgHeads' => Api::DEFAULT_PERMISSION,
                 'getOrgStructure' => Api::DEFAULT_PERMISSION,
+                'getOrgPersonen' => Api::DEFAULT_PERMISSION,
                 'getContractExpire' => Api::DEFAULT_PERMISSION,
                 'getContractNew' => Api::DEFAULT_PERMISSION,
                 'getBirthdays' => Api::DEFAULT_PERMISSION,
@@ -47,7 +48,8 @@ class Api extends Auth_Controller
                 'deletePersonContactData' => Api::DEFAULT_PERMISSION,
                 'getKontakttyp' => Api::DEFAULT_PERMISSION,
                 'foto' => Api::DEFAULT_PERMISSION,
-                'uidByPerson' => Api::DEFAULT_PERMISSION
+                'uidByPerson' => Api::DEFAULT_PERMISSION,
+                'getAdressentyp' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -62,6 +64,7 @@ class Api extends Auth_Controller
         $this->load->model('codex/Nation_model', 'NationModel');
         $this->load->model('codex/Ausbildung_model', 'AusbildungModel');
         $this->load->model('person/kontakttyp_model', 'KontakttypModel');
+        $this->load->model('person/Adressentyp_model', 'AdressentypModel');
         $this->load->model('system/sprache_model', 'SpracheModel');
         $this->load->model('ressource/ort_model', 'OrtModel');
         $this->load->model('ressource/Mitarbeiter_model', 'EmployeeModel');
@@ -264,6 +267,14 @@ class Api extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getOrgStructure($oe);
+        return $this->outputJson($data); 
+    }
+
+    function getOrgPersonen()
+    {
+        $oe = $this->input->get('oe', TRUE);
+
+        $data = $this->OrganisationseinheitModel->getPersonen($oe);
         return $this->outputJson($data); 
     }
     
@@ -701,10 +712,6 @@ class Api extends Auth_Controller
     {
         if($this->input->method() === 'post'){
 
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
-
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
@@ -765,12 +772,14 @@ class Api extends Auth_Controller
             if (!is_numeric($person_id))
                 show_error('person id is not numeric!');
 
-            $data = $this->KontaktModel->getWholeKontakt(null, $person_id);
-            $this->_remapData('kontakt_id',$data);
-
+		    $this->KontaktModel->addOrder("kontakt_id");
+		    $data = $this->KontaktModel->loadWhere(array('person_id'=>$person_id));
+           
             if (isSuccess($data))
+            {
+                $this->_remapData('kontakt_id',$data);
 			    $this->outputJsonSuccess($data->retval);
-		    else
+            } else
 			    $this->outputJsonError('Error when fetching contact data');
 
         } else {
@@ -781,10 +790,6 @@ class Api extends Auth_Controller
     function upsertPersonContactData()
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
@@ -851,6 +856,25 @@ class Api extends Auth_Controller
 
         $this->outputJson($result); 
     }
+
+    //  ------------------------------------------
+    // Adressentyp
+    // -------------------------------------------
+
+    function getAdressentyp()
+    {
+		$this->AdressentypModel->addOrder("sort");
+		$result = $this->AdressentypModel->load();
+
+		if (isError($result))
+		{
+			$this->outputJsonError(getError($result));
+			exit;
+		}
+
+        $this->outputJson($result); 
+    }
+    
 
     private function _remapData($attribute, &$data) {
         $mappedData = new stdClass();

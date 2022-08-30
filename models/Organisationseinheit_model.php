@@ -2,6 +2,10 @@
 
 class Organisationseinheit_model extends DB_Model
 {
+    const FUNKTION_LEITUNG = 'Leitung';
+    const FUNKTION_ASSISTENZ = 'ass';
+    const FUNKTION_DISZIPLINAER = 'oezuordnung';
+    const FUNKTION_FACHLICH = 'fachzuordnung';
 
     public function __construct()
 	{
@@ -52,7 +56,7 @@ class Organisationseinheit_model extends DB_Model
         {
             $leitung = $this->getLeitung($value->oe_kurzbz);
             $leitung_str = $this->formatPerson($leitung);
-            $ass = $this->getAssistenz($oe_kurzbz);
+            $ass = $this->getAssistenz($value->oe_kurzbz);
             $ass_str = $this->formatPerson($ass);
             $value->leitung = $leitung_str;
             $value->assistenz = $ass_str;
@@ -71,33 +75,68 @@ class Organisationseinheit_model extends DB_Model
         return $person_str;
     }
 
+    private function createPersonArray($person)
+    {        
+        $l = array();
+
+        $p_str = $this->formatPerson($person);
+        foreach ($person->retval as $p)
+        {
+            $l[] = [ 'uid' => $p->uid, 'person_id' => $p->person_id, 'name' => $p->nachname.', '.$p->vorname ];
+
+        }
+             
+        return [ 'str' => $p_str, 'data' => $l] ;
+    }
+
     public function getLeitung($oe_kurzbz)
     {        
-        $query = 'SELECT distinct p.person_id,b.uid,p.titelpre,p.titelpost,p.nachname,p.vorname, m.ort_kurzbz, m.telefonklappe FROM public.tbl_benutzerfunktion bf JOIN public.tbl_benutzer b using(uid) 
-            JOIN tbl_person p using(person_id)
-            JOIN tbl_mitarbeiter m ON m.mitarbeiter_uid::text = b.uid::text
-        WHERE bf.funktion_kurzbz=\'Leitung\'
-        AND (bf.datum_bis >= now() OR bf.datum_bis IS NULL)
-        AND (bf.datum_von <= now() OR bf.datum_von IS NULL)
-        AND bf.oe_kurzbz=?
-        ORDER BY p.nachname';
-
-		$result = $this->execQuery($query, array($oe_kurzbz));
-        return $result;
+        return $this->getPersonenByFunktion($oe_kurzbz, Organisationseinheit_model::FUNKTION_LEITUNG);
     }
 
     public function getAssistenz($oe_kurzbz)
     {        
+        return $this->getPersonenByFunktion($oe_kurzbz, Organisationseinheit_model::FUNKTION_ASSISTENZ);
+    }
+
+    public function getPersonenByFunktion($oe_kurzbz, $funktion)
+    {        
         $query = 'SELECT distinct p.person_id,b.uid,p.titelpre,p.titelpost,p.nachname,p.vorname, m.ort_kurzbz, m.telefonklappe FROM public.tbl_benutzerfunktion bf JOIN public.tbl_benutzer b using(uid) 
             JOIN tbl_person p using(person_id)
             JOIN tbl_mitarbeiter m ON m.mitarbeiter_uid::text = b.uid::text
-        WHERE bf.funktion_kurzbz=\'ass\'
+        WHERE bf.funktion_kurzbz=?
         AND (bf.datum_bis >= now() OR bf.datum_bis IS NULL)
         AND (bf.datum_von <= now() OR bf.datum_von IS NULL)
         AND bf.oe_kurzbz=?
         ORDER BY p.nachname';
 
-		$result = $this->execQuery($query, array($oe_kurzbz));
+		$result = $this->execQuery($query, array($funktion, $oe_kurzbz));
+        return $result;
+    }
+
+    public function getPersonen($oe_kurzbz)
+    {        
+
+        $query='SELECT distinct p.person_id,b.uid,
+            ARRAY(
+                select beschreibung 
+                from tbl_benutzerfunktion join tbl_funktion using(funktion_kurzbz) 
+                where tbl_benutzerfunktion.oe_kurzbz=? AND tbl_benutzerfunktion.uid=m.mitarbeiter_uid AND
+                     (tbl_benutzerfunktion.datum_bis >= now() OR tbl_benutzerfunktion.datum_bis IS NULL) AND
+                     (tbl_benutzerfunktion.datum_von <= now() OR tbl_benutzerfunktion.datum_von IS NULL)
+                ) funktionen,
+                p.titelpre,p.titelpost,p.nachname,p.vorname, m.ort_kurzbz, m.telefonklappe 
+        FROM public.tbl_benutzerfunktion bf JOIN public.tbl_benutzer b using(uid) 
+            JOIN tbl_person p using(person_id)
+            JOIN tbl_mitarbeiter m ON m.mitarbeiter_uid::text = b.uid::text            
+        WHERE
+         (bf.datum_bis >= now() OR bf.datum_bis IS NULL)
+        AND (bf.datum_von <= now() OR bf.datum_von IS NULL)
+        AND bf.oe_kurzbz=? 
+        ORDER BY p.nachname, p.vorname';
+
+
+		$result = $this->execQuery($query, array($oe_kurzbz, $oe_kurzbz));
         return $result;
     }
 

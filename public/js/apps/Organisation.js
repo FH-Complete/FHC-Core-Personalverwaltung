@@ -2,13 +2,15 @@
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
+import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
+import {OrgViewer} from '../components/organisation/OrgViewer.js';
 
 const pvApp = Vue.createApp(	{
 	components: {	
 		searchbar,	
-		Sidebar,
 		OrgChooser,
         OrgViewer,
+		CoreNavigationCmpt,
 	},
 	data() {
 		return 	{
@@ -17,6 +19,7 @@ const pvApp = Vue.createApp(	{
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
 			searchfunction: searchfunction,
+			appSideMenuEntries: {},
 		}
 	},
 	methods: {
@@ -37,7 +40,10 @@ const pvApp = Vue.createApp(	{
 		},
 		closeEditorHandler() {
 			this.isEditorOpen=false;
-		},			
+		},
+		newSideMenuEntryHandler: function(payload) {
+			this.appSideMenuEntries = payload;
+		}			
 	},
 });
 

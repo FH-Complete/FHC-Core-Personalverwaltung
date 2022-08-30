@@ -8,7 +8,7 @@
       'axios027' => true,
 			'restclient' => true,      
       'vue3' => true,   
-			'navigationwidget' => false, 
+			'navigationcomponent' => true, 
 			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',       
@@ -56,7 +56,7 @@
 <div class="container-fluid">
   <div class="row">
 
-    <sidebar :active="0"></sidebar>
+  <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
