@@ -15,7 +15,7 @@ export const EmployeeNav = {
     },
     template: `
     <nav
-        class="nav nav-pills flex-column flex-sm-row col-md-9 ms-sm-auto col-lg-12 subnav"
+        class="nav nav-pills flex-column flex-sm-row ms-sm-auto col-lg-12 subnav"
     >
         <a
             class="flex-sm-fill text-sm-center nav-link"

@@ -213,7 +213,7 @@ export const EmployeeHeader = {
             </Toast>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >
+        <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2" >
         <div class="d-flex align-items-center flex-fill" >
         
             <div class="fotocontainer" v-if="!isFetchingName">
@@ -264,10 +264,16 @@ export const EmployeeHeader = {
 
             </div>
         </div>
-        <div>
-            <h2>PNr.</h2>
-            <h6 class="mb-2 text-muted" style="text-align:right">{{ employee?.personalnummer }}</h6>  
+        
+        <div class="p-2 bd-highlight">
+            <h3>PNr</h3>
+            <h6 class="text-muted">{{ employee?.personalnummer }}</h6>
         </div>
+        <div class="p-2 bd-highlight" style="border-left: 1px solid #EEE">
+            <h3>UID</h3>
+            <h6 class="text-muted">{{ employee?.uid }}</h6>  
+        </div>
+        
         </div>
 
         <!-- FotoModal -->

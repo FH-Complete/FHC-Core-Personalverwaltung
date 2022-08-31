@@ -47,7 +47,7 @@ export const EmployeePerson = {
 
     },
     template: `
-    <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2">
+    <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
       <div class="container-fluid">
         <div class="row pt-md-2">
             

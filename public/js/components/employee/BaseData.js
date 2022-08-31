@@ -24,6 +24,7 @@ export const BaseData = {
         const dialogRef = Vue.ref();
 
         const sprache = Vue.inject('sprache');
+        const nations = Vue.inject('nations');
 
         const GESCHLECHT = {
             w: 'weiblich', 
@@ -36,6 +37,15 @@ export const BaseData = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/personBaseData?person_id=${person_id}`;
         };
 
+        const printNation = (code) => {
+            if (!code) return '';
+            let result = nations.value?.filter((item) => item.nation_code == code);
+            if (result?.length > 0)
+                return result[0].nation_text;
+            return '';
+        }
+
+        
         const fetchData = async () => {
             if (personID.value==null) {                
                 return;
@@ -55,7 +65,7 @@ export const BaseData = {
 
         const createShape = () => {
             return {
-                uids: "",
+                uid: "",
                 person_id: 0,
                 kurzbz: "",
                 aktiv: false,
@@ -68,6 +78,8 @@ export const BaseData = {
                 vorname: "",
                 vornamen: "",
                 geschlecht: "",
+                staatsbuergerschaft: "A",
+                geburtsnation: "A",
                 sprache: "",
                 anmerkung: "",
                 homepage: "",
@@ -76,7 +88,7 @@ export const BaseData = {
 
 
         let fakeEmployee = {
-            uids: "jonconnor",
+            uid: "jonconnor",
             person_id: 243,
             kurzbz: "jonconnor",
             aktiv: true,
@@ -94,7 +106,7 @@ export const BaseData = {
         };
 
         const currentValue = Vue.ref(createShape());
-        const preservedValue = Vue.ref(createShape());
+        const preservedValue = Vue.ref(createShape());        
 
         Vue.watch(personID, (currentVal, oldVal) => {
             console.log('BaseData watch',currentVal);
@@ -266,12 +278,14 @@ export const BaseData = {
             showToast, 
             sprache,
             GESCHLECHT,
+            nations,
 
             save,
             toggleMode,  
             validNachname,    
             validGeburtsdatum,  
             validSVNR,    
+            printNation,
         }
         
     },
@@ -302,16 +316,60 @@ export const BaseData = {
     </div>
     <div class="col-md-12 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-start pt-3 pb-2 mb-3">
 
-        <form class="row g-3  col-md-12" ref="baseDataFrm">
-            <div class="col-md-3">
-                <label for="uid" class="form-label">UID <i>(person_id={{personID}})</i></label>
-                <input type="text"  readonly class="form-control-sm form-control-plaintext" id="uid" v-model="currentValue.uids">
+        <form class="row g-3  col-lg-12" ref="baseDataFrm">
+            
+            <!-- Anrede -->
+            <div class="col-lg-2 col-md-4">
+                <label for="anrede" class="form-label">Anrede</label>
+                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anrede" v-model="currentValue.anrede">
             </div>
-            <div class="col-md-3">
-                    <label for="ersatzkennzeichen" class="form-label">Ersatzkennzeichen</label>
-                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="ersatzkennzeichen" v-model="currentValue.ersatzkennzeichen">
+            <div class="col-lg-2 col-md-4">
+                <label for="titelPre" class="form-label">TitelPre</label>
+                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPre" v-model="currentValue.titelpre">
             </div>
-            <div class="col-md-3">
+            <div class="col-lg-2 col-md-4">
+                <label for="titelPost" class="form-label">TitelPost</label>
+                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
+            </div>
+            <div class="col-lg-6"></div>
+            <!--Name -->
+            <div class="col-lg-3 col-md-4">
+                <label for="nachname" class="required form-label">Nachname</label>
+                <input type="text" required  @blur="frmState.nachnameBlured = true"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}" id="nachname" v-model="currentValue.nachname">
+                <div class="invalid-feedback" v-if="frmState.nachnameBlured && validNachname(currentValue.nachname)">
+                  Bitte geben Sie den Nachnamen an.
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4">
+                <label for="vorname" class="form-label">Vorname</label>
+                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vorname" v-model="currentValue.vorname">
+            </div>
+            <div class="col-lg-2 col-md-4">
+                <label for="vornamen" class="form-label">Vornamen</label>
+                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vornamen" v-model="currentValue.vornamen">
+            </div>
+            <div class="col-lg-4"></div>
+
+            <!-- Staatsbürgerschaft, etc. -->
+            <div class="col-lg-2 col-md-3">
+                <label for="staatsbuergerschaft" class="form-label">Staatsbürgerschaft</label>                
+                <select v-if="!readonly" id="staatsbuergerschaft" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.staatsbuergerschaft" >
+                    <option v-for="(item, index) in nations" :value="item.nation_code">
+                        {{ item.nation_text }}
+                    </option>
+                </select>
+                <input v-else type="text"  :readonly="readonly" class="form-control-sm form-control-plaintext" id="staatsbuergerschaft" :value="printNation(currentValue.staatsbuergerschaft)">
+            </div>
+            <div class="col-lg-2 col-md-3">
+                    <label for="geburtsnation" class="form-label">Geburtsnation</label>
+                    <select v-if="!readonly" id="geburtsnation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.geburtsnation" >
+                        <option v-for="(item, index) in nations" :value="item.nation_code">
+                            {{ item.nation_text }}
+                        </option>
+                    </select>
+                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext"  id="geburtsnation" :value="printNation(currentValue.geburtsnation)" >
+            </div>
+            <div class="col-lg-2 col-md-3">
                 <label for="sprache" class="form-label">Sprache</label><br>
                 <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
                     <option value="">-- keine Auswahl --</option>
@@ -322,73 +380,49 @@ export const BaseData = {
                 <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" v-model="currentValue.sprache">
 
             </div>
-            <div class="col-md-3"></div>
-            <!-- Anrede -->
-            <div class="col-md-2">
-                <label for="anrede" class="form-label">Anrede</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anrede" v-model="currentValue.anrede">
-            </div>
-            <div class="col-md-2">
-                <label for="titelPre" class="form-label">TitelPre</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPre" v-model="currentValue.titelpre">
-            </div>
-            <div class="col-md-2">
-                <label for="titelPost" class="form-label">TitelPost</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
-            </div>
-            <div class="col-md-6"></div>
-            <!--Name -->
-            <div class="col-md-3">
-                <label for="nachname" class="required form-label">Nachname</label>
-                <input type="text" required  @blur="frmState.nachnameBlured = true"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}" id="nachname" v-model="currentValue.nachname">
-                <div class="invalid-feedback" v-if="frmState.nachnameBlured && validNachname(currentValue.nachname)">
-                  Bitte geben Sie den Nachnamen an.
-                </div>
-            </div>
-            <div class="col-md-3">
-                <label for="vorname" class="form-label">Vorname</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vorname" v-model="currentValue.vorname">
-            </div>
-            <div class="col-md-3">
-                <label for="vornamen" class="form-label">Vornamen</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vornamen" v-model="currentValue.vornamen">
-            </div>
-            <div class="col-md-3"></div>
+            <div class="col-lg-6 col-md-3"></div>
             
             <!-- Geschlecht -->
-            <div class="col-md-3">
+            <div class="col-lg-2 col-md-3">
                 <label for="geschlecht" class="form-label">Geschlecht</label><br>
                 <select v-if="!readonly" id="geschlecht" v-model="currentValue.geschlecht" class="form-select form-select-sm" aria-label=".form-select-sm " >
                     <option value="w">weiblich</option>
                     <option value="m">männlich</option>
-                    <option value="x">divers</option>
+                    <option val4e="x">divers</option>
                     <option value="u">unbekannt</option>
                 </select>
                 <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="geschlecht" :value="GESCHLECHT[currentValue.geschlecht]">
             </div>
 
-            <div class="col-md-3">
+            <div class="col-lg-2 col-md-3">
                 <label for="geburtsdatum" class="required form-label">Geburtsdatum</label>
                 <input type="date" :readonly="readonly" @blur="frmState.geburtsdatumBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured}" id="geburtsdatum" v-model="currentValue.gebdatum">
             </div>
 
-            <div class="col-md-3">
+            <div class="col-lg-2 col-md-3">
                 <label for="svnr" class="form-label">SVNR</label>
                 <input type="text" :readonly="readonly" @blur="frmState.svnrBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validSVNR(currentValue.svnr) && frmState.svnrBlured}" id="svnr" v-model="currentValue.svnr">
             </div>
 
-            <div class="col-md-3">
+            <div class="col-lg-2 col-md-3">
+                    <label for="ersatzkennzeichen" class="form-label">Ersatzkennzeichen</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="ersatzkennzeichen" v-model="currentValue.ersatzkennzeichen">
+            </div>
+
+            <div class="col-lg-4">
                 
             </div>
             
             
-            <div class="col-md-8"></div>
+            
             <!-- -->
-            <div class="col-6">
+            <div class="col-lg-6">
                 <label for="inputAddress" class="form-label">Anmerkung</label>
                 <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkungen" v-model="currentValue.anmerkung">
                 </textarea>
             </div>
+
+            
             
             <!-- changes -->
             <div class="col-8">
