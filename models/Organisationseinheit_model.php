@@ -133,6 +133,7 @@ class Organisationseinheit_model extends DB_Model
          (bf.datum_bis >= now() OR bf.datum_bis IS NULL)
         AND (bf.datum_von <= now() OR bf.datum_von IS NULL)
         AND bf.oe_kurzbz=? 
+        AND b.aktiv=true
         ORDER BY p.nachname, p.vorname';
 
 
