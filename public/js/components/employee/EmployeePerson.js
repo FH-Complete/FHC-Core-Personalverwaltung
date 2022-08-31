@@ -13,10 +13,12 @@ export const EmployeePerson = {
         MaterialExpensesData,
 	},	
     props: {
-        personid: { type: Number, default: 0 }
+        // personid: { type: Number, default: 0 }
     },
     setup() {
 
+        const route = VueRouter.useRoute();
+        const currentPersonID = Vue.ref(null);
         const items = ["base", "employee", "contact", "bank", "material"];
         const activeItem = Vue.ref("base");
        // const { personID } = Vue.toRefs(props);
@@ -30,9 +32,18 @@ export const EmployeePerson = {
             console.log("activeItem: ", menuItem);
         };
 
-       // console.log('EmployeeSubMenu: personID', props.personID);
+        Vue.watch(
+			() => route.params.id,
+			newId => {
+				currentPersonID.value = newId;
+			}
+		)
 
-        return { items, isActive, setActive }
+        Vue.onMounted(() => {
+            currentPersonID.value = route.params.id;
+        })
+
+        return { items, isActive, setActive, currentPersonID }
 
     },
     template: `
@@ -83,35 +94,35 @@ export const EmployeePerson = {
                     :class="{ active: isActive(items[0]) }"
                     role="tabpanel"
                 >
-                    <base-data editMode :personID="personid" ></base-data>
+                    <base-data editMode :personID="currentPersonID" ></base-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[1]) }"
                     role="tabpanel"
                 >
-                <employee-data editMode :personID="personid"></employee-data>
+                <employee-data editMode :personID="currentPersonID"></employee-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[2]) }"
                     role="tabpanel"
                 >
-                    <contact-data editMode :personID="personid"></contact-data>
+                    <contact-data editMode :personID="currentPersonID"></contact-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[3]) }"
                     role="tabpanel"
                 >
-                <bank-data editMode :personID="personid"></bank-data>
+                <bank-data editMode :personID="currentPersonID"></bank-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[4]) }"
                     role="tabpanel"
                 >
-                <material-expenses-data editMode :personID="personid"></material-expenses-data>
+                <material-expenses-data editMode :personID="currentPersonID"></material-expenses-data>
                 </div>
                 
             </div>

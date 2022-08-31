@@ -244,7 +244,7 @@ export default {
 			console.log('EMPLOYEE APP CREATED; person_id=',person_id);
 			if (person_id != null) {
 				currentPersonID.value = parseInt(person_id);
-				personSelectedHandler(parseInt(person_id));
+				//personSelectedHandler(parseInt(person_id));
 				isEditorOpen.value = true;
 				verticalsplitRef.value.collapseTop();
 			} else {

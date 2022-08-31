@@ -124,8 +124,10 @@ export const BaseData = {
         Vue.onMounted(() => {
             console.log('BaseData mounted', props.personID);
             currentValue.value = createShape();
-            url.value = generateEndpointURL(props.personID); 
-            fetchData();
+            if (props.personID) {
+                url.value = generateEndpointURL(props.personID); 
+                fetchData();
+            }
             
         })
 

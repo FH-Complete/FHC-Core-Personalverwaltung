@@ -63,7 +63,7 @@ export const EmployeeHeader = {
         });
 
         Vue.onMounted(() => {
-            console.log("BaseData mounted", props.personID);
+            console.log("EmployeeHeader mounted", props.personID);
             headerUrl.value = generateEndpointURL(props.personID);
             fetchHeaderData();
         })

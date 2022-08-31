@@ -1,5 +1,7 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
+import {EmployeePerson} from "../components/employee/EmployeePerson.js";
+import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 
 Vue.$fhcapi = fhcapifactory;
@@ -14,7 +16,13 @@ const router = VueRouter.createRouter(
 		history: VueRouter.createWebHistory(),
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id`, component: EmployeeHome },
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id`, component: EmployeeHome,
+				children: [
+					{ path: '', component: EmployeePerson, name: 'person' },
+					{ path: 'contract', component: EmployeeContract },
+					{ path: 'salary', component: EmployeeContract, name: 'salary' },
+				]
+		    },
 		],
 	}
 );

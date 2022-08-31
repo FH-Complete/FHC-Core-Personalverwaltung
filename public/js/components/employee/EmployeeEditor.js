@@ -14,14 +14,31 @@ export default {
         isNew:  Boolean        
     },
     setup( props, {emit }) {
+
+        const router = VueRouter.useRouter();
+    	const route = VueRouter.useRoute();
+        const currentPersonID = Vue.ref(null);
+
         const redirect = (person_id) => {
             emit('personSelected', person_id);
         }
-        return { redirect }
+
+        Vue.onMounted(() => {
+			console.log('EmployeeEditor mounted');
+        })
+
+        Vue.watch(
+			() => route.params.id,
+			newId => {
+				currentPersonID.value = newId;
+			}
+		)
+
+        return { redirect, currentPersonID }
     },
     template: `      
-        <EmployeeHeader v-if="open" :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
-        <EmployeeNav v-if="open" :personID="personid" :edit-mode="true" ></EmployeeNav> 
-        <employee-person v-if="open" :personid="personid"></employee-person>
+        <EmployeeHeader  :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
+        <EmployeeNav  :personID="personid" :edit-mode="true" ></EmployeeNav> 
+        <router-view></router-view>       
     `
 }
