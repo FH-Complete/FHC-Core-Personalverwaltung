@@ -20,8 +20,8 @@ export default {
         return { redirect }
     },
     template: `      
-        <EmployeeHeader v-if="open" :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
-        <EmployeeNav v-if="open" :personID="personid" :edit-mode="true" ></EmployeeNav> 
-        <employee-person v-if="open" :personid="personid"></employee-person>
+        <EmployeeHeader  :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
+        <EmployeeNav  :personID="personid" :edit-mode="true" ></EmployeeNav> 
+        <employee-person  :personid="personid"></employee-person>
     `
 }
