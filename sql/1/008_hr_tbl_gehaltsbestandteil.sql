@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_gehaltsbestandteil (
     anmerkung text,
     grundbetrag text,
     betrag_valorisiert text,
+    valorisieren bool default false,
     dienstverhaeltnis_id integer,
     gehaltstyp_kurzbz character varying(32),
     valorisierungssperre smallint,
