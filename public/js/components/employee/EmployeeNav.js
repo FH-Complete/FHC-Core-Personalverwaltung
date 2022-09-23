@@ -17,12 +17,12 @@ export const EmployeeNav = {
     <nav
         class="nav nav-pills flex-column flex-sm-row ms-sm-auto col-lg-12 subnav"
     >
-        <a
+    
+        <router-link :to="fullPath + personID + '/summary'" 
             class="flex-sm-fill text-sm-center nav-link"
-            aria-current="page"
-            :href="full"
-        >Überblick</a
-        >     
+            :class="[{'router-link-active active': route?.name === 'summary'}]" >
+            Überblick
+        </router-link>
         <router-link :to="fullPath + personID" 
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route?.name === 'person'}]" >
