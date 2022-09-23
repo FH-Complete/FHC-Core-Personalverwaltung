@@ -194,6 +194,7 @@ export const EmployeeHeader = {
             okHandler,
             toastRef,toastDeleteRef,
             redirect,
+            FHC_JS_CONFIG,
 
             employee,
             fileInput,
@@ -254,9 +255,11 @@ export const EmployeeHeader = {
                 
                 <h6 v-if="!isFetchingName" class="mb-2 text-muted">
                     <b>Email</b>&nbsp; 
-                    <a :href="'mailto:'+employee?.uid+'@technikum-wien.at'">{{  employee?.uid }}@technikum-wien.at</a>
-                    <span v-if="employee?.alias">,  
-                        <a :href="'mailto:'+employee?.alias+'@technikum-wien.at'">{{  employee?.alias }}@technikum-wien.at</a> 
+                    <span v-if="!employee?.alias">,  
+                        <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
+                    </span>
+                    <span v-if="employee?.alias">
+                        <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
                     </span>
                     <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <b>DW</b> {{  employee?.telefonklappe }}</span>  
                 </h6>  

@@ -40,7 +40,7 @@
 
 <script>
 
-
+var FHC_JS_CONFIG = { domain: '<?php echo DOMAIN; ?>'};
 
 (function () {
   'use strict'
