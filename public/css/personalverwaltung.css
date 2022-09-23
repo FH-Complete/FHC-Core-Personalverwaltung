@@ -29,3 +29,7 @@ label.required.form-label:after {
     color: #000;
     background: #ccc;
 }
+
+.grayout {
+    color: #aaa;
+}

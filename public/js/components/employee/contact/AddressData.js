@@ -399,7 +399,7 @@ export const AddressData = {
                     <div class="col-md-6">
                         <label for="nation" class="form-label">Nation</label>
                         <select  id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.nation" >
-                            <option v-for="(item, index) in nations" :value="item.nation_code">
+                            <option v-for="(item, index) in nations" :value="item.nation_code" :class="{ 'grayout': item.sperre}">
                                 {{ item.nation_text }}
                             </option>
                         </select>
