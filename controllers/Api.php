@@ -773,7 +773,7 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
 		    $this->KontaktModel->addOrder("kontakt_id");
-		    $data = $this->KontaktModel->loadWhere(array('person_id'=>$person_id));
+		    $data = $this->KontaktModel->loadWhere(array('person_id'=>$person_id, 'kontakttyp !=' => 'hidden'));
            
             if (isSuccess($data))
             {
@@ -844,9 +844,7 @@ class Api extends Auth_Controller
 
     function getKontakttyp()
     {
-        //$this->KontakttypModel->addSelect("nation_code, $nationTextFieldName AS nation_text");
-		$this->NationModel->addOrder("kontakttyp");
-		$result = $this->KontakttypModel->load();
+		$result = $this->KontakttypModel->loadWhere('kontakttyp != \'hidden\'');
 
 		if (isError($result))
 		{
