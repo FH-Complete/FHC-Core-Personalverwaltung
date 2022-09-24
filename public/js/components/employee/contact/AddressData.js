@@ -159,7 +159,7 @@ export const AddressData = {
                 nation: "A",
                 typ: "",
                 heimatadresse: false,
-                zustelladresse: false,
+                zustelladresse: true,
                 firma_id: null,
                 updateamum: "",
                 updatevon: "",
