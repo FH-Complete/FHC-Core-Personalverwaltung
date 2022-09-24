@@ -118,7 +118,7 @@ class Api extends Auth_Controller
 
 		$nationTextFieldName = $language == 'German' ? 'langtext' : 'engltext';
 
-        $this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text");
+        $this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text, sperre");
 		$this->NationModel->addOrder("nation_text");
 		$nationRes = $this->NationModel->load();
 
