@@ -96,23 +96,20 @@ export const AddressData = {
         }
 
         Vue.watchEffect(async () => {
-            if (currentAddress?.value?.nation == 'A') {
+            if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 const response = await fetchGemeinden();
-                gemeinden.value = response.retval;
-                console.log('gemeinden: ',response);
+                gemeinden.value = response?.retval;
             }            
         })
 
         Vue.watchEffect(async () => {
-            if (currentAddress?.value?.nation == 'A') {
+            if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 const response = await fetchOrtschaften();
-                ortschaften.value = response.retval;
-                console.log('ortschaften: ',response);
+                ortschaften.value = response?.retval;
             }            
         })
 
         Vue.onMounted(() => {
-            console.log('AddressData mounted', props.personID);            
             urlAddressData.value = generateAddressDataEndpointURL(props.personID); 
             fetchData();
             
@@ -133,7 +130,7 @@ export const AddressData = {
             currentAddress.value = { ...addressList.value[id] };
             const ok = await confirmDeleteRef.value.show();
             
-            if (ok) {   
+            if (ok && !currentAddress.value.heimatadresse) {   
 
                 postDelete(id)
                     .then((r) => {
@@ -476,9 +473,15 @@ export const AddressData = {
 
         <ModalDialog title="Warnung" ref="confirmDeleteRef">
             <template #body>
-                Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                <span v-if="!currentAddress?.heimatadresse">
+                    Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                </span>
+                <span v-else>
+                    Heimatadresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' kann nicht gelöscht werden!
+                </span>
             </template>
         </ModalDialog>
+
         
         `
 }
