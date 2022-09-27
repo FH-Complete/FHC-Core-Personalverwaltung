@@ -218,7 +218,7 @@ export const EmployeeHeader = {
         <div class="d-flex align-items-center flex-fill" >
         
             <div class="fotocontainer" v-if="!isFetchingName">
-                <img v-if="employee?.foto" style="max-width:101px;border-radius: 0.65rem!important" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
+                <img v-if="employee?.foto" class="img-thumbnail " style="max-width:101px;border-radius: 0.65rem!important" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
                 <div v-if="employee?.foto" class="fotobutton">
                     <div class="d-grid gap-2 d-md-flex ">
                             <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
@@ -232,7 +232,7 @@ export const EmployeeHeader = {
             </div>
 
             <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
-                <svg  class="bd-placeholder-img" style="border-radius: 0.65rem!important" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
+                <svg  class="bd-placeholder-img img-thumbnail" style="border-radius: 0.65rem!important" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
                 <div class="fotobutton-visible" v-if="!isFetchingName">
                     <div class="d-grid gap-2 d-md-flex ">                      
                         <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
