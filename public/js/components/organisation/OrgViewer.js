@@ -117,6 +117,11 @@ export const OrgViewer = {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
             window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
         }
+
+        const getLink = ( person_id ) => {
+            let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+            return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
+        }
       
 
         Vue.onMounted(() => {
@@ -126,7 +131,7 @@ export const OrgViewer = {
         context.expose({ expandAll, collapseAll })
         
         return { nodes, selection, filters, expandedKeys, expandAll, collapseAll, isFetching,
-            showModal, hideModal, modalRef, okHandler, currentValue, currentPersons, redirect2person }
+            showModal, hideModal, modalRef, okHandler, currentValue, currentPersons, redirect2person, getLink }
     },
     template: `    
     
@@ -151,6 +156,12 @@ export const OrgViewer = {
             <template #filter>
                 <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter" placeholder="Filter Leitung"></p-inputtext>
             </template>
+            <template #body="slotProps" v-if"!isFetching">
+                <span v-for="(item, index) in slotProps.node.data.leitung_array.data">
+                    <span v-if="index!=0"> | </span>
+                    <a :href="getLink(item.person_id)">{{ item.name }}</a>
+                </span>
+            </template>
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
             </template>            
@@ -162,12 +173,17 @@ export const OrgViewer = {
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
             </template>
+            <template #body="slotProps" v-if"!isFetching">
+                <span v-for="(item, index) in slotProps.node.data.assistenz_array.data">
+                    <span v-if="index!=0"> | </span>
+                    <a :href="getLink(item.person_id)">{{ item.name }}</a>
+                </span>
+            </template>
         </p-column>
         <p-column headerStyle="width: 3rem" headerClass="text-center" bodyClass="text-center">
                 <template #header>                    
                 </template>
-                <template #body="slotProps">
-                    
+                <template #body="slotProps">  
                     <button type="button" class="btn btn-outline-dark "  @click="showModal(slotProps.node.data)">
                             <i class="fa fa-info"></i>
                     </button>

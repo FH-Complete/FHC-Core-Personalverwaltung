@@ -43,7 +43,9 @@ class Organisationseinheit_model extends DB_Model
         $ass = $this->getAssistenz($oe_kurzbz);
         $ass_str = $this->formatPerson($ass);
         $head->retval[0]->leitung = $leitung_str;
+        $head->retval[0]->leitung_array = $this->createPersonArray($leitung);
         $head->retval[0]->assistenz = $ass_str;
+        $head->retval[0]->assistenz_array = $this->createPersonArray($ass);
         return array("key" => $oe_kurzbz, "type" => "person", "class" => "p-person", "data" => $head->retval[0], "children" => $this->getChilds($oe_kurzbz));   
     }
 
@@ -59,7 +61,9 @@ class Organisationseinheit_model extends DB_Model
             $ass = $this->getAssistenz($value->oe_kurzbz);
             $ass_str = $this->formatPerson($ass);
             $value->leitung = $leitung_str;
+            $value->leitung_array = $this->createPersonArray($leitung);
             $value->assistenz = $ass_str;
+            $value->assistenz_array = $this->createPersonArray($ass);
             $arr[]=array("key" => $value->oe_kurzbz, "type" => "person", "class" => "p-person", "data" => $value, "children" => $this->getChilds($value->oe_kurzbz));
         }
 
