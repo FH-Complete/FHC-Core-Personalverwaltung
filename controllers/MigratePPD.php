@@ -1,4 +1,5 @@
 <?php 
+require('../config/migrate.config.inc.php');
 
 /**
  */
@@ -22,8 +23,7 @@ class MigratePPD extends CI_Controller {
             echo "--------------------<br>";
             echo "<br>";
             echo "connecting....";
-            $dsn = 'postgre://gefi:snakepit@dev-postgres/ppd??char_set=utf8&dbcollat=utf8_general_ci&cache_on=true';
-            $this->ppdDB = $this->load->database($dsn, TRUE);
+            $this->ppdDB = $this->load->database(PPD_DSN, TRUE);
             echo "success<br><br>";
 
             $this->ppdDB->trans_begin();
