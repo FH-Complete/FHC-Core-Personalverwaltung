@@ -154,7 +154,7 @@ export const AddressData = {
                 ort: "",
                 gemeinde: "",
                 nation: "A",
-                typ: "",
+                typ: "h",
                 heimatadresse: false,
                 zustelladresse: true,
                 firma_id: null,
