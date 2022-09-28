@@ -332,7 +332,7 @@ export default {
                         </div>
                     </template>
                     <template #bottom>
-                        <employee-editor :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>
+                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>
                     </template>
                 </verticalsplit> 
                             
