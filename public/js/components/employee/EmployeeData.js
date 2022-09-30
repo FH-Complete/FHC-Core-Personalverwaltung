@@ -271,7 +271,7 @@ export const EmployeeData= {
             </div>            
             <div class="col-md-2">
                 <label for="kurzbezeichnung" class="form-label">Kurzbezeichnung</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
+                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
             </div>
             <div class="col-md-4">
                 <label for="alias" class="form-label">Alias</label>
@@ -285,7 +285,7 @@ export const EmployeeData= {
             </div>
             <div class="col-md-2">
                 <label for="telefonklappe" class="form-label">Telefonklappe</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
+                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
             </div>
             <div class="col-md-4">
                 <label for="ausbildung" class="form-label">Ausbildung</label>

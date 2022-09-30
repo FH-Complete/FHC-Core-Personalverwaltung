@@ -96,23 +96,20 @@ export const AddressData = {
         }
 
         Vue.watchEffect(async () => {
-            if (currentAddress?.value?.nation == 'A') {
+            if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 const response = await fetchGemeinden();
-                gemeinden.value = response.retval;
-                console.log('gemeinden: ',response);
+                gemeinden.value = response?.retval;
             }            
         })
 
         Vue.watchEffect(async () => {
-            if (currentAddress?.value?.nation == 'A') {
+            if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 const response = await fetchOrtschaften();
-                ortschaften.value = response.retval;
-                console.log('ortschaften: ',response);
+                ortschaften.value = response?.retval;
             }            
         })
 
         Vue.onMounted(() => {
-            console.log('AddressData mounted', props.personID);            
             urlAddressData.value = generateAddressDataEndpointURL(props.personID); 
             fetchData();
             
@@ -133,7 +130,7 @@ export const AddressData = {
             currentAddress.value = { ...addressList.value[id] };
             const ok = await confirmDeleteRef.value.show();
             
-            if (ok) {   
+            if (ok && !currentAddress.value.heimatadresse) {   
 
                 postDelete(id)
                     .then((r) => {
@@ -157,9 +154,9 @@ export const AddressData = {
                 ort: "",
                 gemeinde: "",
                 nation: "A",
-                typ: "",
+                typ: "h",
                 heimatadresse: false,
-                zustelladresse: false,
+                zustelladresse: true,
                 firma_id: null,
                 updateamum: "",
                 updatevon: "",
@@ -391,7 +388,7 @@ export const AddressData = {
         <Modal title="Adresse" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentAddress != null"  ref="addressDataFrm" >
-                                
+                               
                     <div class="col-md-6">
                         <label for="strasse" class="form-label">Strasse</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" maxlength="256">
@@ -399,10 +396,11 @@ export const AddressData = {
                     <div class="col-md-6">
                         <label for="nation" class="form-label">Nation</label>
                         <select  id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.nation" >
-                            <option v-for="(item, index) in nations" :value="item.nation_code">
+                            <option v-for="(item, index) in nations" :value="item.nation_code" :class="{ 'grayout': item.sperre}"  :disabled="item.sperre">
                                 {{ item.nation_text }}
                             </option>
                         </select>
+                        
                     </div>
                     <div class="col-md-2">
                         <label for="plz" class="required form-label" >PLZ</label>
@@ -476,9 +474,15 @@ export const AddressData = {
 
         <ModalDialog title="Warnung" ref="confirmDeleteRef">
             <template #body>
-                Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                <span v-if="!currentAddress?.heimatadresse">
+                    Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                </span>
+                <span v-else>
+                    Heimatadresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' kann nicht gelöscht werden!
+                </span>
             </template>
         </ModalDialog>
+
         
         `
 }
