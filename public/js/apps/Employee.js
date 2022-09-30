@@ -135,4 +135,5 @@ const fetchOrte = async () => {
 	return CoreRESTClient.getData(res.data);
 }
 
+pvApp.use(primevue.config.default);
 pvApp.mount('#wrapper');

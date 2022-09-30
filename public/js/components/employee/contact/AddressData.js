@@ -388,7 +388,7 @@ export const AddressData = {
         <Modal title="Adresse" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentAddress != null"  ref="addressDataFrm" >
-                                
+                               
                     <div class="col-md-6">
                         <label for="strasse" class="form-label">Strasse</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" maxlength="256">
@@ -396,10 +396,11 @@ export const AddressData = {
                     <div class="col-md-6">
                         <label for="nation" class="form-label">Nation</label>
                         <select  id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.nation" >
-                            <option v-for="(item, index) in nations" :value="item.nation_code" :class="{ 'grayout': item.sperre}">
+                            <option v-for="(item, index) in nations" :value="item.nation_code" :class="{ 'grayout': item.sperre}"  :disabled="item.sperre">
                                 {{ item.nation_text }}
                             </option>
                         </select>
+                        
                     </div>
                     <div class="col-md-2">
                         <label for="plz" class="required form-label" >PLZ</label>

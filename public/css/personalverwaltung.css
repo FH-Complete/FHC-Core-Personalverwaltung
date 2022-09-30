@@ -30,6 +30,8 @@ label.required.form-label:after {
     background: #ccc;
 }
 
+/* select dropdown */
+
 .grayout {
     color: #aaa;
 }
