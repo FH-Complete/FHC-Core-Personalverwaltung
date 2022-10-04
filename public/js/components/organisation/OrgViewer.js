@@ -1,4 +1,5 @@
 import { Modal } from '../Modal.js';
+import { CoreFilterAPIs } from '../../../../../../public/js/components/filter/API.js';
 
 export const OrgViewer = {
     components: {
@@ -122,6 +123,20 @@ export const OrgViewer = {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
             return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
         }
+
+        const filterOrg = ( oe_kurzbz ) => {
+            console.log('filter oe: ', oe_kurzbz);
+            // note: this only works if the filter contains a field with the name 'OE Kurzbezeichnung'
+            const filterFields = {
+                "filterUniqueId":"extensions/FHC-Core-Personalverwaltung/Employees/index",
+                "filterType":"EmployeeViewer",
+                "filterFields":[{"name":"OE_Kurzbezeichnung","operation":"contains","condition":oe_kurzbz}]
+            };
+            CoreFilterAPIs.applyFilterFields(filterFields);
+            // redirect
+            let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+            window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;
+        }
       
 
         Vue.onMounted(() => {
@@ -131,7 +146,7 @@ export const OrgViewer = {
         context.expose({ expandAll, collapseAll })
         
         return { nodes, selection, filters, expandedKeys, expandAll, collapseAll, isFetching,
-            showModal, hideModal, modalRef, okHandler, currentValue, currentPersons, redirect2person, getLink }
+            showModal, hideModal, modalRef, okHandler, currentValue, currentPersons, redirect2person, getLink, filterOrg }
     },
     template: `    
     
@@ -143,6 +158,9 @@ export const OrgViewer = {
             <template #body  v-if="isFetching">
                 <p-skeleton style="display: inline-block; width:80%"></p-skeleton>
             </template>
+            <template #body="slotProps" v-if"!isFetching">          
+                <a href="#" @click="filterOrg(slotProps.node.data.oe_kurzbz)">{{ slotProps.node.data.bezeichnung }}</a>
+            </template>
         </p-column>
         <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:150px" filterMatchMode="contains">
             <template #filter>
@@ -150,7 +168,7 @@ export const OrgViewer = {
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
-            </template>
+            </template>            
         </p-column>
         <p-column field="leitung" header="Leitung" style="width:300px" filterMatchMode="contains">
             <template #filter>
