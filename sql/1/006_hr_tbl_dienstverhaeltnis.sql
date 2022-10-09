@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_dienstverhaeltnis (
 	mitarbeiter_uid character varying(32),
 	von date,
 	bis date,
-	standort_id integer,
+	oe_kurzbz character varying(32),     -- war standort_id
 	vertragsart_kurzbz character varying(32),
 	insertamum timestamp,
 	insertvon character varying(32),
@@ -46,12 +46,20 @@ BEGIN
 END $$;
 
 -- standort
+-- DO $$
+--BEGIN
+--	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_standort_fk FOREIGN KEY (standort_id)
+--	REFERENCES public.tbl_standort (standort_id) MATCH FULL
+--	ON DELETE SET NULL ON UPDATE CASCADE;
+--   EXCEPTION WHEN OTHERS THEN NULL;
+--END $$;
+
 DO $$
 BEGIN
-	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_standort_fk FOREIGN KEY (standort_id)
-	REFERENCES public.tbl_standort (standort_id) MATCH FULL
+	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_organisationseinheit_fk FOREIGN KEY (oe_kurzbz)
+	REFERENCES public.tbl_organisationseinheit (oe_kurzbz) MATCH FULL
 	ON DELETE SET NULL ON UPDATE CASCADE;
-    EXCEPTION WHEN OTHERS THEN NULL;
+ 	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_dienstverhaeltnis TO vilesci;
