@@ -34,7 +34,7 @@ DO $$
 BEGIN
 	ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_dienstverhaeltnis_fk FOREIGN KEY (dienstverhaeltnis_id)
 	REFERENCES hr.tbl_dienstverhaeltnis (dienstverhaeltnis_id) MATCH FULL
-	ON DELETE SET NULL ON UPDATE CASCADE;
+	ON DELETE CASCADE ON UPDATE CASCADE;
  	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
