@@ -74,7 +74,7 @@ export const searchbaroptions = {
             "defaultaction": {
               "type": "function",
               "action": function(data) { 						
-                window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}`;
+                window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}`;
               }
             },
             "childactions": [

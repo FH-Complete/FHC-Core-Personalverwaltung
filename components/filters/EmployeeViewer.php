@@ -19,9 +19,9 @@
 				ma.ort_kurzbz as "Raum",
 				ma.geschlecht as "Geschlecht",
 				ma.telefonklappe as "Durchwahl",
-				kst.bezeichnung as "Standardkostenstelle",
-				oe.bezeichnung as "Disz_Zuordnung",
-				oe.oe_kurzbz as "OE_Kurzbezeichnung"
+				kst.bezeichnung as "Standardkostenstelle",				
+				oe.bezeichnung as "Disziplinäre Zuordnung",
+				coalesce(kst.oe_kurzbz,oe.oe_kurzbz) as "OE Key"
 			 FROM campus.vw_mitarbeiter ma
 			   LEFT JOIN (
 				SELECT bf.uid,oe_kurzbz,oe_parent_kurzbz,public.tbl_organisationseinheit.bezeichnung,organisationseinheittyp_kurzbz

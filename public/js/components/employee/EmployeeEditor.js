@@ -10,6 +10,7 @@ export default {
     },
     props: {
         personid: Number,
+        personuid: String,
         open: Boolean,
         isNew:  Boolean        
     },
@@ -18,9 +19,10 @@ export default {
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(null);
+        const currentPersonUID = Vue.ref(null);
 
-        const redirect = (person_id) => {
-            emit('personSelected', person_id);
+        const redirect = (params) => {
+            emit('personSelected', params);
         }
 
         Vue.onMounted(() => {
@@ -28,17 +30,18 @@ export default {
         })
 
         Vue.watch(
-			() => route.params.id,
-			newId => {
-				currentPersonID.value = newId;
+			() => route.params,
+			params => {
+				currentPersonID.value = params.id;
+                currentPersonUID.value = params.uid;
 			}
 		)
 
-        return { redirect, currentPersonID }
+        return { redirect, currentPersonID, currentPersonUID }
     },
     template: `      
-        <EmployeeHeader  :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
-        <EmployeeNav  :personID="personid" :edit-mode="true" ></EmployeeNav> 
+        <EmployeeHeader  :personID="personid" :personUID="personuid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
+        <EmployeeNav  :personID="currentPersonID" :personUID="currentPersonUID" :edit-mode="true" ></EmployeeNav> 
         <router-view></router-view>       
     `
 }

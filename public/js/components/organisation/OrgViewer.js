@@ -114,23 +114,23 @@ export const OrgViewer = {
             
         });
 
-        const redirect2person = ( person_id ) => {
+        const redirect2person = ( person_id, uid ) => {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
-            window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
+            window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}`;
         }
 
-        const getLink = ( person_id ) => {
+        const getLink = ( person_id, uid ) => {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
-            return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
+            return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}`;
         }
 
         const filterOrg = ( oe_kurzbz ) => {
             console.log('filter oe: ', oe_kurzbz);
-            // note: this only works if the filter contains a field with the name 'OE Kurzbezeichnung'
+            // note: this only works if the filter contains a field with the name 'Standardkst.Kurz'
             const filterFields = {
                 "filterUniqueId":"extensions/FHC-Core-Personalverwaltung/Employees/index",
                 "filterType":"EmployeeViewer",
-                "filterFields":[{"name":"OE_Kurzbezeichnung","operation":"contains","condition":oe_kurzbz}]
+                "filterFields":[{"name":"OE Key","operation":"equal","condition":oe_kurzbz}]
             };
             CoreFilterAPIs.applyFilterFields(filterFields);
             // redirect
@@ -177,7 +177,7 @@ export const OrgViewer = {
             <template #body="slotProps" v-if"!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.leitung_array.data">
                     <span v-if="index!=0"> | </span>
-                    <a :href="getLink(item.person_id)">{{ item.name }}</a>
+                    <a :href="getLink(item.person_id, item.uid)">{{ item.name }}</a>
                 </span>
             </template>
             <template #body  v-if="isFetching">
@@ -194,7 +194,7 @@ export const OrgViewer = {
             <template #body="slotProps" v-if"!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.assistenz_array.data">
                     <span v-if="index!=0"> | </span>
-                    <a :href="getLink(item.person_id)">{{ item.name }}</a>
+                    <a :href="getLink(item.person_id,item.uid)">{{ item.name }}</a>
                 </span>
             </template>
         </p-column>
@@ -227,7 +227,7 @@ export const OrgViewer = {
                             <label for="typ" class="form-label">Mitarbeiter</label>
                             <table  class="table  table-hover">
                                 <tbody>
-                                    <tr v-for="p in currentPersons" @click="redirect2person(p.person_id)">
+                                    <tr v-for="p in currentPersons" @click="redirect2person(p.person_id,p.uid)">
                                         <td><b>{{ p.nachname }}</b>, {{ p.vorname }} {{ p.titelpre}} {{ p.titelpost }}</td>
                                         <td>{{ p.funktionen.join(', ') }} </td>
                                     </tr>

@@ -17,7 +17,7 @@ const router = VueRouter.createRouter(
 		history: VueRouter.createWebHistory(),
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id`, component: EmployeeHome,
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
 				children: [					
 					{ path: '', component: EmployeePerson, name: 'person' },
 					{ path: 'contract', component: EmployeeContract },

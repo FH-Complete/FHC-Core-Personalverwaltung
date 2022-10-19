@@ -25,13 +25,16 @@ export default {
 
 		const isEditorOpen = Vue.ref(false);
 		const currentPersonID = Vue.ref(null);
+		const currentPersonUID = Vue.ref(null);
 		const appSideMenuEntries = Vue.ref({});
 		const verticalsplitRef = Vue.ref(null);
 
 		Vue.watch(
-			() => route.params.id,
-			newId => {
-				currentPersonID.value = newId;
+			() => route.params,
+			params => {
+				currentPersonID.value = params.id;
+				currentPersonUID.value = params.uid;	
+				console.log('*** EmployeeHome params changed', currentPersonID.value);
 			}
 		)
 
@@ -153,7 +156,7 @@ export default {
 			}
 		});
 
-		const personSelectedHandler = (id) => {
+		const personSelectedHandler = (id, uid) => {
 			console.log('personSelected: ', id);
 
 			if (verticalsplitRef.value.isCollapsed() == 'bottom') {
@@ -161,7 +164,7 @@ export default {
 				//isEditorOpen.value=true;
 			}
 
-			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}`
+			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}`
 			router.push(url);
 		}
 
@@ -184,7 +187,7 @@ export default {
 		}
 
 		const selectRecordHandler = (e, row) => { // Tabulator handler for the rowClick event
-			personSelectedHandler(row.getData().PersonId);
+			personSelectedHandler(row.getData().PersonId, row.getData().UID);
 		}
 
 		const employeesTabulatorEvents = [
@@ -216,10 +219,8 @@ export default {
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
 				{title: "Person ID", field: "PersonId", headerFilter: true},
-				{title: "Personal nummer", field: "Personalnummer", headerFilter: true},
-				{title: "Kurzbz", field: "Kurzbz", headerFilter: true},
+				{title: "Personalnummer", field: "Personalnummer", headerFilter: true},
 				{title: "Vorname", field: "Vorname", headerFilter: true},
-				{title: "Vornamen", field: "Vornamen", headerFilter: true},
 				{title: "Nachname", field: "Nachname", headerFilter: true},
 				{title: "Titel pre", field: "TitelPre", headerFilter: true},
 				{title: "Titel post", field: "TitelPost", headerFilter: true},
@@ -230,20 +231,19 @@ export default {
 				{title: "SVNR", field: "SVNR", headerFilter: true},
 				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
 				{title: "Geschlecht", field: "Geschlecht", formatter:sexformatter, headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, autocomplete: true, sort: "asc"}},
-				{title: "DW", field: "DW", headerFilter: true},
-				{title: "Standard Kostenstelle", field: "StdKst", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
-				{title: "Oe kurzbz", field: "OeKurzbz", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
-				{title: "Oe parent", field: "OeParent", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
-				{title: "Oe bezeichnung", field: "OeBezeichnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
-				{title: "Oe typ", field: "OeTyp", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}
+				{title: "DW", field: "Durchwahl", headerFilter: true},
+				{title: "Standardkostenstelle", field: "Standardkostenstelle", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
+				{title: "Disziplinäre Zuordnung", field: "Disziplinäre Zuordnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
 			]
 		};
 
 		Vue.onMounted(() => {
 			let person_id = route.params.id;
+			let person_uid = route.params.uid;
 			console.log('EMPLOYEE APP CREATED; person_id=',person_id);
 			if (person_id != null) {
 				currentPersonID.value = parseInt(person_id);
+				currentPersonUID.value = person_uid;
 				//personSelectedHandler(parseInt(person_id));
 				isEditorOpen.value = true;
 				verticalsplitRef.value.collapseTop();
@@ -273,6 +273,7 @@ export default {
 
 			isEditorOpen,
 			currentPersonID,
+			currentPersonUID,
 			appSideMenuEntries,
 			searchbaroptions,
 			employeesTabulatorEvents,
@@ -332,7 +333,7 @@ export default {
                         </div>
                     </template>
                     <template #bottom>
-                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :open="isEditorOpen" @person-selected="personSelectedHandler" @close-editor="closeEditorHandler"></employee-editor>
+                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :personuid="currentPersonUID" :open="isEditorOpen" @person-selected="(e) => personSelectedHandler(e.person_id, e.uid)" @close-editor="closeEditorHandler"></employee-editor>
                     </template>
                 </verticalsplit> 
                             

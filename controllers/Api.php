@@ -924,4 +924,19 @@ class Api extends Auth_Controller
         return $this->outputJson($data);                   
     }
 
+    /**
+     * get list of Dienstverhaeltnis by uid
+     */
+    function dvByPerson()
+    {
+        $person_id = $this->input->get('person_id', TRUE);
+
+        if (!is_numeric($person_id))
+			show_error('person id is not numeric!');
+
+        $data = $this->DVModel->getAllDVByPersonID($person_id);
+        
+        return $this->outputJson($data);   
+    }
+
 }

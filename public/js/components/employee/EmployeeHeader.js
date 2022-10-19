@@ -10,11 +10,15 @@ export const EmployeeHeader = {
         "p-skeleton": primevue.skeleton,
 	},	
     props: {
-        personID: { type: Number, default: 0 }
+        personID: Number,
+        personUID: String,
     },
     setup(props, { emit }) {
 
-        const { personID } = Vue.toRefs(props);
+        const route = VueRouter.useRoute();
+
+        const currentPersonID = Vue.ref(props.personID);
+        const currentPersonUID  = Vue.ref(props.personUID);
 
         const employee = Vue.ref();
 
@@ -26,9 +30,9 @@ export const EmployeeHeader = {
         const isFetching = Vue.ref(false);        
         const isFetchingName = Vue.ref(false);        
 
-        const generateEndpointURL = (person_id) => {
+        const generateEndpointURL = (person_id,uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}`;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}&uid=${uid}`;
         };
 
         const fetchHeaderData = async () => {
@@ -54,17 +58,44 @@ export const EmployeeHeader = {
             }
         };
 
-        Vue.watch(personID, (currentValue, oldValue) => {
-            console.log('EmployeeHeaderData watch',currentValue);
-            headerUrl.value = generateEndpointURL(currentValue);
-            fetchHeaderData();
-            previewImage.value = null;
-            fileInput.value.value = null;
+        /*
+        Vue.watch([currentPersonID, currentPersonUID], ([newPersonID, newPersonUID]) => {
+            console.log('EmployeeHeaderData watch newPersonID',newPersonID);
+            headerUrl.value = generateEndpointURL(newPersonID, newPersonUID);
+            if (newPersonID!=null) {
+                fetchHeaderData();
+            } else {
+                previewImage.value = null;
+                fileInput.value.value = null;
+            }
+        });*/
+
+
+        Vue.watch(() => currentPersonID, (newPersonID, oldPersonID) => {
+            console.log('++++ EmployeeHeaderData watch newPersonID',newPersonID);
+           
         });
 
+        
+        Vue.watch(
+			() => route.params,
+			params => {
+				currentPersonID.value = params.id;
+                currentPersonUID.value = params.uid;
+                headerUrl.value = generateEndpointURL(params.id, params.uid);
+                if (currentPersonID.value!=null) {
+                    fetchHeaderData();
+                } else {
+                    previewImage.value = null;
+                    fileInput.value.value = null;
+                }
+			}
+		)
+
+
         Vue.onMounted(() => {
-            console.log("EmployeeHeader mounted", props.personID);
-            headerUrl.value = generateEndpointURL(props.personID);
+            console.log("EmployeeHeader mounted ", props.personID, props.personUID);
+            headerUrl.value = generateEndpointURL(props.personID, props.personUID);
             fetchHeaderData();
         })
 
@@ -177,9 +208,9 @@ export const EmployeeHeader = {
             hideModal();
         }
 
-        const redirect = (person_id) => {
+        const redirect = (person_id, uid) => {
             console.log('person_id', person_id);
-            emit('personSelected', person_id);
+            emit('personSelected', { person_id, uid });
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
           }
         
@@ -201,6 +232,8 @@ export const EmployeeHeader = {
             previewImage,
             isFetching,
             isFetchingName,
+            currentPersonID,
+            currentPersonUID,
         }
     },
     template: `
@@ -249,7 +282,7 @@ export const EmployeeHeader = {
 
                 <h6 v-if="employee?.abteilung && !isFetching" class="mb-2 text-muted">
                     <b>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</b> {{ employee?.abteilung?.bezeichnung }},
-                    <b>Vorgesetze(r) </b> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
+                    <b>Vorgesetze(r) </b> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id, employee?.abteilung?.supervisor?.uid)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
                 </h6>  
                 <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>                
                 

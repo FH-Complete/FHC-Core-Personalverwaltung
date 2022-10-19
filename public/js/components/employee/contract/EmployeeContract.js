@@ -1,12 +1,15 @@
 
 export const EmployeeContract = {
     props: {
-        
+        personUID: { type: String, required: true },
+        writePermission: { type: Boolean, required: false },
     },
     setup() {
 
         const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(null);
+        const dvList = Vue.ref([]);
+        const urlDV = Vue.ref("");
 
         Vue.onMounted(() => {
             console.log('contract mounted');
@@ -19,6 +22,29 @@ export const EmployeeContract = {
 				currentPersonID.value = newId;
 			}
 		)
+
+        const generateDVEndpointURL = () => {
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPersonID?uid=${currentPersonID.value}`;
+        };
+
+        const fetchData = async () => {
+            if (currentPersonID.value==null) {
+                dvList.value = [];
+                return;
+            }
+            isFetching.value = true
+            try {
+              const res = await fetch(urlDV.value)
+              let response = await res.json()
+              isFetching.value = false
+              console.log(response.retval);
+              dvList.value = response.retval;
+            } catch (error) {
+              console.log(error)
+              isFetching.value = false
+            }
+          }
 
         return {currentPersonID}
     },
@@ -58,7 +84,7 @@ export const EmployeeContract = {
                 </div>
 
 
-                <div class="d-flex bd-highlight">            
+                <!-- div class="d-flex bd-highlight">            
                     <div class="flex-grow-1 bd-highlight"><h4>Verträge</h4></div>        
                     <div class="p-2 bd-highlight">
                         <div class="d-grid gap-2 d-md-flex justify-content-end ">
@@ -70,7 +96,7 @@ export const EmployeeContract = {
                         </div>
 
                     </div>
-                </div>
+                </div -->
 
             </div>
             
@@ -79,7 +105,7 @@ export const EmployeeContract = {
 
                 <div class="col-lg-12">        
                 
-                    <div class="table-responsive">
+                    <!--div class="table-responsive">
                         <table class="table table-bordered table-hover table-striped tablesorter">
                             <thead>
                             <tr>
@@ -131,9 +157,49 @@ export const EmployeeContract = {
 
                             </tbody>
                         </table>
-                    </div>
+                    </div-->  <!-- table -->
+
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Accordion Item #1
+                            </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                            </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Accordion Item #2
+                            </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                            </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Accordion Item #3
+                            </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                            </div>
+                            </div>
+                        </div>
+                        </div>
+
                     
-                </div> 
+                </div> <!-- --> 
 
             </div>
         </div>

@@ -1,21 +1,58 @@
 <?php 
-require('../config/migrate.config.inc.php');
+
+
+// FH
+const OE_KURZBZ = 'gst';
 
 /**
  */
 class MigratePPD extends CI_Controller {
 
     private $ppdDB;
+    private $ci;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $filename = APPPATH.'config/extensions/FHC-Core-Personalverwaltung/migrate.config.inc.php';
+        require($filename);
+        $this->ci =& get_instance();
+        $this->ci->load->database();
+    }
+
+    private function uidExists($uid)
+    {
+        $query = $this->ci->db->query('SELECT mitarbeiter_uid FROM public.tbl_mitarbeiter where mitarbeiter_uid=?',array($uid));
+        $result = $query->result();
+        return $result;
+    }
 
     private function insertDV($row)
     {
-        $qry = "insert into hr.tbl_dienstverhaeltnis(mitarbeiter_uid,von,bis,vertragart_kurzbz,insertamum,insertvon) values(?,?,?,?,now(),?)";
-        $this->ppdDB->query($qry, $row->uid, $row->dv_von, $row->dv_bis, 2, 'migration');
-        $error = $this->db->error();
-        return $error;
+        $qry = "insert into hr.tbl_dienstverhaeltnis(mitarbeiter_uid,von,bis,vertragsart_kurzbz, oe_kurzbz, insertamum,insertvon) values(?,?,?,?,?,now(),?)";
+        $result = $this->ci->db->query($qry, array($row->uid, $row->dv_beginn, $row->dv_ende, 'echterDV', OE_KURZBZ, 'migration'));
+        return $result;
     }
 
-    public function message($to = 'World')
+    private function insertVertragsbestandteil($dv_id, $row)
+    {
+        $qry = "insert into hr.tbl_vertragsbestandteil(von, bis, stundenausmass, dienstverhaeltnis_id) values(?, ?, ?, ?)";
+        $result = $this->ci->db->query($qry,array($row->beginn, $row->ende, $row->stunden_pro_woche, $dv_id));
+        return $result;
+    }
+
+    private function getPPDVertraege($dv_id)
+    {
+        $qry="select vertrag.beginn, vertrag.ende, vertrag.grundgehalt, vertrag.stunden_pro_woche 
+            from vertrag
+            where vertrag.parent_id is null and vertrag.dv_id=?
+            order by vertrag.beginn";
+        $query = $this->ppdDB->query($qry, array($dv_id));
+        $result = $query->result();
+        return $result;
+    }
+
+    public function launch()
     {
         try {
             echo '<html><body style="font-family: Courier">';
@@ -28,9 +65,10 @@ class MigratePPD extends CI_Controller {
 
             $this->ppdDB->trans_begin();
 
-            $qry="select uid, personalnummer, vorname, nachname, dv.beginn dv_beginn, dv.ende dv_ende, dv.typ_id,vertrag.beginn v_beginn, vertrag.ende v_ende, vertrag.grundgehalt, vertrag.stunden_pro_woche 
-                from tbl_mitarbeiter join dv using(uid) join vertrag using(dv_id) where archivdate is null and vertrag.parent_id is null and vertrag.grundgehalt>0.0
-                order by nachname, dv.beginn,vertrag.beginn";
+            $qry="select distinct dv.dv_id, uid, personalnummer, vorname, nachname, dv.beginn dv_beginn, dv.ende dv_ende, dv.typ_id
+                from tbl_mitarbeiter join dv using(uid) join vertrag using(dv_id) 
+                where archivdate is null
+                order by nachname, dv.beginn";
             $query = $this->ppdDB->query($qry);
 
             if (!$query) 
@@ -42,20 +80,31 @@ class MigratePPD extends CI_Controller {
 
                 foreach ($query->result() as $row)
                 {
-                        echo "$row->uid, $row->vorname, $row->nachname, DV=$row->dv_beginn - $row->dv_ende, V=$row->v_beginn - $row->v_ende, ".number_format($row->grundgehalt,2).", Stunden/Woche=".number_format($row->stunden_pro_woche, 2)."<br>";
-                        // DV anlegen
-                        $error = $this->insertDV($row);
-                        if ($error)
+                        echo "$row->uid, $row->vorname, $row->nachname, DV=$row->dv_beginn - $row->dv_ende <br>";
+                        if ($this->uidExists($row->uid))
                         {
-                            echo " Error: <span style=\"color:red\">$error</span><br>";
-                        } else {
-                            echo " <span style=\"color:green\">OK</span><br>";
+                            // DV anlegen
+                            if (!$this->insertDV($row))
+                            {
+                                // error
+                            } else {
+                                $dv_id = $this->ci->db->insert_id();
+                                // Verträge
+                                $vertraege = $this->getPPDVertraege($row->dv_id);
+                                foreach ($vertraege as $vertrag_row)
+                                {
+                                    // vertrag anlegen
+                                    $this->insertVertragsbestandteil($dv_id, $vertrag_row);
+                                }
+                                // gehaltsbestandteile anlegen
+                            }
+                            
+
+                            
+
+                            // valorisierungen eintragen
                         }
-                        // vertrag anlegen
-
-                        // gehaltsbestandteile anlegen
-
-                        // valorisierungen eintragen
+                        
                 }
             }
             
@@ -65,7 +114,7 @@ class MigratePPD extends CI_Controller {
 
         } catch (Exception $e) {
 
-            echo 'Error: '.$e->getMessage();
+            echo 'Error: '.$e->getMessage().'<br>';
             $this->ppdDB->trans_rollback();
 
         } finally {
