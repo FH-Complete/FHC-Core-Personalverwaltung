@@ -16,19 +16,19 @@ export const EmployeeHeader = {
     setup(props, { emit }) {
 
         const route = VueRouter.useRoute();
+        const { watch, ref, onMounted } = Vue; 
+        const currentPersonID = ref(props.personID);
+        const currentPersonUID  = ref(props.personUID);
 
-        const currentPersonID = Vue.ref(props.personID);
-        const currentPersonUID  = Vue.ref(props.personUID);
+        const employee = ref();
 
-        const employee = Vue.ref();
+        const headerUrl = ref("");
 
-        const headerUrl = Vue.ref("");
+        const fileInput = ref();
+        const previewImage = ref();
 
-        const fileInput = Vue.ref();
-        const previewImage = Vue.ref();
-
-        const isFetching = Vue.ref(false);        
-        const isFetchingName = Vue.ref(false);        
+        const isFetching = ref(false);        
+        const isFetchingName = ref(false);        
 
         const generateEndpointURL = (person_id,uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -58,50 +58,30 @@ export const EmployeeHeader = {
             }
         };
 
-        /*
-        Vue.watch([currentPersonID, currentPersonUID], ([newPersonID, newPersonUID]) => {
-            console.log('EmployeeHeaderData watch newPersonID',newPersonID);
-            headerUrl.value = generateEndpointURL(newPersonID, newPersonUID);
-            if (newPersonID!=null) {
-                fetchHeaderData();
-            } else {
-                previewImage.value = null;
-                fileInput.value.value = null;
-            }
-        });*/
-
-
-        Vue.watch(() => currentPersonID, (newPersonID, oldPersonID) => {
-            console.log('++++ EmployeeHeaderData watch newPersonID',newPersonID);
-           
-        });
-
-        
-        Vue.watch(
-			() => route.params,
-			params => {
-				currentPersonID.value = params.id;
-                currentPersonUID.value = params.uid;
-                headerUrl.value = generateEndpointURL(params.id, params.uid);
+        watch(
+            () => route.params.uid,
+            (newVal) => {   
+                currentPersonID.value = route.params.id;
+                currentPersonUID.value = newVal;
+                headerUrl.value = generateEndpointURL(route.params.id, newVal);
                 if (currentPersonID.value!=null) {
                     fetchHeaderData();
                 } else {
                     previewImage.value = null;
                     fileInput.value.value = null;
                 }
-			}
-		)
+            }
+        )
 
-
-        Vue.onMounted(() => {
+        onMounted(() => {
             console.log("EmployeeHeader mounted ", props.personID, props.personUID);
             headerUrl.value = generateEndpointURL(props.personID, props.personUID);
             fetchHeaderData();
         })
 
         // Toast 
-        const toastRef = Vue.ref();
-        const toastDeleteRef = Vue.ref();
+        const toastRef = ref();
+        const toastDeleteRef = ref();
         
         const showToast = () => {
             toastRef.value.show();
@@ -181,7 +161,7 @@ export const EmployeeHeader = {
         }
 
         // Modal 
-        let modalRef = Vue.ref();
+        let modalRef = ref();
 
         const showModal = () => {
             modalRef.value.show();
@@ -192,7 +172,7 @@ export const EmployeeHeader = {
         }
 
         // confirm
-        let confirmDeleteRef = Vue.ref();
+        let confirmDeleteRef = ref();
 
         const showDeleteModal = async () => {            
             const ok = await confirmDeleteRef.value.show();

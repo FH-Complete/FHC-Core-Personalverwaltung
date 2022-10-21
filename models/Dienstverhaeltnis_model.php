@@ -10,12 +10,14 @@ class Dienstverhaeltnis_model extends DB_Model
 		$this->pk = 'dienstverhaeltnis_id';
 	}
 
-    public function getAllDVByPersonID($person_id)
+    public function getDVByPersonUID($uid)
     {
         $result = null;
 
 		$qry = "
-        SELECT tbl_benutzer.uid,
+        SELECT 
+            dv.dienstverhaeltnis_id,
+            tbl_benutzer.uid,
             tbl_mitarbeiter.personalnummer,
             tbl_mitarbeiter.kurzbz,
             tbl_mitarbeiter.lektor,
@@ -27,17 +29,17 @@ class Dienstverhaeltnis_model extends DB_Model
             dv.oe_kurzbz,
             dv.vertragsart_kurzbz,       
             dv.updateamum,
-            dv.updatevon,
+            dv.updatevon
         FROM tbl_mitarbeiter
             JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
             JOIN tbl_person USING (person_id)
-            JOIN hr.tbl_dienstverhaeltnis dv ON(tbl_benutzer.uid::text = dv.uid::text)
-        WHERE tbl_person.person_id=?
+            JOIN hr.tbl_dienstverhaeltnis dv ON(tbl_benutzer.uid::text = dv.mitarbeiter_uid::text)
+        WHERE tbl_benutzer.uid=?
+        ORDER BY dv.von desc
         ";
 
-        return $this->execQuery($qry, array($person_id));
+        return $this->execQuery($qry, array($uid));
 		
-		return $result;
     }
 
 }

@@ -1,56 +1,104 @@
 
 export const EmployeeContract = {
-    props: {
-        personUID: { type: String, required: true },
-        writePermission: { type: Boolean, required: false },
+    props: {        
+        writePermission: { type: Boolean, required: false },  // TODO needs change
     },
-    setup() {
+    setup( ) {
 
+        const { watch, ref } = Vue;
         const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(null);
-        const dvList = Vue.ref([]);
-        const urlDV = Vue.ref("");
-
-        Vue.onMounted(() => {
-            console.log('contract mounted');
-            currentPersonID.value = route.params.id;
-        })
-
-        Vue.watch(
-			() => route.params.id,
-			newId => {
-				currentPersonID.value = newId;
-			}
-		)
-
-        const generateDVEndpointURL = () => {
+        const dvList = ref([]);
+        const vertragList = ref([]);
+        const isFetching = ref(false);
+        const currentDVID = ref(null);
+        const currentVertragID = ref(null);
+        const dvSelectedIndex = ref(1);
+  
+        const generateDVEndpointURL = (uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPersonID?uid=${currentPersonID.value}`;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPerson?uid=${uid}`;
         };
 
-        const fetchData = async () => {
-            if (currentPersonID.value==null) {
+        const generateVertragEndpointURL = (dv_id) => {
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}`;
+        };
+
+        const fetchData = async (uid) => {
+            if (uid==null) {
                 dvList.value = [];
+                vertragList.value = [];
                 return;
             }
+            let urlDV = generateDVEndpointURL(uid);
             isFetching.value = true
             try {
-              const res = await fetch(urlDV.value)
-              let response = await res.json()
-              isFetching.value = false
+              const res = await fetch(urlDV);
+              let response = await res.json();
+              isFetching.value = false;
               console.log(response.retval);
               dvList.value = response.retval;
+              if (dvList.value.length>0) {
+                currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
+              }
             } catch (error) {
               console.log(error)
               isFetching.value = false
             }
-          }
+        }
 
-        return {currentPersonID}
+        const fetchVertrag = async (dv_id) => {
+            let urlVertrag = generateVertragEndpointURL(dv_id);
+            isFetching.value = true
+            try {
+              const res = await fetch(urlVertrag);
+              let response = await res.json();
+              isFetching.value = false;
+              console.log(response.retval);
+              vertragList.value = response.retval;
+              if (vertragList.value.length>0) {
+                currentVertragID.value = vertragList.value[0].vertragsbestandteil_id;
+              }
+            } catch (error) {
+              console.log(error)
+              isFetching.value = false
+            }
+        }
+
+
+        
+        fetchData(route.params.uid);
+        watch(
+              ()=> route.params.uid,
+              (newVal) => {                    
+                  fetchData(newVal);
+              }
+        )
+        watch(
+            currentDVID,
+            (newVal) => {
+                fetchVertrag(newVal);
+            }
+        )
+
+        const dvSelectedHandler = (e) => {
+            console.log("DV selected: ", e.target);
+            dvSelectedIndex.value = e.target.selectedIndex+1;
+        }
+
+        const formatDate = (d) => {
+            if (d != null && d != '') {
+		        return d.substring(8, 10) + "." + d.substring(5, 7) + "." + d.substring(0, 4);
+            } else {
+                return ''
+            }
+        }
+
+        return { isFetching, dvList, vertragList, currentDVID, dvSelectedHandler, formatDate, dvSelectedIndex }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
-      <div class="container-fluid px-0">
+      <div class="container-fluid px-1">
 
             <div class="row">
 
@@ -60,43 +108,27 @@ export const EmployeeContract = {
                     </Toast>
                 </div>
 
-                <div class="d-flex bd-highlight">            
+                <div class="d-md-flex bd-highlight pt-1">            
                     <div class="flex-grow-1 bd-highlight">
                         <div class="d-grid gap-2 d-md-flex ">
-                            <h4>Dienstverhältnis</h4>    
-                            <select class="form-select" aria-label="Default select example">
-                            <option selected>Open this select menu</option>
-                            <option value="1">1.1.2000 - 31.12.2005, echter DV</option>
-                            <option value="2">1.1.2006 - ?</option>
-                            </select>            
+                            <h4>Dienstverhältnis <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})</span> </h4> 
                         </div>
                     </div>        
-                    <div class="p-2 bd-highlight">
-                        <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                    <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
+
+                            <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                                    <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
+                                        {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
+                                    </option> 
+                            </select> 
+
                             <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
                                 <i class="fa fa-plus"></i>
                             </button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-plus"></i></button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-minus"></i></button>
-                        </div>
-
                     </div>
                 </div>
-
-
-                <!-- div class="d-flex bd-highlight">            
-                    <div class="flex-grow-1 bd-highlight"><h4>Verträge</h4></div>        
-                    <div class="p-2 bd-highlight">
-                        <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                            <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-plus"></i></button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-minus"></i></button>
-                        </div>
-
-                    </div>
-                </div -->
 
             </div>
             
@@ -160,43 +192,71 @@ export const EmployeeContract = {
                     </div-->  <!-- table -->
 
                     <div class="accordion" id="accordionExample">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Accordion Item #1
+                        <div v-for="(item, index) in vertragList" class="accordion-item" :key="item.vertragsbestandteil_id">
+                            <h2 class="accordion-header" :id="'heading'+index">
+                            <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="true" :aria-controls="'collapse' + index">
+                                {{ formatDate(item.von) }} - {{ formatDate(item.bis) }} | {{ item.stundenausmass }}h
                             </button>
                             </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                            <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample" :class="{ 'show': index === 0 }">
                             <div class="accordion-body">
-                                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                                <!-- -->    
+                                <div class="row pt-md-4">
+
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Details</h5>
+                                            </div>
+                                            <div class="card-body" style="text-align:center">
+                                                    
+                                            </div>
+                                        </div>
+
+                                    </div>          
+
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Notizen</h5>
+                                            </div>
+                                            <div class="card-body" style="text-align:center">
+                                                ...
+                                            </div>
+                                        </div>
+
+                                        <br/>
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Dokumente</h5>
+                                            </div>
+                                            <div class="card-body" style="text-align:center">
+                                                    ...
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5 class="mb-0">Gehalt</h5>
+                                            </div>
+                                            <div class="card-body" style="text-align:center">
+                                                ...
+                                            </div>
+                                        </div>
+
+                                        
+                                    </div>
+
+                                </div>
+
+                                <!-- -->
                             </div>
                             </div>
                         </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                Accordion Item #2
-                            </button>
-                            </h2>
-                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                Accordion Item #3
-                            </button>
-                            </h2>
-                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                            </div>
-                        </div>
-                        </div>
+                        
+                    </div>
 
                     
                 </div> <!-- --> 
@@ -204,6 +264,6 @@ export const EmployeeContract = {
             </div>
         </div>
 
-
+    </div>
     `
 }

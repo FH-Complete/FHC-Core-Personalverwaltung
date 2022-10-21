@@ -54,12 +54,12 @@ export const EmployeeSummary = {
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="mb-0">COVID Zertifikat</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                <div v-if="isFetching" class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>            
-                                <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                                    <div v-if="isFetching" class="spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>            
+                                    <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
                             </div>
                         </div>
 
@@ -69,10 +69,10 @@ export const EmployeeSummary = {
                                 <h5 class="mb-0">Home Office</h5>
                                 </div>
                                 <div class="card-body" style="text-align:center">
-                                <div v-if="isFetching" class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>            
-                                <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
+                                    <div v-if="isFetching" class="spinner-border" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>            
+                                    <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
                             </div>
                         </div>
                     </div>

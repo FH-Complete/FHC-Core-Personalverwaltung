@@ -106,7 +106,7 @@ export default {
 					defaultaction: {
 					  type: "function",
 					  action: (data) =>  { 
-							return personSelectedHandler(data.person_id);
+							return personSelectedHandler(data.person_id, data.uid);
 					  }
 					},
 					childactions: [
@@ -311,7 +311,7 @@ export default {
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
                         
-                <verticalsplit id="macombined" ref="verticalsplitRef">
+                <verticalsplit id="macombined" ref="verticalsplitRef" >
                     <template #top>
                         <div class="d-flex  flex-column" style="height:100%"  >
                         <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

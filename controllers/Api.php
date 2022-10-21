@@ -49,7 +49,9 @@ class Api extends Auth_Controller
                 'getKontakttyp' => Api::DEFAULT_PERMISSION,
                 'foto' => Api::DEFAULT_PERMISSION,
                 'uidByPerson' => Api::DEFAULT_PERMISSION,
-                'getAdressentyp' => Api::DEFAULT_PERMISSION
+                'getAdressentyp' => Api::DEFAULT_PERMISSION,
+                'dvByPerson' => Api::DEFAULT_PERMISSION,
+                'vertragByDV' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -74,6 +76,8 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Statistik_model', 'StatistikModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwandtyp_model', 'SachaufwandtypModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Dienstverhaeltnis_model', 'DVModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertrag_model', 'VertragModel');
     }
 
     function index()
@@ -929,12 +933,30 @@ class Api extends Auth_Controller
      */
     function dvByPerson()
     {
-        $person_id = $this->input->get('person_id', TRUE);
+        $person_uid = $this->input->get('uid', TRUE);
 
-        if (!is_numeric($person_id))
-			show_error('person id is not numeric!');
+        if (!$person_uid)
+        {
+            $this->outputJsonError('invalid parameter person_uid');
+            exit;
+        }
 
-        $data = $this->DVModel->getAllDVByPersonID($person_id);
+        $data = $this->DVModel->getDVByPersonUID($person_uid);
+        
+        return $this->outputJson($data);   
+    }
+
+    function vertragByDV()
+    {
+        $dv_id = $this->input->get('dv_id', TRUE);
+
+        if (!is_numeric($dv_id))
+        {
+            $this->outputJsonError('invalid parameter dv_id');
+            exit;
+        }
+
+        $data = $this->VertragModel->getVertragByDV($dv_id);
         
         return $this->outputJson($data);   
     }

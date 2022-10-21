@@ -11,13 +11,14 @@ export const MaterialExpensesData = {
     props: {
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
+        personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },
     setup( props ) {
 
         const readonly = Vue.ref(false);
 
-        const { personID } = Vue.toRefs(props);
+        const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
         const uid = Vue.ref("");
 
@@ -33,19 +34,19 @@ export const MaterialExpensesData = {
 
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
-        const generateEndpointURL = (person_id) => {           
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${person_id}`;
+        const generateEndpointURL = (person_id,uid) => {           
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${person_id}&person_uid=${uid}`;
         };
 
         const fetchData = async () => {
-            if (personID.value==null) {    
+            if (currentPersonID.value==null) {    
                 materialdataList.value = [];            
                 return;
             }
             isFetching.value = true
  
-            const urlMaterial = `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${personID.value}`;
-            const urlUID = `${full}/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${personID.value}`;
+            const urlMaterial = `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
+            const urlUID = `${full}/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
             try {
               const res = await fetch(urlMaterial);
               let response = await res.json()              
@@ -75,10 +76,9 @@ export const MaterialExpensesData = {
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());
 
-        Vue.watch(personID, (currentVal, oldVal) => {
-            url.value = generateEndpointURL(currentVal);   
-            fetchData();       
-              
+        Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
+            url.value = generateEndpointURL(id, uid);   
+            fetchData();                     
         });
 
         const toggleMode = async () => {
@@ -103,7 +103,7 @@ export const MaterialExpensesData = {
         Vue.onMounted(() => {
             console.log('MaterialData mounted', props.personID);
             currentValue.value = createShape();
-            url.value = generateEndpointURL(props.personID); 
+            url.value = generateEndpointURL(props.personID, props.personUID); 
             fetchData();
             
         })

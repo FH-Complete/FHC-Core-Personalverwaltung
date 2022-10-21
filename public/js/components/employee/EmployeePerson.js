@@ -97,35 +97,35 @@ export const EmployeePerson = {
                     :class="{ active: isActive(items[0]) }"
                     role="tabpanel"
                 >
-                    <base-data editMode :personID="currentPersonID" ></base-data>
+                    <base-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></base-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[1]) }"
                     role="tabpanel"
                 >
-                <employee-data editMode :personID="currentPersonID"></employee-data>
+                <employee-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></employee-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[2]) }"
                     role="tabpanel"
                 >
-                    <contact-data editMode :personID="currentPersonID"></contact-data>
+                    <contact-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></contact-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[3]) }"
                     role="tabpanel"
                 >
-                <bank-data editMode :personID="currentPersonID"></bank-data>
+                <bank-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></bank-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[4]) }"
                     role="tabpanel"
                 >
-                <material-expenses-data editMode :personID="currentPersonID"></material-expenses-data>
+                <material-expenses-data editMode :personID="currentPersonID"  :personUID="currentPersonUID"></material-expenses-data>
                 </div>
                 
             </div>

@@ -9,6 +9,7 @@ export const BaseData = {
     props: {
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
+        personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },
     setup(props) {
