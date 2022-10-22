@@ -10,7 +10,7 @@ class Api_model extends DB_Model
     public function getUID($person_id)
 	{
         $qry = "
-        SELECT tbl_benutzer.uid       
+        SELECT tbl_benutzer.uid
         FROM tbl_mitarbeiter
             JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
             JOIN tbl_person USING (person_id)
@@ -98,7 +98,7 @@ class Api_model extends DB_Model
                 bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
                 oe.oe_kurzbz,oe.oe_parent_kurzbz,oe.bezeichnung,oe.organisationseinheittyp_kurzbz,oe.aktiv,oe.mailverteiler,oe.freigabegrenze,oe.kurzzeichen,oe.lehre,oe.standort,oe.warn_semesterstunden_frei,oe.warn_semesterstunden_fix,oe.standort_id
             FROM tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
-            WHERE uid = ? AND funktion_kurzbz='oezuordnung' 
+            WHERE uid = ? AND funktion_kurzbz='oezuordnung'
                 AND datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
         ";
 
@@ -109,8 +109,8 @@ class Api_model extends DB_Model
     {
         $qry = "
             SELECT bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
-                p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost 
-            FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz) 
+                p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
+            FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
             JOIN public.tbl_benutzer b USING (uid) JOIN public.tbl_mitarbeiter ma ON(b.uid=ma.mitarbeiter_uid)
             JOIN public.tbl_person p  USING(person_id)
             WHERE funktion_kurzbz='Leitung' AND oe.oe_kurzbz = ?
@@ -167,7 +167,7 @@ class Api_model extends DB_Model
 
         $startDate = \DateTime::createFromFormat("Y-m-d", "$year-$month-1")->format("Y-m-d");
         $endDate = \DateTime::createFromFormat("Y-m-d", "$year-$month-1")->format("Y-m-t");
-        
+
         $where = "where bv.ende>='$startDate' and bv.ende<='$endDate' ";
         $order = "order by ende asc";
 
@@ -196,11 +196,24 @@ class Api_model extends DB_Model
 				   WHERE date_part('month',gebdatum)=? and date_part('day',gebdatum)=? and aktiv=true
 				ORDER BY nachname, vorname";
 
-        $currentTime = DateTime::createFromFormat( 'U', $dateAsUnixTS );   
-        $month = $currentTime->format('m');        
-        $day = $currentTime->format('d');        
+        $currentTime = DateTime::createFromFormat( 'U', $dateAsUnixTS );
+        $month = $currentTime->format('m');
+        $day = $currentTime->format('d');
 
 		return $this->execQuery($query, array($month, $day));
+    }
+
+    public function getCovidDate($person_id)
+    {
+        $query="SELECT (p.udf_values -> 'udf_3gvalid')::text::date covid_date, CASE
+            WHEN (p.udf_values -> 'udf_3gvalid')::text::date >= CURRENT_DATE::text::date THEN 1
+            WHEN (p.udf_values -> 'udf_3gvalid')::text::date < CURRENT_DATE::text::date THEN 0
+            ELSE -1
+            END AS covidvalid
+            FROM tbl_person p
+            WHERE p.person_id = ?";
+
+        return $this->execQuery($query, array($person_id));
     }
 
     function runReport($sql, $filter)

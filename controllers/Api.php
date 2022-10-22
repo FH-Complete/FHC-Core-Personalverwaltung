@@ -1,7 +1,6 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
 
-
 class Api extends Auth_Controller
 {
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -28,6 +27,7 @@ class Api extends Auth_Controller
                 'getContractExpire' => Api::DEFAULT_PERMISSION,
                 'getContractNew' => Api::DEFAULT_PERMISSION,
                 'getBirthdays' => Api::DEFAULT_PERMISSION,
+                'getCovidState' => Api::DEFAULT_PERMISSION,
                 'getReportData' => Api::DEFAULT_PERMISSION,
                 'personHeaderData' => Api::DEFAULT_PERMISSION,
                 'personAbteilung' => Api::DEFAULT_PERMISSION,
@@ -314,14 +314,29 @@ class Api extends Auth_Controller
 			show_error('month is not numeric!');
 
         $data = $this->ApiModel->getContractNew($year, $month);
-        $this->outputJson($data); 
+        $this->outputJson($data);
     }
 
     function getBirthdays()
     {
         $date = $this->input->get('date', TRUE);
         $data = $this->ApiModel->getBirthdays($date);
-        $this->outputJson($data); 
+        $this->outputJson($data);
+    }
+
+    function getCovidState()
+    {
+        $person_id = $this->input->get('person_id', TRUE);
+
+        if (!is_numeric($person_id))
+        {
+            $this->outputJsonError("person_id is not numeric!'");
+            return;
+        }
+
+        $data = $this->ApiModel->getCovidDate($person_id);
+        $this->outputJson($data);
+
     }
 
     // --------------------------------------

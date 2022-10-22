@@ -1,11 +1,16 @@
 
+import { CovidCard } from './CovidCard.js';
+
 export const EmployeeSummary = {
+    components: {
+        CovidCard,
+    },
     setup() {
         const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(null);
 
         Vue.onMounted(() => {
-            console.log('contract mounted');
+            console.log('covid card mounted');
             currentPersonID.value = route.params.id;
         })
 
@@ -20,7 +25,7 @@ export const EmployeeSummary = {
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
-      <div class="container-fluid px-0">
+      <div class="container-fluid px-1">
 
             <div class="row">
 
@@ -51,17 +56,8 @@ export const EmployeeSummary = {
                     </div>          
 
                     <div class="col">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">COVID Zertifikat</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                                    <div v-if="isFetching" class="spinner-border" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>            
-                                    <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                            </div>
-                        </div>
+                        
+                        <covid-card :personID="currentPersonID"></covid-card>
 
                         <br/>
                         <div class="card">
