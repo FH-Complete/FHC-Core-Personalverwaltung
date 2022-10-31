@@ -3,7 +3,7 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Personalverwaltung',
-			'jquery' => true,
+			'jquery3' => true,
 			'jqueryui' => false,
 			'bootstrap5' => true,
 			'fontawesome6' => true,

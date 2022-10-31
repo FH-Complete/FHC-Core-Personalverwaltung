@@ -15,3 +15,23 @@ label.required.form-label:after {
     font-style: italic;
     font-size: 0.8em;
 }
+
+.tabulator-popup-container {
+    background-color: white;
+}
+
+.tabulator-edit-list .tabulator-edit-list-item:hover {
+    color: #fff;
+    background: #666;
+}
+
+.tabulator-edit-list .tabulator-edit-list-item.active {
+    color: #000;
+    background: #ccc;
+}
+
+/* select dropdown */
+
+.grayout {
+    color: #aaa;
+}

@@ -30,6 +30,7 @@ export const AddressData = {
         const confirmDeleteRef = Vue.ref();
 
         const nations = Vue.inject('nations');
+        const adressentyp = Vue.inject('adressentyp');
 
         const gemeinden = Vue.ref([]);
 
@@ -95,23 +96,20 @@ export const AddressData = {
         }
 
         Vue.watchEffect(async () => {
-            if (currentAddress?.value?.nation == 'A') {
+            if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 const response = await fetchGemeinden();
-                gemeinden.value = response.retval;
-                console.log('gemeinden: ',response);
+                gemeinden.value = response?.retval;
             }            
         })
 
         Vue.watchEffect(async () => {
-            if (currentAddress?.value?.nation == 'A') {
+            if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 const response = await fetchOrtschaften();
-                ortschaften.value = response.retval;
-                console.log('ortschaften: ',response);
+                ortschaften.value = response?.retval;
             }            
         })
 
         Vue.onMounted(() => {
-            console.log('AddressData mounted', props.personID);            
             urlAddressData.value = generateAddressDataEndpointURL(props.personID); 
             fetchData();
             
@@ -132,7 +130,7 @@ export const AddressData = {
             currentAddress.value = { ...addressList.value[id] };
             const ok = await confirmDeleteRef.value.show();
             
-            if (ok) {   
+            if (ok && !currentAddress.value.heimatadresse) {   
 
                 postDelete(id)
                     .then((r) => {
@@ -156,9 +154,9 @@ export const AddressData = {
                 ort: "",
                 gemeinde: "",
                 nation: "A",
-                typ: "",
+                typ: "h",
                 heimatadresse: false,
-                zustelladresse: false,
+                zustelladresse: true,
                 firma_id: null,
                 updateamum: "",
                 updatevon: "",
@@ -176,6 +174,7 @@ export const AddressData = {
             // reset form state
             frmState.plzBlured=false;
             frmState.ortBlured=false;
+            frmState.typBlured=false;
             // call bootstrap show function
             modalRef.value.show();
         }
@@ -272,7 +271,7 @@ export const AddressData = {
 
         const addressDataFrm = Vue.ref();
 
-        const frmState = Vue.reactive({ plzBlured: false, ortBlured: false, wasValidated: false });
+        const frmState = Vue.reactive({ plzBlured: false, ortBlured: false, typBlured:false, wasValidated: false });
 
         const validPLZ = (n) => {
             return !!n && n.trim() != "";
@@ -282,10 +281,15 @@ export const AddressData = {
             return !!n && n.trim() != "";
         }
 
+        const validTyp = (n) => {
+            return !!n && n.trim() != "";
+        }
+
         const validate = () => {
             frmState.plzBlured = true;
             frmState.ortBlured = true;
-            if (validOrt(currentAddress.value.ort) && validPLZ(currentAddress.value.plz)) {
+            frmState.typBlured = true;
+            if (validOrt(currentAddress.value.ort) && validPLZ(currentAddress.value.plz) && validTyp(currentAddress.value.typ)) {
                 return true;
             }
             return false;
@@ -307,9 +311,9 @@ export const AddressData = {
             addressList, addressListArray, isEditActive, showAddModal, 
             showDeleteModal, showEditModal, confirmDeleteRef, currentAddress, 
             modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
-            gemeinden, ortschaften,
+            gemeinden, ortschaften, adressentyp,
             // form handling
-            validOrt, validPLZ, frmState, addressDataFrm, 
+            validOrt, validPLZ, validTyp, frmState, addressDataFrm, 
         }
         
     },
@@ -384,18 +388,19 @@ export const AddressData = {
         <Modal title="Adresse" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentAddress != null"  ref="addressDataFrm" >
-                                
+                               
                     <div class="col-md-6">
                         <label for="strasse" class="form-label">Strasse</label>
-                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" >
+                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" maxlength="256">
                     </div>
                     <div class="col-md-6">
                         <label for="nation" class="form-label">Nation</label>
                         <select  id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.nation" >
-                            <option v-for="(item, index) in nations" :value="item.nation_code">
+                            <option v-for="(item, index) in nations" :value="item.nation_code" :class="{ 'grayout': item.sperre}"  :disabled="item.sperre">
                                 {{ item.nation_text }}
                             </option>
                         </select>
+                        
                     </div>
                     <div class="col-md-2">
                         <label for="plz" class="required form-label" >PLZ</label>
@@ -413,7 +418,7 @@ export const AddressData = {
                     <!-- Gemeinde -->
                     <div class="col-md-6">
                         <label for="gemeinde" class="form-label">Gemeinde</label>
-                        <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="11" v-model="currentAddress.gemeinde">
+                        <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="256" v-model="currentAddress.gemeinde">
                         <select  v-if="currentAddress.nation=='A'" id="gemeinde" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.gemeinde" >
                             <option v-for="(item, index) in gemeinden" :value="item.name">
                                 {{ item.name }}
@@ -424,19 +429,27 @@ export const AddressData = {
                     <!-- c/o -->
                     <div class="col-md-6">
                         <label for="co_name" class="form-label">Abweich.Empfänger. (c/o)</label>
-                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="11" v-model="currentAddress.co_name">
+                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="256" v-model="currentAddress.co_name">
                     </div>
 
-                    <div class="col-md-2">    </div>
+                    <!-- Adresstyp (Hauptwohnsitz, Nebenwohnsitz, etc.) -->
+                    <div class="col-md-3">
+                        <label for="typ" class="required form-label">Typ</label>
+                        <select  id="typ" class="form-select form-select-sm" aria-label=".form-select-sm " @blur="frmState.typBlured = true" v-model="currentAddress.typ" :class="{'is-invalid': !validTyp(currentAddress.typ) && frmState.typBlured}">
+                            <option v-for="(item, index) in adressentyp" :value="item.adressentyp_kurzbz">
+                                {{ item.bezeichnung }}
+                            </option>
+                        </select>
+                    </div>
                     
-                    <div class="col-md-2">                                             
-                        <label for="heimatadresse" class="form-label">Heimatadresse</label>
+                    <div class="col-md-1">                                             
+                        <label for="heimatadresse" class="form-label">Heimatadr.</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="heimatadresse" v-model="currentAddress.heimatadresse">
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <label for="zustelladresse" class="form-label">Zustelladresse</label>
+                    <div class="col-md-1">
+                        <label for="zustelladresse" class="form-label">Zustelladr.</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="zustelladresse" v-model="currentAddress.zustelladresse">
                         </div>                        
@@ -461,9 +474,15 @@ export const AddressData = {
 
         <ModalDialog title="Warnung" ref="confirmDeleteRef">
             <template #body>
-                Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                <span v-if="!currentAddress?.heimatadresse">
+                    Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                </span>
+                <span v-else>
+                    Heimatadresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' kann nicht gelöscht werden!
+                </span>
             </template>
         </ModalDialog>
+
         
         `
 }

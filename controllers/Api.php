@@ -24,6 +24,7 @@ class Api extends Auth_Controller
                 'deletePersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'getOrgHeads' => Api::DEFAULT_PERMISSION,
                 'getOrgStructure' => Api::DEFAULT_PERMISSION,
+                'getOrgPersonen' => Api::DEFAULT_PERMISSION,
                 'getContractExpire' => Api::DEFAULT_PERMISSION,
                 'getContractNew' => Api::DEFAULT_PERMISSION,
                 'getBirthdays' => Api::DEFAULT_PERMISSION,
@@ -47,7 +48,8 @@ class Api extends Auth_Controller
                 'deletePersonContactData' => Api::DEFAULT_PERMISSION,
                 'getKontakttyp' => Api::DEFAULT_PERMISSION,
                 'foto' => Api::DEFAULT_PERMISSION,
-                'uidByPerson' => Api::DEFAULT_PERMISSION
+                'uidByPerson' => Api::DEFAULT_PERMISSION,
+                'getAdressentyp' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -62,6 +64,7 @@ class Api extends Auth_Controller
         $this->load->model('codex/Nation_model', 'NationModel');
         $this->load->model('codex/Ausbildung_model', 'AusbildungModel');
         $this->load->model('person/kontakttyp_model', 'KontakttypModel');
+        $this->load->model('person/Adressentyp_model', 'AdressentypModel');
         $this->load->model('system/sprache_model', 'SpracheModel');
         $this->load->model('ressource/ort_model', 'OrtModel');
         $this->load->model('ressource/Mitarbeiter_model', 'EmployeeModel');
@@ -90,7 +93,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($spracheRes);
+        $this->outputJson($spracheRes);
     }
 
 
@@ -106,7 +109,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($sachaufwandTypRes); 
+        $this->outputJson($sachaufwandTypRes); 
     }
 
     function getNations()
@@ -115,7 +118,7 @@ class Api extends Auth_Controller
 
 		$nationTextFieldName = $language == 'German' ? 'langtext' : 'engltext';
 
-        $this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text");
+        $this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text, sperre");
 		$this->NationModel->addOrder("nation_text");
 		$nationRes = $this->NationModel->load();
 
@@ -125,7 +128,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($nationRes); 
+        $this->outputJson($nationRes); 
     }
 
     function getAusbildung()
@@ -139,20 +142,20 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($result); 
+        $this->outputJson($result); 
     }
 
     function getStandorteIntern()
     {
         $data = $this->ApiModel->getStandorteIntern();
-        $this->outputJsonSuccess($data); 
+        $this->outputJson($data); 
     }
 
     function getOrte()
     {
         $this->OrtModel->addOrder("ort_kurzbz");
         $data = $this->OrtModel->load();
-        $this->outputJsonSuccess($data);
+        $this->outputJson($data);
     }
 
     function getGemeinden()
@@ -173,7 +176,7 @@ class Api extends Auth_Controller
         $plz = $this->input->get('plz', TRUE);
 
         if (!is_numeric($plz))
-			show_error('plz is not numeric!');
+            $this->outputJsonError("plz '$plz' is not numeric!'");     
 
         $data = $this->ApiModel->getOrtschaften($plz);
         $this->outputJsonSuccess($data); 
@@ -198,10 +201,6 @@ class Api extends Auth_Controller
     function upsertPersonMaterialExpenses()
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
@@ -268,6 +267,14 @@ class Api extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getOrgStructure($oe);
+        return $this->outputJson($data); 
+    }
+
+    function getOrgPersonen()
+    {
+        $oe = $this->input->get('oe', TRUE);
+
+        $data = $this->OrganisationseinheitModel->getPersonen($oe);
         return $this->outputJson($data); 
     }
     
@@ -668,7 +675,7 @@ class Api extends Auth_Controller
             $userData->aktiv = $aktiv;
             $userData->updatevon = getAuthUID();
             $userData->updateamum = 'NOW()';
-            $this->BenutzerModel->update($payload['mitarbeiter_uid'], $userData);
+            $this->BenutzerModel->update(array($payload['mitarbeiter_uid']), $userData);
 
             $result = $this->ApiModel->getPersonEmployeeData($person_id);
 
@@ -704,10 +711,6 @@ class Api extends Auth_Controller
     function upsertPersonAddressData()
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
@@ -769,12 +772,14 @@ class Api extends Auth_Controller
             if (!is_numeric($person_id))
                 show_error('person id is not numeric!');
 
-            $data = $this->KontaktModel->getWholeKontakt(null, $person_id);
-            $this->_remapData('kontakt_id',$data);
-
+		    $this->KontaktModel->addOrder("kontakt_id");
+		    $data = $this->KontaktModel->loadWhere(array('person_id'=>$person_id, 'kontakttyp !=' => 'hidden'));
+           
             if (isSuccess($data))
+            {
+                $this->_remapData('kontakt_id',$data);
 			    $this->outputJsonSuccess($data->retval);
-		    else
+            } else
 			    $this->outputJsonError('Error when fetching contact data');
 
         } else {
@@ -785,10 +790,6 @@ class Api extends Auth_Controller
     function upsertPersonContactData()
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
@@ -843,9 +844,7 @@ class Api extends Auth_Controller
 
     function getKontakttyp()
     {
-        //$this->KontakttypModel->addSelect("nation_code, $nationTextFieldName AS nation_text");
-		$this->NationModel->addOrder("kontakttyp");
-		$result = $this->KontakttypModel->load();
+		$result = $this->KontakttypModel->loadWhere('kontakttyp != \'hidden\'');
 
 		if (isError($result))
 		{
@@ -853,8 +852,27 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJsonSuccess($result); 
+        $this->outputJson($result); 
     }
+
+    //  ------------------------------------------
+    // Adressentyp
+    // -------------------------------------------
+
+    function getAdressentyp()
+    {
+		$this->AdressentypModel->addOrder("sort");
+		$result = $this->AdressentypModel->load();
+
+		if (isError($result))
+		{
+			$this->outputJsonError(getError($result));
+			exit;
+		}
+
+        $this->outputJson($result); 
+    }
+    
 
     private function _remapData($attribute, &$data) {
         $mappedData = new stdClass();

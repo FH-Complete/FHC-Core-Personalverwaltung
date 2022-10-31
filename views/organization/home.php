@@ -2,26 +2,19 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Personalverwaltung',
-			'jquery' => true,
-			'jqueryui' => false,
+			'title' => 'Personalverwaltung',		
 			'bootstrap5' => true,
 			'fontawesome6' => true,
-			'sbadmintemplate' => false,
-			'ajaxlib' => true,
-			'navigationwidget' => false,
+      'axios027' => true,
+			'navigationcomponent' => true,
       'vue3' => true,  
       'primevue3' => true,    
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',  
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css'],     
-      'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',                      
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgViewer.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'                    
-                    ],
+                       'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
+                       'public/css/components/searchbar.css'],     
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
+                                 'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'),
 		)
 	);
 ?>
@@ -75,8 +68,8 @@
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div id="chooser" class=" form-control-dark w-100">
-      <employee-chooser placeholder="MA suchen..."></employee-chooser>
+    <div id="chooser" class="w-100">
+      <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>				
     </div>
     <div class="navbar-nav">
       <div class="nav-item dropdown">
@@ -93,7 +86,7 @@
   <div class="container-fluid">
     <div class="row">
         
-      <sidebar :active="2"></sidebar>
+      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>      
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">

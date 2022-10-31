@@ -227,7 +227,7 @@ class Api_model extends DB_Model
     function getPersonBaseData($person_id)
     {
         $qry = "
-        SELECT array(select tbl_benutzer.uid from tbl_benutzer where tbl_benutzer.person_id=p.person_id) uids,
+        SELECT tbl_benutzer.uid,
             p.person_id,
             p.aktiv,
             p.anrede,
@@ -242,11 +242,15 @@ class Api_model extends DB_Model
             p.svnr,
             p.anmerkung,
             p.ersatzkennzeichen,
+            p.staatsbuergerschaft,
+            p.geburtsnation,
             p.insertamum,
             p.insertvon,
             p.updatevon,
             p.updateamum
         FROM tbl_person p
+            LEFT JOIN tbl_benutzer on(p.person_id=tbl_benutzer.person_id)
+            LEFT JOIN tbl_mitarbeiter on(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
         WHERE p.person_id=?
         ";
 
@@ -256,12 +260,20 @@ class Api_model extends DB_Model
 
     function updatePersonBaseData($personJson)
     {
-        unset($personJson['uids']);
+        unset($personJson['uid']);
         unset($personJson['insertamum']);
         // set empty values to null
         if ($personJson['sprache'] == '')
         {
             $personJson['sprache'] = null;
+        }
+        if ($personJson['geburtsnation'] == '')
+        {
+            $personJson['geburtsnation'] = null;
+        }
+        if ($personJson['staatsbuergerschaft'] == '')
+        {
+            $personJson['staatsbuergerschaft'] = null;
         }
 
         $personJson['updatevon'] = getAuthUID();
@@ -286,13 +298,21 @@ class Api_model extends DB_Model
 
     function insertPersonBaseData($personJson)
     {
-        unset($personJson['uids']);
+        unset($personJson['uid']);
         unset($personJson['updateamum']);
         unset($personJson['updatevon']);
         // set empty values to null
         if ($personJson['sprache'] == '')
         {
             $personJson['sprache'] = null;
+        }
+        if ($personJson['geburtsnation'] == '')
+        {
+            $personJson['geburtsnation'] = null;
+        }
+        if ($personJson['staatsbuergerschaft'] == '')
+        {
+            $personJson['staatsbuergerschaft'] = null;
         }
 
         $personJson['insertvon'] = getAuthUID();
@@ -429,6 +449,7 @@ class Api_model extends DB_Model
         unset($bankDataJson['oe_kurzbz']);
         $bankDataJson['insertvon'] = getAuthUID();
         $bankDataJson['insertamum'] = $this->escape('NOW()');
+        $bankDataJson['typ']='p';
 
         $result = $this->BankverbindungModel->insert($bankDataJson);
 
@@ -507,6 +528,11 @@ class Api_model extends DB_Model
         if ($addressDataJson['nation'] == '')
         {
             $addressDataJson['nation'] = 'A';
+        }
+
+        if ($addressDataJson['typ'] == '')
+        {
+            $addressDataJson['typ'] = 'h';
         }
 
         $result = $this->AdresseModel->insert($addressDataJson);

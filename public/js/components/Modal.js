@@ -25,7 +25,7 @@ export const Modal = {
     template:`
     <div class="modal fade " id="customModal" tabindex="-1" aria-labelledby=""
         aria-hidden="true" ref="modalEle">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="customModalLabel">{{ title }}</h5>

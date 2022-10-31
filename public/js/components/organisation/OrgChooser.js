@@ -1,17 +1,11 @@
-const OrgChooser = {
+import {CoreRESTClient} from '../../../../../js/RESTClient.js';
+
+export const OrgChooser = {
     props: {
       placeholder: String,
     },
     emits: ["orgSelected"],
     setup(_, { emit }) {   
-
-      var protocol_host =
-          location.protocol + "//" +
-          location.hostname + ":" +
-          location.port;
-        
-      const url =
-        `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrgHeads`;
 
       const orgList = Vue.ref([]);
       const isFetching = Vue.ref(false);
@@ -20,10 +14,11 @@ const OrgChooser = {
       const fetchHead = async () => {
         isFetching.value = true
         try {
-          const res = await fetch(url)
-          let response = await res.json()
-          orgList.value = response.retval;
+          const res = await CoreRESTClient.get(
+            'extensions/FHC-Core-Personalverwaltung/api/getOrgHeads');
+          orgList.value = CoreRESTClient.getData(res.data);
           if (orgList.value.length > 0)  {
+            orgList.value.reverse();
             selected.value = orgList.value[0].oe_kurzbz;
             emit("orgSelected", selected.value);
           }
