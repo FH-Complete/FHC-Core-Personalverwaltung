@@ -1,14 +1,19 @@
 CREATE TABLE IF NOT EXISTS hr.tbl_gehaltsbestandteil (
-    gehaltsbestandteil_id integer NOT NULL,
+    gehaltsbestandteil_id integer NOT NULL,    
     von date,
     bis date,
     anmerkung text,
-    grundbetrag text,
-    betrag_valorisiert text,
+    grundbetrag bytea,
+    betrag_valorisiert bytea,
     valorisieren bool default false,
-    dienstverhaeltnis_id integer,
+    dienstverhaeltnis_id bigint,
+    vertragsbestandteil_id bigint,
     gehaltstyp_kurzbz character varying(32),
-    valorisierungssperre smallint,
+    valorisierungssperre date,
+    insertamum timestamp,
+	insertvon character varying(32),
+	updateamum timestamp,
+	updatevon character varying(32),
 	CONSTRAINT tbl_gehaltsbestandteil_pk PRIMARY KEY (gehaltsbestandteil_id)
 );
 
@@ -19,7 +24,8 @@ CREATE SEQUENCE IF NOT EXISTS hr.tbl_gehaltsbestandteil_gehaltsbestandteil_id_se
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
-    CACHE 1;
+    CACHE 1
+    OWNED BY hr.tbl_gehaltsbestandteil.gehaltsbestandteil_id;
 
 GRANT SELECT, UPDATE ON hr.tbl_gehaltsbestandteil_gehaltsbestandteil_id_seq TO vilesci;
 
@@ -44,6 +50,15 @@ BEGIN
 	ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_gehaltstyp_fk FOREIGN KEY (gehaltstyp_kurzbz)
 	REFERENCES hr.tbl_gehaltstyp (gehaltstyp_kurzbz) MATCH FULL
 	ON DELETE SET NULL ON UPDATE CASCADE;
+ 	EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+-- vertrag
+DO $$
+BEGIN
+	ALTER TABLE hr.tbl_gehaltsbestandteil ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
+	REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
+	ON DELETE CASCADE ON UPDATE CASCADE;
  	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
