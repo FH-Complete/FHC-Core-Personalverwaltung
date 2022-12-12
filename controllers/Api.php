@@ -28,6 +28,8 @@ class Api extends Auth_Controller
                 'getContractNew' => Api::DEFAULT_PERMISSION,
                 'getBirthdays' => Api::DEFAULT_PERMISSION,
                 'getCovidState' => Api::DEFAULT_PERMISSION,
+                'getCurrentDV' => Api::DEFAULT_PERMISSION,
+                'getCourseHours' => Api::DEFAULT_PERMISSION,
                 'getReportData' => Api::DEFAULT_PERMISSION,
                 'personHeaderData' => Api::DEFAULT_PERMISSION,
                 'personAbteilung' => Api::DEFAULT_PERMISSION,
@@ -78,6 +80,8 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Dienstverhaeltnis_model', 'DVModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertrag_model', 'VertragModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsbestandteil_model', 'GBTModel');
     }
 
     function index()
@@ -335,6 +339,65 @@ class Api extends Auth_Controller
         }
 
         $data = $this->ApiModel->getCovidDate($person_id);
+        $this->outputJson($data);
+
+    }
+
+    /**
+     * get a list of currently active contracts (DV)
+     */
+    function getCurrentDV()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->DVModel->getCurrentDVByPersonUID($uid);
+
+        if (isSuccess($data))
+        {
+            foreach ($data->retval as $dv) {
+                $gbt_data = $this->GBTModel->getCurrentGBTByDV($dv->dienstverhaeltnis_id);
+
+                if (isSuccess($gbt_data))
+                {
+                    $dv->gehaltsbestandteile = $gbt_data->retval;
+                } else {
+                    $this->outputJsonError("Error when getting salary");
+                }
+            }
+            
+            $this->outputJson($data);
+        } else {
+            $this->outputJsonError("Error when getting current DV");
+        }
+        
+
+    }
+    
+
+    function getCourseHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+        $semester = $this->input->get('semester', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+        
+        if ($semester == '')
+        {
+            $this->outputJsonError("semester is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getCourseHours($uid, $semester);
         $this->outputJson($data);
 
     }

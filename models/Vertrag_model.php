@@ -15,21 +15,24 @@ class Vertrag_model extends DB_Model
 		$qry = "
         SELECT
             vertragsbestandteil_id,
+            dienstverhaeltnis_id,
+            vertragsart_kurzbz,
+            vertragsbestandteil_kurzbz,
             von,
             bis,
+            befristet,
             stundenausmass,
             zeitaufzeichnung,
             azgrelevant,
             homeoffice,
-            dienstverhaeltnis_id,
-            ba1code,
+            inkludierte_lehre,            
             verwendung_code,
             hauptberufcode,
             kv_gruppe,
-            verwendungsgruppenjahr,
-            dvart,
-            inkludierte_lehre,
-            vertragsart_kurzbz
+            verwendungsgruppenjahr,            
+            vertragsbestandteil_id_parent,
+            titel,
+            beschreibung
         FROM hr.tbl_vertragsbestandteil 
         WHERE dienstverhaeltnis_id=?
         ORDER BY von desc

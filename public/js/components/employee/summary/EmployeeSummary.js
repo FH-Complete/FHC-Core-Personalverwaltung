@@ -1,17 +1,22 @@
 
 import { CovidCard } from './CovidCard.js';
+import { DvCard } from './DVCard.js';
+import { LehreCard } from './LehreCard.js';
 
 export const EmployeeSummary = {
     components: {
         CovidCard,
+        DvCard,
+        LehreCard,
     },
     setup() {
         const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(null);
+        const currentUID = Vue.ref(null);
 
         Vue.onMounted(() => {
-            console.log('covid card mounted');
             currentPersonID.value = route.params.id;
+            currentUID.value = route.params.uid;
         })
 
         Vue.watch(
@@ -21,7 +26,14 @@ export const EmployeeSummary = {
 			}
 		)
 
-        return {currentPersonID}
+        Vue.watch(
+			() => route.params.uid,
+			newId => {
+				currentUID.value = newId;
+			}
+		)
+
+        return {currentPersonID, currentUID}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -38,20 +50,8 @@ export const EmployeeSummary = {
                 <div class="row pt-md-4">
 
                     <div class="col">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Dienstverhältnis</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                <div v-if="isFetching" class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>            
-                                <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                                von - bis<br>
-                                Funktion<br>
-                                Gehalt
-                            </div>
-                        </div>
+                        
+                        <dv-card :uid="currentUID"></dv-card>
 
                     </div>          
 
@@ -75,16 +75,9 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <div class="card-header">
-                            <h5 class="mb-0">Lehre</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                            <div v-if="isFetching" class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>            
-                            <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                        </div>
+                        <lehre-card :uid="currentUID"></lehre-card>
 
+                        <br/>
                         <div class="card-header">
                             <h5 class="mb-0">Urlaub/Krankenstand</h5>
                             </div>
