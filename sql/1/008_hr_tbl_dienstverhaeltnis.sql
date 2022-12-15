@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_dienstverhaeltnis (
 	mitarbeiter_uid character varying(32),
 	von date,
 	bis date,
-	oe_kurzbz character varying(32),     -- war standort_id
+	unternehmen_id integer,    -- war standort_id
 	vertragsart_kurzbz character varying(32),
 	befristet boolean,
 	hauptberufcode smallint,
@@ -19,7 +19,8 @@ CREATE SEQUENCE IF NOT EXISTS hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
-    CACHE 1;
+    CACHE 1
+	OWNED BY hr.tbl_dienstverhaeltnis.dienstverhaeltnis_id;
 
 GRANT SELECT, UPDATE ON hr.tbl_dienstverhaeltnis_dienstverhaeltnis_id_seq TO vilesci;
 
@@ -35,7 +36,7 @@ DO $$
 BEGIN
 	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_mitarbeiter_fk FOREIGN KEY (mitarbeiter_uid)
 	REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
-	ON DELETE SET NULL ON UPDATE CASCADE;
+	ON DELETE RESTRICT ON UPDATE CASCADE;
  	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
@@ -44,24 +45,15 @@ DO $$
 BEGIN
 	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_vertragsart_fk FOREIGN KEY (vertragsart_kurzbz)
 	REFERENCES hr.tbl_vertragsart (vertragsart_kurzbz) MATCH FULL
-	ON DELETE SET NULL ON UPDATE CASCADE;
+	ON DELETE RESTRICT ON UPDATE CASCADE;
     EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
--- standort
--- DO $$
---BEGIN
---	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_standort_fk FOREIGN KEY (standort_id)
---	REFERENCES public.tbl_standort (standort_id) MATCH FULL
---	ON DELETE SET NULL ON UPDATE CASCADE;
---   EXCEPTION WHEN OTHERS THEN NULL;
---END $$;
-
 DO $$
 BEGIN
-	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_organisationseinheit_fk FOREIGN KEY (oe_kurzbz)
-	REFERENCES public.tbl_organisationseinheit (oe_kurzbz) MATCH FULL
-	ON DELETE SET NULL ON UPDATE CASCADE;
+	ALTER TABLE hr.tbl_dienstverhaeltnis ADD CONSTRAINT tbl_unternehmen_fk FOREIGN KEY (unternehmen_id)
+	REFERENCES public.tbl_unternehmen (unternehmen_id) MATCH FULL
+	ON DELETE RESTRICT ON UPDATE CASCADE;
  	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 

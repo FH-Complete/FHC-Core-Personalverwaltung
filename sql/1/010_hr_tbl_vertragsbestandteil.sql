@@ -67,6 +67,77 @@ END $$;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_stunden TO vilesci;
 
+-- karenztyp
+
+
+CREATE TABLE hr.tbl_vertragsbestandteil_karenztyp (
+	karenztyp_kurzbz varchar NOT NULL,
+	bezeichnung text,
+	sort smallint,
+	CONSTRAINT tbl_karenztyp_pk PRIMARY KEY (karenztyp_kurzbz)
+);
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_karenztyp TO vilesci;
+
+COMMENT ON TABLE hr.tbl_vertragsbestandteil_karenztyp IS E'Mutterschutz, Elternkarenz, Bildungskarenz, ...';
+
+INSERT INTO hr.tbl_vertragsbestandteil_karenztyp
+	(karenztyp_kurzbz, bezeichnung, sort)
+SELECT 'MUTTERSCHUTZ','Mutterschutz',1
+WHERE
+   NOT EXISTS (
+       SELECT karenztyp_kurzbz FROM hr.tbl_vertragsbestandteil_karenztyp WHERE karenztyp_kurzbz = 'MUTTERSCHUTZ'
+   );
+
+INSERT INTO hr.tbl_vertragsbestandteil_karenztyp
+	(karenztyp_kurzbz, bezeichnung, sort)
+SELECT 'ELTERNKARENZ','Elternkarenz',2
+WHERE
+   NOT EXISTS (
+       SELECT karenztyp_kurzbz FROM hr.tbl_vertragsbestandteil_karenztyp WHERE karenztyp_kurzbz = 'ELTERNKARENZ'
+   );
+
+INSERT INTO hr.tbl_vertragsbestandteil_karenztyp
+	(karenztyp_kurzbz, bezeichnung, sort)
+SELECT 'ELTERNTEILZEIT','Elternteilzeit',3
+WHERE
+   NOT EXISTS (
+       SELECT karenztyp_kurzbz FROM hr.tbl_vertragsbestandteil_karenztyp WHERE karenztyp_kurzbz = 'ELTERNTEILZEIT'
+   );   
+   
+INSERT INTO hr.tbl_vertragsbestandteil_karenztyp
+	(karenztyp_kurzbz, bezeichnung, sort)
+SELECT 'BILDUNGSKARENZ','Bildungskarenz',4
+WHERE
+   NOT EXISTS (
+       SELECT karenztyp_kurzbz FROM hr.tbl_vertragsbestandteil_karenztyp WHERE karenztyp_kurzbz = 'BILDUNGSKARENZ'
+   );    
+
+-- karenz
+CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_karenz (
+	vertragsbestandteil_id integer NOT NULL,
+	karenztyp_kurzbz varchar NOT NULL,
+	geburtstermin date DEFAULT NULL,
+	CONSTRAINT tbl_vertragsbestandteil_karenz_pk PRIMARY KEY (vertragsbestandteil_id)
+);
+
+DO $$
+BEGIN
+	ALTER TABLE hr.tbl_vertragsbestandteil_karenz ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
+	REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
+	ON DELETE CASCADE ON UPDATE CASCADE;
+	EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+	ALTER TABLE hr.tbl_vertragsbestandteil_karenz ADD CONSTRAINT tbl_vertragsbestandteil_karenztyp_fk FOREIGN KEY (karenztyp_kurzbz)
+	REFERENCES hr.tbl_vertragsbestandteil_karenztyp (karenztyp_kurzbz) MATCH FULL
+	ON DELETE SET NULL ON UPDATE CASCADE;
+	EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_karenz TO vilesci;
 
 -- funktionen
 
@@ -163,6 +234,14 @@ BEGIN
 	REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 	ON DELETE CASCADE ON UPDATE CASCADE;
 	EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+DO $$
+BEGIN
+	ALTER TABLE hr.tbl_vertragsbestandteil_kv ADD CONSTRAINT tbl_kv_gruppe_fk FOREIGN KEY (kollektivvertragsgruppe)
+	REFERENCES public.tbl_kv_gruppe (kv_gruppe) MATCH FULL
+	ON DELETE RESTRICT ON UPDATE CASCADE;
+ 	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_kv TO vilesci;

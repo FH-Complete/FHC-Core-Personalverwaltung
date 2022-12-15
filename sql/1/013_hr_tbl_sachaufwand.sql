@@ -18,7 +18,8 @@ CREATE SEQUENCE IF NOT EXISTS hr.tbl_sachaufwand_sachaufwand_id_seq
     INCREMENT BY 1
     NO MAXVALUE
     NO MINVALUE
-    CACHE 1;
+    CACHE 1
+	OWNED BY hr.tbl_sachaufwand.sachaufwand_id;
 
 GRANT SELECT, UPDATE ON hr.tbl_sachaufwand_sachaufwand_id_seq TO vilesci;
 
