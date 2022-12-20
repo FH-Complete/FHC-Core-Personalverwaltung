@@ -10,7 +10,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteiltyp TO vile
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'FREITEXT','Freitext', 1,true
+SELECT 'freitext','Freitext', 1,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'FREITEXT'
@@ -18,7 +18,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'STUNDEN','Stunden', 2,true
+SELECT 'stunden','Stunden', 2,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'STUNDEN'
@@ -26,7 +26,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'FUNKTION','Funktion', 3,true
+SELECT 'funktion','Funktion', 3,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'FUNKTION'
@@ -34,7 +34,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'LEHRE','Lehre', 4,true
+SELECT 'lehre','Lehre', 4,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'LEHRE'
@@ -42,7 +42,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'ZEITAUFZEICHNUNG','Zeitaufzeichnung', 5,true
+SELECT 'zeitaufzeichnung','Zeitaufzeichnung', 5,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'ZEITAUFZEICHNUNG'
@@ -50,7 +50,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'KUENDIGUNGSFRIST','Kündigungsfrist', 6,true
+SELECT 'kuendigungsfrist','Kündigungsfrist', 6,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'KUENDIGUNGSFRIST'
@@ -58,7 +58,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'URLAUBSANSPRUCH','Urlaubsanspruch', 7,true
+SELECT 'urlaubsanspruch','Urlaubsanspruch', 7,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'URLAUBSANSPRUCH'
@@ -66,7 +66,7 @@ WHERE
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
 	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
-SELECT 'KV','KV', 8,true
+SELECT 'kv','KV', 8,true
 WHERE
    NOT EXISTS (
        SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'KV'
