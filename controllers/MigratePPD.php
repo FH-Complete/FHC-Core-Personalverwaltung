@@ -1,5 +1,6 @@
 <?php 
 
+use vertragsbestandteil\VertragsbestandteilFactory;
 
 // FH
 const OE_KURZBZ = 'gst';
@@ -24,11 +25,11 @@ class MigratePPD extends CI_Controller {
         $this->ci =& get_instance();
         $this->ci->load->database();
 
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Dienstverhaeltnis_model','DienstverhaeltnisModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteil_model', 'VertragsbestandteilModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteil_stunden_model', 'VertragsbestandteilStundenModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
-        
+        $this->load->helper('hlp_common_helper');
+        $this->load->helper('hlp_return_object_helper');
+
+        //$this->load->model('extensions/FHC-Core-Personalverwaltung/Dienstverhaeltnis_model', 'DienstverhaeltnisModel');        
+        $this->load->library('vertragsbestandteil/VertragsbestandteilLib', null, 'VertragsbestandteilLib');
     }
 
     private function uidExists($uid)
@@ -43,27 +44,41 @@ class MigratePPD extends CI_Controller {
         
         $dvTyp = MigratePPD::dvTypDef[0];
         if ($row->typ_id!=0) $dvTyp=MigratePPD::dvTypDef[1]; 
-        $qry = "insert into hr.tbl_dienstverhaeltnis(mitarbeiter_uid,von,bis,vertragsart_kurzbz, oe_kurzbz, insertamum,insertvon) values(?,?,?,?,?,now(),?)";
-        $result = $this->ci->db->query($qry, array($row->uid, $row->dv_beginn, $row->dv_ende, $dvTyp, OE_KURZBZ, 'migration'));
+        $qry = "insert into hr.tbl_dienstverhaeltnis(mitarbeiter_uid,von,bis,vertragsart_kurzbz, insertamum,insertvon) values(?,?,?,?,now(),?)";
+        $result = $this->ci->db->query($qry, array($row->uid, $row->dv_beginn, $row->dv_ende, $dvTyp, 'migration'));
         return $result;
     }
 
     private function insertVertragsbestandteil($dv_id, $row, $dvTyp)
-    {
-        $vertragTyp = null;
-        if ($dvTyp==MigratePPD::dvTypDef[1]) $vertragTyp=MigratePPD::vertragTypDef[0];
-        $qry = "insert into hr.tbl_vertragsbestandteil(von, bis, stundenausmass, dienstverhaeltnis_id, vertragsart_kurzbz) values(?, ?, ?, ?, ?)";
-        $result = $this->ci->db->query($qry,array($row->beginn, $row->ende, $row->stunden_pro_woche, $dv_id, $vertragTyp));
-        return $result;
+    {        
+        $data = new stdClass();
+        $data->dienstverhaeltnis_id = $dv_id;
+        $data->von = $row->beginn;
+        $data->bis = $row->ende;
+        
+        $data->wochenstunden = $row->stunden_pro_woche;
+        $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN;
+        
+        $vb = VertragsbestandteilFactory::getVertragsbestandteil($data);
+        
+        try
+        {
+            $this->VertragsbestandteilLib->storeVertragsbestandteil($vb);
+            echo "VERTRAGSBESTANDTEIL_STUNDEN Update successful.\n";
+        }
+        catch( Exception $ex ) 
+        {
+            echo "VERTRAGSBESTANDTEIL_STUNDEN Update failed.\n";
+        }
     }
 
     private function insertVertragsbestandteilStunden($vertragsbestandteil_id, $von, $bis, $stunden)
     {
         $vertragTyp = null;
-        if ($dvTyp==MigratePPD::dvTypDef[1]) $vertragTyp=MigratePPD::vertragTypDef[0];
-        $qry = "insert into hr.tbl_vertragsbestandteil_stunden(von, bis, stundenausmass, dienstverhaeltnis_id, vertragsart_kurzbz) values(?, ?, ?, ?, ?)";
-        $result = $this->ci->db->query($qry,array($row->beginn, $row->ende, $row->stunden_pro_woche, $dv_id, $vertragTyp));
-        return $result;
+        //if ($dvTyp==MigratePPD::dvTypDef[1]) $vertragTyp=MigratePPD::vertragTypDef[0];
+        //$qry = "insert into hr.tbl_vertragsbestandteil_stunden(von, bis, stundenausmass, dienstverhaeltnis_id, vertragsart_kurzbz) values(?, ?, ?, ?, ?)";
+        //$result = $this->ci->db->query($qry,array($row->beginn, $row->ende, $row->stunden_pro_woche, $dv_id, $vertragTyp));
+        //return $result;
     }
 
     private function finishGehaltsbestandteil($dienstverhaeltnis_id, $datum)
@@ -179,7 +194,7 @@ class MigratePPD extends CI_Controller {
             $this->ppdDB = $this->load->database(PPD_DSN, TRUE);
             echo "success<br><br>";
 
-            $this->ppdDB->trans_begin();
+            $this->ci->db->trans_begin();
 
             $qry="select distinct dv.dv_id, uid, personalnummer, vorname, nachname, dv.beginn dv_beginn, dv.ende dv_ende, dv.typ_id
                 from tbl_mitarbeiter join dv using(uid) join vertrag using(dv_id) 
@@ -209,56 +224,10 @@ class MigratePPD extends CI_Controller {
                                 $vertraege = $this->getPPDVertraege($row->dv_id);
                                 foreach ($vertraege as $vertrag_row)
                                 {
-                                    // vertrag anlegen
+                                    // vertrag anlegen (Stunden)
                                     $this->insertVertragsbestandteil($dv_id, $vertrag_row,null);
-                                    $vertragsbestandteil_id = $this->ci->db->insert_id();
-
-                                    // wenn fix angestellt
-                                    if ($row->typ_id == 0)
-                                    {
-                                        
-                                        $grundgehalt = $vertrag_row->grundgehalt;
-
-                                        // letztes valorisiertes Gehalt holen
-                                        $letztesGehalt_row = $this->getPPDVertragLetztesGehalt($vertrag_row->vertrag_id);
-
-                                        if (count($letztesGehalt_row) > 0)
-                                        {
-                                            $ist_gehalt = $letztesGehalt_row[0]->betrag_ist;
-                                        } else {
-                                            $ist_gehalt = $grundgehalt;
-                                        }
-
-                                        //  gehaltsbestandteile anlegen 
-                                        $this->insertGehaltsbestandteil($dv_id, $vertragsbestandteil_id, $vertrag_row->beginn, $vertrag_row->ende, MigratePPD::grundgehaltTypDef[0], $grundgehalt, true, $ist_gehalt);
-                                    }
-
-                                    // Anpassungen
                                     
-                                    $anpassungen = $this->getPPDSubvertrag($vertrag_row->vertrag_id, true);
 
-                                    foreach ($anpassungen as $anpassung_row)
-                                    {
-                                        $grundgehalt += $anpassung_row->grundgehalt;
-
-                                        // letztes valorisiertes Gehalt holen
-                                        $letztesGehalt_row = $this->getPPDVertragLetztesGehalt($anpassung_row->vertrag_id);
-
-                                        if (count($letztesGehalt_row) > 0)
-                                        {
-                                            $ist_gehalt += $letztesGehalt_row[0]->betrag_ist;
-                                        } else {
-                                            $ist_gehalt = $grundgehalt;
-                                        }
-
-                                        $datum_bis = date_create($anpassung_row->beginn)->modify('-1 day');
-
-                                        $this->finishGehaltsbestandteil($dv_id, date_format($datum_bis,"Y-m-d"));
-
-                                        // gehaltsbestandteil anlegen
-                                        $this->insertGehaltsbestandteil($dv_id, $vertragsbestandteil_id, $anpassung_row->beginn, $anpassung_row->ende, MigratePPD::grundgehaltTypDef[0], $grundgehalt, true, $ist_gehalt);
-
-                                    }
                                 }
                              
                                 
@@ -321,12 +290,12 @@ class MigratePPD extends CI_Controller {
             
             
 
-            $this->ppdDB->trans_commit();
+            $this->ci->db->trans_commit();
 
         } catch (Exception $e) {
 
             echo 'Error: '.$e->getMessage().'<br>';
-            $this->ppdDB->trans_rollback();
+            $this->ci->db->trans_rollback();
 
         } finally {
 
