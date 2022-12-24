@@ -141,23 +141,23 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_karenz TO 
 
 -- funktionen
 
-CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_funktionen (
+CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_funktion (
 	vertragsbestandteil_id integer NOT NULL,
 	benutzerffunktion_id smallint,
 	anmerkung smallint,
 	kuendigungsrelevant bool,
-	CONSTRAINT tbl_vertragsbestandteil_funktionen_pk PRIMARY KEY (vertragsbestandteil_id)
+	CONSTRAINT tbl_vertragsbestandteil_funktion_pk PRIMARY KEY (vertragsbestandteil_id)
 );
 
 DO $$
 BEGIN
-	ALTER TABLE hr.tbl_vertragsbestandteil_funktionen ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
+	ALTER TABLE hr.tbl_vertragsbestandteil_funktion ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
 	REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 	ON DELETE CASCADE ON UPDATE CASCADE;
 	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_funktionen TO vilesci;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_funktion TO vilesci;
 
 -- freitext typ
 
@@ -266,21 +266,21 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_lehre TO v
 
 -- urlaubsanspruch
 
-CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbetandteil_urlaubsanspruch (
+CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_urlaubsanspruch (
 	vertragsbestandteil_id integer NOT NULL,
 	tage smallint,
-	CONSTRAINT tbl_vertragsbetandteil_urlaubsanspruch_pk PRIMARY KEY (vertragsbestandteil_id)
+	CONSTRAINT tbl_vertragsbestandteil_urlaubsanspruch_pk PRIMARY KEY (vertragsbestandteil_id)
 );
 
 DO $$
 BEGIN
-	ALTER TABLE hr.tbl_vertragsbetandteil_urlaubsanspruch ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
+	ALTER TABLE hr.tbl_vertragsbestandteil_urlaubsanspruch ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
 	REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
 	ON DELETE CASCADE ON UPDATE CASCADE;
 	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbetandteil_urlaubsanspruch TO vilesci;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_urlaubsanspruch TO vilesci;
 
 -- kuendigungsfrist
 
