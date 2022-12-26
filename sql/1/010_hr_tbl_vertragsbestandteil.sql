@@ -67,6 +67,23 @@ END $$;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_stunden TO vilesci;
 
+-- DV-Typ unbefristet/befristet
+CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_befristung (
+	vertragsbestandteil_id integer NOT NULL,
+	unbefristet bool default true,
+	CONSTRAINT tbl_vertragsbestandteil_befristung_pk PRIMARY KEY (vertragsbestandteil_id)
+);
+
+DO $$
+BEGIN
+	ALTER TABLE hr.tbl_vertragsbestandteil_befristung ADD CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id)
+	REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL
+	ON DELETE CASCADE ON UPDATE CASCADE;
+	EXCEPTION WHEN OTHERS THEN NULL;
+END $$;
+
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_befristung TO vilesci;
+
 -- karenztyp
 
 
@@ -161,7 +178,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_funktion T
 
 -- freitext typ
 
-CREATE TABLE hr.tbl_vertragsbestandteil_freitexttyp (
+CREATE TABLE  IF NOT EXISTS hr.tbl_vertragsbestandteil_freitexttyp (
 	freitexttyp_kurzbz varchar NOT NULL,
 	bezeichnung text,
 	CONSTRAINT tbl_freitexttyp_pk PRIMARY KEY (freitexttyp_kurzbz)

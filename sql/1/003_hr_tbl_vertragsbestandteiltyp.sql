@@ -13,7 +13,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'freitext','Freitext', 1,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'FREITEXT'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'freitext'
    );
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -21,7 +21,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'stunden','Stunden', 2,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'STUNDEN'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'stunden'
    );   
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -29,7 +29,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'funktion','Funktion', 3,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'FUNKTION'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'funktion'
    ); 
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -37,7 +37,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'lehre','Lehre', 4,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'LEHRE'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'lehre'
    ); 
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -45,7 +45,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'zeitaufzeichnung','Zeitaufzeichnung', 5,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'ZEITAUFZEICHNUNG'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'zeitaufzeichnung'
    ); 
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -53,7 +53,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'kuendigungsfrist','Kündigungsfrist', 6,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'KUENDIGUNGSFRIST'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'kuendigungsfrist'
    ); 
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -61,7 +61,7 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'urlaubsanspruch','Urlaubsanspruch', 7,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'URLAUBSANSPRUCH'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'urlaubsanspruch'
    );    
 
 INSERT INTO hr.tbl_vertragsbestandteiltyp 
@@ -69,7 +69,23 @@ INSERT INTO hr.tbl_vertragsbestandteiltyp
 SELECT 'kv','KV', 8,true
 WHERE
    NOT EXISTS (
-       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'KV'
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'kv'
    );    
+
+INSERT INTO hr.tbl_vertragsbestandteiltyp 
+	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
+SELECT 'karenz','Karenz', 9,true
+WHERE
+   NOT EXISTS (
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'karenz'
+   ); 
+
+INSERT INTO hr.tbl_vertragsbestandteiltyp 
+	(vertragsbestandteiltyp_kurzbz, bezeichnung, sort, aktiv) 
+SELECT 'befristung','Befristung', 10,true
+WHERE
+   NOT EXISTS (
+       SELECT vertragsbestandteiltyp_kurzbz FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'Befristung'
+   );   
 
 

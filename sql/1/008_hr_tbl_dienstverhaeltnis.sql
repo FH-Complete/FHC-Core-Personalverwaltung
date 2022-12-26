@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS hr.tbl_dienstverhaeltnis (
 	bis date,
 	unternehmen_id integer,    -- war standort_id
 	vertragsart_kurzbz character varying(32),
-	befristet boolean,
 	hauptberufcode smallint,
 	probezeit smallint,
 	insertamum timestamp,
