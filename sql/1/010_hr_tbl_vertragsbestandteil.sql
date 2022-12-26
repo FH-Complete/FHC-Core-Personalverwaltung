@@ -143,7 +143,7 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_karenz TO 
 
 CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_funktion (
 	vertragsbestandteil_id integer NOT NULL,
-	benutzerffunktion_id smallint,
+	benutzerfunktion_id smallint,
 	anmerkung smallint,
 	kuendigungsrelevant bool,
 	CONSTRAINT tbl_vertragsbestandteil_funktion_pk PRIMARY KEY (vertragsbestandteil_id)
