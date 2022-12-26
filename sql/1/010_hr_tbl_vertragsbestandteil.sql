@@ -31,7 +31,7 @@ DO $$
 BEGIN
 	ALTER TABLE hr.tbl_vertragsbestandteil ADD CONSTRAINT tbl_vertragsbestandteiltyp_fk FOREIGN KEY (vertragsbestandteiltyp_kurzbz)
 	REFERENCES hr.tbl_vertragsbestandteiltyp (vertragsbestandteiltyp_kurzbz) MATCH FULL
-	ON DELETE SET NULL ON UPDATE CASCADE;
+	ON DELETE CASCADE ON UPDATE CASCADE;
 	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
 
