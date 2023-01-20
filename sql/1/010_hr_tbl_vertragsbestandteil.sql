@@ -70,7 +70,9 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_stunden TO
 -- DV-Typ unbefristet/befristet
 CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_befristung (
 	vertragsbestandteil_id integer NOT NULL,
-	unbefristet bool default true,
+	befristet bool default false,
+	befristet_bis date,
+
 	CONSTRAINT tbl_vertragsbestandteil_befristung_pk PRIMARY KEY (vertragsbestandteil_id)
 );
 
@@ -135,6 +137,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_karenz (
 	vertragsbestandteil_id integer NOT NULL,
 	karenztyp_kurzbz varchar NOT NULL,
 	geburtstermin date DEFAULT NULL,
+	geburtstermin_geplant date DEFAULT NULL,
 	CONSTRAINT tbl_vertragsbestandteil_karenz_pk PRIMARY KEY (vertragsbestandteil_id)
 );
 
@@ -192,7 +195,7 @@ COMMENT ON TABLE hr.tbl_vertragsbestandteil_freitexttyp IS E'Verwendung, Sonstig
 
 CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_freitext (
 	vertragsbestandteil_id integer NOT NULL,
-	anmerkung smallint,
+	anmerkung text,
 	kuendigungrelevant bool,
 	freitexttyp_kurzbz varchar,
 	CONSTRAINT tbl_vertragsbestandteil_freitext_pk PRIMARY KEY (vertragsbestandteil_id)

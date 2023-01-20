@@ -28,3 +28,22 @@ BEGIN
 	ON DELETE RESTRICT ON UPDATE CASCADE;
  	EXCEPTION WHEN OTHERS THEN NULL;
 END $$;
+
+
+
+-- insert default org
+INSERT INTO hr.tbl_unternehmen
+	(oe_kurzbz)
+SELECT 'gst'
+WHERE
+   NOT EXISTS (
+       SELECT oe_kurzbz FROM hr.tbl_unternehmen WHERE oe_kurzbz = 'gst'
+   );
+
+INSERT INTO hr.tbl_unternehmen
+	(oe_kurzbz)
+SELECT 'gmbh'
+WHERE
+   NOT EXISTS (
+       SELECT oe_kurzbz FROM hr.tbl_unternehmen WHERE oe_kurzbz = 'gmbh'
+   );   
