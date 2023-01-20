@@ -812,10 +812,27 @@ class Api_model extends DB_Model
         return $this->execQuery($qry);
     }
 
-    function getBankverbindung($person_id)
+
+    // -----------------------------------------
+    // DV
+    // -----------------------------------------
+    function insertDV($contractDataJSON)
     {
+        $dvDataJson['insertvon'] = getAuthUID();
+        $dvDataJson['insertamum'] = $this->escape('NOW()');
+            
+        $result = $this->DVModel->insert($dvDataJson);
+        $dvData = $this->KontaktModel->load($result->retval);
 
+        // create contract details (Vertragsbestandteile)
+
+        // Stunden
+
+        // Befristung
+
+        
+
+        return $dvData;
     }
-
 
 }

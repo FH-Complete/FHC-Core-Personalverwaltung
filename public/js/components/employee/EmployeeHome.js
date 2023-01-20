@@ -28,6 +28,7 @@ export default {
 		const currentPersonUID = Vue.ref(null);
 		const appSideMenuEntries = Vue.ref({});
 		const verticalsplitRef = Vue.ref(null);
+		const currentDate = Vue.ref(null);
 
 		Vue.watch(
 			() => route.params,
@@ -164,7 +165,8 @@ export default {
 				//isEditorOpen.value=true;
 			}
 
-			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}`
+			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}`;
+
 			router.push(url);
 		}
 

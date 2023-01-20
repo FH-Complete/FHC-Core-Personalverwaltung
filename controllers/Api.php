@@ -21,6 +21,7 @@ class Api extends Auth_Controller
                 'personMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'upsertPersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'deletePersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
+                'getVertragsartAll' => Api::DEFAULT_PERMISSION,
                 'getOrgHeads' => Api::DEFAULT_PERMISSION,
                 'getOrgStructure' => Api::DEFAULT_PERMISSION,
                 'getOrgPersonen' => Api::DEFAULT_PERMISSION,
@@ -58,8 +59,10 @@ class Api extends Auth_Controller
 		);
 
 
-		// Loads authentication library and starts authentication
+		// Loads authentication library and starts authenticationfetc
 		$this->load->library('AuthLib');
+        $this->load->library('vertragsbestandteil/VertragsbestandteilLib', 
+			null, 'VertragsbestandteilLib');
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
         $this->load->model('person/Person_model','PersonModel');
@@ -78,10 +81,11 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Statistik_model', 'StatistikModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwandtyp_model', 'SachaufwandtypModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Dienstverhaeltnis_model', 'DVModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertrag_model', 'VertragModel');
+        $this->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 'DVModel');
+        $this->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GBTModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsbestandteil_model', 'GBTModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
+        
     }
 
     function index()
@@ -259,6 +263,15 @@ class Api extends Auth_Controller
 
     }
 
+    // ----------------------------
+    // Vertragart
+    // ----------------------------
+    function getVertragsartAll()
+    {
+        $this->VertragsartModel->addOrder("sort");
+        $data = $this->VertragsartModel->load();
+        $this->outputJson($data);
+    }
 
     // -----------------------------
     // Organisation
@@ -1027,6 +1040,7 @@ class Api extends Auth_Controller
     function vertragByDV()
     {
         $dv_id = $this->input->get('dv_id', TRUE);
+        $stichtag = null;
 
         if (!is_numeric($dv_id))
         {
@@ -1034,9 +1048,69 @@ class Api extends Auth_Controller
             exit;
         }
 
-        $data = $this->VertragModel->getVertragByDV($dv_id);
+        $data = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
+			$dv_id, $stichtag);
+
         
         return $this->outputJson($data);   
     }
+
+
+    /**
+     * create employment and contract details
+     */
+    function createDV()
+    {
+        if($this->input->method() === 'post'){
+
+            $dvJson = json_decode($this->input->raw_input_stream, TRUE);
+            /* payload:
+                {
+                    "mitarbeiterUID": "aburaiaa",
+                    "von": "2023-01-01",
+                    "bis": null,
+                    "befristet": false,
+                    "vertragsartKurzbz": "Werkvertrag",
+                    "unternehmenID": "gst",
+                    "stunden": null,
+                    "gehalt": null,
+                    "kuendigungsfrist": null,
+                    "urlaubsanspruch": null
+                }
+            */
+
+                // init DV
+                unset($dvJson['updateamum']);
+                unset($dvJson['updatevon']);
+                // set empty values to null
+                if ($dvJson['hauptberufcode'] == '')
+                {
+                    $dvJson['hauptberufcode'] = null;
+                }
+                if ($dvJson['probezeit'] == '')
+                {
+                    $dvJson['probezeit'] = null;
+                }
+                if ($dvJson['bis'] == '')
+                {
+                    $dvJson['bis'] = null;
+                }
+            
+                $this->apiModel->insertDV($dvJson);
+            
+                if (isError($result))
+                {
+                    return error($result->msg, EXIT_ERROR);
+                }
+
+                $data = $this->DVModel->getDVByPersonUID($person_uid);
+        
+            return $this->outputJson($data);   
+
+        } else {
+            $this->output->set_status_header('405'); 
+        }
+    }
+   
 
 }

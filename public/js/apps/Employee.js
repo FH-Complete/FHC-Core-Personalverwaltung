@@ -22,7 +22,7 @@ const router = VueRouter.createRouter(
 					{ path: '', component: EmployeePerson, name: 'person' },
 					{ path: 'contract', component: EmployeeContract },
 					{ path: 'salary', component: EmployeeContract, name: 'salary' },
-					{ path: 'summary', component: EmployeeSummary, name: 'summary'},
+					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },
 		],
@@ -41,6 +41,8 @@ const pvApp = Vue.createApp({
 		const kontakttyp = Vue.ref([]);
 		const adressentyp = Vue.ref([]);
 		const sachaufwandtyp  = Vue.ref([]);
+
+		const currentDate = Vue.ref('2022-03-04');
 
 		Vue.provide("sprache",sprache);
 		Vue.provide("nations",nations);

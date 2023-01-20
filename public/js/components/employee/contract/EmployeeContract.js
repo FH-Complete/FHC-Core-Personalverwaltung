@@ -1,8 +1,10 @@
+import {DVDialog} from './DVDialog.js';
 
 
 export const EmployeeContract = {
     components: {	
-		
+		DVDialog,
+       
 	},
     props: {        
         writePermission: { type: Boolean, required: false },  // TODO needs change
@@ -15,8 +17,12 @@ export const EmployeeContract = {
         const vertragList = ref([]);
         const isFetching = ref(false);
         const currentDVID = ref(null);
+        const currentDV = ref(null);
         const currentVertragID = ref(null);
         const dvSelectedIndex = ref(1);
+        const currentWS = ref(null);
+        const dienstverhaeltnisDialogRef = ref();
+        const currentDate = ref();
   
         const generateDVEndpointURL = (uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -27,6 +33,8 @@ export const EmployeeContract = {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}`;
         };
+
+        
 
         const fetchData = async (uid) => {
             if (uid==null) {
@@ -39,11 +47,11 @@ export const EmployeeContract = {
             try {
               const res = await fetch(urlDV);
               let response = await res.json();
-              isFetching.value = false;
-              console.log(response.retval);
+              isFetching.value = false;              
               dvList.value = response.retval;
               if (dvList.value.length>0) {
                 currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
+                currentDV.value = dvList.value[0];
               }
             } catch (error) {
               console.log(error)
@@ -58,10 +66,10 @@ export const EmployeeContract = {
               const res = await fetch(urlVertrag);
               let response = await res.json();
               isFetching.value = false;
-              console.log(response.retval);
-              vertragList.value = response.retval;
+              vertragList.value = response;
               if (vertragList.value.length>0) {
                 currentVertragID.value = vertragList.value[0].vertragsbestandteil_id;
+                getCurrentVertragsbestandteil();
               }
             } catch (error) {
               console.log(error)
@@ -88,6 +96,8 @@ export const EmployeeContract = {
         const dvSelectedHandler = (e) => {
             console.log("DV selected: ", e.target);
             dvSelectedIndex.value = e.target.selectedIndex+1;
+            currentDV.value = dvList.value[e.target.selectedIndex];
+            currentDVID.value = currentDV.value.dienstverhaeltnis_id;
         }
 
         const formatDate = (d) => {
@@ -98,7 +108,28 @@ export const EmployeeContract = {
             }
         }
 
-        return { isFetching, dvList, vertragList, currentDVID, dvSelectedHandler, formatDate, dvSelectedIndex }
+        const filterVertragsbestandteil = (vertragsbestandteile, kurzbz) => {
+            let ws = vertragsbestandteile.filter(value => value.vertragsbestandteiltyp_kurzbz==kurzbz);
+            return ws;
+        }
+
+        const createDVDialog = async () => {
+            const result = await dienstverhaeltnisDialogRef.value.showModal(route.params.uid);
+
+            if (result) {
+                console.log(result);
+            } else {
+                console.log("Dialog cancelled");
+            }
+        }
+
+        const getCurrentVertragsbestandteil = () => {
+            let ws = filterVertragsbestandteil(vertragList.value, 'stunden');
+            currentWS.value = ws[0].wochenstunden;
+        }
+
+        return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
+            dienstverhaeltnisDialogRef, createDVDialog, formatDate, dvSelectedIndex, currentDate }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -115,11 +146,11 @@ export const EmployeeContract = {
                 <div class="d-md-flex bd-highlight pt-1">            
                     <div class="flex-grow-1 bd-highlight">
                         <div class="d-grid gap-2 d-md-flex ">
-                            <h4>Dienstverhältnis <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})</span> </h4> 
+                            <h4>Dienstverhältnis <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></h4> 
                         </div>
                     </div>        
                     <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-
+                             
                             <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
                                     <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
                                         {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
@@ -129,7 +160,8 @@ export const EmployeeContract = {
                             <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
                                 <i class="fa fa-plus"></i>
                             </button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-plus"></i></button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click=""><i class="fa fa-pen"></i></button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
@@ -137,11 +169,259 @@ export const EmployeeContract = {
             </div>
             
             
-            <div class="row">
+            <div class="col-lg-12">
 
-                <div class="col-lg-12">        
+                <div class="row pt-md-4">
+
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Details</h5>
+                            </div>
+                            <div class="card-body" style="text-align:left">
+
+                                <form  ref="baseDataFrm" v-if="currentDV != null">
+
+                                    <div class="row mb-1">
+                                        <label for="zeitraum" class="col-sm-3 col-form-label">Zeitraum</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  id="dvZeitraum" :value="formatDate(currentDV.von) + '-' + formatDate(currentDV.bis)">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-1">
+                                        <label for="dvArt" class="col-sm-3 col-form-label">Art</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="currentDV.vertragsart_kurzbz">
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="art" class="col-sm-3 col-form-label">Befristet</label>
+                                        <div class="col-sm-8">
+                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="dvStunden" class="col-sm-3 col-form-label">Stunden</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="currentWS">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="dvLehre" class="col-sm-3 col-form-label">Lehre</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvLehre">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="dvKuendigungsfrist" class="col-sm-3 col-form-label">Kündigungsfrist</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfrist">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="dvUrlaubsanspruch" class="col-sm-3 col-form-label">Urlaubsanspruch</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch">
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="dvFunktion" class="col-sm-3 col-form-label">Funktion</label>
+                                        <div class="col-sm-8">
+                                            
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Zeitraum</th>
+                                                    <th scope="col">Typ</th>
+                                                    <th scope="col">Zuordnung</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <th scope="row">1.12.2015-</th>
+                                                    <td>Disziplinär</td>
+                                                    <td>Virtual Technologies & Sensor Systems</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">1.12.2015-</th>
+                                                    <td>Fachlich</td>
+                                                    <td>Virtual Technologies & Sensor Systems</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">1.12.2015-</th>
+                                                    <td>Std.Kst.</td>
+                                                    <td>Virtual Technologies & Sensor Systems</td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">1.12.2015-</th>
+                                                    <td>OE-Zuordnung</td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <th scope="row">1.12.2015-</th>
+                                                    <td>LektorIn</td>
+                                                    <td></td>
+                                                </tr>
+                                                
+                                            </tbody>
+                                        </table>
+
+
+                                        </div>
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-1">
+                                        <label for="dvFreitext" class="col-sm-3 col-form-label">Freitext</label>
+                                        <div class="col-sm-8">
+                                            <b>1.2.2015-</b><br>
+                                            <textarea type="text" readonly rows="5"
+                                                class="form-control-sm form-control-plaintext" id="dvFreitext"
+                                                >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                                            </textarea>
+
+                                            <b>1.2.2015-</b><br>
+                                            <textarea type="text" readonly rows="5"
+                                                class="form-control-sm form-control-plaintext" id="dvFreitext"
+                                                >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
+                                            </textarea>
+                                        </div>
+                                        
+                                        <div class="col-sm-1">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                
+
+                                </form>
+
+                            </div>   <!-- card body -->
+                        </div>  <!-- card -->
+                    </div>  <!-- col -->
+
+                    <div class="col">
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Gehalt</h5>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Zeitraum</th>
+                                            <th scope="col">Typ</th>
+                                            <th scope="col">Betrag</th>
+                                            <th scope="cols"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">1.12.2015-</th>
+                                            <td>Grundgehalt</td>
+                                            <td>€ 4711,00</td>
+                                            <td><button type="button" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fa fa-pen"></i>
+                                                </button>
+                                            </td>
+                                        </tr>                                        
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <br>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Dokumente</h5>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Zeitraum</th>
+                                            <th scope="col">Bezeichnung</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">1.12.2015-</th>
+                                            <td>Vertrag</td>
+                                            <td><button type="button" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fa fa-pen"></i>
+                                                </button>
+                                            </td>
+                                        </tr>                                        
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                       
+
+                        <br/>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Notizen</h5>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                                    ...
+                            </div>
+                        </div>     
+                    </div>  <!-- col -->
+
+                    
+                </div>  <!-- row -->
+
+                <div class="col-lg-12">     
                 
-                    <!--div class="table-responsive">
+
+                
+                    <!-- div class="table-responsive">
                         <table class="table table-bordered table-hover table-striped tablesorter">
                             <thead>
                             <tr>
@@ -193,9 +473,9 @@ export const EmployeeContract = {
 
                             </tbody>
                         </table>
-                    </div-->  <!-- table -->
+                    </div -->  
 
-                    <div class="accordion" id="accordionExample">
+                    <!-- div class="accordion" id="accordionExample">
                         <div v-for="(item, index) in vertragList" class="accordion-item" :key="item.vertragsbestandteil_id">
                             <h2 class="accordion-header" :id="'heading'+index">
                             <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="true" :aria-controls="'collapse' + index">
@@ -204,7 +484,7 @@ export const EmployeeContract = {
                             </h2>
                             <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample" :class="{ 'show': index === 0 }">
                             <div class="accordion-body">
-                                <!-- -->    
+                                
                                 <div class="row pt-md-4">
 
                                     <div class="col">
@@ -265,12 +545,12 @@ export const EmployeeContract = {
 
                                 </div>
 
-                                <!-- -->
+                               
                             </div>
                             </div>
                         </div>
                         
-                    </div>
+                    </div -->
 
                     
                 </div> <!-- --> 
@@ -280,6 +560,7 @@ export const EmployeeContract = {
 
     </div>
 
+    <DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog>
 
 
 

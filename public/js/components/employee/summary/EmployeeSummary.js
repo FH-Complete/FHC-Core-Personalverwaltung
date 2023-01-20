@@ -2,38 +2,46 @@
 import { CovidCard } from './CovidCard.js';
 import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
+import { TimelineCard } from './TimelineCard.js';
 
 export const EmployeeSummary = {
     components: {
         CovidCard,
         DvCard,
         LehreCard,
+        TimelineCard,
+    },
+    props: {
+        date: Date,
     },
     setup() {
-        const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(null);
-        const currentUID = Vue.ref(null);
 
-        Vue.onMounted(() => {
+
+        const route = VueRouter.useRoute();
+        const { watch, ref, onMounted } = Vue; 
+        const currentPersonID = ref(null);
+        const currentUID = ref(null);
+
+        onMounted(() => {
             currentPersonID.value = route.params.id;
             currentUID.value = route.params.uid;
         })
 
-        Vue.watch(
+        watch(
 			() => route.params.id,
 			newId => {
 				currentPersonID.value = newId;
 			}
 		)
 
-        Vue.watch(
+        watch(
 			() => route.params.uid,
 			newId => {
 				currentUID.value = newId;
 			}
 		)
 
-        return {currentPersonID, currentUID}
+        return {currentPersonID, currentUID, date}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -51,7 +59,9 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <dv-card :uid="currentUID"></dv-card>
+                        <timeline-card :uid="currentUID"></timeline-card>
+
+                        <dv-card :uid="currentUID" date="2023-01-01" ></dv-card>
 
                     </div>          
 

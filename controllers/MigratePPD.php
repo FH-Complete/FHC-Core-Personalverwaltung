@@ -28,7 +28,7 @@ class MigratePPD extends CI_Controller {
         $this->load->helper('hlp_common_helper');
         $this->load->helper('hlp_return_object_helper');
 
-        //$this->load->model('extensions/FHC-Core-Personalverwaltung/Dienstverhaeltnis_model', 'DienstverhaeltnisModel');        
+        //$this->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 'DienstverhaeltnisModel');        
         $this->load->library('vertragsbestandteil/VertragsbestandteilLib', null, 'VertragsbestandteilLib');
     }
 
@@ -194,7 +194,7 @@ class MigratePPD extends CI_Controller {
             $this->ppdDB = $this->load->database(PPD_DSN, TRUE);
             echo "success<br><br>";
 
-            $this->ci->db->trans_begin();
+            //$this->ci->db->trans_begin();
 
             $qry="select distinct dv.dv_id, uid, personalnummer, vorname, nachname, dv.beginn dv_beginn, dv.ende dv_ende, dv.typ_id
                 from tbl_mitarbeiter join dv using(uid) join vertrag using(dv_id) 
@@ -295,7 +295,7 @@ class MigratePPD extends CI_Controller {
         } catch (Exception $e) {
 
             echo 'Error: '.$e->getMessage().'<br>';
-            $this->ci->db->trans_rollback();
+            // $this->ci->db->trans_rollback();
 
         } finally {
 

@@ -1,6 +1,9 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
-export const LehreCard = {
+export const TimelineCard = {
+     components: {
+        "p-timeline": primevue.timeline,
+     },
      props: {
         uid: String,
      },
@@ -8,7 +11,7 @@ export const LehreCard = {
         
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
-        const title = Vue.ref("Lehre");
+        const title = Vue.ref("Timeline");
         const currentUID = Vue.toRefs(props).uid        
 
         const formatDate = (ds) => {
@@ -58,33 +61,43 @@ export const LehreCard = {
 		}
 
         Vue.onMounted(() => {
-            fetchCurrentDV();
+          //  fetchCurrentDV();
         })
 
         Vue.watch(
 			currentUID,
 			() => {
-				fetchCurrentDV();
+				//fetchCurrentDV();
 			}
 		)
+
+        // dummy events
+        const events = [
+            {status: 'Funktionsänderung', date: '15/10/2020', icon: 'pi pi-shopping-cart', color: '#9C27B0', image: 'game-controller.jpg'},
+            {status: 'Valorisierung (2,5%), Gehalt: € 3121,13', date: '15/10/2020', icon: 'pi pi-cog', color: '#673AB7'},
+            {status: 'Valorisierung (1,5%), Gehalt: € 3150', date: '15/10/2020', icon: 'pi pi-shopping-cart', color: '#FF9800'},
+            {status: 'Eintritt, Gehalt: € 3045', date: '16/10/2020', icon: 'pi pi-check', color: '#607D8B'}
+        ]
       
         return {
-            courseData, isFetching, formatDate, currentSemester, title, currentUID
+            courseData, isFetching, formatDate, currentSemester, title, currentUID, events,
         }
      },
      template: `
      <div class="card">
         <div class="card-header">
             <h5 class="mb-0">{{ title }}</h5>
-                {{ currentSemester }}
+                echter DV
             </div>
             <div class="card-body" style="text-align:center">
-            <div v-if="isFetching" class="spinner-border" role="status">
-                 <span class="visually-hidden">Loading...</span>
-            </div>     
-            <div v-if="!isFetching && courseData!=null">
-                {{ courseData.semesterstunden?.toLocaleString("de-DE", { useGrouping: true, } ) }} Std/Sem
-            </div>
+                <p-timeline :value="events">
+                    <template #content="slotProps">
+                        {{slotProps.item.status}}
+                    </template>
+                    <template #opposite="slotProps">
+                        <small class="p-text-secondary">{{slotProps.item.date}}</small>
+                    </template>
+                </p-timeline>
             
             
         </div>

@@ -3,21 +3,24 @@ import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 export const DvCard = {
      props: {
         uid: String,
+        date: Date,
      },
      setup( props ) {
         
-        const dvData = Vue.ref();
-        //const currentDate = Vue.ref(new Date());
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("Dienstverhältnis");
-        const currentUID = Vue.toRefs(props).uid        
+        const { watch, ref, toRefs, onMounted } = Vue; 
+        const dvData = ref();
+        const currentDate = ref(null);
+        const isFetching = ref(false);
+        const title = ref("Dienstverhältnis");
+        const currentUID = toRefs(props).uid;       
 
         const formatDate = (ds) => {
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        const currentDate = formatDate(new Date());
+        //const currentDate = formatDate(new Date());
+        //const currentDate = formatDate(date);
 
         const capitalize = (s) => {
             return s.charAt(0).toUpperCase() + s.slice(1);
@@ -48,11 +51,11 @@ export const DvCard = {
 			}		
 		}
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             fetchCurrentDV();
         })
 
-        Vue.watch(
+        watch(
 			currentUID,
 			() => {
 				fetchCurrentDV();
@@ -60,14 +63,14 @@ export const DvCard = {
 		)
       
         return {
-            dvData, isFetching, formatDate, currentDate, title, currentUID
+            dvData, isFetching, formatDate, title, currentUID, currentDate
         }
      },
      template: `
      <div class="card">
         <div class="card-header">
             <h5 class="mb-0">{{ title }}</h5>
-                {{ currentDate }}
+                {{ formatDate(currentDate) }}
             </div>
             <div class="card-body" style="text-align:center">
             <div v-if="isFetching" class="spinner-border" role="status">
@@ -78,12 +81,10 @@ export const DvCard = {
                     <table class="table table-bordered">
                     <tbody>
                         <tr><th scope="row">Zeitraum: </th><td>{{ formatDate(item.von) }} - {{ formatDate(item.bis) }}</td></tr>
-                        <tr><th scope="row">Lektor:</th><td>{{ item.lektor }}</td></tr>
                         <tr><th scope="row">Art</th><td>{{ item.vertragsart_kurzbz }}</td></tr>
                         <tr v-for="(salaryItem, salaryIndex) in item.gehaltsbestandteile" :key="salaryItem.gehaltsbestandteil_id">
                             <th scope="row">{{ salaryItem.gehaltstyp_bezeichnung }}:</th><td>€ {{ new Intl.NumberFormat().format(parseFloat(salaryItem.betrag_valorisiert)) }}</td>
                         </tr>
-                        <tr><th scope="row">Funktion:</th><td></td></tr>
                     </tbody>
                     </table>
                 </div>

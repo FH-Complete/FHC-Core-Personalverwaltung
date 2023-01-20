@@ -3,6 +3,7 @@ import {CoreRESTClient} from '../../../../../js/RESTClient.js';
 export const OrgChooser = {
     props: {
       placeholder: String,
+      customClass: String,
     },
     emits: ["orgSelected"],
     setup(_, { emit }) {   
@@ -18,7 +19,7 @@ export const OrgChooser = {
             'extensions/FHC-Core-Personalverwaltung/api/getOrgHeads');
           orgList.value = CoreRESTClient.getData(res.data);
           if (orgList.value.length > 0)  {
-            orgList.value.reverse();
+            //orgList.value.reverse();
             selected.value = orgList.value[0].oe_kurzbz;
             emit("orgSelected", selected.value);
           }
@@ -46,7 +47,7 @@ export const OrgChooser = {
 
     },
     template: `
-    <select  id="orgHeadChooser"  v-model="selected" @change="orgSelected"  aria-label=".form-select-sm " >
+    <select  id="orgHeadChooser"  v-model="selected" @change="orgSelected" class="" aria-label=".form-select-sm " >
         <option v-for="(item, index) in orgList" :value="item.oe_kurzbz"  :key="item.oe_kurzbz">
             {{ item.bezeichnung }}
         </option>         

@@ -20,9 +20,14 @@ export default {
     	const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(null);
         const currentPersonUID = Vue.ref(null);
+        const currentDate = Vue.ref(null);
 
         const redirect = (params) => {
             emit('personSelected', params);
+        }
+
+        const dateChanged = (params) => {
+            console.log("-> date changed: ", params);
         }
 
         Vue.onMounted(() => {
@@ -37,10 +42,10 @@ export default {
 			}
 		)
 
-        return { redirect, currentPersonID, currentPersonUID }
+        return { redirect, dateChanged, currentPersonID, currentPersonUID }
     },
     template: `      
-        <EmployeeHeader  :personID="personid" :personUID="personuid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader> 
+        <EmployeeHeader  :personID="personid" :personUID="personuid" @person-selected="redirect" @date-changed="dateChanged" :edit-mode="true" ></EmployeeHeader> 
         <EmployeeNav  :personID="currentPersonID" :personUID="currentPersonUID" :edit-mode="true" ></EmployeeNav> 
         <router-view></router-view>       
     `
