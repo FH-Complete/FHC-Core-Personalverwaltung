@@ -41,7 +41,7 @@ export const EmployeeSummary = {
 			}
 		)
 
-        return {currentPersonID, currentUID, date}
+        return {currentPersonID, currentUID}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -59,9 +59,12 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <timeline-card :uid="currentUID"></timeline-card>
+                        
+                        <dv-card :uid="currentUID" date="2023-01-26" ></dv-card>
 
-                        <dv-card :uid="currentUID" date="2023-01-01" ></dv-card>
+                        <br>
+
+                        <timeline-card :uid="currentUID"></timeline-card>
 
                     </div>          
 

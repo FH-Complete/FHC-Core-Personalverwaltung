@@ -73,9 +73,9 @@ export const TimelineCard = {
 
         // dummy events
         const events = [
-            {status: 'Funktionsänderung', date: '15/10/2020', icon: 'pi pi-shopping-cart', color: '#9C27B0', image: 'game-controller.jpg'},
-            {status: 'Valorisierung (2,5%), Gehalt: € 3121,13', date: '15/10/2020', icon: 'pi pi-cog', color: '#673AB7'},
-            {status: 'Valorisierung (1,5%), Gehalt: € 3150', date: '15/10/2020', icon: 'pi pi-shopping-cart', color: '#FF9800'},
+            {status: 'Funktionsänderung', date: '1/2/2023', icon: 'pi pi-shopping-cart', color: '#9C27B0', image: 'game-controller.jpg'},
+            {status: 'Valorisierung (2,5%), Gehalt: € 3121,13', date: '1/9/2022', icon: 'pi pi-cog', color: '#673AB7'},
+            {status: 'Valorisierung (1,5%), Gehalt: € 3150', date: '1/9/2021', icon: 'pi pi-shopping-cart', color: '#FF9800'},
             {status: 'Eintritt, Gehalt: € 3045', date: '16/10/2020', icon: 'pi pi-check', color: '#607D8B'}
         ]
       

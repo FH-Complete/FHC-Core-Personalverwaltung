@@ -29,12 +29,7 @@ export const EmployeeNav = {
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route.path.indexOf('contract') > -1 }]" >
             Verträge
-        </router-link>
-        <a
-        class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + route.params.id + '/' + route.params.uid + '/salary'"
-        >Gehalt</a
-        >
+        </router-link>        
         <a
         class="flex-sm-fill text-sm-center nav-link"
         :href="fullPath + route.params.id + -'/' + route.params.uid + '/time'"

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_vertragsart (
     anmerkung text,
     dienstverhaeltnis boolean,
     ba1code integer,
+    dvart ,
 	sort smallint,
 	aktiv boolean,
 	CONSTRAINT tbl_vertragsart_pk PRIMARY KEY (vertragsart_kurzbz)

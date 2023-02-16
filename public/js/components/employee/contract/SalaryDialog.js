@@ -1,16 +1,12 @@
-import {OrgChooser} from "../../organisation/OrgChooser.js";
-import {VertragArtChooser} from "./VertragArtChooser.js";
-import { Modal } from '../../Modal.js';
-import {JobEditor} from './JobEditor.js';
-import {FreitextEditor} from './FreitextEditor.js';
 
-export const DVDialog = {
+import { Modal } from '../../Modal.js';
+
+
+export const SalaryDialog = {
     components: {
-        OrgChooser,
-        VertragArtChooser,
+
         Modal,
-        JobEditor,
-        FreitextEditor,
+
     },
     props: {
         editMode: { type: Boolean, required: true },
@@ -28,14 +24,7 @@ export const DVDialog = {
         let _resolve;
         let _reject;
 
-        const unternehmenSelectedHandler = (unternehmenID) => {
-            console.log('org selected:', unternehmenID);
-			currentValue.value.unternehmenID = unternehmenID;
-        }
-
-        const vertragsartSelectedHandler = (vertragsart) => {
-            currentValue.value.vertragsartKurzbz = vertragsart;
-        }
+      
 
         const showModal = (personUID) => {
             
@@ -67,18 +56,13 @@ export const DVDialog = {
             return firstDay;
         }
 
-        const createShape = (person_id) => {
+        const createShape = (dienstverhaeltnis_id) => {
             return {
-                mitarbeiterUID: person_id,
+                dienstverhaeltnis_id,
                 von: getFirstOfMonth(),
                 bis: null,
-                befristet: false,
-                vertragsartKurzbz: '',
-                unternehmenID: null,
-                stunden: null,
-                gehalt: null,
-                kuendigungsfrist: null,
-                urlaubsanspruch: null,
+                grundbetrag: 0.0,
+                valorisieren: false,
             } 
         }
 

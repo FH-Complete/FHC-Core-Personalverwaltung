@@ -29,7 +29,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 	),
 	'Valorisierung' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Valorisation'),
-		'description' => 'Valorisierung',
+		'description' => 'Bulk Edit',
 		'icon' => 'percent',
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	),

@@ -34,6 +34,20 @@ export const EmployeeContract = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}`;
         };
 
+        const chartOptions = {
+
+              chart: {
+                type: 'line'
+              },
+              title: {
+                text: 'Gehalt'
+              },
+              series: [{
+                data: [4711, 4823, 4931, 5060, 5200, 5270, 5390],
+                color: '#6fcd98'
+              }]
+            
+        }
         
 
         const fetchData = async (uid) => {
@@ -129,7 +143,7 @@ export const EmployeeContract = {
         }
 
         return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
-            dienstverhaeltnisDialogRef, createDVDialog, formatDate, dvSelectedIndex, currentDate }
+            dienstverhaeltnisDialogRef, createDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -348,6 +362,13 @@ export const EmployeeContract = {
                                 <h5 class="mb-0">Gehalt</h5>
                             </div>
                             <div class="card-body" style="text-align:center">
+
+                                <div style="width:100%;height:100%;overflow:auto">
+                                    <figure>
+                                        <highcharts class="chart" :options="chartOptions"></highcharts>
+                                    </figure>
+                                </div>
+
                                 <table class="table">
                                     <thead>
                                         <tr>
@@ -420,60 +441,53 @@ export const EmployeeContract = {
                 <div class="col-lg-12">     
                 
 
-                
-                    <!-- div class="table-responsive">
+                    <br>
+                    <div class="table-responsive">
                         <table class="table table-bordered table-hover table-striped tablesorter">
                             <thead>
                             <tr>
                                 <th>Von <i class="fa fa-sort"></i></th>
                                 <th>Bis <i class="fa fa-sort"></i></th>
-                                <th>Änderungsdatum <i class="fa fa-sort"></i></th>
                                 <th>Art <i class="fa fa-sort"></i></th>
-                                <th>Stunden <i class="fa fa-sort"></i></th>
-                                <th>Betrag <i class="fa fa-sort"></i></th>
-                                <th>Ist <i class="fa fa-sort"></i></th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>1.2.2020</td>
+                                    <td>1.12.2015</td>
                                     <td></td>
-                                    <td>5.3.2021</td>
-                                    <td>unbefristet</td>
-                                    <td>38,5</td>
-                                    <td>2345,67</td>
-                                    <td>2445,00</td>
+                                    <td>Gehalt/Stunden</td>
+                                    <td>4711,00/38,5h</td>
                                 </tr>
                                 <tr>
-                                    <td>1.2.2021</td>
+                                    <td>1.12.2015</td>
                                     <td></td>
-                                    <td>5.3.2021</td>
-                                    <td>Sideletter</td>
-                                    <td>38,5</td>
-                                    <td>2545,67</td>
-                                    <td>2545,67</td>
+                                    <td>Funktion</td>
+                                    <td>Disziplinär/Virtual Technologies & Sensor Systems</td>
                                 </tr>
                                 <tr>
-                                    <td>31.1.2019</td>
-                                    <td>31.1.2020</td>
-                                    <td>5.3.2021</td>
-                                    <td>befristet</td>
-                                    <td>38,5</td>
-                                    <td>2345,67</td>
-                                    <td>2345,67</td>
-                                </tr>									
+                                    <td>1.12.2015</td>
+                                    <td></td>
+                                    <td>Funktion</td>
+                                    <td>Fachlich/Virtual Technologies & Sensor Systems</td>
+                                </tr>
                                 <tr>
+                                    <td>1.12.2015</td>
                                     <td></td>
+                                    <td>Standardkostenstelle</td>
+                                    <td>Disziplinär/Virtual Technologies & Sensor Systems</td>
+                                </tr>
+                                <tr>
+                                    <td>1.12.2015</td>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>LektorIn</td>
                                     <td></td>
                                 </tr>
+                               
 
                             </tbody>
                         </table>
-                    </div -->  
+                    </div >  
 
                     <!-- div class="accordion" id="accordionExample">
                         <div v-for="(item, index) in vertragList" class="accordion-item" :key="item.vertragsbestandteil_id">

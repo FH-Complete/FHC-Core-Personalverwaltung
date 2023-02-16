@@ -28,6 +28,7 @@ export default {
 
         const dateChanged = (params) => {
             console.log("-> date changed: ", params);
+            currentDate.value=params;
         }
 
         Vue.onMounted(() => {

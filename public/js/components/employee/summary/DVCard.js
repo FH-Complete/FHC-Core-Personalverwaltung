@@ -19,7 +19,7 @@ export const DvCard = {
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        //const currentDate = formatDate(new Date());
+        // const currentDate = formatDate(new Date());
         //const currentDate = formatDate(date);
 
         const capitalize = (s) => {
@@ -52,6 +52,7 @@ export const DvCard = {
 		}
 
         onMounted(() => {
+            currentDate.value = props.date;
             fetchCurrentDV();
         })
 
