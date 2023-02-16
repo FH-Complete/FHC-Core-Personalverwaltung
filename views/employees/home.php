@@ -27,6 +27,8 @@
 			],
 			'customJSs' => [
 				'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
+				'addons/reports/vendor/highcharts/highcharts-dist/highcharts.js',
+				'public/extensions/FHC-Core-Personalverwaltung/js/highchartsVue.js'
 			],
 			'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js']
 		)
