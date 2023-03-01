@@ -273,7 +273,7 @@ export const EmployeeHeader = {
 
                     <h6 v-if="employee?.abteilung && !isFetching" class="mb-2 text-muted">
                         <b>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</b> {{ employee?.abteilung?.bezeichnung }},
-                        <b>Vorgesetze(r) </b> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id, employee?.abteilung?.supervisor?.uid)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
+                        <b>Vorgesetzte(r) </b> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id, employee?.abteilung?.supervisor?.uid)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
                     </h6>  
                     <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>                
                     
