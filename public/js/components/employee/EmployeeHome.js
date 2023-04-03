@@ -165,7 +165,8 @@ export default {
 				//isEditorOpen.value=true;
 			}
 
-			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}`;
+			//let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}`;
+			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}/summary`;
 
 			router.push(url);
 		}

@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import {CoreRESTClient} from '../../../../../../../js/RESTClient.js';
 
 export const VertragArtChooser = {
     props: {

@@ -35,3 +35,59 @@ label.required.form-label:after {
 .grayout {
     color: #aaa;
 }
+
+@media (min-width: 1200px) {
+    .modal-xl {
+        max-width: 1150px;
+    }
+
+}
+
+.vtabs {
+    margin: 0 auto;
+    display: flex;
+    
+}
+.vtabs_header {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+.vtabs_header li {
+    padding: 10px 20px;
+    border: 1px solid #fff;
+    background-color: #efefef;
+    color: #0d6efd;;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.vtabs_header li.selected {
+    background-color: #0d6efd;;
+    color: #fff;
+}
+.vtab-content {
+    padding: 10px;
+    width: 100%;
+}
+
+.pv-tab {
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+    width: 30%;
+    height: 300px;
+}
+
+/* Style the buttons that are used to open the tab content */
+.pv-tab button {
+    display: block;
+    background-color: inherit;
+    color: black;
+    padding: 22px 16px;
+    width: 100%;
+    border: none;
+    outline: none;
+    text-align: left;
+    cursor: pointer;
+    transition: 0.3s;
+  }

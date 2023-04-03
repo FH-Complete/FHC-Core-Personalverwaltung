@@ -169,7 +169,7 @@ export const SalaryDialog = {
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="common">
                             <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1" aria-expanded="true" aria-controls="collapse1">
-                                Allgemeines
+                                Dienstverhältnis
                             </button>
                         </h2>
                         <div id="collapse1" class="accordion-collapse collapse show" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample" >

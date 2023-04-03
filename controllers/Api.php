@@ -373,8 +373,13 @@ class Api extends Auth_Controller
 
         if (isSuccess($data))
         {
+
+            /**
+             * @var Gehaltsbestandteil_model
+             */
+            $gbtModel = $this->GBTModel;
             foreach ($data->retval as $dv) {
-                $gbt_data = $this->GBTModel->getCurrentGBTByDV($dv->dienstverhaeltnis_id);
+                $gbt_data = $gbtModel->getCurrentGBTByDV($dv->dienstverhaeltnis_id);
 
                 if (isSuccess($gbt_data))
                 {

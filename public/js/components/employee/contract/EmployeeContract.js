@@ -1,4 +1,4 @@
-import {DVDialog} from './DVDialog.js';
+import {DVDialog} from './dialog/DVDialog.js';
 
 
 export const EmployeeContract = {
