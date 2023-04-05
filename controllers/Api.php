@@ -55,6 +55,9 @@ class Api extends Auth_Controller
                 'getAdressentyp' => Api::DEFAULT_PERMISSION,
                 'dvByPerson' => Api::DEFAULT_PERMISSION,
                 'vertragByDV' => Api::DEFAULT_PERMISSION,
+				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
+				'getContractFunctions' => Api::DEFAULT_PERMISSION,
+				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -85,7 +88,8 @@ class Api extends Auth_Controller
         $this->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GBTModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
-        
+		$this->load->model('ressource/Funktion_model', 'FunktionModel');
+        $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
     }
 
     function index()
@@ -1117,5 +1121,128 @@ class Api extends Auth_Controller
         }
     }
    
+	/*
+	 * return list of child orgets for a given company orget_kurzbz
+	 * as key value list to be used in select or autocomplete
+	 */
+	public function getOrgetsForCompany($companyOrgetkurzbz=null) {
+		if( empty($companyOrgetkurzbz) ) 
+		{
+			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
+			return;
+		}
+		
+		$sql = <<<EOSQL
+			SELECT oe.oe_kurzbz AS key, '[' || oet.bezeichnung || '] ' || oe.bezeichnung AS label 
+			FROM (
+					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
+					(
+						SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
+						WHERE oe_kurzbz=?
+						UNION ALL
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
+						WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+					)
+					SELECT oe_kurzbz
+					FROM oes
+					GROUP BY oe_kurzbz
+			) c 
+			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz 
+			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz 
+			ORDER BY oet.bezeichnung ASC, oe.bezeichnung ASC
+		
+EOSQL;
+			
+		$childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz));
+		if( hasData($childorgets) ) 
+		{
+			$this->outputJson($childorgets);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no orgets found for parent oe_kurzbz ' . $companyOrgetkurzbz );
+			return;
+		}
+	}
 
+	/*
+	 * return list of contract relevant functions
+	 * as key value list to be used in select or autocomplete
+	 */	
+	public function getContractFunctions() {
+		$sql = <<<EOSQL
+			SELECT 
+				funktion_kurzbz AS key, beschreibung AS label 
+			FROM 
+				public.tbl_funktion 
+			WHERE 
+				aktiv = true AND vertragsrelevant = true 
+			ORDER BY beschreibung ASC
+EOSQL;
+		
+		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
+		if( hasData($fkts) ) 
+		{
+			$this->outputJson($fkts);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no contract relevant funktionen found');
+			return;
+		}		
+	}
+	
+	/*
+	 * return list of child orgets for a given company orget_kurzbz
+	 * as key value list to be used in select or autocomplete
+	 */
+	public function getCurrentFunctions($uid, $companyOrgetkurzbz) {
+		if( empty($uid) )
+		{
+			$this->outputJsonError('Missing Parameter <uid>');
+		}
+		
+		if( empty($companyOrgetkurzbz) )
+		{
+			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
+		}
+		
+		$sql = <<<EOSQL
+			SELECT bf.benutzerfunktion_id AS key, f.beschreibung || ', ' || oe.bezeichnung || ' [' || oet.bezeichnung || '], ' || COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a') || ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a') AS label 
+			FROM (
+					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
+					(
+						SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
+						WHERE oe_kurzbz = ? 
+						UNION ALL
+						SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
+						WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
+					)
+					SELECT oe_kurzbz
+					FROM oes
+					GROUP BY oe_kurzbz
+			) c 
+			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz 
+			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz 
+			JOIN public.tbl_benutzerfunktion bf ON bf.oe_kurzbz = oe.oe_kurzbz
+                        JOIN public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
+                        WHERE bf.uid = ? 
+                        ORDER BY f.beschreibung ASC
+		
+EOSQL;
+			
+		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz, $uid));
+		if( hasData($benutzerfunktionen) ) 
+		{
+			$this->outputJson($benutzerfunktionen);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
+			return;
+		}		
+	}
 }
