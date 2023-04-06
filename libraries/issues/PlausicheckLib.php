@@ -95,7 +95,7 @@ class PlausicheckLib
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getUndurchgaengigeDienstverhaeltnisse($person_id = null, $dienstverhaeltnis_id = null)
+	public function getUndurchgaengigeDienstverhaeltnisse($person_id = null, $vertragsbestandteil_id = null)
 	{
 		$params = array();
 
@@ -153,4 +153,97 @@ class PlausicheckLib
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
+
+	/**
+	 * "Echte" Dienstverhaeltnisse should have a Vertragsbestandteil with "stunden" type.
+	 * @param person_id
+	 * @param dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getEchteDienstverhaeltnisseOhneStundenVertragsbestandteil($person_id = null, $dienstverhaeltnis_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dienstverhaeltnis_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+			WHERE
+				vertragsart_kurzbz = 'echterdv'
+				AND NOT EXISTS (
+					SELECT 1
+					FROM
+						hr.tbl_vertragsbestandteil
+					WHERE
+						dienstverhaeltnis_id = dv.dienstverhaeltnis_id
+						AND vertragsbestandteiltyp_kurzbz = 'stunden'
+				)
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($dienstverhaeltnis_id))
+		{
+			$qry .= " AND dvs.dienstverhaeltnis_id = ?";
+			$params[] = $dienstverhaeltnis_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Vertragsbestandteil checks
+
+	/**
+	 * Von Datum of Vertragsbestandteil shouldn't be before Dienstverhaeltnis start.
+	 * @param person_id
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getVertragsbestandteilStartBeforeDienstverhaeltnis($person_id = null, $vertragsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+			WHERE
+				vtb.von < dv.von
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtb.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
 }

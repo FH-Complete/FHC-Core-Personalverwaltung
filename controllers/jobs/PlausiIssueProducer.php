@@ -15,7 +15,9 @@ class PlausiIssueProducer extends PlausiIssueProducer_Controller
 		// structure: fehler_kurzbz => class (library) name for resolving
 		$this->_fehlerLibMappings = array(
 			'paralelleDienstverhaeltnisseEinUnternehmen' => 'ParalelleDienstverhaeltnisseEinUnternehmen',
-			'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis'
+			'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis',
+			'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil',
+			'vertragsbestandteilStartBeforeDienstverhaeltnis' => 'VertragsbestandteilStartBeforeDienstverhaeltnis'
 		);
 	}
 
