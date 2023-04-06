@@ -225,8 +225,8 @@ export default {
 				{title: "Personalnummer", field: "Personalnummer", headerFilter: true},
 				{title: "Vorname", field: "Vorname", headerFilter: true},
 				{title: "Nachname", field: "Nachname", headerFilter: true},
-				{title: "Titel pre", field: "TitelPre", headerFilter: true},
-				{title: "Titel post", field: "TitelPost", headerFilter: true},
+				{title: "TitelPre", field: "TitelPre", headerFilter: true},
+				{title: "TitelPost", field: "TitelPost", headerFilter: true},
 				{title: "Alias", field: "Alias", headerFilter: true},
 				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
 				{title: "Aktiv", field: "Aktiv", formatter:"tickCross",  headerFilter:"tickCross", headerFilterParams:{"tristate":true,elementAttributes:{"value":"true"}}, headerFilterEmptyCheck:function(value){return value === null}},
@@ -234,9 +234,10 @@ export default {
 				{title: "SVNR", field: "SVNR", headerFilter: true},
 				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
 				{title: "Geschlecht", field: "Geschlecht", formatter:sexformatter, headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, autocomplete: true, sort: "asc"}},
-				{title: "DW", field: "Durchwahl", headerFilter: true},
+				{title: "Durchwahl", field: "Durchwahl", headerFilter: true},
 				{title: "Standardkostenstelle", field: "Standardkostenstelle", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
 				{title: "Disziplinäre Zuordnung", field: "Disziplinäre Zuordnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "OE Key", field: "OE Key", headerFilter: true},
 			]
 		};
 

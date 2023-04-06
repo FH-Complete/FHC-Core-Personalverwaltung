@@ -12,7 +12,7 @@ export default {
         personid: Number,
         personuid: String,
         open: Boolean,
-        isNew:  Boolean        
+        isNew:  Boolean
     },
     setup( props, {emit }) {
 
