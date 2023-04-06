@@ -237,6 +237,7 @@ export default {
 				{title: "Durchwahl", field: "Durchwahl", headerFilter: true},
 				{title: "Standardkostenstelle", field: "Standardkostenstelle", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
 				{title: "Disziplinäre Zuordnung", field: "Disziplinäre Zuordnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "OE Key", field: "OE Key", headerFilter: true},
 			]
 		};
 
