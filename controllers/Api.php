@@ -58,6 +58,8 @@ class Api extends Auth_Controller
 				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
 				'getContractFunctions' => Api::DEFAULT_PERMISSION,
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
+				'saveVertrag' => Api::DEFAULT_PERMISSION,
+				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -1244,5 +1246,27 @@ EOSQL;
 			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
 		}		
+	}
+	
+	public function saveVertrag() {
+		$payload = json_decode($this->input->raw_input_stream);
+		
+		$this->outputJson(
+			array(
+				'data' => $payload, 
+				'meta' => array()
+			)
+		);
+		return;
+	}
+	
+	public function getCurrentAndFutureVBs($typ) {
+		$this->outputJson(
+			array(
+				'data' => array(),
+				'meta' => array()
+			)
+		);
+		return;
 	}
 }
