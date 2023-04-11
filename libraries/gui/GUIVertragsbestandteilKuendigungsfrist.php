@@ -89,7 +89,9 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
         }
         $this->getJSONDataInt($this->data['arbeitnehmer_frist'], $decodedData, 'arbeitnehmer_frist');
         $this->getJSONDataInt($this->data['arbeitgeber_frist'], $decodedData, 'arbeitgeber_frist');
-        $this->getJSONData($this->data['gueltigkeit'], $decodedData, 'gueltigkeit');
+        $gueltigkeit = new GUIGueltigkeit();
+        $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
+        $this->data['gueltigkeit'] = $gueltigkeit;
     }
 
 
