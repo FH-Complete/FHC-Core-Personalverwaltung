@@ -151,7 +151,7 @@ export default {
   ],
   data: {
     dienstverhaeltnisid: 1,
-    unternehmen: 'fhtw',
+    unternehmen: 'gst',
     vertragsart_kurzbz: 'echterdv',
     gueltigkeit: {
       guioptions: {

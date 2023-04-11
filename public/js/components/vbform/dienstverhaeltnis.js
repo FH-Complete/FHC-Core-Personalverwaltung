@@ -6,7 +6,7 @@ export default {
   <div class="col-3">
     <select v-model="unternehmen" :disabled="isaenderung || isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
-        v-for="u in getUnternehmen()"
+        v-for="u in lists.unternehmen"
         :value="u.value"
         :selected="isselected(u.value, this.unternehmen)"
         :disabled="u.disabled">
@@ -17,7 +17,7 @@ export default {
   <div class="col-3">
     <select v-model="vertragsart_kurzbz" :disabled="isaenderung || isconfigured('vertragsart_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
-        v-for="v in getVertragsarten()"
+        v-for="v in lists.vertragsarten"
         :value="v.value"
         :selected="isselected(v.value, this.vertragsart_kurzbz)"
         :disabled="v.disabled">
@@ -32,7 +32,11 @@ export default {
   data: function() {
     return {
       'unternehmen': '',
-      'vertragsart_kurzbz': ''
+      'vertragsart_kurzbz': '',
+      'lists': {
+          'unternehmen': [],
+          'vertragsarten': []
+      }
     }
   },
   components: {
@@ -47,64 +51,33 @@ export default {
     }
   },
   created: function() {
+    this.getUnternehmen();
+    this.getVertragsarten();
     this.setDataFromConfig();
   },
   methods: {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
     },
-    getUnternehmen: function() {
-      return [
-        {
-          value: '',
-          label: 'Unternehmen wählen',
-          disabled: true
-        },
-        {
-          value: 'fhtw',
-          label: 'FH Technikum Wien',
-          disabled: false
-        },
-        {
-          value: 'twacademy',
-          label: 'Technikum Wien GmbH',
-          disabled: false
-        }
-      ];
+    getUnternehmen: async function() {
+      const response = await Vue.$fhcapi.DV.getUnternehmen();
+      const unternehmen = response.data.retval;
+      unternehmen.unshift({
+        value: '',
+        label: 'Unternehmen wählen',
+        disabled: true
+      });
+      this.lists.unternehmen = unternehmen;
     },
-    getVertragsarten: function() {
-      return [
-        {
-          value: '',
-          label: 'Vertragsart wählen',
-          disabled: true
-        },
-        {
-          value: 'echterdv',
-          label: 'Echter DV',
-          disabled: false
-        },
-        {
-          value: 'freierdv',
-          label: 'Freier DV',
-          disabled: false
-        },
-        {
-          value: 'gastlektor',
-          label: 'Gastlektor',
-          disabled: false
-        },
-        {
-          value: 'studhilfskraft',
-          label: 'Studentische Hilfskraft',
-          disabled: false
-        },
-        {
-          value: 'werkvertrag',
-          label: 'Werkvertrag',
-          disabled: false
-        }
-      ];
+    getVertragsarten: async function() {
+      const response = await Vue.$fhcapi.DV.getVertragsarten();
+      const vertragsarten = response.data.retval;
+      vertragsarten.unshift({
+        value: '',
+        label: 'Vertragsart wählen',
+        disabled: true
+      });
+      return this.lists.vertragsarten = vertragsarten;
     },
     isconfigured: function(field) {
       if( typeof this.config[field] !== 'undefined' ) {

@@ -15,7 +15,8 @@ export default {
               type="button"
               role="tab"
               :aria-controls="'v-pills-' + child.guioptions.id"
-              :aria-selected="(this.activetab === child.guioptions.id) ? 'true' : 'false'">
+              :aria-selected="(this.activetab === child.guioptions.id) ? 'true' : 'false'"
+              @click="activetab = child.guioptions.id">
         {{ child.guioptions.title }}
       </button>
     </div>
@@ -32,8 +33,12 @@ export default {
     presetable
   ],
   created: function() {
-    if( this.children.length > 0 ) {
+    if( this.preset?.guioptions?.activetab !== undefined ) {
+      this.activetab = this.preset.guioptions.activetab;
+    } else if( this.children.length > 0 ) {
       this.activetab = this.children[0].guioptions.id;
+    } else {
+        this.activetab = '';
     }
   },
   data: function() {
@@ -47,9 +52,11 @@ export default {
       for( var i in this.$refs.parts ) {
         children.push(this.$refs.parts[i].getPayload());
       }
+      var guioptions = JSON.parse(JSON.stringify(this.preset.guioptions));
+      guioptions.activetab = this.activetab;
       var payload = {
         "type": "tabs",
-        "guioptions": JSON.parse(JSON.stringify(this.preset.guioptions)),
+        "guioptions": guioptions,
         "children": children
       }
       return payload;

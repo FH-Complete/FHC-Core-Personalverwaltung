@@ -29,18 +29,38 @@ export default {
     <div class="row g-2">
     <template v-if="mode === 'neu'">
       <div class="col">
-        <input v-model="funktion" :disabled="isinputdisabled('funktion')" type="text" class="form-control form-control-sm" placeholder="Funktion" aria-label="funktion">
+        <select v-model="funktion" :disabled="isinputdisabled('funktion')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option
+            v-for="f in lists.funktionen"
+            :value="f.value"
+            :selected="isselected(f.value, this.funktion)"
+            :disabled="f.disabled">
+            {{ f.label }}
+          </option>
+        </select>
       </div>
       <div class="col">
-        <input v-model="orget" type="text" class="form-control form-control-sm" placeholder="Organisations-Einheit" aria-label="orget">
+        <select v-model="orget" :disabled="isinputdisabled('orget')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option
+            v-for="oe in lists.orgets"
+            :value="oe.value"
+            :selected="isselected(oe.value, this.orget)"
+            :disabled="oe.disabled">
+            {{ oe.label }}
+          </option>
+        </select>        
       </div>
     </template>
     <template v-else-if="mode === 'bestehende'">
       <div class="col">
         <select v-model="benutzerfunktionid" class="form-select form-select-sm">
-          <option value="" disabled>bestehende Funktion wählen</option>
-          <option value="67675">Leitung Core-Entwicklung</option>
-          <option value="67676">Leitung Stg BBE</option>
+          <option
+            v-for="bf in lists.benutzerfunktionen"
+            :value="bf.value"
+            :selected="isselected(bf.value, this.benutzerfunktionid)"
+            :disabled="bf.disabled">
+            {{ bf.label }}
+          </option>
         </select>
       </div>
     </template>
@@ -70,13 +90,24 @@ export default {
       funktion: '',
       orget: '',
       benutzerfunktionid: '',
-      mode: 'neu'
-    }
+      mode: 'neu',
+      lists: {
+        funktionen: [],
+        orgets: [],
+        benutzerfunktionen: []
+      }
+    };
   },
   created: function() {
+    this.getFunktionen();
+    this.getOrgetsForCompany();
+    this.getCurrentFunctions();
     this.setDataFromConfig();
   },
   methods: {
+    isselected: function(optvalue, selvalue) {
+      return (optvalue === selvalue);
+    },
     setDataFromConfig: function() {
       if( typeof this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;
@@ -87,6 +118,39 @@ export default {
       if( typeof this.config?.data?.orget !== undefined ) {
         this.orget = this.config.data.orget;
       }
+      if( typeof this.config?.data?.benutzerfunktionid !== undefined ) {
+        this.benutzerfunktionid = this.config.data.benutzerfunktionid;
+      }
+    },
+    getFunktionen: async function() {
+      const response = await Vue.$fhcapi.Funktion.getContractFunctions();
+      const funktionen = response.data.retval;
+      funktionen.unshift({
+        value: '',
+        label: 'Funktion wählen',
+        disabled: true
+      });
+      this.lists.funktionen = funktionen;
+    },
+    getOrgetsForCompany: async function() {
+      const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany('gst');
+      const orgets = response.data.retval;
+      orgets.unshift({
+        value: '',
+        label: 'OrgEinheit wählen',
+        disabled: true
+      });
+      this.lists.orgets = orgets;
+    },
+    getCurrentFunctions: async function() {
+      const response = await Vue.$fhcapi.Funktion.getCurrentFunctions('ma0080', 'gst');
+      const benutzerfunktionen = response.data.retval;
+      benutzerfunktionen.unshift({
+        value: '',
+        label: 'Benutzerfunktion wählen',
+        disabled: true
+      });
+      this.lists.benutzerfunktionen = benutzerfunktionen;
     },
     removeVB: function() {
       this.$emit('removeVB', {id: this.config.guioptions.id});
@@ -102,6 +166,7 @@ export default {
           id: this.id,
           funktion: this.funktion,
           orget: this.orget,
+          benutzerfunktionid: this.benutzerfunktionid, 
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
         gbs: this.getGehaltsbestandteilePayload()

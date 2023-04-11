@@ -31,7 +31,7 @@ export default {
       selectedmode: 'aenderung',
       selectedpresetidx: -1,
       usedpresets: []
-    }
+    };
   },
   emits: [
     "presetselected"

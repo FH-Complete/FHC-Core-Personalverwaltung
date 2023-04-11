@@ -5,7 +5,13 @@ export default {
   guioptions: {
     id: 'echterdv',
     label: 'Echter DV Allin',
-    description: 'Standard Vorlage für echte Dienstverträge'
+    description: 'Standard Vorlage für echte Dienstverträge',
+    infos: [
+        'Test Info auf oberster Ebene'
+    ],
+    errors:[
+        'Test Error auf oberster Ebene'
+    ]
   },
   children: [
     {
@@ -188,7 +194,7 @@ export default {
   ],
   data: {
     dienstverhaeltnisid: 1,
-    unternehmen: 'fhtw',
+    unternehmen: 'gst',
     vertragsart_kurzbz: 'echterdv',
     gueltigkeit: {
       guioptions: {

@@ -60,6 +60,11 @@ class Api extends Auth_Controller
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
 				'saveVertrag' => Api::DEFAULT_PERMISSION,
 				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
+				'storeToTmpStore' => Api::DEFAULT_PERMISSION,
+				'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
+				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
+				'getUnternehmen' => Api::DEFAULT_PERMISSION,
+				'getVertragsarten' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -92,6 +97,7 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
 		$this->load->model('ressource/Funktion_model', 'FunktionModel');
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
     }
 
     function index()
@@ -1127,7 +1133,8 @@ class Api extends Auth_Controller
 	 * return list of child orgets for a given company orget_kurzbz
 	 * as key value list to be used in select or autocomplete
 	 */
-	public function getOrgetsForCompany($companyOrgetkurzbz=null) {
+	public function getOrgetsForCompany($companyOrgetkurzbz=null) 
+	{
 		if( empty($companyOrgetkurzbz) ) 
 		{
 			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
@@ -1135,7 +1142,7 @@ class Api extends Auth_Controller
 		}
 		
 		$sql = <<<EOSQL
-			SELECT oe.oe_kurzbz AS key, '[' || oet.bezeichnung || '] ' || oe.bezeichnung AS label 
+			SELECT oe.oe_kurzbz AS value, '[' || oet.bezeichnung || '] ' || oe.bezeichnung AS label 
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(
@@ -1172,10 +1179,11 @@ EOSQL;
 	 * return list of contract relevant functions
 	 * as key value list to be used in select or autocomplete
 	 */	
-	public function getContractFunctions() {
+	public function getContractFunctions() 
+	{
 		$sql = <<<EOSQL
 			SELECT 
-				funktion_kurzbz AS key, beschreibung AS label 
+				funktion_kurzbz AS value, beschreibung AS label 
 			FROM 
 				public.tbl_funktion 
 			WHERE 
@@ -1200,7 +1208,8 @@ EOSQL;
 	 * return list of child orgets for a given company orget_kurzbz
 	 * as key value list to be used in select or autocomplete
 	 */
-	public function getCurrentFunctions($uid, $companyOrgetkurzbz) {
+	public function getCurrentFunctions($uid, $companyOrgetkurzbz) 
+	{
 		if( empty($uid) )
 		{
 			$this->outputJsonError('Missing Parameter <uid>');
@@ -1212,7 +1221,7 @@ EOSQL;
 		}
 		
 		$sql = <<<EOSQL
-			SELECT bf.benutzerfunktion_id AS key, f.beschreibung || ', ' || oe.bezeichnung || ' [' || oet.bezeichnung || '], ' || COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a') || ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a') AS label 
+			SELECT bf.benutzerfunktion_id AS value, f.beschreibung || ', ' || oe.bezeichnung || ' [' || oet.bezeichnung || '], ' || COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a') || ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a') AS label 
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(
@@ -1248,8 +1257,26 @@ EOSQL;
 		}		
 	}
 	
-	public function saveVertrag() {
+	public function saveVertrag() 
+	{
 		$payload = json_decode($this->input->raw_input_stream);
+		if( !isset($payload->guioptions) ) 
+		{
+			$payload->guioptions = new stdClass();
+		}
+		
+		if( !isset($payload->guioptions->infos) ) 
+		{
+			$payload->guioptions->infos = array();
+		}
+		
+		if( !isset($payload->guioptions->errors) ) 
+		{
+			$payload->guioptions->errors = array();
+		}
+		
+		$payload->guioptions->infos[] = 'Test Erfolgreich gespeichert.';
+		$payload->guioptions->errors[] = 'Test Beim Speichern ist ein Fehler aufgetreten.';
 		
 		$this->outputJson(
 			array(
@@ -1260,7 +1287,8 @@ EOSQL;
 		return;
 	}
 	
-	public function getCurrentAndFutureVBs($typ) {
+	public function getCurrentAndFutureVBs($typ) 
+	{
 		$this->outputJson(
 			array(
 				'data' => array(),
@@ -1268,5 +1296,129 @@ EOSQL;
 			)
 		);
 		return;
+	}
+	
+	public function storeToTmpStore($tmpstoreid=null) 
+	{
+		$payload = json_decode($this->input->raw_input_stream);
+		$editor = getAuthUID();
+		
+		$ret = null;
+		if( intval($tmpstoreid) > 0 ) 
+		{
+			$ret = $this->TmpStoreModel->update($tmpstoreid, 
+				array(
+					'typ' => $payload->typ,
+					'mitarbeiter_uid' => $payload->mitarbeiter_uid,
+					'formdata' => json_encode($payload->formdata),
+					'updatevon' => $editor,
+					'updateamum' => strftime('%Y-%m-%d %H:%M')				
+				)
+			);
+		}
+		else 
+		{
+			$ret = $this->TmpStoreModel->insert(
+				array(
+					'typ' => $payload->typ,
+					'mitarbeiter_uid' => $payload->mitarbeiter_uid,
+					'formdata' => json_encode($payload->formdata),
+					'insertvon' => $editor,
+					'insertamum' => strftime('%Y-%m-%d %H:%M')
+				)
+			);
+		}
+		
+		$this->outputJson(
+			array(
+				'data' => $payload, 
+				'meta' => array(
+					'tmpstoreid' => $tmpstoreid,
+					'ret' => $ret
+				)
+			)
+		);
+		return;
+	}
+	
+	public function listTmpStoreForMA($mitarbeiteruid) 
+	{
+		$storedentries = $this->TmpStoreModel->listTmpStoreForUid($mitarbeiteruid);
+		$data = array(
+			'aenderung' => array(),
+			'neuanlage' => array()
+		);
+		
+		if( hasData($storedentries) ) 
+		{
+			foreach (getData($storedentries) as $storedentry)
+			{
+				$data[$storedentry->typ][] = $storedentry;
+			}
+		}
+		
+		$this->outputJson(
+			array(
+				'data' => $data, 
+				'meta' => array()
+			)
+		);
+		return;
+	}
+	
+	public function getTmpStoreById($tmpstoreid) 
+	{
+		$tmpstore = $this->TmpStoreModel->load($tmpstoreid);
+		
+		$data = array();
+		if( hasData($tmpstore) )
+		{
+			$data = getData($tmpstore)[0];
+			$data->formdata = json_decode($data->formdata);
+		}
+		
+		$this->outputJson(
+			array(
+				'data' => $data, 
+				'meta' => array()
+			)
+		);
+		return;
+	}
+	
+	public function getUnternehmen()
+	{
+		$this->OrganisationseinheitModel->resetQuery();
+		$this->OrganisationseinheitModel->addSelect('oe_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
+		$this->OrganisationseinheitModel->addOrder('bezeichnung', 'ASC');
+		$unternehmen = $this->OrganisationseinheitModel->loadWhere('oe_parent_kurzbz IS NULL');
+		if( hasData($unternehmen) ) 
+		{
+			$this->outputJson($unternehmen);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no companies (orgets with parent NULL) found');
+			return;
+		}
+	}
+	
+	public function getVertragsarten()
+	{		
+		$this->VertragsartModel->resetQuery();
+		$this->VertragsartModel->addSelect('vertragsart_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
+		$this->VertragsartModel->addOrder('sort', 'ASC');
+		$unternehmen = $this->VertragsartModel->loadWhere('dienstverhaeltnis = true');
+		if( hasData($unternehmen) ) 
+		{
+			$this->outputJson($unternehmen);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no contract types found');
+			return;
+		}
 	}
 }
