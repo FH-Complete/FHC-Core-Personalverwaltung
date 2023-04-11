@@ -91,7 +91,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
             throw new \Exception('missing data');
         }
         $res = $this->getJSONDataFloat($this->data['stunden'], $decodedData, 'stunden');
-        if ($res === false) 
+        if ($res === false)
         {
             throw new \Exception('could not read stunden');
         }
