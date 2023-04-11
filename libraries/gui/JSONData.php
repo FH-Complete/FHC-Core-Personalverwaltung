@@ -43,9 +43,9 @@ trait JSONData {
 
     protected function getJSONDataBool(&$target, &$decoded, $attributeName)
     {
-        if (isset($decoded[$attributeName]) && filter_var($decoded[$attributeName], FILTER_VALIDATE_BOOL))
+        if (isset($decoded[$attributeName]) && filter_var($decoded[$attributeName], FILTER_VALIDATE_BOOLEAN))
         {
-            $target =  filter_var($decoded[$attributeName], FILTER_VALIDATE_BOOL);
+            $target =  filter_var($decoded[$attributeName], FILTER_VALIDATE_BOOLEAN);
             return true;
         }
         return false;
