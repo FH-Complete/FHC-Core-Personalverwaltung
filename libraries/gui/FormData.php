@@ -48,7 +48,7 @@ class FormData extends AbstractBestandteil {
         {
             throw new \Exception('missing children');
         }
-        $this->getJSONData($this->data['children'], $decodedData, 'children');
+        $this->data['children'] = $decodedData;
     }
 
     private function mapData(&$decoded)
