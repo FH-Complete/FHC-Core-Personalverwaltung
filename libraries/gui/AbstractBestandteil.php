@@ -23,7 +23,7 @@ abstract class AbstractBestandteil {
      */
     public function checkType(&$decoded)
     {
-        var_dump($decoded['type']);
+        //var_dump($decoded['type']);
         if (!isset($decoded['type']) || (isset($decoded['type']) && $decoded['type'] !== $this->getTypeString()))
         {
             throw new \Exception('wrong type string: "'.$decoded['type'].'" should be "'.$this->getTypeString().'"');
