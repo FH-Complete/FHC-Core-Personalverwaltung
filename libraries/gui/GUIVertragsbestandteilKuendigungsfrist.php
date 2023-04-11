@@ -115,7 +115,6 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
              
              $data->arbeitgeber_frist = $this->data['arbeitgeber_frist'];
              $data->arbeitnehmer_frist = $this->data['arbeitnehmer_frist'];
-             $data->benutzerfunktion = $this->data['benutzerfunktion'];
              $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_KUENDIGUNGSFRIST;
              
              $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
