@@ -7,7 +7,7 @@ require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
 //require_once __DIR__ . "/../VertragsbestandteilFactory.php";
 //require_once __DIR__ . "/../Vertragsbestandteil.php";
-require_once __DIR__ .'/../VertragsbestandteilStunden.php';
+//require_once __DIR__ .'/../VertragsbestandteilStunden.php';
 
 
 use vertragsbestandteil\VertragsbestandteilFactory;
@@ -118,13 +118,23 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
         {
             // load VBS            
             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+             // merge
+            $vbs->setWochenstunden($this->data['stunden']);
+            $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+            $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {
+
+            $data = new stdClass();
+            $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+            $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+            
+            $data->wochenstunden = $this->data['stunden'];
+            $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN;
+            
+            $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
             $vbs = new vertragsbestandteil\VertragsbestandteilStunden();            
         }
-        // merge
-        $vbs->setWochenstunden($this->data['stunden']);
-        $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
-        $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+       
         return $vbs;
     }
 
