@@ -88,6 +88,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         }
         $this->getJSONData($this->data['funktion'], $decodedData, 'funktion');
         $this->getJSONData($this->data['orget'], $decodedData, 'orget');
+		$this->getJSONData($this->data['mitarbeiter_uid'], $decodedData, 'mitarbeiter_uid');
         $this->getJSONData($this->data['benutzerfunktionid'], $decodedData, 'benutzerfunktionid');
         
         $gueltigkeit = new GUIGueltigkeit();
@@ -120,6 +121,9 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
             // load VBS            
             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
             // merge
+			/**
+			 * @todo refactor update
+			 */
             $vbs->setFunktion($this->data['funktion']);
             $vbs->setOrget($this->data['orget']);
             $vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
@@ -133,7 +137,8 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
             
             $data->funktion = $this->data['funktion'];
             $data->orget = $this->data['orget'];
-            $data->benutzerfunktion = $this->data['benutzerfunktion'];
+			$data->mitarbeiter_uid = $this->data['mitarbeiter_uid'];
+            $data->benutzerfunktionid = $this->data['benutzerfunktionid'];
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FUNKTION;
             
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
