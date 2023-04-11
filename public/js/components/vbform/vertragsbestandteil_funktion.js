@@ -177,7 +177,8 @@ export default {
           id: this.id,
           funktion: this.funktion,
           orget: this.orget,
-          benutzerfunktionid: this.benutzerfunktionid, 
+          benutzerfunktionid: this.benutzerfunktionid,
+          mitarbeiter_uid: this.store.mitarbeiter_uid,
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
         gbs: this.getGehaltsbestandteilePayload()
