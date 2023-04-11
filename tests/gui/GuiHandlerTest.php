@@ -1,7 +1,7 @@
 <?php
 
 
-require_once __DIR__ . "/../../../../application/libraries/vertragsbestandteil/gui/GUIHandler.php";
+require_once __DIR__ . "/../../../../libraries/gui/GUIHandler.php";
 
 use PHPUnit\Framework\TestCase;
 
