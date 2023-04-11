@@ -3,8 +3,8 @@
 
 require_once __DIR__ . '/FormData.php';
 require_once __DIR__ . '/GUIHandlerFactory.php';
-require_once __DIR__ . '/../../../models/vertragsbestandteil/Dienstverhaeltnis_model.php';
-require_once __DIR__ . '/../VertragsbestandteilLib.php';
+//require_once __DIR__ . '/../../../models/vertragsbestandteil/Dienstverhaeltnis_model.php';
+//require_once __DIR__ . '/../../libraries/vertragsbestandteil/VertragsbestandteilLib.php';
 require_once __DIR__ . '/util.php';
 
 /**

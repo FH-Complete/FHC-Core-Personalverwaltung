@@ -5,8 +5,8 @@
 require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
-require_once __DIR__ . "/../VertragsbestandteilFactory.php";
-require_once __DIR__ . "/../Vertragsbestandteil.php";
+//require_once __DIR__ . "/../VertragsbestandteilFactory.php";
+//require_once __DIR__ . "/../Vertragsbestandteil.php";
 require_once __DIR__ .'/../VertragsbestandteilStunden.php';
 
 
