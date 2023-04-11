@@ -1,6 +1,8 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
 
+require_once dirname(__DIR__) . '/libraries/gui/GUIHandler.php';
+
 class Api extends Auth_Controller
 {
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -1257,9 +1259,11 @@ EOSQL;
 		}		
 	}
 	
-	public function saveVertrag() 
+	public function saveVertrag($mitarbeiter_uid) 
 	{
 		$payload = json_decode($this->input->raw_input_stream);
+		$editor = getAuthUID();
+		
 		if( !isset($payload->guioptions) ) 
 		{
 			$payload->guioptions = new stdClass();
@@ -1278,10 +1282,16 @@ EOSQL;
 		$payload->guioptions->infos[] = 'Test Erfolgreich gespeichert.';
 		$payload->guioptions->errors[] = 'Test Beim Speichern ist ein Fehler aufgetreten.';
 		
+		$guihandler = new GUIHandler($mitarbeiter_uid, $editor);
+		$ret = $guihandler->handle($payload);
+		
 		$this->outputJson(
 			array(
-				'data' => $payload, 
-				'meta' => array()
+				'data' => json_decode($ret), 
+				'meta' => array(
+					'mitarbeiter_uid' => $mitarbeiter_uid, 
+					'payload' => $payload
+				)
 			)
 		);
 		return;

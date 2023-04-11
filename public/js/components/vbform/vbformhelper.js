@@ -85,7 +85,7 @@ export default {
       this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(payload)
+      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
       .then((response) => {
         that.$emit('saved', response.data.data);
       });
