@@ -35,8 +35,8 @@ class FormData extends AbstractBestandteil {
     {
         $json = json_encode([
             "children" => $this->children,
-            "data" => $this->generateDvJSON(),
-            "vbs" => $this->generateVbsJSON()
+            "data" => $this->data,
+            "vbs" => $this->vbs
         ]);
         return $json;
     }
