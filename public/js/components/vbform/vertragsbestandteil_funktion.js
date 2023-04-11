@@ -3,6 +3,7 @@ import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
+import store from './vbsharedstate.js';
 
 export default {
   template: `
@@ -95,7 +96,8 @@ export default {
         funktionen: [],
         orgets: [],
         benutzerfunktionen: []
-      }
+      },
+      store: store
     };
   },
   created: function() {
@@ -103,6 +105,15 @@ export default {
     this.getOrgetsForCompany();
     this.getCurrentFunctions();
     this.setDataFromConfig();
+  },
+  watch: {
+      'store.unternehmen': function() {
+        this.getOrgetsForCompany();
+        this.getCurrentFunctions();
+      },
+      'store.mitarbeiter_uid': function() {
+          this.getCurrentFunctions();
+      }
   },
   methods: {
     isselected: function(optvalue, selvalue) {
@@ -133,7 +144,7 @@ export default {
       this.lists.funktionen = funktionen;
     },
     getOrgetsForCompany: async function() {
-      const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany('gst');
+      const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(this.store.unternehmen);
       const orgets = response.data.retval;
       orgets.unshift({
         value: '',
@@ -143,7 +154,7 @@ export default {
       this.lists.orgets = orgets;
     },
     getCurrentFunctions: async function() {
-      const response = await Vue.$fhcapi.Funktion.getCurrentFunctions('ma0080', 'gst');
+      const response = await Vue.$fhcapi.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
       const benutzerfunktionen = response.data.retval;
       benutzerfunktionen.unshift({
         value: '',

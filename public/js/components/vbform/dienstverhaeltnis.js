@@ -1,14 +1,15 @@
 import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
+import store from './vbsharedstate.js';
 
 export default {
   template: `
   <div class="col-3">
-    <select v-model="unternehmen" :disabled="isaenderung || isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <select v-model="store.unternehmen" :disabled="isaenderung || isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
         v-for="u in lists.unternehmen"
         :value="u.value"
-        :selected="isselected(u.value, this.unternehmen)"
+        :selected="isselected(u.value, this.store.unternehmen)"
         :disabled="u.disabled">
         {{ u.label }}
       </option>
@@ -31,12 +32,12 @@ export default {
   `,
   data: function() {
     return {
-      'unternehmen': '',
       'vertragsart_kurzbz': '',
       'lists': {
           'unternehmen': [],
           'vertragsarten': []
-      }
+      },
+      'store': store
     }
   },
   components: {
@@ -87,7 +88,7 @@ export default {
     },
     setDataFromConfig: function() {
       if( this.config?.unternehmen !== undefined ) {
-        this.unternehmen = this.config.unternehmen;
+        this.store.unternehmen = this.config.unternehmen;
       }
       if( this.config?.vertragsart_kurzbz !== undefined ) {
         this.vertragsart_kurzbz = this.config.vertragsart_kurzbz;
@@ -96,7 +97,7 @@ export default {
     getPayload: function() {
       return {
         dienstverhaeltnisid: this.config.dienstverhaeltnisid,
-        unternehmen: this.unternehmen,
+        unternehmen: this.store.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
         gueltigkeit: this.$refs.gueltigkeit.getPayload()
       }

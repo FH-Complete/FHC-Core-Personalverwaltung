@@ -1,5 +1,7 @@
 export default Vue.reactive({
   mode: '',
+  unternehmen: '',
+  mitarbeiter_uid: '',
   gueltigkeit: {
     gueltig_ab: '',
     gueltig_bis: ''

@@ -72,7 +72,7 @@ export default {
       const payload = {
         tmpStoreId: 2,
         typ: this.store.getMode(),  
-        mitarbeiter_uid: 'ma0080',  
+        mitarbeiter_uid: this.store.mitarbeiter_uid,  
         formdata: formdata
       };
       Vue.$fhcapi.TmpStore.storeToTmpStore(payload)

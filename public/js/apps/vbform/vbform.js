@@ -13,8 +13,27 @@ Vue.createApp({
   <div class="container-fluid">
     <h1>{{ title }}</h1>
 
+    <div class="row g-2 py-2">
+      <div class="col-2">
+        <select v-model="store.mitarbeiter_uid" class="form-select form-select-sm">
+            <option value="" disabled>--- Mitarbeiter wählen ---</option>
+            <option value="ma0080">Harald Bamberger</option>
+            <option value="oesi">Andreas Österreicher</option>
+            <option value="hainberg">Cristina Hainberger</option>
+            <option value="ma0068">Manuela Thamer</option>
+            <option value="ma0168">Christopher Gerbrich</option>
+            <option value="bison">Paolo Bison</option>
+            <option value="karpenko">Alexei Karpenko</option>
+            <option value="ma0048">David Cajic</option>
+        </select>
+      </div>
+      <div class="col-10">
+        &nbsp;
+      </div>
+    </div>
+    
     <presets_chooser :presets="presets" @presetselected="presetselected"></presets_chooser>
-
+    
     <div class="row g-2 py-2">
 
       <div class="col-8">
