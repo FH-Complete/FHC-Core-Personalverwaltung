@@ -135,10 +135,9 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
             $data->wochenstunden = $this->data['stunden'];
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN;
             
-            $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
-            $vbs = new vertragsbestandteil\VertragsbestandteilStunden();            
+            $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);            
         }
-       
+        
         return $vbs;
     }
 
