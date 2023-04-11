@@ -4,6 +4,8 @@ require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
 
+use vertragsbestandteil\VertragsbestandteilFactory;
+
 /**
  * ```
  * "type": "vertragsbestandteilfreitext",
@@ -15,7 +17,6 @@ require_once __DIR__ . "/GUIGueltigkeit.php";
  *   "freitexttyp": "allin",
  *   "titel": "Lorem ipsum ",
  *   "freitext": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. \nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. ",
- *   "kuendigungsrelevant": "",
  *   "gueltigkeit": {
  *     "guioptions": {
  *       "sharedstatemode": "reflect"
@@ -28,13 +29,13 @@ require_once __DIR__ . "/GUIGueltigkeit.php";
  * },
  * "gbs": []```
  */
-class GUIVertragsbestandteilZusatzvereinbarung extends AbstractGUIVertragsbestandteil implements JsonSerializable
+class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil implements JsonSerializable
 {
     const TYPE_STRING = "vertragsbestandteilfreitext";
 
     public function __construct()
     {
-        $this->type = GUIVertragsbestandteilZusatzvereinbarung::TYPE_STRING;
+        $this->type = GUIVertragsbestandteilFreitext::TYPE_STRING;
         $this->hasGBS = true;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = null;
@@ -43,7 +44,7 @@ class GUIVertragsbestandteilZusatzvereinbarung extends AbstractGUIVertragsbestan
 
     public function getTypeString(): string
     {
-        return GUIVertragsbestandteilZusatzvereinbarung::TYPE_STRING;
+        return GUIVertragsbestandteilFreitext::TYPE_STRING;
     }
 
     /**
@@ -125,7 +126,36 @@ class GUIVertragsbestandteilZusatzvereinbarung extends AbstractGUIVertragsbestan
     }
 
     public function generateVertragsbestandteil($id) {
-        // TODO
+        /** @var vertragsbestandteil\VertragsbestandteilFreitext */
+        $vbs = null;
+         
+        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        {
+            // load VBS            
+            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            // merge
+            $vbs->setFreitexttyp($this->data['freitexttyp']);
+            $vbs->setTitel($this->data['titel']);
+            $vbs->setFreitext($this->data['freitext']);
+            $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+            $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+
+        } else {
+
+            $data = new stdClass();
+            $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+            $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+            
+            $data->freitexttyp = $this->data['freitexttyp'];
+            $data->titel = $this->data['titel'];
+            $data->freitext = $this->data['freitext'];
+            $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FREITEXT;
+            
+            $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
+
+        }
+        
+        return $vbs;
     }
 
     public function jsonSerialize() {
