@@ -1261,9 +1261,9 @@ EOSQL;
 	
 	public function saveVertrag($mitarbeiter_uid) 
 	{
-		$payload = json_decode($this->input->raw_input_stream);
+		$payload = $this->input->raw_input_stream;
 		$editor = getAuthUID();
-		
+/*		
 		if( !isset($payload->guioptions) ) 
 		{
 			$payload->guioptions = new stdClass();
@@ -1278,10 +1278,10 @@ EOSQL;
 		{
 			$payload->guioptions->errors = array();
 		}
-		
+
 		$payload->guioptions->infos[] = 'Test Erfolgreich gespeichert.';
 		$payload->guioptions->errors[] = 'Test Beim Speichern ist ein Fehler aufgetreten.';
-		
+*/		
 		$guihandler = new GUIHandler($mitarbeiter_uid, $editor);
 		$ret = $guihandler->handle($payload);
 		
@@ -1290,7 +1290,7 @@ EOSQL;
 				'data' => json_decode($ret), 
 				'meta' => array(
 					'mitarbeiter_uid' => $mitarbeiter_uid, 
-					'payload' => $payload
+					'payload' => json_decode($payload)
 				)
 			)
 		);

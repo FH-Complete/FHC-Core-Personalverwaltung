@@ -52,7 +52,7 @@ export default {
         this.id = this.config.data.id;
       }
       if( this.config?.data?.stunden !== undefined ) {
-        this.stunden = this.config.data.stunden;
+        this.stunden = this.config.data.stunden.replace('.', ',');
       }
     },
     removeVB: function() {
@@ -64,7 +64,7 @@ export default {
         guioptions: this.config.guioptions,
         data: {
           id: this.id,
-          stunden: this.stunden,
+          stunden: this.stunden.replace(',', '.'),
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
         },
         gbs: this.$refs.gbh.getPayload()
