@@ -181,7 +181,7 @@ class GUIHandler
 
         if (isError($result))
         {
-            throw Exception($result->msg);
+            throw new Exception($result->msg);
         }
 
         $record = $this->CI->Dienstverhaeltnis_model->load($result->retval);

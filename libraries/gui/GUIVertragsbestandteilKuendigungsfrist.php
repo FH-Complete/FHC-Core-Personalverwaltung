@@ -2,6 +2,8 @@
 
 require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 
+use vertragsbestandteil\VertragsbestandteilFactory;
+
 /**
   *   "type": "vertragsbestandteilkuendigungsfrist",
   *   "guioptions": {
@@ -90,22 +92,37 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
         $this->getJSONData($this->data['gueltigkeit'], $decodedData, 'gueltigkeit');
     }
 
-    private function mapGBS()
-    {
-        $decodedGbsList = [];
-        if (!$this->getJSONData($decodedGbsList, $decoded, 'gbs'))
-        {
-            throw new \Exception('missing gbs');
-        }
-        $guiGBS = null;
-        foreach ($decodedGbsList as $decodedGbs) {
-            $guiGBS = new GUIGehaltsbestandteil();
-            $guiGBS->mapJSON($decodedGbs);
-        }
-    }
 
     public function generateVertragsbestandteil($id) {
-        // TODO
+         /** @var vertragsbestandteil\VertragsbestandteilKuendigungsfrist */
+         $vbs = null;
+         
+         if (isset($vbsData['id']) && $vbsData['id'] > 0)
+         {
+             // load VBS            
+             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+             // merge
+             $vbs->setArbeitgeberFrist($this->data['arbeitgeber_frist']);
+             $vbs->setArbeitnehmerFrist($this->data['arbeitnehmer_frist']);
+             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+             $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+
+         } else {
+ 
+             $data = new stdClass();
+             $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+             $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+             
+             $data->arbeitgeber_frist = $this->data['arbeitgeber_frist'];
+             $data->arbeitnehmer_frist = $this->data['arbeitnehmer_frist'];
+             $data->benutzerfunktion = $this->data['benutzerfunktion'];
+             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_KUENDIGUNGSFRIST;
+             
+             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
+ 
+         }
+         
+         return $vbs;
     }
 
     public function jsonSerialize() {

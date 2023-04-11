@@ -4,6 +4,8 @@ require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
 
+use vertragsbestandteil\VertragsbestandteilFactory;
+
 /**
  * ```
  * "type": "vertragsbestandteilzeitaufzeichnung",
@@ -91,7 +93,34 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
     }
 
     public function generateVertragsbestandteil($id) {
-        // TODO
+        /** @var vertragsbestandteil\VertragsbestandteilZeitaufzeichnung */
+        $vbs = null;
+        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        {
+            // load VBS            
+            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            // merge
+            $vbs->setZeitaufzeichnung($this->data['zeitaufzeichnung']);
+            $vbs->setAzgrelevant($this->data['azgrelevant']);
+            $vbs->setHomeoffice($this->data['homeoffice']);
+            $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+            $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+        } else {
+
+            $data = new stdClass();
+            $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+            $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+            
+            $data->zeitaufzeichnung = $this->data['zeitaufzeichnung'];
+            $data->azgrelevant = $this->data['azgrelevant'];
+            $data->homeoffice = $this->data['homeoffice'];
+            $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG;
+            
+            $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
+
+        }
+        
+        return $vbs;
     }
 
     public function jsonSerialize() {

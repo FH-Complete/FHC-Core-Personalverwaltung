@@ -4,6 +4,8 @@ require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
 
+use vertragsbestandteil\VertragsbestandteilFactory;
+
 class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  implements JsonSerializable
 {    
     const TYPE_STRING = "vertragsbestandteilfunktion";
@@ -15,6 +17,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => false];
         $this->data = ["funktion" => "Leitung",
                        "orget" => "",
+                       "benutzerfunktionid" => "",    // optional; bei bestehender Funktion relevant
                        "gueltigkeit" => [
                            "guioptions" => ["sharedstatemode" => "reflect"],
                            "data" =>       ["gueltig_ab"      => "", "gueltig_bis" => ""]
@@ -85,6 +88,8 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         }
         $this->getJSONData($this->data['funktion'], $decodedData, 'funktion');
         $this->getJSONData($this->data['orget'], $decodedData, 'orget');
+        $this->getJSONData($this->data['benutzerfunktionid'], $decodedData, 'benutzerfunktionid');
+        
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
@@ -114,13 +119,27 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         {
             // load VBS            
             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            // merge
+            $vbs->setFunktion($this->data['funktion']);
+            $vbs->setOrget($this->data['orget']);
+            $vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
+            $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+            $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {
-            $vbs = new vertragsbestandteil\VertragsbestandteilFunktion();            
+
+            $data = new stdClass();
+            $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+            $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+            
+            $data->funktion = $this->data['funktion'];
+            $data->orget = $this->data['orget'];
+            $data->benutzerfunktion = $this->data['benutzerfunktion'];
+            $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FUNKTION;
+            
+            $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
+
         }
-        // merge
-        $vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
-        $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
-        $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+        
         return $vbs;
     }
 
