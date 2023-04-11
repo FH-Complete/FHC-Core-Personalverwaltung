@@ -14,8 +14,8 @@ export default {
         <select v-model="freitexttyp" :disabled="isinputdisabled('freitexttyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option value="" selected>Freitexttyp wählen</option>
           <option value="allin">AllIn</option>
-          <option value="ersatzkraft">Ersatzarbeitskraft</option>
-          <option value="zusatzvbg">Zusatzvereinbarung</option>
+          <option value="ersatzarbeitskraft">Ersatzarbeitskraft</option>
+          <option value="zusatzvereinbarung">Zusatzvereinbarung</option>
           <option value="befristung">Befristung</option>
           <option value="sonstiges">Sonstiges</option>
         </select>
