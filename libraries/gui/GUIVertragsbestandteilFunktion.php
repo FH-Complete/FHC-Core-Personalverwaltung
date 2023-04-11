@@ -15,9 +15,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         $this->type = GUIVertragsbestandteilFunktion::TYPE_STRING;
         $this->hasGBS = true;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => false];
-        $this->data = ["funktion" => "Leitung",
-                       "orget" => "",
-                       "benutzerfunktionid" => "",    // optional; bei bestehender Funktion relevant
+        $this->data = [
                        "gueltigkeit" => [
                            "guioptions" => ["sharedstatemode" => "reflect"],
                            "data" =>       ["gueltig_ab"      => "", "gueltig_bis" => ""]
