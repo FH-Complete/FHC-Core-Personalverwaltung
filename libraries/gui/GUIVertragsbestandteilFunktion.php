@@ -70,7 +70,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         $this->getJSONData($this->guioptions, $decodedGUIOptions, 'infos');
         $this->getJSONData($this->guioptions, $decodedGUIOptions, 'errors');
         $this->getJSONDataBool($this->guioptions, $decodedGUIOptions, 'removable');
-        $this->guioptions['canhavegehaltsbestandteile'] = $this->getHasGBS();
+        //$this->guioptions['canhavegehaltsbestandteile'] = $this->getHasGBS();
         $this->getJSONData($this->guioptions, $decodedGUIOptions, 'disabled');
     }
 

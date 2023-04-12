@@ -83,7 +83,7 @@ export default {
           gehaltstyp: this.gehaltstyp,
           betrag: this.betrag,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
-          valorisierung: this.valorisierung
+          valorisierung: Boolean(this.valorisierung)
         }
       };
     }
