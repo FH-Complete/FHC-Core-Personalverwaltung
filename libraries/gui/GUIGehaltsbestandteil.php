@@ -1,5 +1,6 @@
 <?php
 
+use vertragsbestandteil\Gehaltsbestandteil;
 
 require_once __DIR__ . "/AbstractBestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
@@ -30,8 +31,12 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
 
     const TYPE_STRING = "gehaltsbestandteil";
 
+    /** @var GehaltsbestandteilLib */
+    protected $gbsLib;
+
     public function __construct()
     {
+        $this->gbsLib = new GehaltsbestandteilLib();
         $this->type = GUIVertragsbestandteilStunden::TYPE_STRING;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = [ "gehaltstyp" => "",
@@ -84,6 +89,40 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
         $this->getJSONData($this->data['valorisierung'], $decodedData, 'valorisierung');
+    }
+
+    public function generateGehaltsbestandteil($id)
+    {
+        $gbs = null;
+        if (isset($id) && $id > 0)
+        {
+            // load VBS            
+            $gbs =  $this->gbsLib->fetchGehaltsbestandteil($id);
+             // merge
+            $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp_kurzbz']);
+            $gbs->setGrundbetrag($this->data['grundbetrag']);
+            $gbs->setBetrag_valorisiert($this->data['betrag_valorisiert']);
+            $gbs->setValorisierungssperre($this->data['valorisierungssperre']);
+            $gbs->setValorisierung($this->data['valorisierung']);            
+            $gbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+            $gbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+        } else {
+
+            $data = new stdClass();
+            $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+            $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+            
+            $data->gehaltstyp_kurzbz = $this->data['gehaltstyp_kurzbz'];
+            $data->grundbetrag = $this->data['grundbetrag'];
+            $data->betrag_valorisiert = $this->data['betrag_valorisiert'];
+            $data->valorisierungssperre = $this->data['valorisierungssperre'];
+            $data->valorisierung = $this->data['valorisierung'];
+            
+            $gbs = new Gehaltsbestandteil();
+            $gbs->hydrateByStdClass($data);
+        }
+        
+        return $gbs;
     }
 
 }
