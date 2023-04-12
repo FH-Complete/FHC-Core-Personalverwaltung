@@ -78,6 +78,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     
     public function __construct()
     {
+		$this->gbs = array();
         $this->vbsLib = new VertragsbestandteilLib();
     }
 

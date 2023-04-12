@@ -99,10 +99,10 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             // load VBS            
             $gbs =  $this->gbsLib->fetchGehaltsbestandteil($id);
              // merge
-            $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp_kurzbz']);
-            $gbs->setGrundbetrag($this->data['grundbetrag']);
-            $gbs->setBetrag_valorisiert($this->data['betrag_valorisiert']);
-            $gbs->setValorisierungssperre($this->data['valorisierungssperre']);
+            $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp']);
+            $gbs->setGrundbetrag($this->data['betrag']);
+            $gbs->setBetrag_valorisiert($this->data['betrag']);
+            //$gbs->setValorisierungssperre($this->data['valorisierungssperre']);
             $gbs->setValorisierung($this->data['valorisierung']);            
             $gbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $gbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
@@ -112,10 +112,10 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
             $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
             
-            $data->gehaltstyp_kurzbz = $this->data['gehaltstyp_kurzbz'];
-            $data->grundbetrag = $this->data['grundbetrag'];
-            $data->betrag_valorisiert = $this->data['betrag_valorisiert'];
-            $data->valorisierungssperre = $this->data['valorisierungssperre'];
+            $data->gehaltstyp_kurzbz = $this->data['gehaltstyp'];
+            $data->grundbetrag = $this->data['betrag'];
+            $data->betrag_valorisiert = $this->data['betrag'];
+            //$data->valorisierungssperre = $this->data['valorisierungssperre'];
             $data->valorisierung = $this->data['valorisierung'];
             
             $gbs = new Gehaltsbestandteil();

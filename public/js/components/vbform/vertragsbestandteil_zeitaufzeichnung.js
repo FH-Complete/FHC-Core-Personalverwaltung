@@ -81,9 +81,9 @@ export default {
         guioptions: this.config.guioptions,
         data: {
           id: this.id,
-          zeitaufzeichnung: this.zeitaufzeichnung,
-          azgrelevant: this.azgrelevant,
-          homeoffice: this.homeoffice,
+          zeitaufzeichnung: Boolean(this.zeitaufzeichnung),
+          azgrelevant: Boolean(this.azgrelevant),
+          homeoffice: Boolean(this.homeoffice),
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         }
       };

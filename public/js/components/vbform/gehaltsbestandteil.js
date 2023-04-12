@@ -14,8 +14,8 @@ export default {
     <div class="col-2">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option value="" selected disabled>Gehaltstyp wählen</option>
-        <option value="basis">Basisgehalt</option>
-        <option value="grund">Grundgehalt</option>
+        <option value="basisgehalt">Basisgehalt</option>
+        <option value="grundgehalt">Grundgehalt</option>
         <option value="zulage">Zulage</option>
       </select>
     </div>

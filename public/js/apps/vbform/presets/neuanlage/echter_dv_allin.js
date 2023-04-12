@@ -193,8 +193,8 @@ export default {
     }
   ],
   data: {
-    dienstverhaeltnisid: 1,
-    unternehmen: 'gst',
+    dienstverhaeltnisid: null,
+    unternehmen: '',
     vertragsart_kurzbz: 'echterdv',
     gueltigkeit: {
       guioptions: {

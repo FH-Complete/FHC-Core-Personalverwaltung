@@ -218,7 +218,7 @@ export default {
             ]
           },
           data: {
-            gehaltstyp: 'basis',
+            gehaltstyp: 'basisgehalt',
             valorisierung: true
           }
         }

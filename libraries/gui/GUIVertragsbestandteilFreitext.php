@@ -35,6 +35,7 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
 
     public function __construct()
     {
+		parent::__construct();
         $this->type = GUIVertragsbestandteilFreitext::TYPE_STRING;
         $this->hasGBS = true;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
