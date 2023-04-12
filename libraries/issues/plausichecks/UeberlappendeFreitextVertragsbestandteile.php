@@ -6,9 +6,9 @@ require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PlausicheckLib.php';
 
 /**
- * Dienstverhältnisse with type "echterdv" should have Vertragsbestandteil with type "stunden".
+ * Vertragsbestandteile of type "freitext" should not overlap.
  */
-class EchteDienstverhaeltnisseOhneStundenVertragsbestandteil extends PlausiChecker
+class UeberlappendeFreitextVertragsbestandteile extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -16,10 +16,10 @@ class EchteDienstverhaeltnisseOhneStundenVertragsbestandteil extends PlausiCheck
 		$results = array();
 
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
-		$dienstverhaeltnis_id = isset($params['dienstverhaeltnis_id']) ? $params['dienstverhaeltnis_id'] : null;
+		$vertragsbestandteil_id = isset($params['vertragsbestandteil_id']) ? $params['vertragsbestandteil_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->plausichecklib->getEchteDienstverhaeltnisseOhneStundenVertragsbestandteil($person_id, $dienstverhaeltnis_id);
+		$result = $this->_ci->plausichecklib->getUeberlappendeFreitextVertragsbestandteile($person_id, $vertragsbestandteil_id);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;
@@ -34,8 +34,8 @@ class EchteDienstverhaeltnisseOhneStundenVertragsbestandteil extends PlausiCheck
 			{
 				$results[] = array(
 					'person_id' => $dataObj->person_id,
-					'resolution_params' => array('dienstverhaeltnis_id' => $dataObj->dienstverhaeltnis_id),
-					'fehlertext_params' => array('dienstverhaeltnis_id' => $dataObj->dienstverhaeltnis_id)
+					'resolution_params' => array('vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id),
+					'fehlertext_params' => array('vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id)
 				);
 			}
 		}

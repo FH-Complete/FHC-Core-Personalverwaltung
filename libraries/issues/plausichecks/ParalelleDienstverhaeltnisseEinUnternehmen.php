@@ -6,7 +6,7 @@ require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PlausicheckLib.php';
 
 /**
- * Paralelle Dienstverhältnisse bei gleichem Unternehmen
+ * Dienstverhältnisse should not run in paralell at same company (oe).
  */
 class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 {

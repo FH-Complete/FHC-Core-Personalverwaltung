@@ -43,14 +43,14 @@ class PlausicheckLib
 			WITH dienstverhaeltnisse AS (
 				SELECT
 					ben.person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, dv.oe_kurzbz, vtb.vertragsbestandteiltyp_kurzbz,
-					vtb.von, COALESCE(vtb.bis, '9999-12-31') AS bis
+					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis, dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis
 				FROM
 					public.tbl_benutzer ben
 					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
 					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
-					JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+					LEFT JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
 				WHERE
-					vertragsbestandteiltyp_kurzbz NOT IN ('karenz')";
+					vertragsbestandteiltyp_kurzbz IS NULL OR vertragsbestandteiltyp_kurzbz NOT IN ('karenz')";
 
 		if (isset($person_id))
 		{
@@ -60,8 +60,7 @@ class PlausicheckLib
 
 		$qry.=
 			")
-			SELECT
-				DISTINCT ON (person_id) *
+			SELECT DISTINCT ON (person_id, dienstverhaeltnis_id) *
 			FROM
 				dienstverhaeltnisse dvs
 			WHERE
@@ -73,7 +72,24 @@ class PlausicheckLib
 						dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
 						AND dvss.person_id = dvs.person_id -- same person
 						AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen
-						AND (dvss.von <= dvs.bis AND dvss.bis >= dvs.von)
+						AND (
+							-- vertragsbestandteil time paralell
+							(dvss.vtb_von <= dvs.vtb_bis AND dvss.vtb_bis >= dvs.vtb_von)
+							OR (
+								-- dienstverhaeltnis time paralell
+								dvss.dv_von <= dvs.dv_bis AND dvss.dv_bis >= dvs.dv_von
+								AND NOT EXISTS ( -- karenz time can be paralell
+									SELECT 1
+									FROM
+										hr.tbl_vertragsbestandteil vtb_karenz
+									WHERE
+										dienstverhaeltnis_id IN (dvss.dienstverhaeltnis_id, dvs.dienstverhaeltnis_id)
+										AND vertragsbestandteiltyp_kurzbz = 'karenz'
+										AND von <= GREATEST(dvss.dv_von, dvs.dv_von)
+										AND COALESCE(bis, '9999-12-31') >= LEAST(dvss.dv_bis, dvs.dv_bis)
+								)
+							)
+						) -- overlap
 				)";
 
 		if (isset($vertragsbestandteil_id))
@@ -84,7 +100,7 @@ class PlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, von, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dienstverhaeltnis_id, dv_von, vtb_von, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -104,7 +120,7 @@ class PlausicheckLib
 				SELECT ben.person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id,
 					dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis,
 					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis,
-					dv.oe_kurzbz, RANK() OVER(PARTITION BY dienstverhaeltnis_id ORDER BY vtb.von) AS reihenfolge
+					dv.oe_kurzbz, RANK() OVER(PARTITION BY dienstverhaeltnis_id ORDER BY vtb.von, vtb.insertamum) AS reihenfolge
 				FROM
 					public.tbl_benutzer ben
 					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
@@ -124,19 +140,24 @@ class PlausicheckLib
 				ORDER BY
 					vtb.von
 			)
-			SELECT DISTINCT ON (person_id) *
+			SELECT *
 			FROM
 				dienstverhaeltnisse dvs
 			WHERE
 			(
-				NOT EXISTS ( -- there is no following vertragsbestandteil, and it's not the end of dienstverhaeltnis
+				NOT EXISTS (
 					SELECT 1
 					FROM
 						dienstverhaeltnisse dvss
 					WHERE
-						dvs.vertragsbestandteil_id <> dvss.vertragsbestandteil_id
-						AND dvs.dienstverhaeltnis_id = dvss.dienstverhaeltnis_id
-						AND ((dvss.vtb_von <= dvs.vtb_bis + INTERVAL '1 day' AND (dvss.vtb_bis >= dvs.vtb_bis OR dvs.vtb_bis = dvs.dv_bis)))
+						(-- there is no following vertragsbestandteil
+							dvs.vertragsbestandteil_id <> dvss.vertragsbestandteil_id
+							AND dvs.dienstverhaeltnis_id = dvss.dienstverhaeltnis_id
+							AND dvss.vtb_von <= dvs.vtb_bis + INTERVAL '1 day'
+							AND dvss.vtb_bis > dvs.vtb_bis
+						)
+						-- and it's not the end of dienstverhaeltnis
+						OR dvs.vtb_bis = dvs.dv_bis
 				)
 				OR (dvs.reihenfolge = 1 AND dvs.vtb_von > dvs.dv_von) -- or time gap at beginning of dienstverhaeltnis
 			)";
@@ -246,4 +267,408 @@ class PlausicheckLib
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
+	/**
+	 * Bis Datum of Vertragsbestandteil shouldn't be after Dienstverhaeltnis end.
+	 * @param person_id
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getVertragsbestandteilEndAfterDienstverhaeltnis($person_id = null, $vertragsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+			WHERE
+				dv.bis IS NOT NULL -- null means 'unlimited' with no end.
+				AND (vtb.bis > dv.bis OR vtb.bis IS NULL)
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtb.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Vertragsbestandteile of a Dienstverhältnis which are marked as not overlapping and are of same type should not overlap in time.
+	 * @param person_id
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getUeberlappendeVertragsbestandteile($person_id = null, $vertragsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			WITH vertragsbestandteile AS (
+				SELECT ben.person_id, dv.dienstverhaeltnis_id,
+					vtb.vertragsbestandteil_id, vtb.vertragsbestandteiltyp_kurzbz, dv.oe_kurzbz,
+					dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis,
+					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis
+				FROM
+					public.tbl_benutzer ben
+					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+					JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+					JOIN hr.tbl_vertragsbestandteiltyp vtb_typ USING (vertragsbestandteiltyp_kurzbz)
+			WHERE
+				vtb_typ.ueberlappend = FALSE
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		$qry.=
+			"
+				ORDER BY
+					vtb.von
+			)
+			SELECT *
+			FROM
+				vertragsbestandteile vtbs
+			WHERE
+			(
+				EXISTS ( -- there is overlapping vertragsbestandteil
+					SELECT 1
+					FROM
+						vertragsbestandteile vtbss
+					WHERE
+						vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
+						AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id -- different Vertragsbestandteil
+						AND vtbs.vertragsbestandteiltyp_kurzbz = vtbss.vertragsbestandteiltyp_kurzbz -- same type
+						AND (vtbss.vtb_von <= vtbs.vtb_bis AND vtbss.vtb_bis >= vtbs.vtb_von) -- overlap
+				)
+			)";
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtbs.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, vtb_von, dienstverhaeltnis_id, vertragsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+	/**
+	 * Vertragsbestandteile of type "freitext" of a Dienstverhältnis which are marked as not overlapping should not overlap in time.
+	 * @param person_id
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getUeberlappendeFreitextVertragsbestandteile($person_id = null, $vertragsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			WITH vertragsbestandteile AS (
+				SELECT ben.person_id, dv.dienstverhaeltnis_id,
+					vtb.vertragsbestandteil_id, vtb_freitext.freitexttyp_kurzbz, dv.oe_kurzbz,
+					dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis,
+					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis
+				FROM
+					public.tbl_benutzer ben
+					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+					JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+					JOIN hr.tbl_vertragsbestandteil_freitext vtb_freitext USING (vertragsbestandteil_id)
+					JOIN hr.tbl_vertragsbestandteil_freitexttyp vtb_freitexttyp USING (freitexttyp_kurzbz)
+			WHERE
+				vtb_freitexttyp.ueberlappend = FALSE
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		$qry.=
+			"
+				ORDER BY
+					vtb.von
+			)
+			SELECT *
+			FROM
+				vertragsbestandteile vtbs
+			WHERE
+			(
+				EXISTS ( -- there is overlapping vertragsbestandteil
+					SELECT 1
+					FROM
+						vertragsbestandteile vtbss
+					WHERE
+						vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
+						AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id
+						AND vtbs.freitexttyp_kurzbz = vtbss.freitexttyp_kurzbz -- same type
+						AND (vtbss.vtb_von <= vtbs.vtb_bis AND vtbss.vtb_bis >= vtbs.vtb_von)
+				)
+			)";
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtbs.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, vtb_von, dienstverhaeltnis_id, vertragsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Gehalt checks
+
+	/**
+	 * Grundgehalt should be assigned to "stunden" Vertragsbestandteil.
+	 * @param person_id
+	 * @param gehaltsbestandteil_id Gehaltsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getGrundgehaltKeinemStundenVertragsbestandteilZugewiesen($person_id = null, $gehaltsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_gehaltsbestandteil geh USING (dienstverhaeltnis_id)
+				LEFT JOIN hr.tbl_vertragsbestandteil vtb USING (vertragsbestandteil_id)
+			WHERE
+				geh.gehaltstyp_kurzbz = 'grundgehalt'
+				AND (vtb.vertragsbestandteil_id IS NULL OR vtb.vertragsbestandteiltyp_kurzbz <> 'stunden')
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($gehaltsbestandteil_id))
+		{
+			$qry .= " AND geh.gehaltsbestandteil_id = ?";
+			$params[] = $gehaltsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Gehaltsbestandteil date span should be in Vertragsbestandteil date span.
+	 * @param person_id
+	 * @param gehaltsbestandteil_id Gehaltsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getGehaltsbestandteilNichtImVertragsbestandteilDatumsbereich($person_id = null, $gehaltsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				ben.person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+				JOIN hr.tbl_gehaltsbestandteil geh USING (vertragsbestandteil_id)
+			WHERE
+				(
+					geh.von < vtb.von
+					OR geh.bis > vtb.bis
+					OR geh.von > vtb.bis
+					OR geh.bis < vtb.von
+				)
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($gehaltsbestandteil_id))
+		{
+			$qry .= " AND geh.gehaltsbestandteil_id = ?";
+			$params[] = $gehaltsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				ben.person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Gehaltsbestandteil date span should be part of Dienstverhaeltnis date span.
+	 * @param person_id
+	 * @param gehaltsbestandteil_id Gehaltsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getGehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich($person_id = null, $gehaltsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				ben.person_id, dv.dienstverhaeltnis_id, geh.gehaltsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_gehaltsbestandteil geh USING (dienstverhaeltnis_id)
+			WHERE
+				(
+					geh.von < dv.von
+					OR geh.bis > dv.bis
+					OR geh.von > dv.bis
+					OR geh.bis < dv.von
+				)
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($gehaltsbestandteil_id))
+		{
+			$qry .= " AND geh.gehaltsbestandteil_id = ?";
+			$params[] = $gehaltsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, gehaltsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
+	// Funktion checks
+
+	/**
+	 * Uid of Benutzerfunktion should correspond to uid of Dienstverhältnis.
+	 * @param person_id
+	 * @param dienstverhaeltnis_id Dienstverhältnis violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getFunktionUidUngleichDienstverhaeltnisUid($person_id = null, $dienstverhaeltnis_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dienstverhaeltnis_id, benutzerfunktion_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+				JOIN hr.tbl_vertragsbestandteil_funktion vtb_funktion USING (vertragsbestandteil_id)
+				JOIN public.tbl_benutzerfunktion ben_funktion USING (benutzerfunktion_id)
+			WHERE
+				dv.mitarbeiter_uid <> ben_funktion.uid
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($dienstverhaeltnis_id))
+		{
+			$qry .= " AND dv.dienstverhaeltnis_id = ?";
+			$params[] = $dienstverhaeltnis_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Funktion date span should overlap with date span of Vertragsbestandteil.
+	 * @param person_id
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getFunktionFaelltNichtInVertragsbestandteilZeitraum($person_id = null, $vertragsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+				JOIN hr.tbl_vertragsbestandteil_funktion vtb_funktion USING (vertragsbestandteil_id)
+				JOIN public.tbl_benutzerfunktion ben_funktion USING (benutzerfunktion_id)
+			WHERE
+				--benutzerfunktion date span does not overlap with vertragsbestandteil date span
+				vtb.von > ben_funktion.datum_bis OR vtb.bis < ben_funktion.datum_von
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtb.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
 }

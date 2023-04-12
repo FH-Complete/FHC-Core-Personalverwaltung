@@ -17,7 +17,15 @@ class PlausiIssueProducer extends PlausiIssueProducer_Controller
 			'paralelleDienstverhaeltnisseEinUnternehmen' => 'ParalelleDienstverhaeltnisseEinUnternehmen',
 			'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis',
 			'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil',
-			'vertragsbestandteilStartBeforeDienstverhaeltnis' => 'VertragsbestandteilStartBeforeDienstverhaeltnis'
+			'vertragsbestandteilStartBeforeDienstverhaeltnis' => 'VertragsbestandteilStartBeforeDienstverhaeltnis',
+			'vertragsbestandteilEndAfterDienstverhaeltnis' => 'VertragsbestandteilEndAfterDienstverhaeltnis',
+			'ueberlappendeVertragsbestandteile' => 'UeberlappendeVertragsbestandteile',
+			'ueberlappendeFreitextVertragsbestandteile' => 'UeberlappendeFreitextVertragsbestandteile',
+			'grundgehaltKeinemStundenVertragsbestandteilZugewiesen' => 'GrundgehaltKeinemStundenVertragsbestandteilZugewiesen',
+			'gehaltsbestandteilNichtImVertragsbestandteilDatumsbereich' => 'GehaltsbestandteilNichtImVertragsbestandteilDatumsbereich',
+			'gehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich' => 'GehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich',
+			'funktionUidUngleichDienstverhaeltnisUid' => 'FunktionUidUngleichDienstverhaeltnisUid',
+			'funktionFaelltNichtInVertragsbestandteilZeitraum' => 'FunktionFaelltNichtInVertragsbestandteilZeitraum'
 		);
 	}
 
