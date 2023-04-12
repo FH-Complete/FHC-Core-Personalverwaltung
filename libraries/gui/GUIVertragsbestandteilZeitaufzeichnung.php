@@ -34,6 +34,7 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
 
     public function __construct()
     {
+		parent::__construct();
         $this->type = GUIVertragsbestandteilZeitaufzeichnung::TYPE_STRING;
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];

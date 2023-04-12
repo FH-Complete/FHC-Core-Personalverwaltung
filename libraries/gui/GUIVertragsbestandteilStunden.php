@@ -20,6 +20,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
 
     public function __construct()
     {                
+		parent::__construct();
         $this->type = GUIVertragsbestandteilStunden::TYPE_STRING;
         $this->hasGBS = true;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];

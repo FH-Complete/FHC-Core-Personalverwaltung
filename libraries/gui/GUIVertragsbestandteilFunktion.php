@@ -22,6 +22,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 
     public function __construct()
     {
+		parent::__construct();
         $this->type = GUIVertragsbestandteilFunktion::TYPE_STRING;        
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => false];
         $this->data = [
