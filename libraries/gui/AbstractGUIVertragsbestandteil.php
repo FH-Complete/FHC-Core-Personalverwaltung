@@ -70,7 +70,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     
     /** @var boolean does this vertragsbestandteil have a GBS array? */
     protected $hasGBS = false;
-    /** @var array gehaltsbestandteile connected to current vertragsbestandteil */
+    /** @var array{GUIGehaltsbestandteil} gehaltsbestandteile connected to current vertragsbestandteil */
     protected $gbs;
 
     /** @var VertragsbestandteilLib */
@@ -82,6 +82,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     }
 
     abstract public function generateVertragsbestandteil($id);
+
 
     /**
      * Get the value of uuid

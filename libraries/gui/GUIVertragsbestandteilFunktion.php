@@ -170,6 +170,8 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
             
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
 
+            
+
         }
         
         return $vbs;

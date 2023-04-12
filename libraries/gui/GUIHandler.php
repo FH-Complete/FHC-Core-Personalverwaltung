@@ -116,7 +116,7 @@ class GUIHandler
 
     private function handleVBS($dienstverhaeltnis_id, $vbs)
     {
-        /**  @var GUIVertragsbestandteilFunktion */
+        /**  @var AbstractGUIVertragsbestandteil */
         $vbsMapper = GUIHandlerFactory::getGUIHandler($vbs['type']);
         try {
 		    $vbsMapper->mapJSON($vbs);
@@ -134,6 +134,12 @@ class GUIHandler
                 $vbsInstance->setUpdateamum((new DateTime())->format("Y-m-d h:m:s"));
             }
 
+            $gbsList = $vbsMapper->getGbs();
+            foreach ($gbsList as $gbs) {
+                $gbsData = $gbs->getData();
+                $gbsInstance = $gbs->generateGehaltsbestandteil(isset($gbsData['id'])?$gbsData['id']:null);
+                $vbsInstance->addGehaltsbestandteil($gbsInstance);
+            }
             // TODO Validate?
 
             // store        
