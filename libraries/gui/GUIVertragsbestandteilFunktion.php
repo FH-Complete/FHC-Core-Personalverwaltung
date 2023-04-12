@@ -143,10 +143,10 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
     public function generateVertragsbestandteil($id) {
         /** @var vertragsbestandteil\VertragsbestandteilFunktion */
         $vbs = null;
-        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        if (isset($id) && $id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
             // merge
 			/**
 			 * @todo refactor update

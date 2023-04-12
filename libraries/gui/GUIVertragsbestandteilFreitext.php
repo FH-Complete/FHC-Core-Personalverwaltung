@@ -129,7 +129,7 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
         /** @var vertragsbestandteil\VertragsbestandteilFreitext */
         $vbs = null;
          
-        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        if (isset($id) && $id > 0)
         {
             // load VBS            
             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);

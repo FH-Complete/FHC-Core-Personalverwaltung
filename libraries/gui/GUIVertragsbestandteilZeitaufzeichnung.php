@@ -95,10 +95,10 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
     public function generateVertragsbestandteil($id) {
         /** @var vertragsbestandteil\VertragsbestandteilZeitaufzeichnung */
         $vbs = null;
-        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        if (isset($id) && $id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
             // merge
             $vbs->setZeitaufzeichnung($this->data['zeitaufzeichnung']);
             $vbs->setAzgrelevant($this->data['azgrelevant']);

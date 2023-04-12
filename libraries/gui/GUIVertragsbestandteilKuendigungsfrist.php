@@ -99,10 +99,10 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
          /** @var vertragsbestandteil\VertragsbestandteilKuendigungsfrist */
          $vbs = null;
          
-         if (isset($vbsData['id']) && $vbsData['id'] > 0)
+         if (isset($id) && $id > 0)
          {
              // load VBS            
-             $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+             $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
              // merge
              $vbs->setArbeitgeberFrist($this->data['arbeitgeber_frist']);
              $vbs->setArbeitnehmerFrist($this->data['arbeitnehmer_frist']);

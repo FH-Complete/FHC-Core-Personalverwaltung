@@ -118,10 +118,10 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
     public function generateVertragsbestandteil($id)
     {
         $vbs = null;
-        if (isset($vbsData['id']) && $vbsData['id'] > 0)
+        if (isset($id) && $id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
              // merge
             $vbs->setWochenstunden($this->data['stunden']);
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
