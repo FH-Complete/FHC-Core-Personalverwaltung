@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
-require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PlausicheckLib.php';
+require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
  * Dienstverhältnisse should not run in paralell at same company (oe).
@@ -12,14 +12,21 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
-		$this->_ci->load->library('PlausicheckLib');
+		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
 		$results = array();
 
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
-		$vertragsbestandteil_id = isset($params['vertragsbestandteil_id']) ? $params['vertragsbestandteil_id'] : null;
+		$erste_dienstverhaeltnis_id = isset($params['erste_dienstverhaeltnis_id']) ? $params['erste_dienstverhaeltnis_id'] : null;
+		$zweite_dienstverhaeltnis_id = isset($params['zweite_dienstverhaeltnis_id']) ? $params['zweite_dienstverhaeltnis_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->plausichecklib->getParalelleDienstverhaeltnisseEinUnternehmen($person_id, $vertragsbestandteil_id);
+		$result = $this->_ci->personalverwaltungplausichecklib->getParalelleDienstverhaeltnisseEinUnternehmen(
+			$person_id,
+			$erste_dienstverhaeltnis_id,
+			$zweite_dienstverhaeltnis_id
+		);
+
+		//var_dump($result);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;
@@ -34,8 +41,14 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 			{
 				$results[] = array(
 					'person_id' => $dataObj->person_id,
-					'resolution_params' => array('vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id),
-					'fehlertext_params' => array('vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id)
+					'resolution_params' => array(
+						'erste_dienstverhaeltnis_id' => $dataObj->erste_dienstverhaeltnis_id,
+						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id
+					),
+					'fehlertext_params' => array(
+						'erste_dienstverhaeltnis_id' => $dataObj->erste_dienstverhaeltnis_id,
+						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id
+					)
 				);
 			}
 		}

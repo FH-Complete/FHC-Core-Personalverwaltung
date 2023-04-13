@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 /**
  * Library containing database queries for execution of Personalverwaltung plausichecks.
  */
-class PlausicheckLib
+class PersonalverwaltungPlausicheckLib
 {
 	private $_ci; // Code igniter instance
 	private $_db; // database object
@@ -35,8 +35,11 @@ class PlausicheckLib
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getParalelleDienstverhaeltnisseEinUnternehmen($person_id = null, $vertragsbestandteil_id = null)
-	{
+	public function getParalelleDienstverhaeltnisseEinUnternehmen(
+		$person_id = null,
+		$erste_dienstverhaeltnis_id = null,
+		$zweite_dienstverhaeltnis_id = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -60,49 +63,75 @@ class PlausicheckLib
 
 		$qry.=
 			")
-			SELECT DISTINCT ON (person_id, dienstverhaeltnis_id) *
+			SELECT
+				DISTINCT ON (dvs.person_id, dvs.dienstverhaeltnis_id, dvss.dienstverhaeltnis_id) dvs.person_id,
+					dvs.dienstverhaeltnis_id AS erste_dienstverhaeltnis_id, dvss.dienstverhaeltnis_id AS zweite_dienstverhaeltnis_id,
+					dvs.vertragsbestandteil_id AS erste_vertragsbestandteil_id, dvss.vertragsbestandteil_id AS zweite_vertragsbestandteil_id
 			FROM
-				dienstverhaeltnisse dvs
+				dienstverhaeltnisse dvs, dienstverhaeltnisse dvss
 			WHERE
-				EXISTS (
-					SELECT 1
-					FROM
-						dienstverhaeltnisse dvss
-					WHERE
-						dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
-						AND dvss.person_id = dvs.person_id -- same person
-						AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen
-						AND (
-							-- vertragsbestandteil time paralell
-							(dvss.vtb_von <= dvs.vtb_bis AND dvss.vtb_bis >= dvs.vtb_von)
-							OR (
-								-- dienstverhaeltnis time paralell
-								dvss.dv_von <= dvs.dv_bis AND dvss.dv_bis >= dvs.dv_von
-								AND NOT EXISTS ( -- karenz time can be paralell
-									SELECT 1
-									FROM
-										hr.tbl_vertragsbestandteil vtb_karenz
-									WHERE
-										dienstverhaeltnis_id IN (dvss.dienstverhaeltnis_id, dvs.dienstverhaeltnis_id)
-										AND vertragsbestandteiltyp_kurzbz = 'karenz'
-										AND von <= GREATEST(dvss.dv_von, dvs.dv_von)
-										AND COALESCE(bis, '9999-12-31') >= LEAST(dvss.dv_bis, dvs.dv_bis)
-								)
-							)
-						) -- overlap
-				)";
+			dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
+			AND dvss.person_id = dvs.person_id -- same person
+			AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen
+			AND (
+				-- vertragsbestandteil time paralell
+				(dvss.vtb_von <= dvs.vtb_bis AND dvss.vtb_bis >= dvs.vtb_von)
+				OR (
+					-- dienstverhaeltnis time paralell
+					dvss.dv_von <= dvs.dv_bis AND dvss.dv_bis >= dvs.dv_von
+					AND NOT EXISTS ( -- karenz time can be paralell
+						SELECT 1
+						FROM
+							hr.tbl_vertragsbestandteil vtb_karenz
+						WHERE
+							dienstverhaeltnis_id IN (dvss.dienstverhaeltnis_id, dvs.dienstverhaeltnis_id)
+							AND vertragsbestandteiltyp_kurzbz = 'karenz'
+							AND von <= GREATEST(dvss.dv_von, dvs.dv_von)
+							AND COALESCE(bis, '9999-12-31') >= LEAST(dvss.dv_bis, dvs.dv_bis)
+					)
+				)
+			)";
 
-		if (isset($vertragsbestandteil_id))
+			var_dump($erste_dienstverhaeltnis_id);
+			var_dump($zweite_dienstverhaeltnis_id);
+
+		if (isset($erste_dienstverhaeltnis_id) && isset($zweite_dienstverhaeltnis_id))
 		{
-			$qry .= " AND dvs.vertragsbestandteil_id = ?";
-			$params[] = $vertragsbestandteil_id;
+			$qry .= " AND dvs.dienstverhaeltnis_id = ?";
+			$params[] = $erste_dienstverhaeltnis_id;
+
+			$qry .= " AND dvss.dienstverhaeltnis_id = ?";
+			$params[] = $zweite_dienstverhaeltnis_id;
 		}
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id, dv_von, vtb_von, vertragsbestandteil_id";
+				dvs.person_id, dvs.dienstverhaeltnis_id, dvss.dienstverhaeltnis_id";
 
-		return $this->_db->execReadOnlyQuery($qry, $params);
+
+		$uniqueDienstverhaeltnisse = array();
+		$result = $this->_db->execReadOnlyQuery($qry, $params);
+
+		if (isError($result)) return $result;
+
+		if (hasData($result))
+		{
+			$dienstverhaeltnis_id_combos = array();
+			$dienstverhaeltnisse = getData($result);
+
+			foreach ($dienstverhaeltnisse as $dv)
+			{
+				$id_combo = min($dv->erste_dienstverhaeltnis_id, $dv->zweite_dienstverhaeltnis_id)
+					.max($dv->erste_dienstverhaeltnis_id, $dv->zweite_dienstverhaeltnis_id);
+				if (!in_array($id_combo, $dienstverhaeltnis_id_combos))
+				{
+					$uniqueDienstverhaeltnisse[] = $dv;
+					$dienstverhaeltnis_id_combos[] = $id_combo;
+				}
+			}
+		}
+
+		return success($uniqueDienstverhaeltnisse);
 	}
 
 	/**

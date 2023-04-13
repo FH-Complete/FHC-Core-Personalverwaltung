@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
-require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PlausicheckLib.php';
+require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
  * Gehaltsbestandteil date span should be in Dienstverhaeltnis date span.
@@ -12,14 +12,14 @@ class GehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich extends PlausiChec
 {
 	public function executePlausiCheck($params)
 	{
-		$this->_ci->load->library('PlausicheckLib');
+		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
 		$results = array();
 
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 		$gehaltsbestandteil_id = isset($params['gehaltsbestandteil_id']) ? $params['gehaltsbestandteil_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->plausichecklib->getGehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich($person_id, $gehaltsbestandteil_id);
+		$result = $this->_ci->personalverwaltungplausichecklib->getGehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich($person_id, $gehaltsbestandteil_id);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;
