@@ -61,27 +61,6 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
     }
 
     /**
-     * ["id" => null, 
-     *  "infos" => [],
-     *  "errors" => [], 
-     *  "removeable" => true
-     * ]
-     * @param mixed $decoded decoded JSON data (use associative array)
-     */
-    private function mapGUIOptions(&$decoded)
-    {
-        $decodedGUIOptions = null;
-        if (!$this->getJSONData($decodedGUIOptions, $decoded, 'guioptions'))
-        {
-            throw new \Exception('missing guioptions');
-        }
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'id');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'infos');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'errors');
-        $this->getJSONDataBool($this->guioptions, $decodedGUIOptions, 'removable');
-    }
-
-    /**
      * {
      *   "freitexttyp": "allin",
      *   "titel": "Lorem ipsum ",

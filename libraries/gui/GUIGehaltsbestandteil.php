@@ -62,19 +62,6 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         $this->mapData($decoded);
     }
 
-    private function mapGUIOptions(&$decoded)
-    {
-        $decodedGUIOptions = null;
-        if (!$this->getJSONData($decodedGUIOptions, $decoded, 'guioptions'))
-        {
-            throw new \Exception('missing guioptions');
-        }
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'id');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'infos');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'errors');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'removable');
-    }
-
     private function mapData(&$decoded)
     {
         $decodedData = null;
@@ -101,8 +88,8 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
              // merge
             $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp']);
             $gbs->setGrundbetrag($this->data['betrag']);
-            $gbs->setBetrag_valorisiert($this->data['betrag']);
-            //$gbs->setValorisierungssperre($this->data['valorisierungssperre']);
+            $gbs->setBetrag_valorisiert($this->data['betrag_valorisiert']);
+            $gbs->setValorisierungssperre($this->data['valorisierungssperre']);
             $gbs->setValorisierung($this->data['valorisierung']);            
             $gbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $gbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));

@@ -18,6 +18,16 @@ abstract class AbstractBestandteil {
     abstract public function getTypeString(): string;
     abstract public function mapJSON(&$decoded);
 
+    protected function mapGUIOptions(&$decoded)
+    {
+        $decodedGUIOptions = null;
+        if (!$this->getJSONData($decodedGUIOptions, $decoded, 'guioptions'))
+        {
+            throw new \Exception('missing guioptions');
+        }
+        $this->guioptions = $decodedGUIOptions;
+    }
+
     /**
      * check type string ('vertragsbestandteilstunden', etc.)
      */
