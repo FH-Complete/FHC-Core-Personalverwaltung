@@ -23,6 +23,8 @@ class FormData extends AbstractBestandteil {
     public function mapJSON(&$decoded)
     {
         $this->checkType($decoded);
+        // preserve guioptions (only infos and errors can change)
+        $this->mapGUIOptions($decoded);
         // preserve gui data
         $this->mapChildren($decoded);
         // data contains DV
@@ -31,9 +33,21 @@ class FormData extends AbstractBestandteil {
         $this->mapVbs($decoded);
     }
 
+    private function mapGUIOptions(&$decoded)
+    {
+        $decodedGUIOptions = null;
+        if (!$this->getJSONData($decodedGUIOptions, $decoded, 'guioptions'))
+        {
+            throw new \Exception('missing guioptions');
+        }
+        $this->guioptions = $decodedGUIOptions;
+    }
+
     public function generateJSON()
     {
         $json = json_encode([
+            "type" => FormData::TYPE_STRING,
+            "guioptions" => $this->guioptions,
             "children" => $this->children,
             "data" => $this->data,
             "vbs" => $this->vbs
