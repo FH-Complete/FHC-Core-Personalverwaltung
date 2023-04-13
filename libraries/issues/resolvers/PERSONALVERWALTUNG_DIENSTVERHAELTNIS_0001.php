@@ -11,7 +11,6 @@ class PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0001 implements IIssueResolvedChecker
 {
 	public function checkIfIssueIsResolved($params)
 	{
-		var_dump($params);
 		if (!isset($params['issue_person_id']) || !is_numeric($params['issue_person_id']))
 			return error('Person Id missing, issue_id: '.$params['issue_id']);
 

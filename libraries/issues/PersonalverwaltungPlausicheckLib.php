@@ -92,9 +92,6 @@ class PersonalverwaltungPlausicheckLib
 				)
 			)";
 
-			var_dump($erste_dienstverhaeltnis_id);
-			var_dump($zweite_dienstverhaeltnis_id);
-
 		if (isset($erste_dienstverhaeltnis_id) && isset($zweite_dienstverhaeltnis_id))
 		{
 			$qry .= " AND dvs.dienstverhaeltnis_id = ?";
