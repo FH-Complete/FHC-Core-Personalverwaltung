@@ -1,6 +1,6 @@
 <?php
 
-require_once "application/libraries/vertragsbestandteil/gui/FormData.php";
+require_once __DIR__."/../../libraries/gui/FormData.php";
 
 use PHPUnit\Framework\TestCase;
 
@@ -14,7 +14,7 @@ class FormDataTest extends TestCase
 	
 	public function testMapJSON_01()
 	{
-		$jsondata = file_get_contents('./system/UnitTests/vertragsbestandteil/gui/stunden01.json');
+		$jsondata = file_get_contents(__DIR__.'/stunden01.json');
         $formDataMapper = new FormData();
 		$decoded = json_decode($jsondata, true);
 		$formDataMapper->mapJSON($decoded);

@@ -32,16 +32,7 @@ class FormData extends AbstractBestandteil {
         // vbs array
         $this->mapVbs($decoded);
     }
-
-    private function mapGUIOptions(&$decoded)
-    {
-        $decodedGUIOptions = null;
-        if (!$this->getJSONData($decodedGUIOptions, $decoded, 'guioptions'))
-        {
-            throw new \Exception('missing guioptions');
-        }
-        $this->guioptions = $decodedGUIOptions;
-    }
+    
 
     public function generateJSON()
     {
