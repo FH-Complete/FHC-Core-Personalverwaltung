@@ -111,6 +111,7 @@ class PersonalverwaltungPlausicheckLib
 
 		if (isError($result)) return $result;
 
+		// return only unique combinations of dienstverhaeltnis ids
 		if (hasData($result))
 		{
 			$dienstverhaeltnis_id_combos = array();
@@ -196,7 +197,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, vtb_von, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dv_von, dienstverhaeltnis_id, vtb_von, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -238,7 +239,7 @@ class PersonalverwaltungPlausicheckLib
 
 		if (isset($dienstverhaeltnis_id))
 		{
-			$qry .= " AND dvs.dienstverhaeltnis_id = ?";
+			$qry .= " AND dv.dienstverhaeltnis_id = ?";
 			$params[] = $dienstverhaeltnis_id;
 		}
 
@@ -288,7 +289,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -330,7 +331,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -397,7 +398,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, vtb_von, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dv_von, dienstverhaeltnis_id, vtb_von, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -464,7 +465,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, vtb_von, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dv_von, dienstverhaeltnis_id, vtb_von, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -510,7 +511,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
+				person_id, dv.von, dv.dienstverhaeltnis_id, vtb.von, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -557,7 +558,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				ben.person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
+				ben.person_id, dv.von, dv.dienstverhaeltnis_id, geh.von, geh.gehaltsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -603,7 +604,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, gehaltsbestandteil_id";
+				person_id, dv.von, dienstverhaeltnis_id, geh.von, gehaltsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -649,7 +650,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id";
+				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id, benutzerfunktion_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -693,7 +694,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id";
+				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id, benutzerfunktion_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}

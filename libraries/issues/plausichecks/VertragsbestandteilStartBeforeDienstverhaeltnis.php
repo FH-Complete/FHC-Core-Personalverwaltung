@@ -19,7 +19,10 @@ class VertragsbestandteilStartBeforeDienstverhaeltnis extends PlausiChecker
 		$vertragsbestandteil_id = isset($params['vertragsbestandteil_id']) ? $params['vertragsbestandteil_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->personalverwaltungplausichecklib->getVertragsbestandteilStartBeforeDienstverhaeltnis($person_id, $vertragsbestandteil_id);
+		$result = $this->_ci->personalverwaltungplausichecklib->getVertragsbestandteilStartBeforeDienstverhaeltnis(
+			$person_id,
+			$vertragsbestandteil_id
+		);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;

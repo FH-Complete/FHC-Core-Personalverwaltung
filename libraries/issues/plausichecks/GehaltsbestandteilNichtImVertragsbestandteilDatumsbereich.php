@@ -19,7 +19,10 @@ class GehaltsbestandteilNichtImVertragsbestandteilDatumsbereich extends PlausiCh
 		$gehaltsbestandteil_id = isset($params['gehaltsbestandteil_id']) ? $params['gehaltsbestandteil_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->personalverwaltungplausichecklib->getGehaltsbestandteilNichtImVertragsbestandteilDatumsbereich($person_id, $gehaltsbestandteil_id);
+		$result = $this->_ci->personalverwaltungplausichecklib->getGehaltsbestandteilNichtImVertragsbestandteilDatumsbereich(
+			$person_id,
+			$gehaltsbestandteil_id
+		);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;

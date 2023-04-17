@@ -19,7 +19,10 @@ class EchteDienstverhaeltnisseOhneStundenVertragsbestandteil extends PlausiCheck
 		$dienstverhaeltnis_id = isset($params['dienstverhaeltnis_id']) ? $params['dienstverhaeltnis_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->personalverwaltungplausichecklib->getEchteDienstverhaeltnisseOhneStundenVertragsbestandteil($person_id, $dienstverhaeltnis_id);
+		$result = $this->_ci->personalverwaltungplausichecklib->getEchteDienstverhaeltnisseOhneStundenVertragsbestandteil(
+			$person_id,
+			$dienstverhaeltnis_id
+		);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;

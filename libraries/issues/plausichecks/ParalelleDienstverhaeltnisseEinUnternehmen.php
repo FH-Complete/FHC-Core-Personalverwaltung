@@ -26,8 +26,6 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 			$zweite_dienstverhaeltnis_id
 		);
 
-		//var_dump($result);
-
 		// If error occurred then return the error
 		if (isError($result)) return $result;
 
