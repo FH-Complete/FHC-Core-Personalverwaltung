@@ -74,5 +74,6 @@ export default {
     showModal: function() {
         this.$refs['modalRef'].show();
     }
-  }
+  },
+  expose: ['showModal'],
 };
