@@ -148,4 +148,13 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 
         return $this;
     }
+	
+	public function JSONserlializeGBS() {
+		$gbs = array();
+		foreach ($this->gbs as $gb)
+		{
+			$gbs[] = $gb->jsonSerialize();
+		}
+		return $gbs;
+	}
 }    

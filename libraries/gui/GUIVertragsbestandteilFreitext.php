@@ -143,7 +143,7 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
             "type" => $this->type,
             "guioptions" => $this->guioptions,
             "data" => $this->data,
-            "gbs" => $this->gbs];
+            "gbs" => $this->JSONserlializeGBS()];
     }
 
 }

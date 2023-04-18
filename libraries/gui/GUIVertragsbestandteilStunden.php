@@ -128,7 +128,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
             "type" => $this->type,
             "guioptions" => $this->guioptions,
             "data" => $this->data,
-            "gbs" => $this->gbs];
+            "gbs" => $this->JSONserlializeGBS()];
     }
 
 }

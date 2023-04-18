@@ -41,7 +41,7 @@ export default {
     return {
       id: null,
       stunden: ''
-    }
+    };
   },
   created: function() {
     this.setDataFromConfig();
@@ -52,6 +52,9 @@ export default {
         this.id = this.config.data.id;
       }
       if( this.config?.data?.stunden !== undefined ) {
+        if(!isNaN(this.config.data.stunden)) {
+            this.config.data.stunden = this.config.data.stunden.toString();
+        }
         this.stunden = this.config.data.stunden.replace('.', ',');
       }
     },

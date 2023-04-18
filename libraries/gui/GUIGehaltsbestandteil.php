@@ -112,4 +112,11 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         return $gbs;
     }
 
+	public function jsonSerialize() {
+        return [
+            "type" => $this->type,
+            "guioptions" => $this->guioptions,
+            "data" => $this->data
+		];
+    }
 }
