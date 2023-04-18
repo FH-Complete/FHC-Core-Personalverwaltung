@@ -40,7 +40,6 @@ export default Vue.reactive({
     this.mode = mode;
   },
   reset: function() {
-    this.mode = '',
     this.gueltigkeit = {
       gueltig_ab: '',
       gueltig_bis: ''

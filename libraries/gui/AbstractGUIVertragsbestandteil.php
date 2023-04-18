@@ -84,7 +84,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
         $this->CI = get_instance();
         $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib',
             null, 'VertragsbestandteilLib');
-        $this->vbsLib = $this->VertragsbestandteilLib;
+        $this->vbsLib = $this->CI->VertragsbestandteilLib;
         //$this->vbsLib = new VertragsbestandteilLib();
     }
 

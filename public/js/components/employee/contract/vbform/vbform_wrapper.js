@@ -42,7 +42,17 @@ export default {
     return {
       vbhjson: presets,
       presets: presets,
-      preset: presets[this.mode][0],
+      preset: {
+        type: 'preset',
+        guioptions: {
+
+        },
+        children: [],
+        data: {
+          dienstverhaeltnisid: null
+        },
+        vbs: {}
+      },
       store: store
     };
   },

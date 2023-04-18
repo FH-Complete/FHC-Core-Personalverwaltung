@@ -5,7 +5,7 @@ export default {
   <div class="row g-2 py-2">
     <div class="col-4">
 
-      <select v-model="selectedmode" @change="selectmode" v-if="showselectmode" class="form-select form-select-sm">
+      <select v-model="store.mode" @change="selectmode" v-if="showselectmode" class="form-select form-select-sm">
         <option value="neuanlage" selected>Neuanlage</option>
         <option value="aenderung">Änderung</option>
       </select>
@@ -29,7 +29,6 @@ export default {
   data: function() {
     return {
       store: store,
-      selectedmode: 'aenderung',
       selectedpresetidx: -1,
       usedpresets: []
     };
@@ -38,30 +37,26 @@ export default {
     "presetselected"
   ],
   created: function() {
-    if( this.store.mode !== '' ) {
-        this.selectedmode = this.store.mode;
-    }
     this.selectmode();
   },
   watch: {
     'store.mode': function() {
-      this.selectedmode = this.store.mode;
       this.selectmode();
     }
   },
   methods: {
     selectmode: function() {
-      this.usedpresets = ( typeof this.presets[this.selectedmode] !== 'undefined')
-                       ? this.presets[this.selectedmode]
+      this.selectedpresetidx = -1;        
+      this.usedpresets = ( typeof this.presets[this.store.mode] !== 'undefined')
+                       ? this.presets[this.store.mode]
                        : [];
-      this.selectedpresetidx = -1;
       this.selectpreset();
     },
     selectpreset: function() {
       var preset = ( typeof this.usedpresets[this.selectedpresetidx] !== 'undefined' )
                  ? this.usedpresets[this.selectedpresetidx]
                  : {
-                   type: preset,
+                   type: 'preset',
                    guioptions: {
 
                    },
@@ -72,7 +67,6 @@ export default {
                    vbs: {}
                  };
       this.store.reset();
-      this.store.setMode(this.selectedmode);
       this.$emit("presetselected", preset);
     }
   }
