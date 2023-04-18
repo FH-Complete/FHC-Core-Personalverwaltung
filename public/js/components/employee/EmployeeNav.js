@@ -25,7 +25,7 @@ export const EmployeeNav = {
             :class="[{'router-link-active active': route?.name === 'person'}]" >
             Person
         </router-link>
-        <router-link :to="'/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/' + route.params.id + '/' + route.params.uid + '/contract'" 
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract'" 
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route.path.indexOf('contract') > -1 }]" >
             Verträge
