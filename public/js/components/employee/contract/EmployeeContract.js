@@ -1,9 +1,11 @@
-import {DVDialog} from './dialog/DVDialog.js';
+//import {DVDialog} from './dialog/DVDialog.js';
+import vbform_wrapper from './vbform/vbform_wrapper.js';
 
 
 export const EmployeeContract = {
     components: {	
-		DVDialog,
+		//DVDialog,
+                'vbform_wrappper': vbform_wrapper,
        
 	},
     props: {        
@@ -21,7 +23,9 @@ export const EmployeeContract = {
         const currentVertragID = ref(null);
         const dvSelectedIndex = ref(1);
         const currentWS = ref(null);
-        const dienstverhaeltnisDialogRef = ref();
+        //const dienstverhaeltnisDialogRef = ref();
+        const VbformWrapperRef = ref();
+        
         const currentDate = ref();
   
         const generateDVEndpointURL = (uid) => {
@@ -126,7 +130,7 @@ export const EmployeeContract = {
             let ws = vertragsbestandteile.filter(value => value.vertragsbestandteiltyp_kurzbz==kurzbz);
             return ws;
         }
-
+/*
         const createDVDialog = async () => {
             const result = await dienstverhaeltnisDialogRef.value.showModal(route.params.uid);
 
@@ -136,6 +140,10 @@ export const EmployeeContract = {
                 console.log("Dialog cancelled");
             }
         }
+*/
+        const createDVDialog = () => {
+            VbformWrapperRef.value.showModal();
+        }
 
         const getCurrentVertragsbestandteil = () => {
             let ws = filterVertragsbestandteil(vertragList.value, 'stunden');
@@ -143,7 +151,9 @@ export const EmployeeContract = {
         }
 
         return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
-            dienstverhaeltnisDialogRef, createDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
+            //dienstverhaeltnisDialogRef,
+            VbformWrapperRef,
+            createDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -574,7 +584,8 @@ export const EmployeeContract = {
 
     </div>
 
-    <DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog>
+    <!--DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog-->
+    <vbform_wrapper ref="VbformWrapperRef" :title="'Test'" :mode="'neuanlage'" :mitarbeiter_uid="'ma0080'"></vbform_wrapper>
 
 
 
