@@ -7,7 +7,7 @@ import {Modal} from '../../../Modal.js';
 
 export default {
   template: `
-    <Modal :title="'Dienstverhältnis ' + (editMode?'bearbeiten':'anlegen')" ref="modalRef">
+    <Modal :title="'Dienstverhältnis ' + (editMode?'bearbeiten':'anlegen')" ref="modalRef" id="vbformModal">
         <template #body>
     
         <presets_chooser :presets="presets" @presetselected="presetselected"></presets_chooser>

@@ -590,7 +590,7 @@ export const EmployeeContract = {
         ref="VbformWrapperRef" 
         :title="'Test'" 
         :mode="'neuanlage'" 
-        :mitarbeiter_uid="'ma0080'">
+        :mitarbeiter_uid="route.params.uid">
     </vbform_wrapper>
 
 
