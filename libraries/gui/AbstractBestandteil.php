@@ -28,6 +28,34 @@ abstract class AbstractBestandteil {
         $this->guioptions = $decodedGUIOptions;
     }
 
+    public function addGUIInfo($infos)
+    {
+        if (!isset($this->guioptions['infos']))
+        {
+            $this->guioptions['infos'] = array();
+        }
+        if (is_array($infos))
+        {
+            $this->guioptions['infos'] = array_merge($this->guioptions['infos'], $infos);
+        } else {
+            $this->guioptions['infos'][] = $infos;
+        }
+    }
+    
+    public function addGUIError($errors)
+    {
+        if (!isset($this->guioptions['errors']))
+        {
+            $this->guioptions['errors'] = array();
+        }
+        if (is_array($errors))
+        {
+            $this->guioptions['errors'] = array_merge($this->guioptions['errors'], $errors);
+        } else {
+            $this->guioptions['errors'][] = $errors;
+        }
+    }
+
     /**
      * check type string ('vertragsbestandteilstunden', etc.)
      */

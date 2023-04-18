@@ -25,6 +25,7 @@ export const EmployeeContract = {
         const currentWS = ref(null);
         //const dienstverhaeltnisDialogRef = ref();
         const VbformWrapperRef = ref();
+        const vbformmode = ref('neuanlage');
         
         const currentDate = ref();
   
@@ -142,6 +143,12 @@ export const EmployeeContract = {
         }
 */
         const createDVDialog = () => {
+            vbformmode.value = 'neuanlage';
+            VbformWrapperRef.value.showModal();
+        }
+
+        const updateDVDialog = () => {
+            vbformmode.value = 'aenderung';
             VbformWrapperRef.value.showModal();
         }
 
@@ -152,8 +159,8 @@ export const EmployeeContract = {
 
         return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef, route,
-            createDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
+            VbformWrapperRef, route, vbformmode,
+            createDVDialog, updateDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -185,7 +192,7 @@ export const EmployeeContract = {
                                 <i class="fa fa-plus"></i>
                             </button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click=""><i class="fa fa-pen"></i></button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
@@ -588,8 +595,8 @@ export const EmployeeContract = {
     <vbform_wrapper 
         id="vbFormWrapper" 
         ref="VbformWrapperRef" 
-        :title="'Test'" 
-        :mode="'neuanlage'" 
+        :title="'Dienstverhältnis'" 
+        :mode="vbformmode" 
         :mitarbeiter_uid="route.params.uid">
     </vbform_wrapper>
 

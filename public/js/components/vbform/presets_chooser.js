@@ -5,12 +5,12 @@ export default {
   <div class="row g-2 py-2">
     <div class="col-4">
 
-      <select v-model="selectedmode" @change="selectmode">
+      <select v-model="selectedmode" @change="selectmode" v-if="showselectmode" class="form-select form-select-sm">
         <option value="neuanlage" selected>Neuanlage</option>
         <option value="aenderung">Änderung</option>
       </select>
 
-      <select v-model="selectedpresetidx" @change="selectpreset">
+      <select v-model="selectedpresetidx" @change="selectpreset" class="form-select form-select-sm">
         <option value="-1" disabled>Vorlage wählen</option>
         <option v-for="(preset, idx) in usedpresets" :key="idx"
                 :value="idx">
@@ -23,7 +23,8 @@ export default {
   </div>
   `,
   props:[
-    'presets'
+    'presets',
+    'showselectmode'
   ],
   data: function() {
     return {
@@ -41,6 +42,12 @@ export default {
         this.selectedmode = this.store.mode;
     }
     this.selectmode();
+  },
+  watch: {
+    'store.mode': function() {
+      this.selectedmode = this.store.mode;
+      this.selectmode();
+    }
   },
   methods: {
     selectmode: function() {

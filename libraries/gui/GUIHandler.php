@@ -67,13 +67,15 @@ class GUIHandler
                 }
             }
 
-            $this->CI->db->trans_commit();
-            
+            $this->CI->db->trans_commit();         
+            $formDataMapper->addGUIInfo('Dienstverhältnis gespeichert');
+
         } catch(Exception $ex) {
             // TODO write error message to guioptions errors array
             log_message('error','Transaction failed');
             $this->CI->db->trans_rollback();
-        }
+            $formDataMapper->addGUIError('Dienstverhältnis konnte nicht gespeichert werden');
+        }        
 
         return $formDataMapper->generateJSON();
     }
@@ -141,9 +143,16 @@ class GUIHandler
                 $vbsInstance->addGehaltsbestandteil($gbsInstance);
             }
             // TODO Validate?
+            $valid = $vbsInstance->validate();
 
-            // store        
-            $this->CI->VertragsbestandteilLib->storeVertragsbestandteil($vbsInstance);
+            // store
+            if ($valid)
+            {
+                $this->CI->VertragsbestandteilLib->storeVertragsbestandteil($vbsInstance);
+            } else {
+                // write guioptions
+                $vbsMapper->addGUIError($vbsInstance->getValidationErrors());
+            }
 
         } catch (Exception $ex) {
             log_message('error','saving Vertragsbestandteil failed');

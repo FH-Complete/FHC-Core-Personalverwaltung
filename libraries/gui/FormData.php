@@ -32,7 +32,7 @@ class FormData extends AbstractBestandteil {
         // vbs array
         $this->mapVbs($decoded);
     }
-    
+
 
     public function generateJSON()
     {

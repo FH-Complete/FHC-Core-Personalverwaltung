@@ -7,23 +7,27 @@ import {Modal} from '../../../Modal.js';
 
 export default {
   template: `
-    <Modal :title="'Dienstverhältnis ' + (editMode?'bearbeiten':'anlegen')" ref="modalRef" id="vbformModal">
+    <Modal :title="title + (mode=='aenderung'?' bearbeiten':' anlegen')" ref="modalRef" id="vbformModal">
         <template #body>
     
-        <presets_chooser :presets="presets" @presetselected="presetselected"></presets_chooser>
+        <presets_chooser :presets="presets" @presetselected="presetselected" :showselectmode="false"></presets_chooser>
 
         <div class="row g-2 py-2">
 
-          <div class="col-8">
+          <div class="col-12">
             <vbformhelper ref="vbformhelper" :preset="preset" 
                 @vbhjsonready="processJSON" 
                 @saved="handleSaved"></vbformhelper>
           </div>
 
-          <div class="col-4">
+          
+
+        </div>
+
+        <div class="row">
+          <div class="col-12">
             <debug_viewer v-bind:text="vbhjson"></debug_viewer>
           </div>
-
         </div>
         
     </template>
@@ -52,6 +56,11 @@ export default {
     this.store.setMode(this.mode);
     this.presettostore();
     this.store.mitarbeiter_uid = this.mitarbeiter_uid;
+  },
+  watch: {
+    'mode': function() {
+      this.store.setMode(this.mode);
+    }
   },
   methods: {
     presetselected: function(preset) {
