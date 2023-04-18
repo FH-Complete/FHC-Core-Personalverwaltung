@@ -37,6 +37,9 @@ export default {
     "presetselected"
   ],
   created: function() {
+    if( this.store.mode !== '' ) {
+        this.selectedmode = this.store.mode;
+    }
     this.selectmode();
   },
   methods: {
