@@ -10,7 +10,7 @@ class FormData extends AbstractBestandteil {
     /** @var array GUI data */
     protected $children;
     /** @var array */
-    protected $vbs = [];   
+    protected $vbs = [];
 
     public function getTypeString(): string
     {
@@ -73,12 +73,6 @@ class FormData extends AbstractBestandteil {
         //$this->getJSONData($this->data['gueltigkeit'], $decodedData, 'gueltigkeit');
     }
 
-    private function generateDvJSON()
-    {
-        return json_encode($this->data);
-    }
-
-
     private function mapVbs(&$decoded)
     {
         if (!$this->getJSONData($this->vbs, $decoded, 'vbs'))
@@ -88,10 +82,6 @@ class FormData extends AbstractBestandteil {
         //$this->getJSONData($this->vbs, $decodedData, 'vbs');
     }
 
-    private function generateVbsJSON()
-    {
-        return json_encode($this->vbs);
-    }
 
     /**
      * Get the value of children
@@ -110,5 +100,13 @@ class FormData extends AbstractBestandteil {
         return $this->vbs;
     }
 
+    /**
+     * Set the value of vbs
+     */
+    public function setVbs($vbs): self
+    {
+        $this->vbs = $vbs;
 
+        return $this;
+    }
 }

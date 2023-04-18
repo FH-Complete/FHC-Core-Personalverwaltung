@@ -9,8 +9,7 @@ require_once __DIR__ . '/util.php';
 
 /**
  * GUIHandler takes JSON from GUI and manages the process of
- * storing the data to the database 
- * TODO convert to controller
+ * storing the data to the database
  */
 class GUIHandler
 {
@@ -62,9 +61,11 @@ class GUIHandler
 		        // VBS
 		        $vbsList = $formDataMapper->getVbs();
 
+                $handledVBs = array();
                 foreach ($vbsList as $vbsID => $vbs) {
-                    $this->handleVBS($dvData['dienstverhaeltnisid'] ,$vbs);
+                    $handledVBs[$vbsID] = $this->handleVBS($dvData['dienstverhaeltnisid'], $vbs);
                 }
+                $formDataMapper->setVbs($handledVBs);
             }
 
             $this->CI->db->trans_commit();         
@@ -158,6 +159,8 @@ class GUIHandler
             log_message('error','saving Vertragsbestandteil failed');
             throw new Exception($ex->getMessage());
         }
+
+        return $vbsMapper;
 		// GBS
         /*
 		foreach ($vbsMapper->getGbs() as $gbs)
