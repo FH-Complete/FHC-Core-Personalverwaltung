@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . "/AbstractBestandteil.php";
-
+    
 /**
  * Wrapper for Vertragsbestandteil in JSON schema produced by the GUI.
  * Example:
@@ -75,11 +75,17 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 
     /** @var VertragsbestandteilLib */
     protected $vbsLib;
+
+    protected $CI;
     
     public function __construct()
     {
 		$this->gbs = array();
-        $this->vbsLib = new VertragsbestandteilLib();
+        $this->CI = get_instance();
+        $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib',
+            null, 'VertragsbestandteilLib');
+        $this->vbsLib = $this->VertragsbestandteilLib;
+        //$this->vbsLib = new VertragsbestandteilLib();
     }
 
     abstract public function generateVertragsbestandteil($id);

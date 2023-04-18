@@ -1,21 +1,26 @@
 <?php
 
-require_once "application/libraries/vertragsbestandteil/gui/GUIVertragsbestandteilFunktion.php";
-require_once "application/libraries/vertragsbestandteil/gui/FormData.php";
+require_once __DIR__."/../../libraries/gui/GUIVertragsbestandteilFunktion.php";
+require_once __DIR__."/../../libraries/gui/FormData.php";
 
 use PHPUnit\Framework\TestCase;
 
 class GUIVertragsbestandteilFunktionTest extends TestCase
 {
+
+	private static $CI;
 	
     public function setUp()
     {
 		error_reporting(E_ALL & ~E_STRICT & ~E_DEPRECATED);
+		self::$CI =& get_instance();
+        self::$CI->load->helper('hlp_common');
+        self::$CI->load->helper('hlp_return_object');
 	}
 	
 	public function testMapJSON_01()
 	{
-		$jsondata = file_get_contents('./system/UnitTests/vertragsbestandteil/gui/funktion01.json');
+		$jsondata = file_get_contents(__DIR__.'/funktion01.json');
 		$decoded = json_decode($jsondata, true);
 		$formDataMapper = new FormData();
 		$formDataMapper->mapJSON($decoded);

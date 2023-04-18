@@ -29,7 +29,7 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
 
     public function __construct()
     {
-		parent::__construct();
+        parent::__construct();
         $this->type = GUIVertragsbestandteilKuendigungsfrist::TYPE_STRING;
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
@@ -56,27 +56,6 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
         $this->checkType($decoded);
         $this->mapGUIOptions($decoded);
         $this->mapData($decoded);
-    }
-
-    /**
-     * ["id" => null, 
-     *  "infos" => [], 
-     *  "errors" => [], 
-     *  "removeable" => true
-     * ]
-     * @param mixed $decoded decoded JSON data (use associative array)
-     */
-    private function mapGUIOptions(&$decoded)
-    {
-        $decodedGUIOptions = null;
-        if (!$this->getJSONData($decodedGUIOptions, $decoded, 'guioptions'))
-        {
-            throw new \Exception('missing guioptions');
-        }
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'id');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'infos');
-        $this->getJSONData($this->guioptions, $decodedGUIOptions, 'errors');
-        $this->getJSONDataBool($this->guioptions, $decodedGUIOptions, 'removable');
     }
 
     /**    
