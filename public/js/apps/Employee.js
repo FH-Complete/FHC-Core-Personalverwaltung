@@ -1,11 +1,12 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import pv21apifactory from "../api/vbform/api.js";
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
 import {EmployeeSummary } from "../components/employee/summary/EmployeeSummary.js";
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 
-Vue.$fhcapi = fhcapifactory;
+Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 var personSelectedRef = { callback: () => {}};
 

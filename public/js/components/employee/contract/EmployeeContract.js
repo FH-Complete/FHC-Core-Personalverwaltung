@@ -5,7 +5,7 @@ import vbform_wrapper from './vbform/vbform_wrapper.js';
 export const EmployeeContract = {
     components: {	
 		//DVDialog,
-                'vbform_wrappper': vbform_wrapper,
+                'vbform_wrapper': vbform_wrapper,
        
 	},
     props: {        
@@ -152,7 +152,7 @@ export const EmployeeContract = {
 
         return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef,
+            VbformWrapperRef, route,
             createDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
@@ -585,7 +585,13 @@ export const EmployeeContract = {
     </div>
 
     <!--DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog-->
-    <vbform_wrapper ref="VbformWrapperRef" :title="'Test'" :mode="'neuanlage'" :mitarbeiter_uid="'ma0080'"></vbform_wrapper>
+    <vbform_wrapper 
+        id="vbFormWrapper" 
+        ref="VbformWrapperRef" 
+        :title="'Test'" 
+        :mode="'neuanlage'" 
+        :mitarbeiter_uid="route.params.uid">
+    </vbform_wrapper>
 
 
 
