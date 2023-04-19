@@ -57,6 +57,19 @@ abstract class AbstractBestandteil {
     }
 
     /**
+     * convenience method
+     * @return boolean  true if there are validation error messages
+     */
+    public function hasErrors()
+    {
+        if (isset($this->guioptions['errors']) && count($this->guioptions['errors']) > 0)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * check type string ('vertragsbestandteilstunden', etc.)
      */
     public function checkType(&$decoded)

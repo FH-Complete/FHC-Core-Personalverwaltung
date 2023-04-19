@@ -62,13 +62,26 @@ class GUIHandler
 		        $vbsList = $formDataMapper->getVbs();
 
                 $handledVBs = array();
+                $validationFailed = false;
+
                 foreach ($vbsList as $vbsID => $vbs) {
                     $handledVBs[$vbsID] = $this->handleVBS($dvData['dienstverhaeltnisid'], $vbs);
+
+                    if ($handledVBs[$vbsID]->hasErrors()) {
+                        $validationFailed = true;
+                    }
                 }
                 $formDataMapper->setVbs($handledVBs);
+
+                if ($validationFailed)
+                {
+                    $errormsg = 'Validation error while saving Vertragsbestandteile';
+                    log_message('error', $errormsg);
+                    throw new Exception($errormsg);
+                }
             }
 
-            $this->CI->db->trans_commit();         
+            $this->CI->db->trans_commit();
             $formDataMapper->addGUIInfo('Dienstverhältnis gespeichert');
 
         } catch(Exception $ex) {
