@@ -21,12 +21,12 @@ import {IssueViewerTabulatorEventHandlers} from './IssueViewerTabulatorSetup.js'
 import {CoreFilterCmpt} from '../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 
-const IssueViewerApp = Vue.createApp({
+const issueViewerApp = Vue.createApp({
 	data: function() {
 		return {
 			appSideMenuEntries: {},
-			IssueViewerTabulatorOptions: IssueViewerTabulatorOptions,
-			IssueViewerTabulatorEventHandlers: IssueViewerTabulatorEventHandlers
+			issueViewerTabulatorOptions: IssueViewerTabulatorOptions,
+			issueViewerTabulatorEventHandlers: IssueViewerTabulatorEventHandlers
 		};
 	},
 	components: {
@@ -40,4 +40,4 @@ const IssueViewerApp = Vue.createApp({
 	}
 });
 
-IssueViewerApp.mount('#main');
+issueViewerApp.mount('#main');

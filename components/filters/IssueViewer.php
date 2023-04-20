@@ -5,6 +5,12 @@
 		'query' => '
 			SELECT
 				issue.issue_id AS "IssueId",
+				issue.fehlercode AS "Fehlercode",
+				issue.inhalt AS "Text",
+				issue.person_id AS "PersonId",
+				issue.datum AS "Datum",
+				issue.verarbeitetvon AS "Bearbeitet von",
+				issue.verarbeitetamum AS "Bearbeitet am",
 				issue.status_kurzbz AS "Statuscode"
 			FROM
 				system.tbl_issue issue

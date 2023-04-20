@@ -31,8 +31,7 @@
 					filter-type="IssueViewer"
 					:tabulator-options="issueViewerTabulatorOptions"
 					:tabulator-events="issueViewerTabulatorEventHandlers"
-					@nw-new-entry="newSideMenuEntryHandler"
->
+					@nw-new-entry="newSideMenuEntryHandler">
 				</core-filter-cmpt>
 			</div>
 		</div>

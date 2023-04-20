@@ -55,7 +55,8 @@ export const IssueViewerTabulatorEventHandlers = [
 	{
 		event: "rowClick",
 		handler: function(e, row) {
-			alert(row.getData().Data);
+			console.log("in click");
+			//alert(row.getData().Data);
 		}
 	}
 ];
