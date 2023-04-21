@@ -22,29 +22,40 @@ export const IssueViewerTabulatorOptions = {
 	height: 700,
 	layout: 'fitColumns',
 	columns: [
-		{title: 'Issue ID', field: 'IssueId', headerFilter: true},
-		{title: 'Statuscode', field: 'Statuscode', headerFilter: true}
+		{title: 'Datum', field: 'Datum', headerFilter: true, formatter:
+			function(cell){
+				return cell.getValue().replace(/(.*)-(.*)-(.*)\s(.*)/, '$3.$2.$1 $4');
+			}
+		},
+		{title: 'Fehlercode', field: 'Fehlercode', headerFilter: true},
+		{title: 'Inhalt', field: 'Inhalt', headerFilter: true},
+		{title: 'Vorname', field: 'Vorname', headerFilter: true},
+		{title: 'Nachname', field: 'Nachname', headerFilter: true},
+		{title: 'Person Id', field: 'PersonId', headerFilter: true},
+		{title: 'Statuscode', field: 'Statuscode', headerFilter: true},
+		{title: 'Bearbeitet von', field: 'Bearbeitet von', headerFilter: true},
+		{title: 'Bearbeitet am', field: 'Bearbeitet am', headerFilter: true},
+		{title: 'Issue Id', field: 'IssueId', headerFilter: true},
+		{title: 'Fehlertyp', field: 'Fehlertyp', headerFilter: true}
 	],
 	rowFormatter: function(row) {
 		let data = row.getData(); // get data for this row
 
-		console.log(data);
+		// If data is not null and provides the property Fehlertyp and it is not null
+		if (data != null && data.hasOwnProperty('Fehlertyp') && data.Fehlertyp != null)
+		{
+			let fehlertyp = data.Fehlertyp;
 
-		// If data is not null and provides the property RequestId and it is not null
-		//~ if (data != null && data.hasOwnProperty('RequestId') && data.RequestId != null)
-		//~ {
-			//~ let requestId = data.RequestId;
-
-			//~ if (requestId.includes("error"))
-			//~ {
-				//~ row.getElement().style.color = "red";
-			//~ }
-			//~ else if (requestId.includes("warning"))
-			//~ {
-				//~ row.getElement().style.color = "orange";
-
-			//~ }
-		//~ }
+			// color errors and warnings
+			if (fehlertyp == "error")
+			{
+				row.getElement().style.color = "red";
+			}
+			else if (fehlertyp == "warning")
+			{
+				row.getElement().style.color = "orange";
+			}
+		}
 	}
 };
 
@@ -53,10 +64,10 @@ export const IssueViewerTabulatorOptions = {
  */
 export const IssueViewerTabulatorEventHandlers = [
 	{
+		// show issue text on row click
 		event: "rowClick",
 		handler: function(e, row) {
-			console.log("in click");
-			//alert(row.getData().Data);
+			alert(row.getData().Inhalt);
 		}
 	}
 ];

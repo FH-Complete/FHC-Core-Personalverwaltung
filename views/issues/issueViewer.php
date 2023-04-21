@@ -8,10 +8,10 @@
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'tabulator5' => true,
-		//~ 'phrases' => array(
-			//~ 'global' => array('mailAnXversandt'),
-			//~ 'ui' => array('bitteEintragWaehlen')
-		//~ ),
+		'phrases' => array(
+			'global' => array('mailAnXversandt'),
+			'ui' => array('bitteEintragWaehlen')
+		),
 		'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/IssueViewer.js')
 	);
 
