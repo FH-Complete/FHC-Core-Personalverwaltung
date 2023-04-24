@@ -16,10 +16,15 @@ class UeberlappendeVertragsbestandteile extends PlausiChecker
 		$results = array();
 
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
-		$vertragsbestandteil_id = isset($params['vertragsbestandteil_id']) ? $params['vertragsbestandteil_id'] : null;
+		$erste_vertragsbestandteil_id = isset($params['erste_vertragsbestandteil_id']) ? $params['erste_vertragsbestandteil_id'] : null;
+		$zweite_vertragsbestandteil_id = isset($params['zweite_vertragsbestandteil_id']) ? $params['zweite_vertragsbestandteil_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->personalverwaltungplausichecklib->getUeberlappendeVertragsbestandteile($person_id, $vertragsbestandteil_id);
+		$result = $this->_ci->personalverwaltungplausichecklib->getUeberlappendeVertragsbestandteile(
+			$person_id,
+			$erste_vertragsbestandteil_id,
+			$zweite_vertragsbestandteil_id
+		);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;
@@ -34,8 +39,14 @@ class UeberlappendeVertragsbestandteile extends PlausiChecker
 			{
 				$results[] = array(
 					'person_id' => $dataObj->person_id,
-					'resolution_params' => array('vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id),
-					'fehlertext_params' => array('vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id)
+					'resolution_params' => array(
+						'erste_vertragsbestandteil_id' => $dataObj->erste_vertragsbestandteil_id,
+						'zweite_vertragsbestandteil_id' => $dataObj->zweite_vertragsbestandteil_id
+					),
+					'fehlertext_params' => array(
+						'erste_vertragsbestandteil_id' => $dataObj->erste_vertragsbestandteil_id,
+						'zweite_vertragsbestandteil_id' => $dataObj->zweite_vertragsbestandteil_id
+					)
 				);
 			}
 		}

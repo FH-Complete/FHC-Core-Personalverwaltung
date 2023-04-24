@@ -289,7 +289,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id";
+				person_id, dv.von, dienstverhaeltnis_id, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -342,13 +342,14 @@ class PersonalverwaltungPlausicheckLib
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getUeberlappendeVertragsbestandteile($person_id = null, $vertragsbestandteil_id = null)
+	public function getUeberlappendeVertragsbestandteile($person_id = null, $erste_vertragsbestandteil_id = null, $zweite_vertragsbestandteil_id = null)
 	{
 		$params = array();
 
 		$qry = "
 			WITH vertragsbestandteile AS (
-				SELECT ben.person_id, dv.dienstverhaeltnis_id,
+				SELECT
+					ben.person_id, dv.dienstverhaeltnis_id,
 					vtb.vertragsbestandteil_id, vtb.vertragsbestandteiltyp_kurzbz, dv.oe_kurzbz,
 					dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis,
 					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis
@@ -358,8 +359,8 @@ class PersonalverwaltungPlausicheckLib
 					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
 					JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
 					JOIN hr.tbl_vertragsbestandteiltyp vtb_typ USING (vertragsbestandteiltyp_kurzbz)
-			WHERE
-				vtb_typ.ueberlappend = FALSE
+				WHERE
+					vtb_typ.ueberlappend = FALSE
 			";
 
 		if (isset($person_id))
@@ -370,35 +371,33 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry.=
 			"
-				ORDER BY
-					vtb.von
 			)
-			SELECT *
+			SELECT
+				DISTINCT vtbs.person_id, vtbs.dv_von, vtbs.dienstverhaeltnis_id,
+				LEAST(vtbs.vertragsbestandteil_id, vtbss.vertragsbestandteil_id) AS erste_vertragsbestandteil_id,
+				GREATEST(vtbs.vertragsbestandteil_id, vtbss.vertragsbestandteil_id) AS zweite_vertragsbestandteil_id
 			FROM
-				vertragsbestandteile vtbs
-			WHERE
+				vertragsbestandteile vtbs, vertragsbestandteile vtbss
+			WHERE -- there is overlapping vertragsbestandteil
 			(
-				EXISTS ( -- there is overlapping vertragsbestandteil
-					SELECT 1
-					FROM
-						vertragsbestandteile vtbss
-					WHERE
-						vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
-						AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id -- different Vertragsbestandteil
-						AND vtbs.vertragsbestandteiltyp_kurzbz = vtbss.vertragsbestandteiltyp_kurzbz -- same type
-						AND (vtbss.vtb_von <= vtbs.vtb_bis AND vtbss.vtb_bis >= vtbs.vtb_von) -- overlap
-				)
+				vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
+				AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id -- different Vertragsbestandteil
+				AND vtbs.vertragsbestandteiltyp_kurzbz = vtbss.vertragsbestandteiltyp_kurzbz -- same type
+				AND (vtbss.vtb_von <= vtbs.vtb_bis AND vtbss.vtb_bis >= vtbs.vtb_von) -- overlap
 			)";
 
-		if (isset($vertragsbestandteil_id))
+		if (isset($erste_vertragsbestandteil_id) && isset($zweite_vertragsbestandteil_id))
 		{
 			$qry .= " AND vtbs.vertragsbestandteil_id = ?";
-			$params[] = $vertragsbestandteil_id;
+			$params[] = $erste_vertragsbestandteil_id;
+
+			$qry .= " AND vtbss.vertragsbestandteil_id = ?";
+			$params[] = $zweite_vertragsbestandteil_id;
 		}
 
 		$qry .= "
 			ORDER BY
-				person_id, dv_von, dienstverhaeltnis_id, vtb_von, vertragsbestandteil_id";
+				vtbs.person_id, vtbs.dienstverhaeltnis_id, erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -414,7 +413,8 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry = "
 			WITH vertragsbestandteile AS (
-				SELECT ben.person_id, dv.dienstverhaeltnis_id,
+				SELECT
+					ben.person_id, dv.dienstverhaeltnis_id,
 					vtb.vertragsbestandteil_id, vtb_freitext.freitexttyp_kurzbz, dv.oe_kurzbz,
 					dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis,
 					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis

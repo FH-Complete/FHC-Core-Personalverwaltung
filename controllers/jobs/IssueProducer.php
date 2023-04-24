@@ -3,7 +3,7 @@
 /**
  * Job for resolving Personalverwaltung issues
  */
-class PlausiIssueProducer extends PlausiIssueProducer_Controller
+class IssueProducer extends PlausiIssueProducer_Controller
 {
 	protected $_extensionName = 'FHC-Core-Personalverwaltung'; // name of extension for file path
 
