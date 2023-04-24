@@ -31,14 +31,18 @@ class PersonalverwaltungPlausicheckLib
 
 	/**
 	 * There shouldn't be any Dienstverhaeltnisse running in paralell for a person in the same company.
+	 * This means: either Dienstverhaeltnis time span or Vertragsbestandteil time span overlap.
 	 * @param person_id
-	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param erste_dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
+	 * @param zweite_dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck, overlapping with first
 	 * @return success with data or error
 	 */
 	public function getParalelleDienstverhaeltnisseEinUnternehmen(
 		$person_id = null,
 		$erste_dienstverhaeltnis_id = null,
-		$zweite_dienstverhaeltnis_id = null
+		$zweite_dienstverhaeltnis_id = null,
+		$erste_vertragsbestandteil_id = null,
+		$zweite_vertragsbestandteil_id = null
 	) {
 		$params = array();
 
@@ -64,33 +68,43 @@ class PersonalverwaltungPlausicheckLib
 		$qry.=
 			")
 			SELECT
-				DISTINCT ON (dvs.person_id, dvs.dienstverhaeltnis_id, dvss.dienstverhaeltnis_id) dvs.person_id,
-					dvs.dienstverhaeltnis_id AS erste_dienstverhaeltnis_id, dvss.dienstverhaeltnis_id AS zweite_dienstverhaeltnis_id,
-					dvs.vertragsbestandteil_id AS erste_vertragsbestandteil_id, dvss.vertragsbestandteil_id AS zweite_vertragsbestandteil_id
+				DISTINCT person_id,
+				LEAST(erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id) AS erste_dienstverhaeltnis_id,
+				GREATEST(erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id) AS zweite_dienstverhaeltnis_id,
+				CASE
+					WHEN
+						paralelle_vtb = TRUE
+					THEN
+						LEAST(erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id)
+					ELSE
+						NULL
+				END AS erste_vertragsbestandteil_id,
+				CASE
+					WHEN
+						paralelle_vtb = TRUE
+					THEN
+						GREATEST(erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id)
+					ELSE
+						NULL
+				END AS zweite_vertragsbestandteil_id
 			FROM
-				dienstverhaeltnisse dvs, dienstverhaeltnisse dvss
-			WHERE
-			dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
-			AND dvss.person_id = dvs.person_id -- same person
-			AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen
-			AND (
-				-- vertragsbestandteil time paralell
-				(dvss.vtb_von <= dvs.vtb_bis AND dvss.vtb_bis >= dvs.vtb_von)
-				OR (
-					-- dienstverhaeltnis time paralell
-					dvss.dv_von <= dvs.dv_bis AND dvss.dv_bis >= dvs.dv_von
-					AND NOT EXISTS ( -- karenz time can be paralell
-						SELECT 1
-						FROM
-							hr.tbl_vertragsbestandteil vtb_karenz
-						WHERE
-							dienstverhaeltnis_id IN (dvss.dienstverhaeltnis_id, dvs.dienstverhaeltnis_id)
-							AND vertragsbestandteiltyp_kurzbz = 'karenz'
-							AND von <= GREATEST(dvss.dv_von, dvs.dv_von)
-							AND COALESCE(bis, '9999-12-31') >= LEAST(dvss.dv_bis, dvs.dv_bis)
-					)
-				)
-			)";
+			(
+				SELECT
+					dvs.person_id,
+					dvs.dienstverhaeltnis_id AS erste_dienstverhaeltnis_id, dvss.dienstverhaeltnis_id AS zweite_dienstverhaeltnis_id,
+					dvs.vertragsbestandteil_id AS erste_vertragsbestandteil_id, dvss.vertragsbestandteil_id AS zweite_vertragsbestandteil_id,
+					dvs.dv_von AS erstes_dv_von, dvss.dv_von AS zweites_dv_von,
+					dvs.vtb_von AS erstes_vtb_von, dvss.vtb_von AS zweites_vtb_von,
+					dvs.dv_bis AS erstes_dv_bis, dvss.dv_bis AS zweites_dv_bis,
+					dvs.vtb_bis AS erstes_vtb_bis, dvss.vtb_bis AS zweites_vtb_bis,
+					(dvss.vtb_von <= dvs.vtb_bis AND dvss.vtb_bis >= dvs.vtb_von) AS paralelle_vtb
+				FROM
+					dienstverhaeltnisse dvs, dienstverhaeltnisse dvss
+				WHERE
+					dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
+					AND dvss.person_id = dvs.person_id -- same person
+					AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen
+				";
 
 		if (isset($erste_dienstverhaeltnis_id) && isset($zweite_dienstverhaeltnis_id))
 		{
@@ -101,35 +115,42 @@ class PersonalverwaltungPlausicheckLib
 			$params[] = $zweite_dienstverhaeltnis_id;
 		}
 
-		$qry .= "
-			ORDER BY
-				dvs.person_id, dvs.dienstverhaeltnis_id, dvss.dienstverhaeltnis_id";
-
-
-		$uniqueDienstverhaeltnisse = array();
-		$result = $this->_db->execReadOnlyQuery($qry, $params);
-
-		if (isError($result)) return $result;
-
-		// return only unique combinations of dienstverhaeltnis ids
-		if (hasData($result))
+		if (isset($erste_vertragsbestandteil_id) && isset($zweite_vertragsbestandteil_id))
 		{
-			$dienstverhaeltnis_id_combos = array();
-			$dienstverhaeltnisse = getData($result);
+			$qry .= " AND dvs.vertragsbestandteil_id = ?";
+			$params[] = $erste_vertragsbestandteil_id;
 
-			foreach ($dienstverhaeltnisse as $dv)
-			{
-				$id_combo = min($dv->erste_dienstverhaeltnis_id, $dv->zweite_dienstverhaeltnis_id)
-					.max($dv->erste_dienstverhaeltnis_id, $dv->zweite_dienstverhaeltnis_id);
-				if (!in_array($id_combo, $dienstverhaeltnis_id_combos))
-				{
-					$uniqueDienstverhaeltnisse[] = $dv;
-					$dienstverhaeltnis_id_combos[] = $id_combo;
-				}
-			}
+			$qry .= " AND dvss.vertragsbestandteil_id = ?";
+			$params[] = $zweite_vertragsbestandteil_id;
 		}
 
-		return success($uniqueDienstverhaeltnisse);
+		$qry .= "
+			) alle_dvs
+			WHERE (
+					-- vertragsbestandteil time paralell
+					paralelle_vtb
+					OR (
+						-- dienstverhaeltnis time paralell
+						alle_dvs.zweites_dv_von <= alle_dvs.erstes_dv_bis AND alle_dvs.zweites_dv_bis >= alle_dvs.erstes_dv_von
+						AND NOT EXISTS ( -- karenz time can be paralell
+							SELECT 1
+							FROM
+								hr.tbl_vertragsbestandteil vtb_karenz
+							WHERE
+								dienstverhaeltnis_id IN (alle_dvs.erste_dienstverhaeltnis_id, alle_dvs.zweite_dienstverhaeltnis_id)
+								AND vertragsbestandteiltyp_kurzbz = 'karenz'
+								AND von <= GREATEST(alle_dvs.erstes_dv_von, alle_dvs.zweites_dv_von)
+								AND COALESCE(bis, '9999-12-31') >= LEAST(alle_dvs.erstes_dv_bis, alle_dvs.zweites_dv_bis)
+						)
+					)
+				)
+		";
+
+		$qry .= "
+			ORDER BY
+				person_id, erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id, erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
 	/**
@@ -197,7 +218,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv_von, dienstverhaeltnis_id, vtb_von, vertragsbestandteil_id";
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -289,7 +310,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dienstverhaeltnis_id, vertragsbestandteil_id";
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -331,7 +352,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id";
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -342,8 +363,11 @@ class PersonalverwaltungPlausicheckLib
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getUeberlappendeVertragsbestandteile($person_id = null, $erste_vertragsbestandteil_id = null, $zweite_vertragsbestandteil_id = null)
-	{
+	public function getUeberlappendeVertragsbestandteile(
+		$person_id = null,
+		$erste_vertragsbestandteil_id = null,
+		$zweite_vertragsbestandteil_id = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -360,8 +384,7 @@ class PersonalverwaltungPlausicheckLib
 					JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
 					JOIN hr.tbl_vertragsbestandteiltyp vtb_typ USING (vertragsbestandteiltyp_kurzbz)
 				WHERE
-					vtb_typ.ueberlappend = FALSE
-			";
+					vtb_typ.ueberlappend = FALSE";
 
 		if (isset($person_id))
 		{
@@ -369,8 +392,7 @@ class PersonalverwaltungPlausicheckLib
 			$params[] = $person_id;
 		}
 
-		$qry.=
-			"
+		$qry.= "
 			)
 			SELECT
 				DISTINCT vtbs.person_id, vtbs.dv_von, vtbs.dienstverhaeltnis_id,
@@ -407,8 +429,11 @@ class PersonalverwaltungPlausicheckLib
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getUeberlappendeFreitextVertragsbestandteile($person_id = null, $vertragsbestandteil_id = null)
-	{
+	public function getUeberlappendeFreitextVertragsbestandteile(
+		$person_id = null,
+		$erste_vertragsbestandteil_id = null,
+		$zweite_vertragsbestandteil_id = null
+	) {
 		$params = array();
 
 		$qry = "
@@ -425,9 +450,8 @@ class PersonalverwaltungPlausicheckLib
 					JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
 					JOIN hr.tbl_vertragsbestandteil_freitext vtb_freitext USING (vertragsbestandteil_id)
 					JOIN hr.tbl_vertragsbestandteil_freitexttyp vtb_freitexttyp USING (freitexttyp_kurzbz)
-			WHERE
-				vtb_freitexttyp.ueberlappend = FALSE
-			";
+				WHERE
+					vtb_freitexttyp.ueberlappend = FALSE";
 
 		if (isset($person_id))
 		{
@@ -435,37 +459,34 @@ class PersonalverwaltungPlausicheckLib
 			$params[] = $person_id;
 		}
 
-		$qry.=
-			"
-				ORDER BY
-					vtb.von
+		$qry.= "
 			)
-			SELECT *
+			SELECT
+				DISTINCT vtbs.person_id, vtbs.dv_von, vtbs.dienstverhaeltnis_id,
+				LEAST(vtbs.vertragsbestandteil_id, vtbss.vertragsbestandteil_id) AS erste_vertragsbestandteil_id,
+				GREATEST(vtbs.vertragsbestandteil_id, vtbss.vertragsbestandteil_id) AS zweite_vertragsbestandteil_id
 			FROM
-				vertragsbestandteile vtbs
-			WHERE
+				vertragsbestandteile vtbs, vertragsbestandteile vtbss
+			WHERE -- there is overlapping vertragsbestandteil
 			(
-				EXISTS ( -- there is overlapping vertragsbestandteil
-					SELECT 1
-					FROM
-						vertragsbestandteile vtbss
-					WHERE
-						vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
-						AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id
-						AND vtbs.freitexttyp_kurzbz = vtbss.freitexttyp_kurzbz -- same type
-						AND (vtbss.vtb_von <= vtbs.vtb_bis AND vtbss.vtb_bis >= vtbs.vtb_von)
-				)
+				vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
+				AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id -- different Vertragsbestandteil
+				AND vtbs.freitexttyp_kurzbz = vtbss.freitexttyp_kurzbz -- same type
+				AND (vtbss.vtb_von <= vtbs.vtb_bis AND vtbss.vtb_bis >= vtbs.vtb_von) -- overlap
 			)";
 
-		if (isset($vertragsbestandteil_id))
+		if (isset($erste_vertragsbestandteil_id) && isset($zweite_vertragsbestandteil_id))
 		{
 			$qry .= " AND vtbs.vertragsbestandteil_id = ?";
-			$params[] = $vertragsbestandteil_id;
+			$params[] = $erste_vertragsbestandteil_id;
+
+			$qry .= " AND vtbss.vertragsbestandteil_id = ?";
+			$params[] = $zweite_vertragsbestandteil_id;
 		}
 
 		$qry .= "
 			ORDER BY
-				person_id, dv_von, dienstverhaeltnis_id, vtb_von, vertragsbestandteil_id";
+				vtbs.person_id, vtbs.dienstverhaeltnis_id, erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -511,7 +532,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dv.dienstverhaeltnis_id, vtb.von, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
+				person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, geh.gehaltsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -558,7 +579,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				ben.person_id, dv.von, dv.dienstverhaeltnis_id, geh.von, geh.gehaltsbestandteil_id";
+				ben.person_id, dv.dienstverhaeltnis_id, geh.gehaltsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -604,7 +625,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dienstverhaeltnis_id, geh.von, gehaltsbestandteil_id";
+				person_id, dienstverhaeltnis_id, gehaltsbestandteil_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -650,7 +671,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id, benutzerfunktion_id";
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -694,7 +715,7 @@ class PersonalverwaltungPlausicheckLib
 
 		$qry .= "
 			ORDER BY
-				person_id, dv.von, dienstverhaeltnis_id, vtb.von, vertragsbestandteil_id, benutzerfunktion_id";
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id, benutzerfunktion_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}

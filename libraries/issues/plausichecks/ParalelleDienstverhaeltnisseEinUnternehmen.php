@@ -18,12 +18,16 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 		$erste_dienstverhaeltnis_id = isset($params['erste_dienstverhaeltnis_id']) ? $params['erste_dienstverhaeltnis_id'] : null;
 		$zweite_dienstverhaeltnis_id = isset($params['zweite_dienstverhaeltnis_id']) ? $params['zweite_dienstverhaeltnis_id'] : null;
+		$erste_vertragsbestandteil_id = isset($params['erste_vertragsbestandteil_id']) ? $params['erste_vertragsbestandteil_id'] : null;
+		$zweite_vertragsbestandteil_id = isset($params['zweite_vertragsbestandteil_id']) ? $params['zweite_vertragsbestandteil_id'] : null;
 
 		// get employee data
 		$result = $this->_ci->personalverwaltungplausichecklib->getParalelleDienstverhaeltnisseEinUnternehmen(
 			$person_id,
 			$erste_dienstverhaeltnis_id,
-			$zweite_dienstverhaeltnis_id
+			$zweite_dienstverhaeltnis_id,
+			$erste_vertragsbestandteil_id,
+			$zweite_vertragsbestandteil_id
 		);
 
 		// If error occurred then return the error
@@ -41,11 +45,19 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 					'person_id' => $dataObj->person_id,
 					'resolution_params' => array(
 						'erste_dienstverhaeltnis_id' => $dataObj->erste_dienstverhaeltnis_id,
-						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id
+						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id,
+						'erste_vertragsbestandteil_id' => $dataObj->erste_vertragsbestandteil_id,
+						'zweite_vertragsbestandteil_id' => $dataObj->zweite_vertragsbestandteil_id
 					),
 					'fehlertext_params' => array(
 						'erste_dienstverhaeltnis_id' => $dataObj->erste_dienstverhaeltnis_id,
-						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id
+						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id,
+						'erste_vertragsbestandteil_id' => isset($dataObj->erste_vertragsbestandteil_id)
+							? $dataObj->erste_vertragsbestandteil_id
+							: 'N/A',
+						'zweite_vertragsbestandteil_id' => isset($dataObj->zweite_vertragsbestandteil_id)
+							? $dataObj->zweite_vertragsbestandteil_id
+							: 'N/A'
 					)
 				);
 			}

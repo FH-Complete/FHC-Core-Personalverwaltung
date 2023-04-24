@@ -20,6 +20,13 @@ class PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0001 implements IIssueResolvedChecker
 		if (!isset($params['zweite_dienstverhaeltnis_id']) || !is_numeric($params['zweite_dienstverhaeltnis_id']))
 			return error('Second Dienstverhaeltnis Id missing, issue_id: '.$params['issue_id']);
 
+		$erste_vertragsbestandteil_id = null;
+		$zweite_vertragsbestandteil_id = null;
+		if (isset($params['erste_vertragsbestandteil_id']) && isset($params['zweite_vertragsbestandteil_id']))
+		{
+			$erste_vertragsbestandteil_id = $params['erste_vertragsbestandteil_id'];
+			$zweite_vertragsbestandteil_id = $params['zweite_vertragsbestandteil_id'];
+		}
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
@@ -29,7 +36,9 @@ class PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0001 implements IIssueResolvedChecker
 		$checkRes = $this->_ci->personalverwaltungplausichecklib->getParalelleDienstverhaeltnisseEinUnternehmen(
 			$params['issue_person_id'],
 			$params['erste_dienstverhaeltnis_id'],
-			$params['zweite_dienstverhaeltnis_id']
+			$params['zweite_dienstverhaeltnis_id'],
+			$erste_vertragsbestandteil_id,
+			$zweite_vertragsbestandteil_id
 		);
 
 		if (isError($checkRes)) return $checkRes;
