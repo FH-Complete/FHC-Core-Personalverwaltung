@@ -5,6 +5,7 @@ import verticalsplit from "../../../../../js/components/verticalsplit/verticalsp
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
 import EmployeeEditor from "./EmployeeEditor.js";
+import { CreateWizard } from './create/CreateWizard.js';
 
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -17,20 +18,23 @@ export default {
 		EmployeeEditor,		
 		verticalsplit,
 		searchbar,
+		CreateWizard,
 	},
     setup() {
 
+		const { watch, ref } = Vue;
 		const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
 
-		const isEditorOpen = Vue.ref(false);
-		const currentPersonID = Vue.ref(null);
-		const currentPersonUID = Vue.ref(null);
-		const appSideMenuEntries = Vue.ref({});
-		const verticalsplitRef = Vue.ref(null);
-		const currentDate = Vue.ref(null);
+		const isEditorOpen = ref(false);
+		const currentPersonID = ref(null);
+		const currentPersonUID = ref(null);
+		const appSideMenuEntries = ref({});
+		const verticalsplitRef = ref(null);
+		const createWizardRef = ref();
+		const currentDate = ref(null);
 
-		Vue.watch(
+		watch(
 			() => route.params,
 			params => {
 				currentPersonID.value = params.id;
@@ -39,7 +43,7 @@ export default {
 			}
 		)
 
-		const searchbaroptions = Vue.ref({
+		const searchbaroptions = ref({
 			types: [
 			  "person",
 			  "raum",
@@ -176,6 +180,10 @@ export default {
 		const closeEditorHandler = () => {
 			//isEditorOpen.value=false;
 		}
+
+		const openCreateWizard = () => {
+			createWizardRef.value.showModal();
+		}
 		
 		const newSideMenuEntryHandler = (payload) => {
 			appSideMenuEntries.value = payload;
@@ -273,9 +281,11 @@ export default {
 			newSideMenuEntryHandler,
 			searchfunction,
 			selectRecordHandler,
-			searchfunctiondummy,			
+			searchfunctiondummy,
+			openCreateWizard,			
 
-			isEditorOpen,
+			createWizardRef,
+			isEditorOpen,			
 			currentPersonID,
 			currentPersonUID,
 			appSideMenuEntries,
@@ -288,6 +298,7 @@ export default {
 
 	},
     template: `
+
         <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
             <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="${FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router}">FHComplete [PV21]</a>
             <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -324,7 +335,7 @@ export default {
                             <h1 class="h2" style="margin-bottom:0" > Mitarbeiter </h1>
                             </div>
                             <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
-                                <button type="button" class="btn btn-outline-secondary" ><i class="fa fa-plus"></i></button>
+                                <button type="button" class="btn btn-outline-secondary" @click="openCreateWizard()"><i class="fa fa-plus"></i></button>
                             </div>
                         </div>
                             <!-- Filter component -->
@@ -343,7 +354,9 @@ export default {
                             
             </main>
             </div>
-        </div>            
+        </div>      		
+		
+		<CreateWizard id="createWizard" ref="createWizardRef" ></CreateWizard>
     
     `
 }

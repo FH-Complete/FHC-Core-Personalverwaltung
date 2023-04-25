@@ -67,6 +67,7 @@ class Api extends Auth_Controller
 				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
 				'getUnternehmen' => Api::DEFAULT_PERMISSION,
 				'getVertragsarten' => Api::DEFAULT_PERMISSION,
+                'filterPerson' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -1004,8 +1005,31 @@ class Api extends Auth_Controller
     {
         $searchString = $this->input->get('search', TRUE);
         $data = $this->ApiModel->filter($searchString);
-        return $this->outputJson($data);       
+        return $this->outputJson($data);
     }
+
+    function filterPerson()
+    {
+
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            $surnameString = $payload['surname'];
+            $birthdateString = $payload['birthdate'];
+            $result = $this->ApiModel->filterPerson($surnameString, $birthdateString);
+
+            if (isSuccess($result))
+			    $this->outputJson($result);
+		    else
+			    $this->outputJsonError('Error when searching for person');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
+        
+    }
+
 
     function foto()
     {

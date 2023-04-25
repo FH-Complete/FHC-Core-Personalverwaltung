@@ -726,6 +726,51 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, $parametersArray);
     }
 
+    /**
+     * search person (used by employee create dialog)
+     */
+    function filterPerson($surname, $birthdate=null)
+    {
+
+        $parametersArray = array($surname);
+        $where ="p.nachname~* ? ";
+
+        if(isset($birthdate) && $birthdate != '')
+        {
+			$where.=" AND p.gebdatum=?";
+            $parametersArray[] = $birthdate;
+        }
+
+        $qry='
+            SELECT 
+                p.person_id,
+                b.uid,
+                p.svnr,
+                p.titelpost,
+                p.titelpre,
+                p.nachname,
+                p.vorname,
+                p.vornamen,
+                p.geschlecht,
+                p.gebdatum,
+                ma.personalnummer,
+                s.matrikelnr,
+                CASE WHEN ma.personalnummer is not null THEN \'Mitarbeiter\'
+                     WHEN s.matrikelnr is not null THEN \'Student\'
+                     ELSE \'-\'
+                END AS status
+            FROM
+                public.tbl_person p LEFT JOIN
+                public.tbl_benutzer b ON (p.person_id=b.person_id)  LEFT JOIN
+                public.tbl_mitarbeiter ma ON (b.uid=ma.mitarbeiter_uid) LEFT JOIN
+                public.tbl_student s ON (b.uid=s.student_uid)
+            WHERE '.$where.'
+            ORDER BY p.nachname, p.vorname, status
+        ';
+
+        return $this->execQuery($qry, $parametersArray);
+    }
+
     // -----------------------------------
     // Foto
     // -----------------------------------

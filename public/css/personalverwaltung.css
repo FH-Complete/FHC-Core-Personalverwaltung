@@ -43,6 +43,12 @@ label.required.form-label:after {
 
 }
 
+@media (min-width: 992px) {
+    #createWizard .modal-lg {
+        max-width: 60%;
+    }
+}
+
 .vtabs {
     margin: 0 auto;
     display: flex;
