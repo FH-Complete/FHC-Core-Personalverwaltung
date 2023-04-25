@@ -36,7 +36,8 @@ export default {
   props: [
       'mode',
       'title',
-      'mitarbeiter_uid'
+      'mitarbeiter_uid',
+      'dvid'
   ],
   data: function() {
     return {
@@ -74,6 +75,9 @@ export default {
   },
   methods: {
     presetselected: function(preset) {
+      if( this.mode === 'aenderung' ) {
+          preset.data.dienstverhaeltnisid = this.dvid;
+      }
       this.preset = preset;
       this.presettostore();
     },

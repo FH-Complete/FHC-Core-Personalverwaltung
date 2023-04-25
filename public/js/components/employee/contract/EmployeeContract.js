@@ -26,6 +26,7 @@ export const EmployeeContract = {
         //const dienstverhaeltnisDialogRef = ref();
         const VbformWrapperRef = ref();
         const vbformmode = ref('neuanlage');
+        const vbformDVid = ref(null);
         
         const currentDate = ref();
   
@@ -144,11 +145,13 @@ export const EmployeeContract = {
 */
         const createDVDialog = () => {
             vbformmode.value = 'neuanlage';
+            vbformDVid.value = null;
             VbformWrapperRef.value.showModal();
         }
 
         const updateDVDialog = () => {
             vbformmode.value = 'aenderung';
+            vbformDVid.value = currentDVID.value;
             VbformWrapperRef.value.showModal();
         }
 
@@ -159,7 +162,7 @@ export const EmployeeContract = {
 
         return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef, route, vbformmode,
+            VbformWrapperRef, route, vbformmode, vbformDVid, 
             createDVDialog, updateDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
@@ -597,6 +600,7 @@ export const EmployeeContract = {
         ref="VbformWrapperRef" 
         :title="'Dienstverhältnis'" 
         :mode="vbformmode" 
+        :dvid="vbformDVid"
         :mitarbeiter_uid="route.params.uid">
     </vbform_wrapper>
 
