@@ -1309,6 +1309,8 @@ EOSQL;
 		$guihandler = new GUIHandler($mitarbeiter_uid, $editor);
 		$ret = $guihandler->handle($payload);
 		
+		//print_r($guihandler);
+		
 		$this->outputJson(
 			array(
 				'data' => json_decode($ret), 

@@ -192,16 +192,23 @@ export default {
       ]
     }
   ],
-  data: {
-    dienstverhaeltnisid: null,
-    unternehmen: '',
-    vertragsart_kurzbz: 'echterdv',
-    gueltigkeit: {
-      guioptions: {
-        sharedstatemode: "set",
-        disabled: [
-          'gueltig_bis'
-        ]
+  dv: {
+    type: 'dienstverhaeltnis',
+    guioptions: {
+        infos: [],
+        errors: []
+    },
+    data: {
+      dienstverhaeltnisid: null,
+      unternehmen: '',
+      vertragsart_kurzbz: 'echterdv',
+      gueltigkeit: {
+        guioptions: {
+          sharedstatemode: "set",
+          disabled: [
+            'gueltig_bis'
+          ]
+        }
       }
     }
   },

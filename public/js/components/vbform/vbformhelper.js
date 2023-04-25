@@ -57,7 +57,7 @@ export default {
         "type": "formdata",
         "guioptions": JSON.parse(JSON.stringify(this.preset.guioptions)),
         "children": children,
-        "data": this.store.getDVPayload(),
+        "dv": this.store.getDVPayload(),
         "vbs": this.store.getVBsPayload()
       };
       return payload;

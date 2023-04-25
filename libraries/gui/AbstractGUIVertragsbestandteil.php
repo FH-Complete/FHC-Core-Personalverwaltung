@@ -72,25 +72,28 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     protected $hasGBS = false;
     /** @var array{GUIGehaltsbestandteil} gehaltsbestandteile connected to current vertragsbestandteil */
     protected $gbs;
-
-    /** @var VertragsbestandteilLib */
-    protected $vbsLib;
-
-    protected $CI;
-    
+	
+	protected $vbsinstance;
+	
     public function __construct()
     {
 		$this->gbs = array();
-        $this->CI = get_instance();
-        $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib',
-            null, 'VertragsbestandteilLib');
-        $this->vbsLib = $this->CI->VertragsbestandteilLib;
-        //$this->vbsLib = new VertragsbestandteilLib();
     }
 
     abstract public function generateVertragsbestandteil($id);
 
 
+	public function getVbsinstance()
+	{
+		return $this->vbsinstance;
+	}
+
+	public function setVbsinstance($vbsinstance)
+	{
+		$this->vbsinstance = $vbsinstance;
+		return $this;
+	}
+	
     /**
      * Get the value of uuid
      */

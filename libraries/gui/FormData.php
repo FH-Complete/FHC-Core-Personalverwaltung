@@ -9,6 +9,8 @@ class FormData extends AbstractBestandteil {
 
     /** @var array GUI data */
     protected $children;
+	/** @var array */
+	protected $dv;
     /** @var array */
     protected $vbs = [];
 
@@ -28,7 +30,7 @@ class FormData extends AbstractBestandteil {
         // preserve gui data
         $this->mapChildren($decoded);
         // data contains DV
-        $this->mapData($decoded);
+        $this->mapDv($decoded);
         // vbs array
         $this->mapVbs($decoded);
     }
@@ -40,7 +42,7 @@ class FormData extends AbstractBestandteil {
             "type" => FormData::TYPE_STRING,
             "guioptions" => $this->guioptions,
             "children" => $this->children,
-            "data" => $this->data,
+            "dv" => $this->dv,
             "vbs" => $this->vbs
         ]);
         return $json;
@@ -56,21 +58,13 @@ class FormData extends AbstractBestandteil {
         $this->children = $decodedData;
     }
 
-    private function mapData(&$decoded)
+    private function mapDv(&$decoded)
     {
         $decodedData = null;
-        if (!$this->getJSONData($decodedData, $decoded, 'data'))
+        if (!$this->getJSONData($this->dv, $decoded, 'dv'))
         {
-            throw new \Exception('missing data');
+            throw new \Exception('missing dv');
         }
-        
-        $this->getJSONDataInt($this->data['dienstverhaeltnisid'], $decodedData, 'dienstverhaeltnisid');
-        $this->getJSONData($this->data['unternehmen'], $decodedData, 'unternehmen');
-        $this->getJSONData($this->data['vertragsart_kurzbz'], $decodedData, 'vertragsart_kurzbz');
-        $gueltigkeit = new GUIGueltigkeit();
-        $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
-        $this->data['gueltigkeit'] = $gueltigkeit;
-        //$this->getJSONData($this->data['gueltigkeit'], $decodedData, 'gueltigkeit');
     }
 
     private function mapVbs(&$decoded)
@@ -91,6 +85,10 @@ class FormData extends AbstractBestandteil {
         return $this->children;
     }
 
+	public function getDv() 
+	{
+		return $this->dv;
+	}
 
     /**
      * Get the value of vbs
@@ -100,6 +98,13 @@ class FormData extends AbstractBestandteil {
         return $this->vbs;
     }
 
+	public function setDv($dv)
+	{
+		$this->dv = $dv;
+		
+		return $this;
+	}
+	
     /**
      * Set the value of vbs
      */

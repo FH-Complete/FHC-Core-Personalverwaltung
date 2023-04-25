@@ -15,9 +15,23 @@ abstract class AbstractBestandteil {
     /** @var object container for the real data */
     protected $data;
 
+    /** @var VertragsbestandteilLib */
+    protected $vbsLib;
+
+    protected $CI;
+	
+	public function __construct()
+	{
+        $this->CI = get_instance();
+        $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib',
+            null, 'VertragsbestandteilLib');
+        $this->vbsLib = $this->CI->VertragsbestandteilLib;
+        //$this->vbsLib = new VertragsbestandteilLib();
+	}
+	
     abstract public function getTypeString(): string;
     abstract public function mapJSON(&$decoded);
-
+	
     protected function mapGUIOptions(&$decoded)
     {
         $decodedGUIOptions = null;

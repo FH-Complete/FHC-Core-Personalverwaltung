@@ -49,8 +49,10 @@ export default {
 
         },
         children: [],
-        data: {
-          dienstverhaeltnisid: null
+        dv: {
+          data: {
+            dienstverhaeltnisid: null
+          }
         },
         vbs: {}
       },
@@ -86,7 +88,7 @@ export default {
       for( var key in vbs ) {
         this.store.addVB(key, vbs[key]);
       }
-      this.store.setDV(JSON.parse(JSON.stringify(this.preset.data)));
+      this.store.setDV(JSON.parse(JSON.stringify(this.preset.dv)));
     },
     processJSON: function(payload) {
       this.vbhjson = payload;

@@ -49,14 +49,21 @@ export default {
       ]
     }
   ],
-  data: {
-    dienstverhaeltnisid: null,
-    unternehmen: '',
-    vertragsart_kurzbz: 'freierdv',
-    gueltigkeit: {
-      guioptions: {
-        sharedstatemode: "set",
-        disabled: []
+  dv: {
+    type: 'dienstverhaeltnis',
+    guioptions: {
+        infos: [],
+        errors: []
+    },
+    data: {
+      dienstverhaeltnisid: null,
+      unternehmen: '',
+      vertragsart_kurzbz: 'freierdv',
+      gueltigkeit: {
+        guioptions: {
+          sharedstatemode: "set",
+          disabled: []
+        }
       }
     }
   },

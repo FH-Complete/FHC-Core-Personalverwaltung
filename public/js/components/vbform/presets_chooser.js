@@ -61,8 +61,10 @@ export default {
 
                    },
                    children: [],
-                   data: {
-                     dienstverhaeltnisid: null
+                   dv: {
+                     data: {
+                       dienstverhaeltnisid: null
+                     }
                    },
                    vbs: {}
                  };

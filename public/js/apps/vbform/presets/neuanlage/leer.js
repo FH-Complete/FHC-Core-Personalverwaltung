@@ -55,15 +55,22 @@ export default {
       children: []
     }
   ],
-  data: {
-    dienstverhaeltnisid: null,
-    unternehmen: '',
-    vertragsart_kurzbz: '',
-    gueltigkeit: {
-      guioptions: {
-        sharedstatemode: "set",
-        disabled: []
-      }
+  dv: {
+    type: 'dienstverhaeltnis',
+    guioptions: {
+        infos: [],
+        errors: []
+    },
+    data: {
+      dienstverhaeltnisid: null,
+      unternehmen: '',
+      vertragsart_kurzbz: '',
+      gueltigkeit: {
+        guioptions: {
+          sharedstatemode: "set",
+          disabled: []
+        }
+      }          
     }
   },
   vbs: {}

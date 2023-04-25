@@ -149,16 +149,23 @@ export default {
       ]
     }
   ],
-  data: {
-    dienstverhaeltnisid: 1,
-    unternehmen: 'gst',
-    vertragsart_kurzbz: 'echterdv',
-    gueltigkeit: {
-      guioptions: {
-        sharedstatemode: "set",
-        disabled: [
-          'gueltig_bis'
-        ]
+  dv: {
+    type: 'dienstverhaeltnis',
+    guioptions: {
+        infos: [],
+        errors: []
+    },
+    data: {
+      dienstverhaeltnisid: 1,
+      unternehmen: 'gst',
+      vertragsart_kurzbz: 'echterdv',
+      gueltigkeit: {
+        guioptions: {
+          sharedstatemode: "set",
+          disabled: [
+            'gueltig_bis'
+          ]
+        }
       }
     }
   },

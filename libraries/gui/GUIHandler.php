@@ -7,6 +7,8 @@ require_once __DIR__ . '/GUIHandlerFactory.php';
 //require_once __DIR__ . '/../../libraries/vertragsbestandteil/VertragsbestandteilLib.php';
 require_once __DIR__ . '/util.php';
 
+use vertragsbestandteil\Dienstverhaeltnis;
+
 /**
  * GUIHandler takes JSON from GUI and manages the process of
  * storing the data to the database
@@ -18,6 +20,12 @@ class GUIHandler
     protected $userUID;
     protected $CI;
 
+	protected $formDataMapper;
+	protected $dv;
+	protected $vbs;
+	
+	protected $validationFailed;
+	
     public function __construct($employeeUID, $userUID)
     {
         $this->employeeUID = $employeeUID;
@@ -27,8 +35,6 @@ class GUIHandler
 			'Dienstverhaeltnis_model');
         $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib', 
             null, 'VertragsbestandteilLib');
-		
-
     }
 
     /**
@@ -40,16 +46,106 @@ class GUIHandler
      */
     public function handle($guidata)
     {
+		$this->formDataMapper = new FormData();
+		$this->dv = null;
+		$this->vbs = array();
+		$this->validationFailed = false;
+		
+		$this->parse($guidata);
+		
+		if ($this->validationFailed)
+		{
+			$errormsg = 'Validation error while saving Vertragsbestandteile';
+			log_message('error', $errormsg);
+			$this->formDataMapper->addGUIError('Dienstverhältnis konnte nicht gespeichert werden');
+		}
+		else
+		{
+			//$this->store();
+		}
+		return $this->formDataMapper->generateJSON();
+	}
+
+	protected function parse($guidata)
+	{
+		$decoded = json_decode($guidata, true);
+		$this->formDataMapper->mapJSON($decoded);
+		// DV
+		$this->parseDV();
+		
+		// VBS
+		$vbsList = $this->formDataMapper->getVbs();
+
+		foreach ($vbsList as $vbsID => $vbs) {
+			$this->vbs[$vbsID] = $this->parseVB($vbs);
+
+			if ($this->vbs[$vbsID]->hasErrors()) {
+				$this->validationFailed = true;
+			}
+		}
+		$this->formDataMapper->setVbs($this->vbs);
+	}
+	
+	protected function parseDV()
+	{        
+        $dvData = $this->formDataMapper->getDv();
+        $dvMapper = new GUIDienstverhaeltnis();
+		$dvMapper->mapJSON($dvData);
+		$dvMapper->generateDienstverhaeltnis($this->employeeUID, $this->userUID);
+		$this->formDataMapper->setDv($dvMapper);
+	}
+	
+	protected function parseVB($vbs) 
+	{
+        /**  @var AbstractGUIVertragsbestandteil */
+        $vbsMapper = GUIHandlerFactory::getGUIHandler($vbs['type']);
+		$vbsMapper->mapJSON($vbs);
+		$vbsData = $vbsMapper->getData();
+
+		// merge GUI-Data with DB-Data
+		$vbsInstance = $vbsMapper->generateVertragsbestandteil(isset($vbsData['id'])?$vbsData['id']:null);
+		$vbsMapper->setVbsinstance($vbsInstance);
+		if ($vbsInstance->getDienstverhaeltnis_id() === null) 
+		{
+			$vbsInstance->setDienstverhaeltnis_id($dienstverhaeltnis_id);
+			$vbsInstance->setInsertvon($this->userUID);
+			$vbsInstance->setInsertamum((new DateTime())->format("Y-m-d h:m:s"));
+		} else {
+			$vbsInstance->setUpdatevon($this->userUID);
+			$vbsInstance->setUpdateamum((new DateTime())->format("Y-m-d h:m:s"));
+		}
+
+		$gbsList = $vbsMapper->getGbs();
+		foreach ($gbsList as $gbsMapper) {
+			$gbsData = $gbsMapper->getData();
+			$gbsInstance = $gbsMapper->generateGehaltsbestandteil(isset($gbsData['id'])?$gbsData['id']:null);
+			$gbsvalid = $gbsInstance->validate();
+			if(!$gbsvalid) 
+			{
+				$gbsMapper->addGUIError($gbsInstance->getValidationErrors());
+			}
+			$vbsInstance->addGehaltsbestandteil($gbsInstance);
+		}
+		// TODO Validate?
+		$valid = $vbsInstance->validate();
+
+		if (!$valid)
+		{
+			// write guioptions
+			$vbsMapper->addGUIError($vbsInstance->getValidationErrors());
+		}
+
+        return $vbsMapper;
+	}
+	
+	protected function store() 
+	{
         $this->CI->db->trans_begin();
 
         try {
-            $decoded = json_decode($guidata, true);
-            $formDataMapper = new FormData();
-		    $formDataMapper->mapJSON($decoded);
 
-            // DV
-            $dvData = $formDataMapper->getData();
-            $res = $this->handleDV($dvData);
+
+            
 
             if ($res === false)
             {
@@ -129,7 +225,7 @@ class GUIHandler
         return false;
         
     }
-
+	
     private function handleVBS($dienstverhaeltnis_id, $vbs)
     {
         /**  @var AbstractGUIVertragsbestandteil */

@@ -1,5 +1,5 @@
 <?php
-
+require_once __DIR__ .'/GUIDienstverhaeltnis.php';
 require_once __DIR__ .'/GUIVertragsbestandteilStunden.php';
 require_once __DIR__ .'/GUIVertragsbestandteilFunktion.php';
 require_once __DIR__ .'/GUIVertragsbestandteilKuendigungsfrist.php';
@@ -11,6 +11,9 @@ class GUIHandlerFactory {
     public static function getGUIHandler($type)
     {
         switch ($type) {
+            case GUIDienstverhaeltnis::TYPE_STRING:
+                return new GUIDienstverhaeltnis();
+                break;
             case GUIVertragsbestandteilStunden::TYPE_STRING:
                 return new GUIVertragsbestandteilStunden();
                 break;
