@@ -271,6 +271,73 @@ class PersonalverwaltungPlausicheckLib
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 
+	/**
+	 * "Echte" Dienstverhaeltnisse should have a Vertragsbestandteil with "stunden" type.
+	 * @param person_id
+	 * @param dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getDienstverhaeltnisseOhneStandardkostenstellenzuordnung($person_id = null, $dienstverhaeltnis_id = null, $)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				DISTINCT person_id, dienstverhaeltnis_id, dv.oe_kurzbz, kst.oe_kurzbz
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN public.tbl_benutzerfunktion kst ON ben.uid = kst.uid AND kst.funktion_kurzbz = 'kstzuordnung'
+			WHERE
+				(kst.datum_von <= dv.bis OR dv.bis IS NULL) AND (kst.datum_bis >= dv.von OR kst.datum_bis IS NULL)
+				AND EXISTS ( -- dienverhaeltnis oe (Unternehmen) does not match any parent of kstzuordnung oe
+					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) AS
+					(
+						SELECT
+							oe_kurzbz, oe_parent_kurzbz
+						FROM
+							public.tbl_organisationseinheit
+						WHERE
+							oe_kurzbz = kst.oe_kurzbz
+						UNION ALL
+						SELECT
+							o.oe_kurzbz, o.oe_parent_kurzbz
+						FROM
+							public.tbl_organisationseinheit o, oes
+						WHERE
+							o.oe_kurzbz=oes.oe_parent_kurzbz
+					)
+					SELECT
+						1
+					FROM
+						public.tbl_benutzerfunktion kst
+					WHERE
+						uid = ben.uid
+						AND funktion_kurzbz = 'kstzuordnung'
+						AND NOT EXISTS ()
+						AND oe_kurzbz = dv.oe_kurzbz
+				)";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($dienstverhaeltnis_id))
+		{
+			$qry .= " AND dv.dienstverhaeltnis_id = ?";
+			$params[] = $dienstverhaeltnis_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Vertragsbestandteil checks
 
