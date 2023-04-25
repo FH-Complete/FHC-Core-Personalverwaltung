@@ -191,7 +191,21 @@ export default {
 			{
 				event: "rowClick",
 				handler: selectRecordHandler
-			}
+			},
+                        {
+                                event: "dataFiltered",
+                                handler: function(filters, rows) {
+                                    var el = document.getElementById("search_count");
+                                    el.innerHTML = rows.length;
+                                }
+                        },
+                        {
+                                event: "dataLoaded",
+                                handler: function(data) {
+                                    var el = document.getElementById("total_count");
+                                    el.innerHTML = data.length;
+                                }
+                        }
 		];
 
 		const sexformatter = function(cell, formatterParams, onRendered) {
@@ -213,6 +227,7 @@ export default {
 			maxHeight: "100%",
 			minHeight: 50,
 			layout: 'fitColumns',
+                        footerElement: '<div><span id="search_count"></span> von <span id="total_count"></span></div>',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
 				{title: "PersonId", field: "PersonId", headerFilter: true},
