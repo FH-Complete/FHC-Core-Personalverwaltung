@@ -105,8 +105,7 @@ class PersonalverwaltungPlausicheckLib
 				WHERE
 					dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
 					AND dvss.person_id = dvs.person_id -- same person
-					AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen
-				";
+					AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen";
 
 		if (isset($erste_dienstverhaeltnis_id) && isset($zweite_dienstverhaeltnis_id))
 		{
@@ -251,8 +250,7 @@ class PersonalverwaltungPlausicheckLib
 					WHERE
 						dienstverhaeltnis_id = dv.dienstverhaeltnis_id
 						AND vertragsbestandteiltyp_kurzbz = 'stunden'
-				)
-			";
+				)";
 
 		if (isset($person_id))
 		{
@@ -761,8 +759,7 @@ class PersonalverwaltungPlausicheckLib
 					OR geh.bis > vtb.bis
 					OR geh.von > vtb.bis
 					OR geh.bis < vtb.von
-				)
-			";
+				)";
 
 		if (isset($person_id))
 		{
@@ -807,8 +804,7 @@ class PersonalverwaltungPlausicheckLib
 					OR geh.bis > dv.bis
 					OR geh.von > dv.bis
 					OR geh.bis < dv.von
-				)
-			";
+				)";
 
 		if (isset($person_id))
 		{
@@ -853,8 +849,7 @@ class PersonalverwaltungPlausicheckLib
 				JOIN hr.tbl_gehaltsbestandteil geh USING (dienstverhaeltnis_id)
 				JOIN hr.tbl_vertragsbestandteil vtb ON geh.vertragsbestandteil_id = vtb.vertragsbestandteil_id
 			WHERE
-				geh.dienstverhaeltnis_id <> vtb.dienstverhaeltnis_id
-			";
+				geh.dienstverhaeltnis_id <> vtb.dienstverhaeltnis_id";
 
 		if (isset($person_id))
 		{
@@ -905,8 +900,7 @@ class PersonalverwaltungPlausicheckLib
 				JOIN hr.tbl_vertragsbestandteil_funktion vtb_funktion USING (vertragsbestandteil_id)
 				JOIN public.tbl_benutzerfunktion ben_funktion USING (benutzerfunktion_id)
 			WHERE
-				dv.mitarbeiter_uid <> ben_funktion.uid
-			";
+				dv.mitarbeiter_uid <> ben_funktion.uid";
 
 		if (isset($person_id))
 		{
@@ -949,8 +943,7 @@ class PersonalverwaltungPlausicheckLib
 				JOIN public.tbl_benutzerfunktion ben_funktion USING (benutzerfunktion_id)
 			WHERE
 				--benutzerfunktion date span does not overlap with vertragsbestandteil date span
-				vtb.von > ben_funktion.datum_bis OR vtb.bis < ben_funktion.datum_von
-			";
+				vtb.von > ben_funktion.datum_bis OR vtb.bis < ben_funktion.datum_von";
 
 		if (isset($person_id))
 		{
