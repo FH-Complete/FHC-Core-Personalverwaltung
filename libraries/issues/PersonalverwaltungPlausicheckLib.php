@@ -35,6 +35,8 @@ class PersonalverwaltungPlausicheckLib
 	 * @param person_id
 	 * @param erste_dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
 	 * @param zweite_dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck, overlapping with first
+	 * @param erste_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param zweite_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck, overlapping with first
 	 * @return success with data or error
 	 */
 	public function getParalelleDienstverhaeltnisseEinUnternehmen(
@@ -272,9 +274,9 @@ class PersonalverwaltungPlausicheckLib
 	}
 
 	/**
-	 * "Echte" Dienstverhaeltnisse should have a Vertragsbestandteil with "stunden" type.
+	 * There shouldn't be Dienstverhältnisse with a wrong Organisationseinheit for Standardkostenstellen Organisationseinheiten.
 	 * @param person_id
-	 * @param dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
+	 * @param benutzerfunktion_id Benutzerverhältnis violating the plausicheck
 	 * @return success with data or error
 	 */
 	public function getFehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe($person_id = null, $benutzerfunktion_id = null)
@@ -290,9 +292,10 @@ class PersonalverwaltungPlausicheckLib
 				JOIN public.tbl_benutzerfunktion kst ON ben.uid = kst.uid
 				JOIN hr.tbl_dienstverhaeltnis dvs ON ben.uid = dvs.mitarbeiter_uid
 			WHERE
-				kst.funktion_kurzbz = 'kstzuordnung'
+				kst.funktion_kurzbz = 'kstzuordnung' -- Standardkostenstellenzuordnung
+				-- dates of Kostenstellenfunktion and Dienstverhältnis overlap
 				AND (kst.datum_von <= dvs.bis OR dvs.bis IS NULL) AND (kst.datum_bis >= dvs.von OR kst.datum_bis IS NULL)
-				AND NOT EXISTS (
+				AND NOT EXISTS ( -- a dv with parent oe does not exist for the benutzerfunktion (kostenstelle) oe
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) AS
 					(
 						SELECT
@@ -428,7 +431,8 @@ class PersonalverwaltungPlausicheckLib
 	/**
 	 * Vertragsbestandteile of a Dienstverhältnis which are marked as not overlapping and are of same type should not overlap in time.
 	 * @param person_id
-	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param erste_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param zweite_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck, overlapping with first
 	 * @return success with data or error
 	 */
 	public function getUeberlappendeVertragsbestandteile(
@@ -495,7 +499,8 @@ class PersonalverwaltungPlausicheckLib
 	/**
 	 * Vertragsbestandteile of type "freitext" of a Dienstverhältnis which are marked as not overlapping should not overlap in time.
 	 * @param person_id
-	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param erste_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param zweite_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck, overlapping with first
 	 * @return success with data or error
 	 */
 	public function getUeberlappendeFreitextVertragsbestandteile(
@@ -564,6 +569,7 @@ class PersonalverwaltungPlausicheckLib
 	 * Bis Datum of Vertragsbestandteil shouldn't be after Dienstverhaeltnis end.
 	 * @param person_id
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param vertragsbestandteiltyp_kurzbz Vertragsbestandteil type
 	 * @return success with data or error
 	 */
 	public function getVertragsbestandteilOhneZusatztabelle($person_id = null, $vertragsbestandteil_id = null, $vertragsbestandteiltyp_kurzbz = null)
@@ -618,9 +624,10 @@ class PersonalverwaltungPlausicheckLib
 	}
 
 	/**
-	 * Bis Datum of Vertragsbestandteil shouldn't be after Dienstverhaeltnis end.
+	 * Vertragsbestandteil shouldn't be connected to a table not corresponding to the Vertragsbestandteiltyp.
 	 * @param person_id
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @param vertragsbestandteiltyp_kurzbz Vertragsbestandteil type
 	 * @return success with data or error
 	 */
 	public function getVertragsbestandteilFalscheZusatztabelle(
@@ -823,9 +830,10 @@ class PersonalverwaltungPlausicheckLib
 	}
 
 	/**
-	 * Gehaltsbestandteil date span should be part of Dienstverhaeltnis date span.
+	 * Gehaltsbestandteil sholdn't be assigned to a Vertragsbestandteil with a different Dienstverhältnis.
 	 * @param person_id
 	 * @param gehaltsbestandteil_id Gehaltsbestandteil violating the plausicheck
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
 	public function getVerschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil(
