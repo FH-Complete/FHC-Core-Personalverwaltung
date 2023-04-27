@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * There shouldn't be paralell Dienstverhaeltnisse in one company (oe).
+ * Gehaltsbestandteil date span should be part of Vertragsbestandteil date span.
  */
 class PERSONALVERWALTUNG_GEHALT_0002 implements IIssueResolvedChecker
 {

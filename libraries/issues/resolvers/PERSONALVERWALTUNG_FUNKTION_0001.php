@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * There shouldn't be paralell Dienstverhaeltnisse in one company (oe).
+ * Uid of Funktion should be the same as uid from Dienstverhältnis.
  */
 class PERSONALVERWALTUNG_FUNKTION_0001 implements IIssueResolvedChecker
 {

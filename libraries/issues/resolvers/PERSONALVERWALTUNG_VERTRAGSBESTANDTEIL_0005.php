@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * There shouldn't be paralell Dienstverhaeltnisse in one company (oe).
+ * Vertragsbestandteil of a certain type should have correct "additional" table.
  */
 class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0005 implements IIssueResolvedChecker
 {
@@ -17,7 +17,7 @@ class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0005 implements IIssueResolvedCheck
 		if (!isset($params['vertragsbestandteil_id']) || !is_numeric($params['vertragsbestandteil_id']))
 			return error('Vertragsbestandteil Id missing, issue_id: '.$params['issue_id']);
 
-		if (!isset($params['vertragsbestandteiltyp_kurzbz']) || !is_numeric($params['vertragsbestandteiltyp_kurzbz']))
+		if (!isset($params['vertragsbestandteiltyp_kurzbz']))
 			return error('Vertragsbestandteiltyp missing, issue_id: '.$params['issue_id']);
 
 		$this->_ci =& get_instance(); // get code igniter instance

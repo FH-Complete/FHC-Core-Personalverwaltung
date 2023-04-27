@@ -6,7 +6,7 @@ require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * Vertragsbestandteil end should not be after Dienstverhaeltnis end.
+ * Vertragsbestandteil of a certain type shouldn't have the wrong "additional" table.
  */
 class VertragsbestandteilFalscheZusatztabelle extends PlausiChecker
 {
@@ -45,7 +45,8 @@ class VertragsbestandteilFalscheZusatztabelle extends PlausiChecker
 					),
 					'fehlertext_params' => array(
 						'vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id,
-						'vertragsbestandteiltyp_kurzbz' => $dataObj->vertragsbestandteiltyp_kurzbz
+						'vertragsbestandteiltyp_kurzbz' => $dataObj->vertragsbestandteiltyp_kurzbz,
+						'zusatztabellen' => $dataObj->zusatztabellen
 					)
 				);
 			}

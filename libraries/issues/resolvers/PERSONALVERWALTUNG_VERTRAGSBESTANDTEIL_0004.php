@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * There shouldn't be paralell Dienstverhaeltnisse in one company (oe).
+ * Vertragsbestandteile of type "freitext" should not overlap.
  */
 class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0004 implements IIssueResolvedChecker
 {

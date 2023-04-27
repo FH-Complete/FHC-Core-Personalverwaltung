@@ -17,6 +17,7 @@ class IssueProducer extends PlausiIssueProducer_Controller
 			'paralelleDienstverhaeltnisseEinUnternehmen' => 'ParalelleDienstverhaeltnisseEinUnternehmen',
 			'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis',
 			'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil',
+			'fehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe' => 'FehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe',
 			'vertragsbestandteilStartBeforeDienstverhaeltnis' => 'VertragsbestandteilStartBeforeDienstverhaeltnis',
 			'vertragsbestandteilEndAfterDienstverhaeltnis' => 'VertragsbestandteilEndAfterDienstverhaeltnis',
 			'ueberlappendeVertragsbestandteile' => 'UeberlappendeVertragsbestandteile',
@@ -26,6 +27,7 @@ class IssueProducer extends PlausiIssueProducer_Controller
 			'grundgehaltKeinemStundenVertragsbestandteilZugewiesen' => 'GrundgehaltKeinemStundenVertragsbestandteilZugewiesen',
 			'gehaltsbestandteilNichtImVertragsbestandteilDatumsbereich' => 'GehaltsbestandteilNichtImVertragsbestandteilDatumsbereich',
 			'gehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich' => 'GehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich',
+			'verschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil' => 'VerschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil',
 			'funktionUidUngleichDienstverhaeltnisUid' => 'FunktionUidUngleichDienstverhaeltnisUid',
 			'funktionFaelltNichtInVertragsbestandteilZeitraum' => 'FunktionFaelltNichtInVertragsbestandteilZeitraum'
 		);

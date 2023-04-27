@@ -33,8 +33,8 @@ export const IssueViewerTabulatorOptions = {
 		{title: 'Nachname', field: 'Nachname', headerFilter: true},
 		{title: 'Person Id', field: 'PersonId', headerFilter: true},
 		{title: 'Statuscode', field: 'Statuscode', headerFilter: true},
-		{title: 'Bearbeitet von', field: 'Bearbeitet von', headerFilter: true},
-		{title: 'Bearbeitet am', field: 'Bearbeitet am', headerFilter: true},
+		{title: 'Verarbeitet von', field: 'Verarbeitet von', headerFilter: true},
+		{title: 'Verarbeitet am', field: 'Verarbeitet am', headerFilter: true},
 		{title: 'Issue Id', field: 'IssueId', headerFilter: true},
 		{title: 'Fehlertyp', field: 'Fehlertyp', headerFilter: true}
 	],
@@ -45,9 +45,14 @@ export const IssueViewerTabulatorOptions = {
 		if (data != null && data.hasOwnProperty('Fehlertyp') && data.Fehlertyp != null)
 		{
 			let fehlertyp = data.Fehlertyp;
+			let statuscode = data.Statuscode;
 
 			// color errors and warnings
-			if (fehlertyp == "error")
+			if (statuscode == "resolved")
+			{
+				row.getElement().style.color = "green";
+			}
+			else if (fehlertyp == "error")
 			{
 				row.getElement().style.color = "red";
 			}

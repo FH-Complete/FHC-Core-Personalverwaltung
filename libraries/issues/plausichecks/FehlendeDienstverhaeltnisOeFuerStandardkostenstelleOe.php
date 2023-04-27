@@ -6,9 +6,9 @@ require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * Vertragsbestandteil of a certain type should have correct "additional" table.
+ * Dienstverhältnis shouldn't have a wrong Organisationseinheit (company oe) for a Standardkostenstelle.
  */
-class VertragsbestandteilOhneZusatztabelle extends PlausiChecker
+class FehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
@@ -16,14 +16,12 @@ class VertragsbestandteilOhneZusatztabelle extends PlausiChecker
 		$results = array();
 
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
-		$vertragsbestandteil_id = isset($params['vertragsbestandteil_id']) ? $params['vertragsbestandteil_id'] : null;
-		$vertragsbestandteiltyp_kurzbz = isset($params['vertragsbestandteiltyp_kurzbz']) ? $params['vertragsbestandteiltyp_kurzbz'] : null;
+		$benutzerfunktion_id = isset($params['benutzerfunktion_id']) ? $params['benutzerfunktion_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->personalverwaltungplausichecklib->getVertragsbestandteilOhneZusatztabelle(
+		$result = $this->_ci->personalverwaltungplausichecklib->getFehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe(
 			$person_id,
-			$vertragsbestandteil_id,
-			$vertragsbestandteiltyp_kurzbz
+			$benutzerfunktion_id
 		);
 
 		// If error occurred then return the error
@@ -39,13 +37,10 @@ class VertragsbestandteilOhneZusatztabelle extends PlausiChecker
 			{
 				$results[] = array(
 					'person_id' => $dataObj->person_id,
-					'resolution_params' => array(
-						'vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id,
-						'vertragsbestandteiltyp_kurzbz' => $dataObj->vertragsbestandteiltyp_kurzbz
-					),
+					'resolution_params' => array('benutzerfunktion_id' => $dataObj->benutzerfunktion_id),
 					'fehlertext_params' => array(
-						'vertragsbestandteil_id' => $dataObj->vertragsbestandteil_id,
-						'vertragsbestandteiltyp_kurzbz' => $dataObj->vertragsbestandteiltyp_kurzbz
+						'benutzerfunktion_id' => $dataObj->benutzerfunktion_id,
+						'oe_kurzbz' => $dataObj->oe_kurzbz
 					)
 				);
 			}

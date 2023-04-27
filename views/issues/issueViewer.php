@@ -27,7 +27,7 @@
 			<div>
 				<!-- Filter component -->
 				<core-filter-cmpt
-					title="Issue Viewer"
+					title="Personal Fehlermonitoring"
 					filter-type="IssueViewer"
 					:tabulator-options="issueViewerTabulatorOptions"
 					:tabulator-events="issueViewerTabulatorEventHandlers"

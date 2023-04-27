@@ -6,7 +6,7 @@ require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * Vertragsbestandteil end should not be before Dienstverhaeltnis start.
+ * Vertragsbestandteil start should not be before Dienstverhaeltnis start.
  */
 class VertragsbestandteilStartBeforeDienstverhaeltnis extends PlausiChecker
 {

@@ -277,21 +277,22 @@ class PersonalverwaltungPlausicheckLib
 	 * @param dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getDienstverhaeltnisseOhneStandardkostenstellenzuordnung($person_id = null, $dienstverhaeltnis_id = null, $)
+	public function getFehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe($person_id = null, $benutzerfunktion_id = null)
 	{
 		$params = array();
 
 		$qry = "
 			SELECT
-				DISTINCT person_id, dienstverhaeltnis_id, dv.oe_kurzbz, kst.oe_kurzbz
+				ben.person_id, kst.benutzerfunktion_id, kst.oe_kurzbz
 			FROM
 				public.tbl_benutzer ben
 				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
-				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
-				JOIN public.tbl_benutzerfunktion kst ON ben.uid = kst.uid AND kst.funktion_kurzbz = 'kstzuordnung'
+				JOIN public.tbl_benutzerfunktion kst ON ben.uid = kst.uid
+				JOIN hr.tbl_dienstverhaeltnis dvs ON ben.uid = dvs.mitarbeiter_uid
 			WHERE
-				(kst.datum_von <= dv.bis OR dv.bis IS NULL) AND (kst.datum_bis >= dv.von OR kst.datum_bis IS NULL)
-				AND EXISTS ( -- dienverhaeltnis oe (Unternehmen) does not match any parent of kstzuordnung oe
+				kst.funktion_kurzbz = 'kstzuordnung'
+				AND (kst.datum_von <= dvs.bis OR dvs.bis IS NULL) AND (kst.datum_bis >= dvs.von OR kst.datum_bis IS NULL)
+				AND NOT EXISTS (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) AS
 					(
 						SELECT
@@ -311,12 +312,12 @@ class PersonalverwaltungPlausicheckLib
 					SELECT
 						1
 					FROM
-						public.tbl_benutzerfunktion kst
+						hr.tbl_dienstverhaeltnis dvss
 					WHERE
-						uid = ben.uid
-						AND funktion_kurzbz = 'kstzuordnung'
-						AND NOT EXISTS ()
-						AND oe_kurzbz = dv.oe_kurzbz
+						dvss.mitarbeiter_uid = ma.mitarbeiter_uid
+						AND (kst.datum_von <= dvss.bis OR dvss.bis IS NULL)
+						AND (kst.datum_bis >= dvss.von OR kst.datum_bis IS NULL)
+						AND oe_kurzbz IN (SELECT oe_kurzbz FROM oes)
 				)";
 
 		if (isset($person_id))
@@ -325,15 +326,15 @@ class PersonalverwaltungPlausicheckLib
 			$params[] = $person_id;
 		}
 
-		if (isset($dienstverhaeltnis_id))
+		if (isset($benutzerfunktion_id))
 		{
-			$qry .= " AND dv.dienstverhaeltnis_id = ?";
-			$params[] = $dienstverhaeltnis_id;
+			$qry .= " AND kst.benutzerfunktion_id = ?";
+			$params[] = $benutzerfunktion_id;
 		}
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id";
+				person_id, benutzerfunktion_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
@@ -490,6 +491,7 @@ class PersonalverwaltungPlausicheckLib
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
+
 	/**
 	 * Vertragsbestandteile of type "freitext" of a Dienstverhältnis which are marked as not overlapping should not overlap in time.
 	 * @param person_id
@@ -621,13 +623,23 @@ class PersonalverwaltungPlausicheckLib
 	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
 	 * @return success with data or error
 	 */
-	public function getVertragsbestandteilFalscheZusatztabelle($person_id = null, $vertragsbestandteil_id = null, $vertragsbestandteiltyp_kurzbz = null)
-	{
+	public function getVertragsbestandteilFalscheZusatztabelle(
+		$person_id = null,
+		$vertragsbestandteil_id = null,
+		$vertragsbestandteiltyp_kurzbz = null
+	) {
 		$params = array();
 
 		$qry = "
 			SELECT
-				ben.person_id, vtb.vertragsbestandteil_id, vtb.vertragsbestandteiltyp_kurzbz
+				ben.person_id, vtb.vertragsbestandteil_id, vtb.vertragsbestandteiltyp_kurzbz,
+				concat_ws(', '
+					, CASE WHEN std.vertragsbestandteil_id IS NOT NULL THEN 'stunden' ELSE NULL END
+					, CASE WHEN freitext.vertragsbestandteil_id IS NOT NULL THEN 'freitext' ELSE NULL END
+					, CASE WHEN karenz.vertragsbestandteil_id IS NOT NULL THEN 'karenz' ELSE NULL END
+					, CASE WHEN urlaub.vertragsbestandteil_id IS NOT NULL THEN 'urlaub' ELSE NULL END
+					, CASE WHEN zt.vertragsbestandteil_id IS NOT NULL THEN 'zt' ELSE NULL END
+				) AS zusatztabellen
 			FROM
 				public.tbl_benutzer ben
 				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
@@ -696,8 +708,7 @@ class PersonalverwaltungPlausicheckLib
 				LEFT JOIN hr.tbl_vertragsbestandteil vtb USING (vertragsbestandteil_id)
 			WHERE
 				geh.gehaltstyp_kurzbz = 'grundgehalt'
-				AND (vtb.vertragsbestandteil_id IS NULL OR vtb.vertragsbestandteiltyp_kurzbz <> 'stunden')
-			";
+				AND (vtb.vertragsbestandteil_id IS NULL OR vtb.vertragsbestandteiltyp_kurzbz <> 'stunden')";
 
 		if (isset($person_id))
 		{
@@ -802,6 +813,57 @@ class PersonalverwaltungPlausicheckLib
 		{
 			$qry .= " AND geh.gehaltsbestandteil_id = ?";
 			$params[] = $gehaltsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, gehaltsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Gehaltsbestandteil date span should be part of Dienstverhaeltnis date span.
+	 * @param person_id
+	 * @param gehaltsbestandteil_id Gehaltsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getVerschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil(
+		$person_id = null,
+		$gehaltsbestandteil_id = null,
+		$vertragsbestandteil_id = null
+	) {
+		$params = array();
+
+		$qry = "
+			SELECT
+				ben.person_id, dv.dienstverhaeltnis_id, geh.gehaltsbestandteil_id, vtb.vertragsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_gehaltsbestandteil geh USING (dienstverhaeltnis_id)
+				JOIN hr.tbl_vertragsbestandteil vtb ON geh.vertragsbestandteil_id = vtb.vertragsbestandteil_id
+			WHERE
+				geh.dienstverhaeltnis_id <> vtb.dienstverhaeltnis_id
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($gehaltsbestandteil_id))
+		{
+			$qry .= " AND geh.gehaltsbestandteil_id = ?";
+			$params[] = $gehaltsbestandteil_id;
+		}
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtb.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
 		}
 
 		$qry .= "

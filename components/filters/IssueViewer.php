@@ -11,8 +11,8 @@
 				pers.nachname AS "Nachname",
 				issue.person_id AS "PersonId",
 				issue.status_kurzbz AS "Statuscode",
-				issue.verarbeitetvon AS "Bearbeitet von",
-				issue.verarbeitetamum AS "Bearbeitet am",
+				issue.verarbeitetvon AS "Verarbeitet von",
+				issue.verarbeitetamum AS "Verarbeitet am",
 				issue.issue_id AS "IssueId",
 				fehler.fehlertyp_kurzbz AS "Fehlertyp"
 			FROM

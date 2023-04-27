@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * There shouldn't be paralell Dienstverhaeltnisse in one company (oe).
+ * Grundgehalt should be assigned to a Vertragsbestandteil with type "stunden".
  */
 class PERSONALVERWALTUNG_GEHALT_0001 implements IIssueResolvedChecker
 {

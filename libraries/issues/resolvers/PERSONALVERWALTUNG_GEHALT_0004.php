@@ -5,14 +5,17 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
- * Vertragsbestandteil end should not be after Dienstverhaeltnis end.
+ * Dienstverhältnis of Gehaltsbestandteil shouldn't be different than dienstverhältnis of assigned Vertragsbestandteil.
  */
-class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0002 implements IIssueResolvedChecker
+class PERSONALVERWALTUNG_GEHALT_0004 implements IIssueResolvedChecker
 {
 	public function checkIfIssueIsResolved($params)
 	{
 		if (!isset($params['issue_person_id']) || !is_numeric($params['issue_person_id']))
 			return error('Person Id missing, issue_id: '.$params['issue_id']);
+
+		if (!isset($params['gehaltsbestandteil_id']) || !is_numeric($params['gehaltsbestandteil_id']))
+			return error('Gehaltsbestandteil Id missing, issue_id: '.$params['issue_id']);
 
 		if (!isset($params['vertragsbestandteil_id']) || !is_numeric($params['vertragsbestandteil_id']))
 			return error('Vertragsbestandteil Id missing, issue_id: '.$params['issue_id']);
@@ -22,8 +25,9 @@ class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0002 implements IIssueResolvedCheck
 		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
 
 		// check if issue persists
-		$checkRes = $this->_ci->personalverwaltungplausichecklib->getVertragsbestandteilEndAfterDienstverhaeltnis(
+		$checkRes = $this->_ci->personalverwaltungplausichecklib->getVerschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil(
 			$params['issue_person_id'],
+			$params['gehaltsbestandteil_id'],
 			$params['vertragsbestandteil_id']
 		);
 
