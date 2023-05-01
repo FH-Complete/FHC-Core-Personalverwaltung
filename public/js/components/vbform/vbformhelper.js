@@ -22,8 +22,8 @@ export default {
             <button class="btn btn-secondary btn-sm float-end" @click="getJSON">get JSON</button>
           </div>
         </div>
-        <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []"></infos>
-        <errors :errors="(preset?.guioptions?.errors !== undefined) ? preset?.guioptions?.errors : []"></errors>
+        <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
+        <errors :errors="(preset?.guioptions?.errors !== undefined) ? preset?.guioptions?.errors : []" :padright="false"></errors>
       </div>
       <component ref="parts" v-for="(child, idx) in children" :key="idx" :is="child.type" :preset="child"></component>
     </div>

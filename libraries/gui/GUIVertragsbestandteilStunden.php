@@ -1,7 +1,4 @@
 <?php
-
-
-
 require_once __DIR__ . "/AbstractGUIVertragsbestandteil.php";
 require_once __DIR__ . "/GUIGehaltsbestandteil.php";
 require_once __DIR__ . "/GUIGueltigkeit.php";
@@ -14,14 +11,14 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 use vertragsbestandteil\VertragsbestandteilStunden;
 
 
-class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil implements JsonSerializable
+class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
 {    
     const TYPE_STRING = "vertragsbestandteilstunden";
 
     public function __construct()
     {                
 		parent::__construct();
-        $this->type = GUIVertragsbestandteilStunden::TYPE_STRING;
+        $this->type = self::TYPE_STRING;
         $this->hasGBS = true;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = ["stunden" => "",
@@ -32,25 +29,6 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
                       ];
         $this->gbs = [];
     }
-
-    public function getTypeString(): string
-    {
-        return GUIVertragsbestandteilStunden::TYPE_STRING;
-    }
-
-    /**
-     * parse JSON into object
-     * @param string $jsondata 
-     */
-    public function mapJSON(&$decoded)
-    {
-        $this->checkType($decoded);
-        $this->mapGUIOptions($decoded);
-        $this->mapData($decoded);
-        $this->mapGBS($decoded);
-    }
-
-
 
     /**
      * {
@@ -65,7 +43,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
      *     }
      * }
      */
-    private function mapData(&$decoded)
+    protected function mapData(&$decoded)
     {
         $decodedData = null;
         if (!$this->getJSONData($decodedData, $decoded, 'data'))
@@ -82,28 +60,15 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
         $this->data['gueltigkeit'] = $gueltigkeit;
     }
 
-    private function mapGBS(&$decoded)
+    public function generateVBLibInstance()
     {
-        $decodedGbsList = [];
-        if (!$this->getJSONData($decodedGbsList, $decoded, 'gbs'))
-        {
-            throw new \Exception('missing gbs');
-        }
-        $guiGBS = null;
-        foreach ($decodedGbsList as $decodedGbs) {
-            $guiGBS = new GUIGehaltsbestandteil();
-            $guiGBS->mapJSON($decodedGbs);
-            $this->gbs[] = $guiGBS;
-        }
-    }
-
-    public function generateVertragsbestandteil($id)
-    {
+		$handler = GUIHandler::getInstance();
         $vbs = null;
-        if (isset($id) && $id > 0)
+		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+        if ($id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
+            $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
              // merge
             $vbs->setWochenstunden($this->data['stunden']);
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
@@ -120,15 +85,6 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil imple
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);            
         }
         
-        return $vbs;
+        $this->setVbsinstance($vbs);
     }
-
-    public function jsonSerialize() {
-        return [
-            "type" => $this->type,
-            "guioptions" => $this->guioptions,
-            "data" => $this->data,
-            "gbs" => $this->JSONserlializeGBS()];
-    }
-
 }

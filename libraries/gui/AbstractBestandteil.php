@@ -2,7 +2,7 @@
 
 require_once  __DIR__.'/JSONData.php';
 
-abstract class AbstractBestandteil {
+abstract class AbstractBestandteil implements JsonSerializable {
 
     use JSONData;
 
@@ -15,21 +15,32 @@ abstract class AbstractBestandteil {
     /** @var object container for the real data */
     protected $data;
 
-    /** @var VertragsbestandteilLib */
-    protected $vbsLib;
-
-    protected $CI;
-	
 	public function __construct()
 	{
-        $this->CI = get_instance();
-        $this->CI->load->library('vertragsbestandteil/VertragsbestandteilLib',
-            null, 'VertragsbestandteilLib');
-        $this->vbsLib = $this->CI->VertragsbestandteilLib;
-        //$this->vbsLib = new VertragsbestandteilLib();
+		$this->type = '';
+		$this->guioptions = array();
+		$this->data = array();
+	}
+
+	
+	public function getTypeString(): string
+    {
+        return static::TYPE_STRING;
+    }
+	
+	public function jsonSerialize() {
+        return [
+            "type" => $this->type,
+            "guioptions" => $this->guioptions,
+            "data" => $this->data
+		];
+    }
+	
+	public function isValid() {
+		return !$this->hasErrors();
 	}
 	
-    abstract public function getTypeString(): string;
+	abstract public function validate();
     abstract public function mapJSON(&$decoded);
 	
     protected function mapGUIOptions(&$decoded)
@@ -39,9 +50,22 @@ abstract class AbstractBestandteil {
         {
             throw new \Exception('missing guioptions');
         }
+		
         $this->guioptions = $decodedGUIOptions;
+		$this->resetInfosAndErrors();
     }
 
+	protected function resetInfosAndErrors() 
+	{
+		if( isset($this->guioptions['infos']) ) {
+			$this->guioptions['infos'] = array();
+		}
+		
+		if( isset($this->guioptions['errors']) ) {
+			$this->guioptions['errors'] = array();
+		}
+	}
+	
     public function addGUIInfo($infos)
     {
         if (!isset($this->guioptions['infos']))

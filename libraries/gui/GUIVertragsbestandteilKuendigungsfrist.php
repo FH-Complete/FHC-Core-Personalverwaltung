@@ -30,7 +30,7 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
     public function __construct()
     {
         parent::__construct();
-        $this->type = GUIVertragsbestandteilKuendigungsfrist::TYPE_STRING;
+        $this->type = self::TYPE_STRING;
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = ["arbeitnehmer_frist" => "",
@@ -42,25 +42,9 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
                       ];        
     }
 
-    public function getTypeString(): string
-    {
-        return GUIVertragsbestandteilKuendigungsfrist::TYPE_STRING;
-    }
-
-    /**
-     * parse JSON into object
-     * @param string $jsondata 
-     */
-    public function mapJSON(&$decoded)
-    {
-        $this->checkType($decoded);
-        $this->mapGUIOptions($decoded);
-        $this->mapData($decoded);
-    }
-
     /**    
      */
-    private function mapData(&$decoded)
+    protected function mapData(&$decoded)
     {
         $decodedData = null;
         if (!$this->getJSONData($decodedData, $decoded, 'data'))
@@ -75,14 +59,15 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
     }
 
 
-    public function generateVertragsbestandteil($id) {
-         /** @var vertragsbestandteil\VertragsbestandteilKuendigungsfrist */
-         $vbs = null;
-         
-         if (isset($id) && $id > 0)
+    public function generateVBLibInstance() {
+		$handler = GUIHandler::getInstance();
+        /** @var vertragsbestandteil\VertragsbestandteilKuendigungsfrist */
+        $vbs = null;
+		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+        if ($id > 0)
          {
              // load VBS            
-             $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
+             $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
              // merge
              $vbs->setArbeitgeberFrist($this->data['arbeitgeber_frist']);
              $vbs->setArbeitnehmerFrist($this->data['arbeitnehmer_frist']);
@@ -103,14 +88,6 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
  
          }
          
-         return $vbs;
+         $this->setVbsinstance($vbs);
     }
-
-    public function jsonSerialize() {
-        return [
-            "type" => $this->type,
-            "guioptions" => $this->guioptions,
-            "data" => $this->data];
-    }
-
 }

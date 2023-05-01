@@ -50,11 +50,6 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
                       ];        
     }
 
-    public function getTypeString(): string
-    {
-        return self::TYPE_STRING;
-    }
-
     /**
      * parse JSON into object
      * @param string $jsondata 
@@ -86,18 +81,23 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
     }
 
 
-    public function generateDienstverhaeltnis($employeeUID, $userUID) {
+    public function generateVBLibInstance() {
+		$handler = GUIHandler::getInstance();
+		$employeeUID = $handler->getEmployeeUID(); 
+		$editorUID = $handler->getEditorUID();
+			
 		$dienstverhaeltnisid = $this->data['dienstverhaeltnisid'];
 		
         if (isset($dienstverhaeltnisid) && intval($dienstverhaeltnisid) > 0)
         {
-			$this->dv = $this->CI->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($dienstverhaeltnisid));
+			$this->dv = $handler->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($dienstverhaeltnisid));
 			$this->dv->setMitarbeiter_uid($employeeUID);
 			// @TODO 2023-04-25 bh: gueltig_ab bei "normaler" Vertragsaenderung nicht ueberscheiben
 			$this->dv->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
 			$this->dv->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
 			$this->dv->setOe_kurzbz($this->data['unternehmen']);
-			$this->dv->setUpdatevon($userUID);
+			$this->dv->setVertragsart_kurzbz($this->data['vertragsart_kurzbz']);
+			$this->dv->setUpdatevon($editorUID);
 		}
 		else 
 		{
@@ -107,16 +107,12 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
 			$data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
 			$data->oe_kurzbz = $this->data['unternehmen'];
-			$data->insertvon = $userUID;
+			$data->vertragsart_kurzbz = $this->data['vertragsart_kurzbz'];
+			$data->insertvon = $editorUID;
 			$data->insertamum = $now->format(DateTime::ATOM);
 			
 			$this->dv = new Dienstverhaeltnis();
 			$this->dv->hydrateByStdClass($data);
-		}
-		
-		if( !$this->dv->validate() )
-		{
-			$this->addGUIError($this->dv->getValidationErrors());
 		}
     }
 
@@ -132,5 +128,17 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
             "data" => $this->data
 		];
     }
-
+	
+	public function validate()
+	{
+		if( !($this->dv instanceof vertragsbestandteil\IValidation) )
+		{			
+			return;
+		}
+		
+		if( !$this->dv->validate() )
+		{
+			$this->addGUIError($this->dv->getValidationErrors());
+		}
+	}
 }

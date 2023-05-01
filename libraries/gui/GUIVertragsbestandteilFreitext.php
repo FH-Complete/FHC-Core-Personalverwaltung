@@ -43,22 +43,7 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
         $this->gbs = [];
     }
 
-    public function getTypeString(): string
-    {
-        return GUIVertragsbestandteilFreitext::TYPE_STRING;
-    }
 
-    /**
-     * parse JSON into object
-     * @param string $jsondata 
-     */
-    public function mapJSON(&$decoded)
-    {
-        $this->checkType($decoded);
-        $this->mapGUIOptions($decoded);
-        $this->mapData($decoded);
-        $this->mapGBS($decoded);
-    }
 
     /**
      * {
@@ -75,7 +60,7 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
      *       "gueltig_bis": ""
      *     }
      */
-    private function mapData(&$decoded)
+    protected function mapData(&$decoded)
     {
         $decodedData = null;
         if (!$this->getJSONData($decodedData, $decoded, 'data'))
@@ -90,29 +75,15 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
         $this->data['gueltigkeit'] = $gueltigkeit;
     }
 
-    private function mapGBS(&$decoded)
-    {
-        $decodedGbsList = [];
-        if (!$this->getJSONData($decodedGbsList, $decoded, 'gbs'))
-        {
-            throw new \Exception('missing gbs');
-        }
-        $guiGBS = null;
-        foreach ($decodedGbsList as $decodedGbs) {
-            $guiGBS = new GUIGehaltsbestandteil();
-            $guiGBS->mapJSON($decodedGbs);
-            $this->gbs[] = $guiGBS;
-        }
-    }
-
-    public function generateVertragsbestandteil($id) {
+    public function generateVBLibInstance() {
+		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilFreitext */
         $vbs = null;
-         
-        if (isset($id) && $id > 0)
+		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+        if ($id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($vbsData['id']);
+            $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
             // merge
             $vbs->setFreitexttyp($this->data['freitexttyp']);
             $vbs->setTitel($this->data['titel']);
@@ -135,15 +106,6 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
 
         }
         
-        return $vbs;
+        $this->setVbsinstance($vbs);
     }
-
-    public function jsonSerialize() {
-        return [
-            "type" => $this->type,
-            "guioptions" => $this->guioptions,
-            "data" => $this->data,
-            "gbs" => $this->JSONserlializeGBS()];
-    }
-
 }

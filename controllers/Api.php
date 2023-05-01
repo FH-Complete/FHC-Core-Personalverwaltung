@@ -1306,7 +1306,9 @@ EOSQL;
 		$payload->guioptions->infos[] = 'Test Erfolgreich gespeichert.';
 		$payload->guioptions->errors[] = 'Test Beim Speichern ist ein Fehler aufgetreten.';
 */		
-		$guihandler = new GUIHandler($mitarbeiter_uid, $editor);
+		$guihandler = GUIHandler::getInstance();
+		$guihandler->setEmployeeUID($mitarbeiter_uid)
+			->setEditorUID($editor);
 		$ret = $guihandler->handle($payload);
 		
 		//print_r($guihandler);

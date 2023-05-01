@@ -31,13 +31,11 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
 
     const TYPE_STRING = "gehaltsbestandteil";
 
-    /** @var GehaltsbestandteilLib */
-    protected $gbsLib;
-
+	protected $gbsInstance;
+	
     public function __construct()
     {
-        $this->gbsLib = new GehaltsbestandteilLib();
-        $this->type = GUIVertragsbestandteilStunden::TYPE_STRING;
+        $this->type = self::TYPE_STRING;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = [ "gehaltstyp" => "",
                         "betrag" => "",
@@ -49,10 +47,16 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
                       ];
     }
 
-    public function getTypeString(): string
-    {
-        return GUIGehaltsbestandteil::TYPE_STRING;
-    }
+	public function getGbsInstance()
+	{
+		return $this->gbsInstance;
+	}
+
+	public function setGbsInstance($gbsInstance)
+	{
+		$this->gbsInstance = $gbsInstance;
+		return $this;
+	}
 
     public function mapJSON(&$decoded)
     {
@@ -78,13 +82,15 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         $this->getJSONData($this->data['valorisierung'], $decodedData, 'valorisierung');
     }
 
-    public function generateGehaltsbestandteil($id)
+    public function generateGehaltsbestandteil()
     {
+		$handler = GUIHandler::getInstance();
         $gbs = null;
-        if (isset($id) && $id > 0)
+		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+        if ($id > 0)
         {
             // load VBS            
-            $gbs =  $this->gbsLib->fetchGehaltsbestandteil($id);
+            $gbs =  $handler->GehaltsbestandteilLib->fetchGehaltsbestandteil($id);
              // merge
             $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp']);
             $gbs->setGrundbetrag($this->data['betrag']);
@@ -109,14 +115,19 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $gbs->hydrateByStdClass($data);
         }
         
-        return $gbs;
+        $this->setGbsInstance($gbs);
     }
 
-	public function jsonSerialize() {
-        return [
-            "type" => $this->type,
-            "guioptions" => $this->guioptions,
-            "data" => $this->data
-		];
-    }
+	public function validate()
+	{
+		if( !($this->gbsInstance instanceof vertragsbestandteil\IValidation) )
+		{			
+			return;
+		}
+		
+		if( !$this->gbsInstance->validate() )
+		{
+			$this->addGUIError($this->gbsInstance->getValidationErrors());
+		}
+	}
 }
