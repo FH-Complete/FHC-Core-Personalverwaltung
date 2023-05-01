@@ -9,15 +9,10 @@ class FormData extends AbstractBestandteil {
 
     /** @var array GUI data */
     protected $children;
-	/** @var array */
+	/** @var GUIDienstverhaeltnis */
 	protected $dv;
     /** @var array */
     protected $vbs = [];
-
-    public function getTypeString(): string
-    {
-        return FormData::TYPE_STRING;
-    }
 
     /**
      * read JSON and turn it into data structure
@@ -36,16 +31,15 @@ class FormData extends AbstractBestandteil {
     }
 
 
-    public function generateJSON()
+    public function jsonSerialize()
     {
-        $json = json_encode([
-            "type" => FormData::TYPE_STRING,
-            "guioptions" => $this->guioptions,
-            "children" => $this->children,
-            "dv" => $this->dv,
-            "vbs" => $this->vbs
-        ]);
-        return $json;
+        return [
+            "type"			=> $this->getTypeString(),
+            "guioptions"	=> $this->guioptions,
+            "children"		=> $this->children,
+            "dv"			=> $this->dv,
+            "vbs"			=> $this->vbs
+        ];
     }
 
     private function mapChildren(&$decoded)
@@ -61,21 +55,33 @@ class FormData extends AbstractBestandteil {
     private function mapDv(&$decoded)
     {
         $decodedData = null;
-        if (!$this->getJSONData($this->dv, $decoded, 'dv'))
+        if (!$this->getJSONData($decodedData, $decoded, 'dv'))
         {
             throw new \Exception('missing dv');
         }
+        $this->dv = new GUIDienstverhaeltnis();
+		$this->dv->mapJSON($decodedData);		
+		$this->dv->generateVBLibInstance();
+		$this->dv->validate();
     }
 
     private function mapVbs(&$decoded)
     {
-        if (!$this->getJSONData($this->vbs, $decoded, 'vbs'))
+		$decodedData = array();
+        if (!$this->getJSONData($decodedData, $decoded, 'vbs'))
         {
             throw new \Exception('missing vbs');
         }
-        //$this->getJSONData($this->vbs, $decodedData, 'vbs');
+        
+		foreach ($decodedData as $vbid => $vbs)
+		{
+		    $vbsMapper = GUIHandlerFactory::getGUIHandler($vbs['type']);
+			$vbsMapper->mapJSON($vbs);
+			$vbsMapper->generateVBLibInstance();
+			$vbsMapper->validate();
+			$this->vbs[$vbid] = $vbsMapper;
+		}
     }
-
 
     /**
      * Get the value of children
@@ -114,4 +120,19 @@ class FormData extends AbstractBestandteil {
 
         return $this;
     }
+	
+	public function isValid()
+	{
+		$valid = $this->dv->isValid();
+		foreach ($this->vbs as $vb)
+		{
+			$valid = (!$vb->isValid()) ? false : $valid;
+		}
+		return $valid;
+	}
+	
+	public function validate()
+	{
+		return;
+	}
 }

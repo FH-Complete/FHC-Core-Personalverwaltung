@@ -23,7 +23,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
     public function __construct()
     {
 		parent::__construct();
-        $this->type = GUIVertragsbestandteilFunktion::TYPE_STRING;        
+        $this->type = self::TYPE_STRING;        
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => false];
         $this->data = [
                        "gueltigkeit" => [
@@ -32,23 +32,6 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
                        ]
                       ];
         $this->gbs = [];
-    }
-
-    public function getTypeString(): string
-    {
-        return GUIVertragsbestandteilFunktion::TYPE_STRING;
-    }
-
-    /**
-     * parse JSON into object
-     * @param string $jsondata 
-     */
-    public function mapJSON(&$decoded)
-    {
-        $this->checkType($decoded);
-        $this->mapGUIOptions($decoded);
-        $this->mapData($decoded);
-        $this->mapGBS($decoded);
     }
 
     /**
@@ -98,7 +81,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
      *    }
      * }
      */
-    private function mapData(&$decoded)
+    protected function mapData(&$decoded)
     {
         $decodedData = null;
         if (!$this->getJSONData($decodedData, $decoded, 'data'))
@@ -115,30 +98,15 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         $this->data['gueltigkeit'] = $gueltigkeit;
     }
 
-    private function mapGBS(&$decoded)
-    {
-        //echo "gbs: ";var_dump($decoded);
-        $decodedGbsList = [];
-        if (!$this->getJSONData($decodedGbsList, $decoded, 'gbs'))
-        {
-            throw new \Exception('missing gbs');
-        }
-        $guiGBS = null;
-        foreach ($decodedGbsList as $decodedGbs) {
-            $guiGBS = new GUIGehaltsbestandteil();
-            $guiGBS->mapJSON($decodedGbs);
-            $this->gbs[] = $guiGBS;
-        }
-    }
-
-
-    public function generateVertragsbestandteil($id) {
+    public function generateVBLibInstance() {
+		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilFunktion */
         $vbs = null;
-        if (isset($id) && $id > 0)
+		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+        if ($id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
+            $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
             // merge
 			/**
 			 * @todo refactor update
@@ -161,20 +129,8 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FUNKTION;
             
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);
-
-            
-
         }
         
-        return $vbs;
+        $this->setVbsinstance($vbs);
     }
-
-    public function jsonSerialize() {
-        return [
-            "type" => $this->type,
-            "guioptions" => $this->guioptions,
-            "data" => $this->data,
-            "gbs" => $this->JSONserlializeGBS()];
-    }
-
 }

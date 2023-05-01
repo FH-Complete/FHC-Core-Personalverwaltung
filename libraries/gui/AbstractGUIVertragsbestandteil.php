@@ -80,9 +80,55 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 		$this->gbs = array();
     }
 
-    abstract public function generateVertragsbestandteil($id);
+    abstract public function generateVBLibInstance();
 
+    /**
+     * parse JSON into object
+     * @param string $jsondata 
+     */
+    public function mapJSON(&$decoded)
+    {
+        $this->checkType($decoded);
+        $this->mapGUIOptions($decoded);
+        $this->mapData($decoded);
+        $this->mapGBS($decoded);
+    }
 
+    protected function mapGBS(&$decoded)
+    {
+		if( !$this->getHasGBS() )
+		{
+			return;
+		}
+		
+        $decodedGbsList = [];
+        if (!$this->getJSONData($decodedGbsList, $decoded, 'gbs'))
+        {
+            throw new \Exception('missing gbs');
+        }
+        $guiGBS = null;
+        foreach ($decodedGbsList as $decodedGbs) {
+            $guiGBS = new GUIGehaltsbestandteil();
+            $guiGBS->mapJSON($decodedGbs);
+			$guiGBS->generateGehaltsbestandteil();
+			$guiGBS->validate();
+            $this->gbs[] = $guiGBS;
+        }
+    }
+	
+    public function jsonSerialize() {
+        $json = [
+            "type" => $this->type,
+            "guioptions" => $this->guioptions,
+            "data" => $this->data
+		];
+		if( $this->getHasGBS() ) 
+		{
+			$json["gbs"] = $this->gbs;
+		}
+		return $json;
+    }
+	
 	public function getVbsinstance()
 	{
 		return $this->vbsinstance;
@@ -112,8 +158,6 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
         return $this;
     }
 
-    
-
     /**
      * Get the value of hasGBS
      */
@@ -132,8 +176,6 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
         return $this;
     }
 
-  
-
     /**
      * Get the value of gbs
      */
@@ -151,13 +193,27 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 
         return $this;
     }
+
+	public function validate()
+	{
+		if( !($this->vbsinstance instanceof vertragsbestandteil\IValidation) )
+		{			
+			return;
+		}
+		
+		if( !$this->vbsinstance->validate() )
+		{
+			$this->addGUIError($this->vbsinstance->getValidationErrors());
+		}
+	}
 	
-	public function JSONserlializeGBS() {
-		$gbs = array();
+	public function isValid()
+	{
+		$valid = !$this->hasErrors();
 		foreach ($this->gbs as $gb)
 		{
-			$gbs[] = $gb->jsonSerialize();
+			$valid = (!$gb->isValid()) ? false : $valid;
 		}
-		return $gbs;
+		return $valid;
 	}
 }    

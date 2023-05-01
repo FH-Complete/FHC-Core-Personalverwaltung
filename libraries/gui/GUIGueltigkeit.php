@@ -70,7 +70,9 @@ class GUIGueltigkeit implements JsonSerializable {
     }
 
     public function jsonSerialize() {
-        return ["guioptions" => $this->guioptions,
-            "data" => $this->data];
+        return [
+			"guioptions" => $this->guioptions,
+            "data" => $this->data
+		];
     }
 }

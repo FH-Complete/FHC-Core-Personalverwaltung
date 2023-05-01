@@ -5,8 +5,8 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
-  <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
+  <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []" :padleft="true"></infos>
+  <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []" :padleft="true"></errors>
   <div class="row g-2 py-2">
     <div class="col-1">
       &nbsp;

@@ -35,29 +35,13 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
     public function __construct()
     {
 		parent::__construct();
-        $this->type = GUIVertragsbestandteilZeitaufzeichnung::TYPE_STRING;
+        $this->type = self::TYPE_STRING;
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = null;
     }
 
-    public function getTypeString(): string
-    {
-        return GUIVertragsbestandteilZeitaufzeichnung::TYPE_STRING;
-    }
-
-    /**
-     * parse JSON into object
-     * @param string $jsondata
-     */
-    public function mapJSON(&$decoded)
-    {
-        $this->checkType($decoded);
-        $this->mapGUIOptions($decoded);
-        $this->mapData($decoded);
-    }
-
-    private function mapData(&$decoded)
+    protected function mapData(&$decoded)
     {
         $decodedData = null;
         if (!$this->getJSONData($decodedData, $decoded, 'data'))
@@ -72,13 +56,15 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
         $this->data['gueltigkeit'] = $gueltigkeit;
     }
 
-    public function generateVertragsbestandteil($id) {
+    public function generateVBLibInstance() {
+		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilZeitaufzeichnung */
         $vbs = null;
-        if (isset($id) && $id > 0)
+		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+        if ($id > 0)
         {
             // load VBS            
-            $vbs =  $this->vbsLib->fetchVertragsbestandteil($id);
+            $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
             // merge
             $vbs->setZeitaufzeichnung($this->data['zeitaufzeichnung']);
             $vbs->setAzgrelevant($this->data['azgrelevant']);
@@ -100,13 +86,6 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
 
         }
         
-        return $vbs;
-    }
-
-    public function jsonSerialize() {
-        return [
-            "type" => $this->type,
-            "guioptions" => $this->guioptions,
-            "data" => $this->data];
+        $this->setVbsinstance($vbs);
     }
 }
