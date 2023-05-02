@@ -1,10 +1,16 @@
 import { Modal } from '../../Modal.js';
 import { SearchExistingDialog  } from "./SearchExistingDialog.js";
+import { CreateEmployeeFrm } from './CreateEmployeeFrm.js';
+import Step from './stepper/Step.js'
+import Steps from './stepper/Steps.js';
 
 export const CreateWizard = {
     components: {
         Modal,
+        Steps,
+        Step,
         SearchExistingDialog,
+        CreateEmployeeFrm,
     },
     props: {
         
@@ -14,6 +20,8 @@ export const CreateWizard = {
         // Modal 
         const { watch, ref } = Vue;
         const modalRef = ref();
+        const stepsRef = ref();
+        const schnellanlageRef = ref();
         const currentValue = ref();
         const isFetching = ref(false);
         let _resolve;
@@ -35,35 +43,32 @@ export const CreateWizard = {
         }
         
 
-       
-
         const okHandler = () => {
-            if (!frmState.bisBlured && currentValue.value.befristet) {
-                frmState.bisBlured = true;;
-            }
-            if (!dienstvehaeltnisFrm.value.checkValidity()) {
+            
+            /*
+            postData()
+                .then((r) => {
+                    if (r.error == 0) {
+                        console.log('employee successfully saved');
+                        showToast();
+                    }                       
+                }
+                )
+                .catch((error) => {
+                    console.log(error.message);
+                });
+            */
+            schnellanlageRef.value.save().then(() => {
+                console.log("employee successfully created")
+                hideModal()
+                _resolve(true)
+            })
+            .catch((error) => {
+                console.log(error.message);
+            });
 
-                console.log("form invalid");        
-
-            } else {
-
-                console.log("form valid");
-                
-                postData()
-                    .then((r) => {
-                        if (r.error == 0) {
-                            console.log('employee successfully saved');
-                            showToast();
-                        }                       
-                    }
-                    )
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
-                
-                hideModal();
-                _resolve(true);
-            }
+            
+            
         }
 
         
@@ -71,6 +76,21 @@ export const CreateWizard = {
             hideModal();
             _resolve(false);
         }
+
+        const showCreateHandler = () => {
+            stepsRef.value.selectStep('Schnellanlage')
+        }
+
+        const getSelectedTitle = () => {
+            if (stepsRef.value != undefined)
+                return stepsRef.value.selectedTitle;
+            return '-';
+        }
+
+        const searchCriteriaHandler = (e) => {
+            currentValue.value = e;
+        }
+
 
         const postData = async () => {
             isFetching.value = true
@@ -101,21 +121,38 @@ export const CreateWizard = {
         
         Vue.defineExpose({ showModal });
 
-        return { modalRef, showModal, hideModal, okHandler,cancelHandler, currentValue };
+        return { modalRef, stepsRef, schnellanlageRef, showModal, hideModal, 
+            okHandler,cancelHandler, currentValue, showCreateHandler, getSelectedTitle,
+            searchCriteriaHandler };
     },
     template: `
         <Modal :title="'Mitarbeiter anlegen'" ref="modalRef" id="createWizardModal">
             <template #body>
+            
+                <Steps  ref="stepsRef">
+                    <Step title="Suche">
+                        <search-existing-dialog @change="searchCriteriaHandler" />
+                    </Step>
+                    <Step title="Schnellanlage" >
+                        <create-employee-frm ref="schnellanlageRef" :defaultval="currentValue" />
+                    </Step>                    
+                </Steps>
 
-                <search-existing-dialog />
+                
 
             </template>
             <template #footer>
                 <button type="button" class="btn btn-secondary" @click="cancelHandler()">
                     Abbrechen
                 </button>
-                <button type="button" class="btn btn-primary" @click="okHandler()" >
+                <button type="button" class="btn btn-primary" @click="stepsRef.selectStep('Suche')" v-if="getSelectedTitle() != 'Suche'" >
+                    zurück
+                </button>
+                <button type="button" class="btn btn-primary" @click="okHandler()" v-if="getSelectedTitle() != 'Suche'" >
                     OK
+                </button>
+                <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue.surname == ''"  @click="showCreateHandler()" v-if="getSelectedTitle() != 'Schnellanlage'">
+                    Neuanlage
                 </button>
             </template>
 

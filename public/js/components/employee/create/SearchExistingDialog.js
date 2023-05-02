@@ -8,7 +8,8 @@ export const SearchExistingDialog = {
     props: {
        
     },
-    setup( props ) {
+    emits: ["change"],
+    setup( props, { emit } ) {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
@@ -22,6 +23,8 @@ export const SearchExistingDialog = {
 
         const isFetching = Vue.ref(false);
 
+        const surnameRef = Vue.ref(null);
+
         const formatDate = (ds) => {
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
@@ -30,10 +33,13 @@ export const SearchExistingDialog = {
 
         const filterPerson = async () => {
             
+            emit('change', currentValue );
+
             if (currentValue.surname.length<=2) {
                 personList.value = [];
                 return;
             }
+            
 
             try {
                 let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
@@ -78,7 +84,14 @@ export const SearchExistingDialog = {
             console.log("Person übernehmen: ", id);
         }
 
-        return {  currentValue, filterPerson, personSelectedHandler, takePerson, personList  };
+        Vue.onMounted(() => {
+            console.log('SearchExistingDialog mounted');
+            surnameRef.value.focus();
+            
+        })
+
+
+        return {  currentValue, filterPerson, personSelectedHandler, takePerson, personList, surnameRef  };
     },
     template: `
     <form class="row g-3" ref="searchExistingFrm" id="searchExistingFrm" >
@@ -86,11 +99,13 @@ export const SearchExistingDialog = {
         <div class="col-md-3">
             <label for="surname" class="required form-label">Nachname</label>
             <input id="surname" 
+                ref="surnameRef"
                 v-model="currentValue.surname" 
                 @keyup="filterPerson"
                 type="text" 
                 class="form-control form-control-sm" 
-                placeholder="Nachname" aria-label="nachname">
+                placeholder="Nachname" aria-label="nachname"
+                autofocus >
         </div>
         <div class="col-md-9"></div>
         <div class="col-md-3">
