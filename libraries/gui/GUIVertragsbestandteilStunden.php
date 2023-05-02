@@ -51,10 +51,12 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
             throw new \Exception('missing data');
         }
         $res = $this->getJSONDataFloat($this->data['stunden'], $decodedData, 'stunden');
+/*		
         if ($res === false)
         {
             throw new \Exception('could not read stunden');
         }
+ */
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
