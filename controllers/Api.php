@@ -65,6 +65,7 @@ class Api extends Auth_Controller
 				'storeToTmpStore' => Api::DEFAULT_PERMISSION,
 				'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
 				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
+				'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
 				'getUnternehmen' => Api::DEFAULT_PERMISSION,
 				'getVertragsarten' => Api::DEFAULT_PERMISSION,
                 'filterPerson' => Api::DEFAULT_PERMISSION,
@@ -1283,35 +1284,17 @@ EOSQL;
 		}		
 	}
 	
-	public function saveVertrag($mitarbeiter_uid) 
+	public function saveVertrag($mitarbeiter_uid, $dryrun=null) 
 	{
 		$payload = $this->input->raw_input_stream;
 		$editor = getAuthUID();
-/*		
-		if( !isset($payload->guioptions) ) 
-		{
-			$payload->guioptions = new stdClass();
-		}
-		
-		if( !isset($payload->guioptions->infos) ) 
-		{
-			$payload->guioptions->infos = array();
-		}
-		
-		if( !isset($payload->guioptions->errors) ) 
-		{
-			$payload->guioptions->errors = array();
-		}
 
-		$payload->guioptions->infos[] = 'Test Erfolgreich gespeichert.';
-		$payload->guioptions->errors[] = 'Test Beim Speichern ist ein Fehler aufgetreten.';
-*/		
+		$onlyvalidate = (strtolower($dryrun) === 'dryrun') ? true : false;
+		
 		$guihandler = GUIHandler::getInstance();
 		$guihandler->setEmployeeUID($mitarbeiter_uid)
 			->setEditorUID($editor);
-		$ret = $guihandler->handle($payload);
-		
-		//print_r($guihandler);
+		$ret = $guihandler->handle($payload, $onlyvalidate);
 		
 		$this->outputJson(
 			array(
@@ -1365,6 +1348,8 @@ EOSQL;
 					'insertamum' => strftime('%Y-%m-%d %H:%M')
 				)
 			);
+			$tmpstoreid = getData($ret);
+			$payload->tmpStoreId = $tmpstoreid;
 		}
 		
 		$this->outputJson(
@@ -1418,6 +1403,19 @@ EOSQL;
 		$this->outputJson(
 			array(
 				'data' => $data, 
+				'meta' => array()
+			)
+		);
+		return;
+	}
+
+	public function deleteFromTmpStore($tmpstoreid) 
+	{
+		$result = $this->TmpStoreModel->delete($tmpstoreid);
+		
+		$this->outputJson(
+			array(
+				'data' => $result, 
 				'meta' => array()
 			)
 		);

@@ -92,6 +92,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         $this->getJSONData($this->data['orget'], $decodedData, 'orget');
 		$this->getJSONData($this->data['mitarbeiter_uid'], $decodedData, 'mitarbeiter_uid');
         $this->getJSONData($this->data['benutzerfunktionid'], $decodedData, 'benutzerfunktionid');
+		$this->getJSONData($this->data['mode'], $decodedData, 'mode');
         
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);

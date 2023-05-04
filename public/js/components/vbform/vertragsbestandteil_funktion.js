@@ -14,6 +14,7 @@ export default {
       <div class="col-2">
         <div class="form-check">
           <input v-model="mode" class="form-check-input form-check-input-sm" type="radio"
+            @change="resetDropdowns"
             :name="'vbfunktionmode_' + config.guioptions.id" :id="'vbfunktionmode1_' + config.guioptions.id" value="neu">
           <label class="form-check-label" :for="'vbfunktionmode1_' + config.guioptions.id">Neue Funktion</label>
         </div>
@@ -21,6 +22,7 @@ export default {
       <div class="col-3">
         <div class="form-check">
           <input v-model="mode" class="form-check-input form-check-input-sm" type="radio"
+            @change="resetDropdowns"
             :name="'vbfunktionmode_' + config.guioptions.id" :id="'vbfunktionmode2_' + config.guioptions.id" value="bestehende">
           <label class="form-check-label" :for="'vbfunktionmode2_' + config.guioptions.id">bestehende Funktion</label>
         </div>
@@ -119,18 +121,26 @@ export default {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
     },
+    resetDropdowns: function() {
+      this.funktion = '';
+      this.orget = '';
+      this.benutzerfunktionid = '';
+    },
     setDataFromConfig: function() {
-      if( typeof this.config?.data?.id !== undefined ) {
+      if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;
       }
-      if( typeof this.config?.data?.funktion !== undefined ) {
+      if( this.config?.data?.funktion !== undefined ) {
         this.funktion = this.config.data.funktion;
       }
-      if( typeof this.config?.data?.orget !== undefined ) {
+      if( this.config?.data?.orget !== undefined ) {
         this.orget = this.config.data.orget;
       }
-      if( typeof this.config?.data?.benutzerfunktionid !== undefined ) {
+      if( this.config?.data?.benutzerfunktionid !== undefined ) {
         this.benutzerfunktionid = this.config.data.benutzerfunktionid;
+      }
+      if( this.config?.data?.mode !== undefined ) {
+        this.mode = this.config.data.mode;
       }
     },
     getFunktionen: async function() {
@@ -144,6 +154,9 @@ export default {
       this.lists.funktionen = funktionen;
     },
     getOrgetsForCompany: async function() {
+      if( this.store.unternehmen === '' ) {
+          return;
+      }
       const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(this.store.unternehmen);
       const orgets = response.data.retval;
       orgets.unshift({
@@ -154,6 +167,9 @@ export default {
       this.lists.orgets = orgets;
     },
     getCurrentFunctions: async function() {
+      if(this.store.unternehmen === '' || this.store.mitarbeiter_uid === '' ) {
+        return;  
+      }
       const response = await Vue.$fhcapi.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
       const benutzerfunktionen = response.data.retval;
       benutzerfunktionen.unshift({
@@ -179,6 +195,7 @@ export default {
           orget: this.orget,
           benutzerfunktionid: this.benutzerfunktionid,
           mitarbeiter_uid: this.store.mitarbeiter_uid,
+          mode: this.mode,
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
         gbs: this.getGehaltsbestandteilePayload()

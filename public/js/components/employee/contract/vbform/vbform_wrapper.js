@@ -1,4 +1,4 @@
-import presets from '../../../../apps/vbform/presets.js';
+import presets from '../../../../apps/vbform/presets/presets.js.php';
 import debug_viewer from '../../../vbform/debug_viewer.js';
 import vbformhelper from '../../../vbform/vbformhelper.js';
 import store from '../../../vbform/vbsharedstate.js';
@@ -10,21 +10,22 @@ export default {
     <Modal :title="title + (mode=='aenderung'?' bearbeiten':' anlegen')" ref="modalRef" id="vbformModal">
         <template #body>
     
-        <presets_chooser :presets="presets" @presetselected="presetselected" :showselectmode="false"></presets_chooser>
+        <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
 
         <div class="row g-2 py-2">
 
           <div class="col-12">
-            <vbformhelper ref="vbformhelper" :preset="preset" 
+            <vbformhelper ref="vbformhelperRef" :preset="preset" 
                 @vbhjsonready="processJSON" 
-                @saved="handleSaved"></vbformhelper>
+                @saved="handleSaved"
+                @loadedfromtmpstore="handleLoadFromTmpStore"></vbformhelper>
           </div>
 
           
 
         </div>
 
-        <div class="row">
+        <div v-if="debug" class="row">
           <div class="col-12">
             <debug_viewer v-bind:text="vbhjson"></debug_viewer>
           </div>
@@ -37,7 +38,8 @@ export default {
       'mode',
       'title',
       'mitarbeiter_uid',
-      'dvid'
+      'dvid',
+      'debug'
   ],
   data: function() {
     return {
@@ -84,17 +86,27 @@ export default {
       this.presettostore();
     },
     presettostore: function() {
+      this.store.reset();
       var vbs = JSON.parse(JSON.stringify(this.preset.vbs));
       for( var key in vbs ) {
         this.store.addVB(key, vbs[key]);
       }
-      this.store.setDV(JSON.parse(JSON.stringify(this.preset.dv)));
+      var dv = JSON.parse(JSON.stringify(this.preset.dv));
+      this.store.setDV(dv);
     },
     processJSON: function(payload) {
       this.vbhjson = payload;
     },
+    handlePresetSelected: function(preset) {
+      this.presetselected(preset);
+      this.$refs['vbformhelperRef'].resetTmpStoreHelper();  
+    },
     handleSaved: function(payload) {
       this.presetselected(payload);
+    },
+    handleLoadFromTmpStore: function(payload) {
+      this.presetselected(payload);
+      this.$refs['presetchooserRef'].resetSelectedPreset();
     },
     showModal: function() {
         this.$refs['modalRef'].show();

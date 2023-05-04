@@ -79,21 +79,28 @@ class GUIHandler
      * @param string $userUID  uid of the user currently editing the employee data
      * @return string JSON for GUI client
      */
-    public function handle($guidata)
+    public function handle($guidata, $onlyvalidate=false)
     {
 		$decoded = json_decode($guidata, true);
 		$this->DataMapper = GUIHandlerFactory::getGUIHandler($decoded['type']);
 		$this->DataMapper->mapJSON($decoded);
 		
-		if (!$this->DataMapper->isValid())
+		if( $this->DataMapper->isValid() )
 		{
-			$errormsg = 'Validation error while saving Vertragsbestandteile';
-			log_message('error', $errormsg);
-			$this->DataMapper->addGUIError('Dienstverhältnis konnte nicht gespeichert werden');
+			if( $onlyvalidate ) 
+			{
+				$this->DataMapper->addGUIInfo('Dienstverhältnis kann gespeichert werden.');
+			}
+			else
+			{
+				$this->store();	
+			}			
 		}
 		else
 		{
-			$this->store();
+			$errormsg = 'Validation error while saving Vertragsbestandteile';
+			log_message('error', $errormsg);
+			$this->DataMapper->addGUIError('Dienstverhältnis kann nicht gespeichert werden.');
 		}
 		
 		$json = json_encode($this->DataMapper);

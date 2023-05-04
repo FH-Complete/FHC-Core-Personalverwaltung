@@ -10,8 +10,11 @@
 
 @media (min-width: 992px) {
 
-	#vbFormWrapper .modal-lg {
-		max-width: 70%;
-	}
+    #vbFormWrapper .modal-lg {
+        max-width: 70%;
+    }
 
+    #vbFormWrapper .modal-content {
+        height: 100%;
+    }
 }

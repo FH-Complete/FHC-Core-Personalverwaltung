@@ -5,21 +5,31 @@ import dv from './dv.js';
 import store from './vbsharedstate.js';
 import errors from './errors.js';
 import infos from './infos.js';
+import tmpstorehelper from './tmpstorehelper.js';
 
 export default {
   template: `
     <div class="vbformhelper">
       <div class="border-bottom py-2 mb-3">
+        <tmpstorehelper ref="tmpstorehelper" @loadedfromtmpstore="loadedFromTmpStore" @savetotmpstore="saveToTmpStore"></tmpstorehelper>
         <div class="row g-2 py-2">
-          <div class="col-9">&nbsp;</div>
+          <div class="col-10">&nbsp;</div>
+<!--        
           <div class="col-1">
-            <button class="btn btn-primary btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
+            <button class="btn btn-warning btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
           </div>
           <div class="col-1">
-            <button class="btn btn-primary btn-sm float-end" @click="save">Speichern</button>
-          </div>        
+            <button class="btn btn-warning btn-sm float-end" @click="loadFromTmpStore">Laden</button>
+          </div>
           <div class="col-1">
-            <button class="btn btn-secondary btn-sm float-end" @click="getJSON">get JSON</button>
+            <button class="btn btn-warning btn-sm float-end" @click="deleteFromTmpStore">Löschen</button>
+          </div>
+-->
+          <div class="col-1">
+            <button class="btn btn-danger btn-sm float-end" @click="save">Speichern</button>
+          </div>
+          <div class="col-1">
+            <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
           </div>
         </div>
         <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
@@ -33,7 +43,8 @@ export default {
     "dv": dv,
     "vertragsbestandteillist": vertragsbestandteillist,
     "infos": infos,
-    "errors": errors
+    "errors": errors,
+    "tmpstorehelper": tmpstorehelper
   },
   mixins: [
     presetable
@@ -45,7 +56,8 @@ export default {
   },
   emits: [
     "vbhjsonready",
-    "saved"
+    "saved",
+    "loadedfromtmpstore"
   ],
   methods: {
     getPayload: function() {
@@ -66,18 +78,40 @@ export default {
       var payload = this.getPayload();
       this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
     },
+    resetTmpStoreHelper: function() {
+        this.$refs['tmpstorehelper'].fetchTmpStoreList(true);
+        this.store.setTmpStoreId(null);
+    },
     saveToTmpStore: function() {
       const formdata = this.getPayload();
       this.$emit('vbhjsonready', JSON.stringify(formdata, null, 2));
       const payload = {
-        tmpStoreId: 2,
+        tmpStoreId: this.store.getTmpStoreId(),
         typ: this.store.getMode(),  
         mitarbeiter_uid: this.store.mitarbeiter_uid,  
         formdata: formdata
       };
       Vue.$fhcapi.TmpStore.storeToTmpStore(payload)
       .then((response) => {
+        this.store.setTmpStoreId(response.data.meta.tmpstoreid);
+        this.$refs['tmpstorehelper'].fetchTmpStoreList(false);
         console.log('storeToTmpStore executed.');
+      });
+    },
+    loadedFromTmpStore: function(payload) {
+        this.$emit('loadedfromtmpstore', payload);
+    },
+    loadFromTmpStore: function() {
+      Vue.$fhcapi.TmpStore.getTmpStoreById(2)
+      .then((response) => {
+        console.log('loadFromTmpStore executed.');
+        this.$emit('loadedfromtmpstore', response.data.data.formdata);
+      });
+    },
+    deleteFromTmpStore: function() {
+      Vue.$fhcapi.TmpStore.deleteFromTmpStore(2)
+      .then((response) => {
+        console.log('deleteFromTmpStore executed.');
       });
     },
     save: function() {
@@ -86,6 +120,16 @@ export default {
       
       const that = this;
       Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
+      .then((response) => {
+        that.$emit('saved', response.data.data);
+      });
+    },
+    validate: function() {
+      const payload = this.getPayload();
+      this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
+      
+      const that = this;
+      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
       .then((response) => {
         that.$emit('saved', response.data.data);
       });

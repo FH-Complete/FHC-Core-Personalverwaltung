@@ -24,5 +24,11 @@ export default {
             + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/getTmpStoreById/' 
             + id;
     return axios.get(url);
+  },
+  deleteFromTmpStore: function(id) {
+    var url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
+            + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/deleteFromTmpStore/' 
+            + id;
+    return axios.post(url);
   }
 };

@@ -2,6 +2,7 @@ export default Vue.reactive({
   mode: '',
   unternehmen: '',
   mitarbeiter_uid: '',
+  tmpstoreid: null,
   gueltigkeit: {
     gueltig_ab: '',
     gueltig_bis: ''
@@ -38,6 +39,12 @@ export default Vue.reactive({
   },
   setMode: function(mode) {
     this.mode = mode;
+  },
+  getTmpStoreId: function() {
+      return this.tmpstoreid;
+  },
+  setTmpStoreId: function(tmpstoreid) {
+      this.tmpstoreid = tmpstoreid;
   },
   reset: function() {
     this.gueltigkeit = {

@@ -49,10 +49,10 @@ export default {
   data: function () {
     return {
       id: null,
-      zeitaufzeichnung: '',
-      azgrelevant: '',
-      homeoffice: ''
-    }
+      zeitaufzeichnung: true,
+      azgrelevant: true,
+      homeoffice: true
+    };
   },
   created: function() {
     this.setDataFromConfig();

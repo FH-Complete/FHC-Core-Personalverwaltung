@@ -36,7 +36,7 @@ export default {
   emits: [
     "presetselected"
   ],
-  created: function() {
+  mounted: function() {
     this.selectmode();
   },
   watch: {
@@ -45,8 +45,11 @@ export default {
     }
   },
   methods: {
+    resetSelectedPreset: function() {
+      this.selectedpresetidx = -1;
+    },
     selectmode: function() {
-      this.selectedpresetidx = -1;        
+      this.resetSelectedPreset();
       this.usedpresets = ( typeof this.presets[this.store.mode] !== 'undefined')
                        ? this.presets[this.store.mode]
                        : [];

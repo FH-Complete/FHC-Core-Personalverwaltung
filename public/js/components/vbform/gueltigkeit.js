@@ -61,6 +61,9 @@ export default {
     this.setGUIOptionsFromConfig();
     this.setDataFromConfig();
   },
+  mounted: function() {
+    this.gueltigkeitchanged();
+  },
   watch: {
     'sharedstate.gueltigkeit.gueltig_ab': function() {
       if( this.sharedstatemode === 'reflect' ) {

@@ -5,7 +5,7 @@ import store from './vbsharedstate.js';
 export default {
   template: `
   <div class="col-3">
-    <select v-model="store.unternehmen" :disabled="isaenderung || isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <select v-model="store.unternehmen" :disabled="isaenderung && isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
         v-for="u in lists.unternehmen"
         :value="u.value"
@@ -16,7 +16,7 @@ export default {
     </select>
   </div>
   <div class="col-3">
-    <select v-model="vertragsart_kurzbz" :disabled="isaenderung || isconfigured('vertragsart_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <select v-model="vertragsart_kurzbz" :disabled="isaenderung && isconfigured('vertragsart_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
         v-for="v in lists.vertragsarten"
         :value="v.value"
