@@ -1376,7 +1376,7 @@ EOSQL;
 		{
 			foreach (getData($storedentries) as $storedentry)
 			{
-				$data[$storedentry->typ][] = $storedentry;
+				$data[$storedentry->typ][$storedentry->tmp_store_id] = $storedentry;
 			}
 		}
 		

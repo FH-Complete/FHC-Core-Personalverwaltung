@@ -14,15 +14,20 @@ export default {
       </select>
 
     </div>
-    <div class="col-1">
-        <button class="btn btn-warning btn-sm float-end" @click="selecttmpstore">Laden</button>
+    <div class="col-4">
+        <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
+            <div class="btn-group me-2" role="group" aria-label="First group">
+                <button class="btn btn-warning btn-sm float-end" @click="selecttmpstore">Laden</button>
+            </div>
+            <div class="btn-group me-2" role="group" aria-label="Second group">
+                <button class="btn btn-warning btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
+            </div>
+            <div class="btn-group" role="group" aria-label="Third group">
+                <button class="btn btn-warning btn-sm float-end" @click="deleteFromTmpStore">Löschen</button>
+            </div>
+        </div>        
     </div>
-    <div class="col-2">
-        <button class="btn btn-warning btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
-    </div>
-    <div class="col-1">
-      <button class="btn btn-warning btn-sm float-end" @click="deleteFromTmpStore">Löschen</button>
-    </div>
+
     <div class="col-4">&nbsp;</div>
   </div>
   `,

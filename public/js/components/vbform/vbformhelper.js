@@ -13,23 +13,17 @@ export default {
       <div class="border-bottom py-2 mb-3">
         <tmpstorehelper ref="tmpstorehelper" @loadedfromtmpstore="loadedFromTmpStore" @savetotmpstore="saveToTmpStore"></tmpstorehelper>
         <div class="row g-2 py-2">
-          <div class="col-10">&nbsp;</div>
-<!--        
-          <div class="col-1">
-            <button class="btn btn-warning btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
-          </div>
-          <div class="col-1">
-            <button class="btn btn-warning btn-sm float-end" @click="loadFromTmpStore">Laden</button>
-          </div>
-          <div class="col-1">
-            <button class="btn btn-warning btn-sm float-end" @click="deleteFromTmpStore">Löschen</button>
-          </div>
--->
-          <div class="col-1">
-            <button class="btn btn-danger btn-sm float-end" @click="save">Speichern</button>
-          </div>
-          <div class="col-1">
-            <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
+          <div class="col-9">&nbsp;</div>
+        
+          <div class="col-3">
+            <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
+                <div class="btn-group me-2" role="group" aria-label="First group">
+                    <button class="btn btn-danger btn-sm float-end" @click="save">Speichern</button>
+                </div>
+                <div class="btn-group me-2" role="group" aria-label="Second group">
+                    <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
+                </div>
+            </div>
           </div>
         </div>
         <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
@@ -100,19 +94,6 @@ export default {
     },
     loadedFromTmpStore: function(payload) {
         this.$emit('loadedfromtmpstore', payload);
-    },
-    loadFromTmpStore: function() {
-      Vue.$fhcapi.TmpStore.getTmpStoreById(2)
-      .then((response) => {
-        console.log('loadFromTmpStore executed.');
-        this.$emit('loadedfromtmpstore', response.data.data.formdata);
-      });
-    },
-    deleteFromTmpStore: function() {
-      Vue.$fhcapi.TmpStore.deleteFromTmpStore(2)
-      .then((response) => {
-        console.log('deleteFromTmpStore executed.');
-      });
     },
     save: function() {
       const payload = this.getPayload();
