@@ -1,10 +1,15 @@
 <?php
+
+use phpDocumentor\Reflection\Types\Boolean;
+
 defined('BASEPATH') || exit('No direct script access allowed');
 
 require_once dirname(__DIR__) . '/libraries/gui/GUIHandler.php';
 
+
 class Api extends Auth_Controller
 {
+
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 
     public function __construct() {
@@ -69,6 +74,7 @@ class Api extends Auth_Controller
 				'getUnternehmen' => Api::DEFAULT_PERMISSION,
 				'getVertragsarten' => Api::DEFAULT_PERMISSION,
                 'filterPerson' => Api::DEFAULT_PERMISSION,
+                'createEmployee' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -679,6 +685,58 @@ class Api extends Auth_Controller
 
     }
 
+    /** helper to sanitize and validate a string (string length must be >0)
+     * @return false if validation fails
+    */
+    private function validateJSONDataString(&$target, &$decoded, $attributeName)
+    {
+        if (isset($decoded[$attributeName]))
+        {
+            $target = filter_var($decoded[$attributeName], FILTER_SANITIZE_STRING);
+            if ($target == '') return false;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * validate and sanitize
+     */
+    private function validateEmployeeQuickPayload(&$payload) : bool
+    {
+        $attributeList = ['vorname', 'nachname', 'email', 'gebdatum', 'geschlecht', 'staatsbuergerschaft'];
+
+        foreach ($attributeList as $key) {
+            if (!$this->validateJSONDataString($payload['nachname'], $payload, 'nachname'))
+                {
+                    $this->outputJsonError('nachname is empty!');
+                    return false;
+                }
+        }
+        
+        return true;
+    }
+
+    /**
+     * validate payload for converting person to employee
+     */
+    private function validateEmployeeTakePayload(&$payload) : bool
+    {
+        if (!isset($payload['person_id']) || (isset($payload['person_id']) && !is_int($payload['person_id'])))
+            {
+                $this->outputJsonError('missing person_id');
+                return false;
+            }
+
+        if (!$this->validateJSONDataString($payload['uid'], $payload, 'uid'))
+            {
+                $this->outputJsonError('uid is empty!');
+                return false;
+            }
+        return true;
+    }
+
+
 
     // get person data
     function personBaseData()
@@ -1097,6 +1155,100 @@ class Api extends Auth_Controller
 
         
         return $this->outputJson($data);   
+    }
+
+    // ----------------------------------------
+    // Employee
+    // ----------------------------------------
+
+    function createEmployee()
+    {
+        if($this->input->method() === 'post')
+        {
+            /* example of submitted json:
+            {"action":"quick",
+             "payload":{"vorname":"Werner","vornamen":"","nachname":"Masik","gebdatum":"2023-05-12","email":"werner.masik@radiotechnikum.at","svnr":"","geschlecht":"w","staatsbuergerschaft":"A","anmerkung":""}}
+             */
+            $json = json_decode($this->input->raw_input_stream, TRUE);
+            $action = $json['action'];
+            $payload = $json['payload'];
+            // init
+            $person_id = null;
+
+            if ($action == 'quick')
+            {
+
+                if (!$this->validateEmployeeQuickPayload($payload))
+                    return;
+
+
+                // create person
+                $personJson = array_merge([], $payload);
+                unset($personJson['email']);
+                $result = $this->ApiModel->insertPersonBaseData($personJson);
+                
+
+                if (isError($result))
+                {
+                    $this->outputJsonError('error creating person base data');
+                    return;
+                }
+                $person_id = $result->retval;
+
+                // create contact email
+                $contactJson = [
+                    'person_id' => $person_id,
+                    'kontakttyp' => 'email',
+                    'kontakt' => $payload['email'],
+                    'zustellung' => true];
+                $result = $this->ApiModel->insertPersonContactData($contactJson);
+
+                if (isError($result))
+                {
+                    $this->outputJsonError('error creating email for person');
+                    return;
+                }
+
+
+            } elseif ($action == 'take') {
+
+                // validate
+                if (!$this->validateEmployeeTakePayload($payload))
+                    return;
+                $person_id = $payload['person_id'];
+
+            }
+        
+
+            // generate UID and Personalnummer
+            $personalnummer = $this->ApiModel->generatePersonalnummer();
+            $uid = sprintf('ma%05d',  $personalnummer - 10000);
+
+            // create benutzer
+            $result = $this->ApiModel->insertUser([ 'uid' => $uid, 'person_id' => $person_id ]);
+            if (isError($result)) 
+            {
+                $this->outputJsonError('error creating user for person');
+                return;
+            }
+            $uid = $result->retval;
+
+            // create employee
+            $employeeJson = [ 'mitarbeiter_uid' => $uid, 'personalnummer' => $personalnummer];
+            $result = $this->ApiModel->insertEmployee($employeeJson);
+            if (isError($result)) 
+            {
+                $this->outputJsonError('error creating employee');
+                return;
+            }
+
+            
+            // return person_id and uid
+            $this->outputJsonSuccess(['person_id' => $person_id, 'uid' => $uid]);
+
+        } else {
+            $this->output->set_status_header('405');
+        }  
     }
 
 

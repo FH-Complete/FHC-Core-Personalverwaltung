@@ -6,6 +6,7 @@ import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
 import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
+import { Toast } from '../Toast.js';
 
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -19,6 +20,7 @@ export default {
 		verticalsplit,
 		searchbar,
 		CreateWizard,
+		Toast,
 	},
     setup() {
 
@@ -32,6 +34,7 @@ export default {
 		const appSideMenuEntries = ref({});
 		const verticalsplitRef = ref(null);
 		const createWizardRef = ref();
+		const toastEmployeeCreatedRef = ref();
 		const currentDate = ref(null);
 
 		watch(
@@ -182,7 +185,12 @@ export default {
 		}
 
 		const openCreateWizard = () => {
-			createWizardRef.value.showModal();
+			createWizardRef.value.showModal().then((action) => {
+				console.log('create wizard closed. action: ', action);
+				if (action !== false) {
+					showEmployeeCreatedToast();
+				}
+			})
 		}
 		
 		const newSideMenuEntryHandler = (payload) => {
@@ -264,6 +272,10 @@ export default {
 			]
 		};
 
+		const showEmployeeCreatedToast = () => {
+            toastEmployeeCreatedRef.value.show();
+        }
+
 		Vue.onMounted(() => {
 			let person_id = route.params.id;
 			let person_uid = route.params.uid;
@@ -308,6 +320,7 @@ export default {
 			employeesTabulatorEvents,
 			employeesTabulatorOptions,
 			verticalsplitRef,
+			toastEmployeeCreatedRef,
 			route,
 		}
 
@@ -352,6 +365,12 @@ export default {
                             <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
                                 <button type="button" class="btn btn-outline-secondary" @click="openCreateWizard()"><i class="fa fa-plus"></i></button>
                             </div>
+
+							<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+								<Toast ref="toastEmployeeCreatedRef">
+									<template #body><h4>Mitarbeiter erstellt.</h4></template>
+								</Toast>
+							</div>
                         </div>
                             <!-- Filter component -->
                             <core-filter-cmpt

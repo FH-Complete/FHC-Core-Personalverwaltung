@@ -327,18 +327,67 @@ class Api_model extends DB_Model
         {
             $personJson['staatsbuergerschaft'] = null;
         }
+        if ($personJson['svnr'] == '')
+        {
+            $personJson['svnr'] = null;
+        }
 
         $personJson['insertvon'] = getAuthUID();
         $personJson['insertamum'] = $this->escape('NOW()');
 
-        $result = $this->PersonModel->insert($personJson['person_id'], $personJson);
-
+        $result = $this->PersonModel->insert($personJson);
+       
         if (isError($result))
         {
             return error($result->msg, EXIT_ERROR);
         }
 
-        return success($personJson['person_id']);
+        $person_id = $result->retval;
+
+        return success($person_id);
+    }
+
+    private function generateEmployeeUID($personalnummer)
+    {
+        /* did not work out:
+        $string = $person_id - 10000;
+        $uid = strlen($string) < 4 ? 'ma0'. $string: 'ma'. $string;
+        return $uid;
+        */
+        //$qry = "select max(substr(uid,3)::integer) uid from tbl_benutzer where uid~'^ma[0-9]+'";
+
+        $uid = sprintf('ma%05d',  $personalnummer);
+
+        return $uid;
+    }
+
+    function generatePersonalnummer()
+    {
+        $qry = "select nextval('tbl_mitarbeiter_personalnummer_seq') pnr";
+
+        $result = $this->execQuery($qry);
+
+        return $result->retval[0]->pnr;
+    }
+
+    function insertUser($userJson)
+    {
+        
+        unset($userJson['updateamum']);
+        unset($userJson['updatevon']);
+        $userJson['aktiv'] = true;
+
+        $userJson['insertvon'] = getAuthUID();
+        $userJson['insertamum'] = $this->escape('NOW()');
+
+        $result = $this->BenutzerModel->insert($userJson);
+       
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($userJson['uid']);
     }
 
     // -------------------------------------
@@ -430,6 +479,28 @@ class Api_model extends DB_Model
 
         return $result;
         //return success($employeeDataJson['mitarbeiter_uid']);
+    }
+
+    function insertEmployee($employeeJson)
+    {
+
+        $employeeJson['insertvon'] = getAuthUID();
+        $employeeJson['insertamum'] = $this->escape('NOW()');
+
+        if ($employeeJson['standort_id'] == 0)
+        {
+            $employeeJson['standort_id'] = null;
+        }
+
+        $result = $this->EmployeeModel->insert($employeeJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($employeeJson['personalnummer']);
+        //return success($employeeJson['mitarbeiter_uid']);
     }
 
 
@@ -758,7 +829,8 @@ class Api_model extends DB_Model
                 CASE WHEN ma.personalnummer is not null THEN \'Mitarbeiter\'
                      WHEN s.matrikelnr is not null THEN \'Student\'
                      ELSE \'-\'
-                END AS status
+                END AS status,
+                exists (select 1 from public.tbl_benutzer tb join public.tbl_mitarbeiter tm on(tb.uid=tm.mitarbeiter_uid) where person_id=p.person_id) as taken
             FROM
                 public.tbl_person p LEFT JOIN
                 public.tbl_benutzer b ON (p.person_id=b.person_id)  LEFT JOIN

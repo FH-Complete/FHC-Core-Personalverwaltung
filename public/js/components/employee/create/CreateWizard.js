@@ -21,6 +21,7 @@ export const CreateWizard = {
         const { watch, ref } = Vue;
         const modalRef = ref();
         const stepsRef = ref();
+        const searchExistingRef = ref();
         const schnellanlageRef = ref();
         const currentValue = ref();
         const isFetching = ref(false);
@@ -39,7 +40,7 @@ export const CreateWizard = {
         }
 
         const hideModal = () => {
-            modalRef.value.hide();
+            modalRef.value.hide({type: 'CANCEL'});
         }
         
 
@@ -60,8 +61,14 @@ export const CreateWizard = {
             */
             schnellanlageRef.value.save().then(() => {
                 console.log("employee successfully created")
+                stepsRef.value.reset()
+                currentValue.value = { surname: '', birthdate: null} 
+                searchExistingRef.value.reset()  
+                schnellanlageRef.value.reset()             
                 hideModal()
-                _resolve(true)
+                
+                
+                _resolve({type: 'CREATED', payload: { uid: 'dummy' }})
             })
             .catch((error) => {
                 console.log(error.message);
@@ -121,7 +128,7 @@ export const CreateWizard = {
         
         Vue.defineExpose({ showModal });
 
-        return { modalRef, stepsRef, schnellanlageRef, showModal, hideModal, 
+        return { modalRef, stepsRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
             okHandler,cancelHandler, currentValue, showCreateHandler, getSelectedTitle,
             searchCriteriaHandler };
     },
@@ -131,7 +138,7 @@ export const CreateWizard = {
             
                 <Steps  ref="stepsRef">
                     <Step title="Suche">
-                        <search-existing-dialog @change="searchCriteriaHandler" />
+                        <search-existing-dialog ref="searchExistingRef" @change="searchCriteriaHandler" @select="cancelHandler" />
                     </Step>
                     <Step title="Schnellanlage" >
                         <create-employee-frm ref="schnellanlageRef" :defaultval="currentValue" />

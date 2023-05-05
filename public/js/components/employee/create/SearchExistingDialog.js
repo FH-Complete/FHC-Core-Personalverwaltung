@@ -8,7 +8,7 @@ export const SearchExistingDialog = {
     props: {
        
     },
-    emits: ["change"],
+    emits: ["change", "select", "take"],
     setup( props, { emit } ) {
 
         const router = VueRouter.useRouter();
@@ -77,11 +77,44 @@ export const SearchExistingDialog = {
 			console.log('personSelected: ', id);			
 			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}/summary`;
 			router.push(url);
+            emit('select', uid );
 		}
 
         // create new employee based on student
-        const takePerson = (id, uid) => {
-            console.log("Person übernehmen: ", id);
+        const take = async (person_id, uid) => {
+                                
+            // submit
+            isFetching.value = true
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+
+            const endpoint =
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/createEmployee`;
+
+            const res = await fetch(endpoint,{
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ action: "take", payload: { person_id, uid}}),
+            });    
+
+            if (!res.ok) {
+                isFetching.value = false;
+                const message = `An error has occured: ${res.status}`;
+                throw new Error(message);
+            }
+            let response = await res.json();
+        
+            isFetching.value = false;                
+            personSelectedHandler(person_id, response.retval.uid);
+                    
+        }
+
+
+        const reset = () => {
+            currentValue.surname = null;
+            currentValue.birthdate = null;
+            personList.value = [];
         }
 
         Vue.onMounted(() => {
@@ -91,7 +124,7 @@ export const SearchExistingDialog = {
         })
 
 
-        return {  currentValue, filterPerson, personSelectedHandler, takePerson, personList, surnameRef  };
+        return {  currentValue, filterPerson, personSelectedHandler, personList, surnameRef, take, reset  };
     },
     template: `
     <form class="row g-3" ref="searchExistingFrm" id="searchExistingFrm" >
@@ -135,9 +168,9 @@ export const SearchExistingDialog = {
                         <td @click.stop>
                             <div class="d-grid gap-2 d-md-flex align-middle">
                                 <button type="button" class="btn btn-outline-dark btn-sm" 
-                                    @click="takePerson(person.person_id, person.uid)"
+                                    @click="take(person.person_id, person.uid)"
                                     style="white-space: nowrap"
-                                    v-if="person.status=='Student'">
+                                    v-if="person.status=='Student' && !person.taken">
                                     übernehmen
                                 </button>
                             </div>

@@ -1,6 +1,9 @@
 
 import { validSVNR } from "../../../helpers/validation/svnr.js";
 
+// path to CI-Router without host and port (requires https!)
+const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+
 export const CreateEmployeeFrm = {
     components: {
  
@@ -87,7 +90,7 @@ export const CreateEmployeeFrm = {
         }
 
         const validate = () => {
-            // trigger contraint validation
+            // trigger constraint validation
             Object.keys(frmState).forEach((item) => { frmState[item] = true })
             if (!validNachname(currentValue.value.nachname)) {
                 return false;
@@ -128,14 +131,14 @@ export const CreateEmployeeFrm = {
                 let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
                 const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonBaseData`;
+                    `${full}/extensions/FHC-Core-Personalverwaltung/api/createEmployee`;
 
                 const res = await fetch(endpoint,{
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify(currentValue.value),
+                    body: JSON.stringify({ action: "quick", payload: {...currentValue.value}}),
                 });    
 
                 if (!res.ok) {
@@ -145,17 +148,29 @@ export const CreateEmployeeFrm = {
                 }
                 let response = await res.json();
             
-                isFetching.value = false;
-                
-                currentValue.value = response.retval[0];
-                preservedValue.value = currentValue.value;
+                isFetching.value = false;                
+                redirect2Employee(response.retval.person_id, response.retval.uid);
+                //currentValue.value = response.retval[0];
+                //preservedValue.value = currentValue.value;
                 
             }
 
             frmState.wasValidated  = true;  
         }
 
-        Vue.defineExpose({ save })
+        const reset = () => {
+            currentValue.value = createShape();
+            // reset constraint validation
+            Object.keys(frmState).forEach((item) => { frmState[item] = false })
+        }
+
+        const redirect2Employee = (id, uid) => {
+			console.log('redirect: ', id, uid);			
+			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}/summary`;
+			router.push(url);            
+		}
+
+        Vue.defineExpose({ save, reset, })
 
         return { 
             createEmployeeFrm, 
@@ -171,6 +186,7 @@ export const CreateEmployeeFrm = {
             validSVNR,            
             frmState,
             defaultvalRef,
+            reset,
             save,
          }
 
@@ -226,7 +242,7 @@ export const CreateEmployeeFrm = {
                 aria-label=".form-select-sm " >
                 <option value="w">weiblich</option>
                 <option value="m">männlich</option>
-                <option val4e="x">divers</option>
+                <option value="x">divers</option>
                 <option value="u">unbekannt</option>
             </select>
             <div class="invalid-feedback" v-if="frmState.geschlechtBlured && !validGeschlecht(currentValue.geschlecht)">
