@@ -96,8 +96,16 @@ export default {
       mode: 'neu',
       lists: {
         funktionen: [],
-        orgets: [],
-        benutzerfunktionen: []
+        orgets: [{
+            value: '',
+            label: 'Bitte zuerst ein Unternehmen auswählen',
+            disabled: true
+        }],
+        benutzerfunktionen: [{
+            value: '',
+            label: 'Bitte zuerst ein Unternehmen auswählen',
+            disabled: true
+        }]
       },
       store: store
     };
@@ -122,8 +130,12 @@ export default {
       return (optvalue === selvalue);
     },
     resetDropdowns: function() {
-      this.funktion = '';
-      this.orget = '';
+      if(!this.isinputdisabled('funktion')) {
+        this.funktion = '';
+      }
+      if(!this.isinputdisabled('orget')) {
+        this.orget = '';
+      }
       this.benutzerfunktionid = '';
     },
     setDataFromConfig: function() {

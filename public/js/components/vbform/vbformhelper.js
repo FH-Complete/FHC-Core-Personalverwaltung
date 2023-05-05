@@ -5,20 +5,18 @@ import dv from './dv.js';
 import store from './vbsharedstate.js';
 import errors from './errors.js';
 import infos from './infos.js';
-import tmpstorehelper from './tmpstorehelper.js';
 
 export default {
   template: `
     <div class="vbformhelper">
-      <div class="border-bottom py-2 mb-3">
-        <tmpstorehelper ref="tmpstorehelper" @loadedfromtmpstore="loadedFromTmpStore" @savetotmpstore="saveToTmpStore"></tmpstorehelper>
+      <div class="border-bottom py-2 mb-3">        
         <div class="row g-2 py-2">
           <div class="col-9">&nbsp;</div>
         
           <div class="col-3">
             <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
                 <div class="btn-group me-2" role="group" aria-label="First group">
-                    <button class="btn btn-danger btn-sm float-end" @click="save">Speichern</button>
+                    <button class="btn btn-danger btn-sm float-end" @click="save">{{ getSaveButtonLabel }}</button>
                 </div>
                 <div class="btn-group me-2" role="group" aria-label="Second group">
                     <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
@@ -37,8 +35,7 @@ export default {
     "dv": dv,
     "vertragsbestandteillist": vertragsbestandteillist,
     "infos": infos,
-    "errors": errors,
-    "tmpstorehelper": tmpstorehelper
+    "errors": errors
   },
   mixins: [
     presetable
@@ -50,8 +47,7 @@ export default {
   },
   emits: [
     "vbhjsonready",
-    "saved",
-    "loadedfromtmpstore"
+    "saved"
   ],
   methods: {
     getPayload: function() {
@@ -71,29 +67,6 @@ export default {
     getJSON: function() {
       var payload = this.getPayload();
       this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
-    },
-    resetTmpStoreHelper: function() {
-        this.$refs['tmpstorehelper'].fetchTmpStoreList(true);
-        this.store.setTmpStoreId(null);
-    },
-    saveToTmpStore: function() {
-      const formdata = this.getPayload();
-      this.$emit('vbhjsonready', JSON.stringify(formdata, null, 2));
-      const payload = {
-        tmpStoreId: this.store.getTmpStoreId(),
-        typ: this.store.getMode(),  
-        mitarbeiter_uid: this.store.mitarbeiter_uid,  
-        formdata: formdata
-      };
-      Vue.$fhcapi.TmpStore.storeToTmpStore(payload)
-      .then((response) => {
-        this.store.setTmpStoreId(response.data.meta.tmpstoreid);
-        this.$refs['tmpstorehelper'].fetchTmpStoreList(false);
-        console.log('storeToTmpStore executed.');
-      });
-    },
-    loadedFromTmpStore: function(payload) {
-        this.$emit('loadedfromtmpstore', payload);
     },
     save: function() {
       const payload = this.getPayload();
@@ -115,5 +88,14 @@ export default {
         that.$emit('saved', response.data.data);
       });
     }
+  },
+  computed: {
+      getSaveButtonLabel: function() {
+          if( this.store.mode === 'aenderung' ) {
+              return 'Änderung speichern';
+          } else {
+              return 'Dienstverhältnis anlegen';
+          }
+      }
   }
 }

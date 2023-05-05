@@ -3,7 +3,7 @@ import store from './vbsharedstate.js';
 export default {
   template: `
   <div class="row g-2 py-2">
-    <div class="col-4">
+    <div class="col-7">
         
       <select v-model="selectedtmpstoreidx" class="form-select form-select-sm">
         <option value="-1" disabled>Zwischenspeicherung wählen</option>
@@ -14,7 +14,7 @@ export default {
       </select>
 
     </div>
-    <div class="col-4">
+    <div class="col-5">
         <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
             <div class="btn-group me-2" role="group" aria-label="First group">
                 <button class="btn btn-warning btn-sm float-end" @click="selecttmpstore">Laden</button>
@@ -27,8 +27,6 @@ export default {
             </div>
         </div>        
     </div>
-
-    <div class="col-4">&nbsp;</div>
   </div>
   `,
   data: function() {
@@ -63,6 +61,8 @@ export default {
         this.tmpstores = response.data.data;
         if(resetselected === true) {
           this.selectedtmpstoreidx = -1;
+        } else {
+          this.selectedtmpstoreidx = this.store.tmpstoreid;
         }
       });
     },

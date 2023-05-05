@@ -3,7 +3,7 @@ import store from './vbsharedstate.js';
 export default {
   template: `
   <div class="row g-2 py-2">
-    <div class="col-4">
+    <div class="col-12">
 
       <select v-model="store.mode" @change="selectmode" v-if="showselectmode" class="form-select form-select-sm">
         <option value="neuanlage" selected>Neuanlage</option>
@@ -19,7 +19,6 @@ export default {
       </select>
 
     </div>
-    <div class="col-8">&nbsp;</div>
   </div>
   `,
   props:[
