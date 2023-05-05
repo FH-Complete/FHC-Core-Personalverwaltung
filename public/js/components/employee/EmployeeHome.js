@@ -356,6 +356,7 @@ export default {
                             <!-- Filter component -->
                             <core-filter-cmpt
                             filter-type="EmployeeViewer"
+                            :sideMenu="false"
                             :tabulator-options="employeesTabulatorOptions"
                             :tabulator-events="employeesTabulatorEvents"
                             @nw-new-entry="newSideMenuEntryHandler">

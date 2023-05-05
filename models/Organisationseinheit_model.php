@@ -21,8 +21,8 @@ class Organisationseinheit_model extends DB_Model
     public function getHeads()
     {
         //$this->addJoin('hr.tbl_unternehmen','public.tbl_organisationseinheit.oe_kurzbz=hr.tbl_unternehmen.oe_kurzbz','INNER');
-        $result = $this->loadWhere(array('oe_parent_kurzbz' => NULL));
-        $result = $this->load();
+        $result = $this->loadWhere(array('oe_parent_kurzbz' => NULL, 'aktiv' => true));
+        //$result = $this->load();
 
         return $result;
     }
