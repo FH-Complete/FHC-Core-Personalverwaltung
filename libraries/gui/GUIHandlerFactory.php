@@ -4,6 +4,7 @@ require_once __DIR__ .'/GUIDienstverhaeltnis.php';
 require_once __DIR__ .'/GUIVertragsbestandteilStunden.php';
 require_once __DIR__ .'/GUIVertragsbestandteilFunktion.php';
 require_once __DIR__ .'/GUIVertragsbestandteilKuendigungsfrist.php';
+require_once __DIR__ .'/GUIVertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ .'/GUIVertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ .'/GUIVertragsbestandteilFreitext.php';
 require_once __DIR__ .'/GUIGehaltsbestandteil.php';
@@ -28,6 +29,9 @@ class GUIHandlerFactory {
                 break;
             case GUIVertragsbestandteilKuendigungsfrist::TYPE_STRING:
                 $handler = new GUIVertragsbestandteilKuendigungsfrist();
+                break;
+            case GUIVertragsbestandteilUrlaubsanspruch::TYPE_STRING:
+                $handler = new GUIVertragsbestandteilUrlaubsanspruch();
                 break;
             case GUIVertragsbestandteilZeitaufzeichnung::TYPE_STRING:
                 $handler = new GUIVertragsbestandteilZeitaufzeichnung();

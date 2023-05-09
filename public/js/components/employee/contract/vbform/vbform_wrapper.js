@@ -29,8 +29,7 @@ export default {
             <vbformhelper ref="vbformhelperRef" :preset="preset" 
                 @vbhjsonready="processJSON" 
                 @saved="handleSaved"
-                @validated="handleValidated"
-                @loadedfromtmpstore="handleLoadFromTmpStore"></vbformhelper>
+                @validated="handleValidated"></vbformhelper>
           </div>
 
         </div>

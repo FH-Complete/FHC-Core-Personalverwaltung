@@ -62,6 +62,14 @@ export default {
                 }
               },
               children: []
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Urlaubsanspruch',
+                vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
+              },
+              children: []
             }
           ]
         },

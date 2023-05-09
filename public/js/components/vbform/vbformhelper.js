@@ -47,7 +47,8 @@ export default {
   },
   emits: [
     "vbhjsonready",
-    "saved"
+    "saved",
+    "validated"
   ],
   methods: {
     getPayload: function() {
