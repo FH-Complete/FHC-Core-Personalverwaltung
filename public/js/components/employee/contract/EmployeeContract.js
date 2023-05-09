@@ -226,9 +226,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  id="dvZeitraum" :value="formatDate(currentDV.von) + '-' + formatDate(currentDV.bis)">
                                         </div>
                                         <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                                            
                                         </div>
                                     </div>
                                     <div class="row mb-1">
@@ -244,9 +242,7 @@ export const EmployeeContract = {
                                             <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">
                                         </div>
                                         <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                                            
                                         </div>
                                     </div>
 
@@ -256,9 +252,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="currentWS">
                                         </div>
                                         <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                                            
                                         </div>
                                     </div>
 
@@ -268,9 +262,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvLehre">
                                         </div>
                                         <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                                            
                                         </div>
                                     </div>
 
@@ -280,9 +272,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfrist">
                                         </div>
                                         <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                                            
                                         </div>
                                     </div>
 
@@ -292,9 +282,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch">
                                         </div>
                                         <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+                                            
                                         </div>
                                     </div>
 
