@@ -11,6 +11,8 @@ class Api extends Auth_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+    // code igniter 
+    protected $CI;
 
     public function __construct() {
         
@@ -108,6 +110,8 @@ class Api extends Auth_Controller
 		$this->load->model('ressource/Funktion_model', 'FunktionModel');
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
+        // get CI for transaction management
+        $this->CI = &get_instance();
     }
 
     function index()
@@ -707,9 +711,9 @@ class Api extends Auth_Controller
         $attributeList = ['vorname', 'nachname', 'email', 'gebdatum', 'geschlecht', 'staatsbuergerschaft'];
 
         foreach ($attributeList as $key) {
-            if (!$this->validateJSONDataString($payload['nachname'], $payload, 'nachname'))
+            if (!$this->validateJSONDataString($payload[$key], $payload, $key))
                 {
-                    $this->outputJsonError('nachname is empty!');
+                    $this->outputJsonError($key.' is empty!');
                     return false;
                 }
         }
@@ -1172,75 +1176,105 @@ class Api extends Auth_Controller
             $json = json_decode($this->input->raw_input_stream, TRUE);
             $action = $json['action'];
             $payload = $json['payload'];
-            // init
-            $person_id = null;
 
-            if ($action == 'quick')
-            {
+            // wrap in transaction
+            $this->CI->db->trans_begin();
+            try
+		    {
 
-                if (!$this->validateEmployeeQuickPayload($payload))
-                    return;
+                // init
+                $person_id = null;
 
-
-                // create person
-                $personJson = array_merge([], $payload);
-                unset($personJson['email']);
-                $result = $this->ApiModel->insertPersonBaseData($personJson);
-                
-
-                if (isError($result))
+                if ($action == 'quick')
                 {
-                    $this->outputJsonError('error creating person base data');
+
+                    if (!$this->validateEmployeeQuickPayload($payload))
+                    {
+                        $this->CI->db->trans_rollback();
+                        $this->outputJsonError('validation error');
+                        return;
+                    }
+
+                    // create person
+                    $personJson = array_merge([], $payload);
+                    unset($personJson['email']);
+                    $result = $this->ApiModel->insertPersonBaseData($personJson);
+                    
+
+                    if (isError($result))
+                    {
+                        $this->CI->db->trans_rollback();
+                        $this->outputJsonError('error creating person base data');
+                        return;
+                    }
+                    $person_id = $result->retval;
+
+                    // create contact email
+                    $contactJson = [
+                        'person_id' => $person_id,
+                        'kontakttyp' => 'email',
+                        'kontakt' => $payload['email'],
+                        'zustellung' => true];
+                    $result = $this->ApiModel->insertPersonContactData($contactJson);
+
+                    if (isError($result))
+                    {
+                        $this->CI->db->trans_rollback();
+                        $this->outputJsonError('error creating email for person');
+                        return;
+                    }
+
+
+                } elseif ($action == 'take') {
+
+                    // validate
+                    if (!$this->validateEmployeeTakePayload($payload))
+                    {
+                        $this->CI->db->trans_rollback();
+                        $this->outputJsonError('validation error');
+                        return;
+                    }
+                        
+                    $person_id = $payload['person_id'];
+
+                }
+            
+
+                // generate UID and Personalnummer
+                $personalnummer = $this->ApiModel->generatePersonalnummer();
+                $uid = sprintf('ma%05d',  $personalnummer - 10000);
+
+                // create benutzer
+                $result = $this->ApiModel->insertUser([ 'uid' => $uid, 'person_id' => $person_id ]);
+                if (isError($result)) 
+                {
+                    $this->CI->db->trans_rollback();
+                    $this->outputJsonError('error creating user for person');
                     return;
                 }
-                $person_id = $result->retval;
+                $uid = $result->retval;
 
-                // create contact email
-                $contactJson = [
-                    'person_id' => $person_id,
-                    'kontakttyp' => 'email',
-                    'kontakt' => $payload['email'],
-                    'zustellung' => true];
-                $result = $this->ApiModel->insertPersonContactData($contactJson);
-
-                if (isError($result))
+                // create employee
+                $employeeJson = [ 'mitarbeiter_uid' => $uid, 'personalnummer' => $personalnummer];
+                $result = $this->ApiModel->insertEmployee($employeeJson);
+                if (isError($result)) 
                 {
-                    $this->outputJsonError('error creating email for person');
+                    $this->CI->db->trans_rollback();
+                    $this->outputJsonError('error creating employee');
                     return;
                 }
 
-
-            } elseif ($action == 'take') {
-
-                // validate
-                if (!$this->validateEmployeeTakePayload($payload))
-                    return;
-                $person_id = $payload['person_id'];
+                // commit transaction
+                $this->CI->db->trans_commit();
 
             }
-        
-
-            // generate UID and Personalnummer
-            $personalnummer = $this->ApiModel->generatePersonalnummer();
-            $uid = sprintf('ma%05d',  $personalnummer - 10000);
-
-            // create benutzer
-            $result = $this->ApiModel->insertUser([ 'uid' => $uid, 'person_id' => $person_id ]);
-            if (isError($result)) 
+            catch (Exception $ex)
             {
-                $this->outputJsonError('error creating user for person');
+                log_message('debug', "Transaction rolled back. " . $ex->getMessage());
+                $this->CI->db->trans_rollback();
+                $this->outputJsonError('Creating Employee failed.');
                 return;
-            }
-            $uid = $result->retval;
-
-            // create employee
-            $employeeJson = [ 'mitarbeiter_uid' => $uid, 'personalnummer' => $personalnummer];
-            $result = $this->ApiModel->insertEmployee($employeeJson);
-            if (isError($result)) 
-            {
-                $this->outputJsonError('error creating employee');
-                return;
-            }
+            }	
 
             
             // return person_id and uid

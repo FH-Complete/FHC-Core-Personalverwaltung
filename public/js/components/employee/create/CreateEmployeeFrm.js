@@ -146,10 +146,18 @@ export const CreateEmployeeFrm = {
                     const message = `An error has occured: ${res.status}`;
                     throw new Error(message);
                 }
-                let response = await res.json();
-            
-                isFetching.value = false;                
-                redirect2Employee(response.retval.person_id, response.retval.uid);
+                let response = await res.json();            
+                isFetching.value = false;  
+
+                if (response.error == 1) {
+                    // error handling
+                    const message = `error when creating employee`;
+                    console.log(message, reponse.retval);
+                    throw new Error(message);
+                } else {
+                    redirect2Employee(response.retval.person_id, response.retval.uid);
+                }
+
                 //currentValue.value = response.retval[0];
                 //preservedValue.value = currentValue.value;
                 
