@@ -210,7 +210,7 @@ export const EmployeeContract = {
                     <div class="col">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Details</h5>
+                                <h5 class="mb-0">Allgemein</h5>
                             </div>
                             <div class="card-body" style="text-align:left">
 
@@ -294,7 +294,7 @@ export const EmployeeContract = {
                                         </div>
                                     </div>
 
-                                    <div class="row mb-1">
+                                    <!-- div class="row mb-1">
                                         <label for="dvFunktion" class="col-sm-3 col-form-label">Funktion</label>
                                         <div class="col-sm-8">
                                             
@@ -343,9 +343,9 @@ export const EmployeeContract = {
                                                 <i class="fa fa-pen"></i>
                                             </button>
                                         </div>
-                                    </div>
+                                    </div -->
 
-                                    <div class="row mb-1">
+                                    <!-- div class="row mb-1">
                                         <label for="dvFreitext" class="col-sm-3 col-form-label">Freitext</label>
                                         <div class="col-sm-8">
                                             <b>1.2.2015-</b><br>
@@ -366,16 +366,125 @@ export const EmployeeContract = {
                                                 <i class="fa fa-pen"></i>
                                             </button>
                                         </div>
-                                    </div>
+                                    </div-->
                                 
 
                                 </form>
 
                             </div>   <!-- card body -->
                         </div>  <!-- card -->
+                        <br/>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Bruttomonatsgehalt</h5>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Sonstige Vereinbarung</h5>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                            </div>
+                        </div>
+                        <br/>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Karenz</h5>
+                            </div>
+                            <div class="card-body" style="text-align:center">
+                            </div>
+                        </div>
+                        <br/>
+
                     </div>  <!-- col -->
 
                     <div class="col">
+
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Zuordnung</h5>
+                            </div>
+                            <div class="card-body" style="text-align:left">
+
+                                <form  class="row g-3" v-if="currentDV != null">
+ 
+                                    <div class="col-md-4">
+                                        <label for="iban" class="form-label" >Zuordnung</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="Standardkostenstelle" >
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="iban" class="form-label" >Abteilung</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="iban" class="form-label" >SAP Kostenstelle</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <!-- row 2 -->
+
+                                    <div class="col-md-4">
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="Disziplinär" >
+                                    </div>
+
+                                    <div class="col-md-4">                                        
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+
+                                    <!-- row 3 -->
+                                   
+                                    <div class="col-md-4">
+                                    <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="Fachlich" >
+                                    </div>
+
+                                    <div class="col-md-4">                                        
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        
+                                    </div>
+
+                                    <!-- taetigkeit -->
+                                    <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Tätigkeit</h5></div>
+                                    <div class="col-md-4">
+                                        <label for="iban" class="form-label" >Tätigkeit</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="" >
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="iban" class="form-label" >Abteilung</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="iban" class="form-label" >Bezeichnung</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+                                
+
+                                </form>
+
+
+
+
+
+                            </div>
+                        </div>
+                        <br/>
 
                         <div class="card">
                             <div class="card-header">
@@ -458,7 +567,7 @@ export const EmployeeContract = {
                     
                 </div>  <!-- row -->
 
-                <div class="col-lg-12">     
+                <!--div class="col-lg-12">     
                 
 
                     <br>
@@ -587,7 +696,10 @@ export const EmployeeContract = {
                     </div -->
 
                     
-                </div> <!-- --> 
+                </div--> <!-- --> 
+                <br/>
+
+                
 
             </div>
         </div>
