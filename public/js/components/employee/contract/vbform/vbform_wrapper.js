@@ -120,6 +120,7 @@ export default {
     handleSaved: function(payload) {
       this.$refs['tmpstorehelper'].deleteFromTmpStorePromise()
         .then(() => {
+        this.$refs['tmpstorehelper'].fetchTmpStoreList();
         this.presetselected(payload);
         this.$emit('dvsaved');
       });
