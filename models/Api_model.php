@@ -676,7 +676,8 @@ class Api_model extends DB_Model
         $contactDataJson['insertvon'] = getAuthUID();
         $contactDataJson['insertamum'] = $this->escape('NOW()');
 
-        if ($contactDataJson['standort_id'] == 0)
+        if ( isset($contactDataJson['standort_id']) 
+			&& $contactDataJson['standort_id'] == 0)
         {
             $contactDataJson['standort_id'] = null;
         }
