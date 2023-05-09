@@ -218,37 +218,65 @@ export const EmployeeContract = {
                             </div>
                             <div class="card-body" style="text-align:left">
 
-                                <form  ref="baseDataFrm" v-if="currentDV != null">
+                                <form  ref="baseDataFrm" class="row g-3" v-if="currentDV != null">
 
-                                    <div class="row mb-1">
-                                        <label for="zeitraum" class="col-sm-3 col-form-label">Zeitraum</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  id="dvZeitraum" :value="formatDate(currentDV.von) + '-' + formatDate(currentDV.bis)">
-                                        </div>
-                                        <div class="col-sm-1">
-                                            
-                                        </div>
+
+                                    <!-- Allgemein -->
+    
+                                    <div class="col-md-4">
+                                        <label for="organisation" class="col-sm-6 form-label">Organisation</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
                                     </div>
-                                    <div class="row mb-1">
-                                        <label for="dvArt" class="col-sm-3 col-form-label">Art</label>
-                                        <div class="col-sm-8">
+
+                                    <div class="col-md-4">
+                                        <label for="dvArt" class="col-sm-6 form-label">Vertragsart</label>
+                                        <div class="col-sm-12">
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="currentDV.vertragsart_kurzbz">
                                         </div>
                                     </div>
 
-                                    <div class="row mb-1">
-                                        <label for="art" class="col-sm-3 col-form-label">Befristet</label>
+                                    <div class="col-md-4"></div>
+                                    
+                                    <!-- von bis -->
+                                    <div class="col-md-4">
+                                        <label for="zeitraum_von" class="form-label" >Von</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(currentDV.von)" >
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="zeitraum_bis" class="form-label" >Bis</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(currentDV.bis)" >
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="befristetCheck" class="form-label" >Befristet</label>
                                         <div class="col-sm-8">
                                             <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">
                                         </div>
-                                        <div class="col-sm-1">
-                                            
-                                        </div>
                                     </div>
 
-                                    <div class="row mb-1">
-                                        <label for="dvStunden" class="col-sm-3 col-form-label">Stunden</label>
-                                        <div class="col-sm-8">
+                                    <!--div class="col-md-3"></div-->
+
+                                    <!-- Kündigungsfrist -->
+                                    <div class="col-md-4">
+                                        <label for="dvKuendigungsfristAG" class="form-label">Kündigungsfrist AG</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAG">
+                                    </div>
+                                    
+
+                                    <div class="col-md-4">
+                                        <label for="dvKuendigungsfristAN" class="form-label">Kündigungsfrist AN</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAN">
+                                    </div>
+
+                                    <div class="col-md-4"></div>
+
+
+                                    <!-- Arbeitszeit -->
+                                    <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h5></div>
+                                    <div class="col-md-4">
+                                        <label for="dvStunden" class="form-label">Wochenstunden</label>
+                                        <div class="col-sm-12">
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="currentWS">
                                         </div>
                                         <div class="col-sm-1">
@@ -256,35 +284,45 @@ export const EmployeeContract = {
                                         </div>
                                     </div>
 
-                                    <div class="row mb-1">
-                                        <label for="dvLehre" class="col-sm-3 col-form-label">Lehre</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvLehre">
-                                        </div>
-                                        <div class="col-sm-1">
-                                            
-                                        </div>
+                                    <div class="col-md-4">
+                                        <label for="dvTeilzeittyp" class="form-label">Teilzeittyp</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp">
+                                        </div>                                        
                                     </div>
 
-                                    <div class="row mb-1">
-                                        <label for="dvKuendigungsfrist" class="col-sm-3 col-form-label">Kündigungsfrist</label>
+                                    <div class="col-md-4">
+                                        <label for="allInCheck" class="form-label" >AllIn</label>
                                         <div class="col-sm-8">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfrist">
+                                            <input class="form-check-input mt-2" type="checkbox" id="allInCheck">
                                         </div>
-                                        <div class="col-sm-1">
-                                            
+                                    </div>
+                                    <!--div class="col-md-3"></div-->
+
+                                    
+
+                                    <!-- Zeitaufzeichnung -->
+                                    <div class="col-md-4">
+                                        <label for="zapflichtigCheck" class="form-label" >Zeitaufzeichnung</label>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="zapflichtigCheck"> 
+                                            <label class="form-check-label" for="zapflichtigCheck">Zeitaufzeichnungspflichtig</label>
                                         </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="azgCheck"> 
+                                            <label class="form-check-label" for="azgCheck">AZG relevant</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="homeofficeCheck">
+                                            <label class="form-check-label" for="homeofficeCheck">Homeoffice</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label for="dvUrlaubsanspruch" class="form-label">Urlaubsanspruch</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch">
                                     </div>
 
-                                    <div class="row mb-1">
-                                        <label for="dvUrlaubsanspruch" class="col-sm-3 col-form-label">Urlaubsanspruch</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch">
-                                        </div>
-                                        <div class="col-sm-1">
-                                            
-                                        </div>
-                                    </div>
+                                    <div class="col-md-5"></div>
 
                                     <!-- div class="row mb-1">
                                         <label for="dvFunktion" class="col-sm-3 col-form-label">Funktion</label>
