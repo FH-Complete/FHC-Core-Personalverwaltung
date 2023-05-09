@@ -93,7 +93,7 @@ export default {
   methods: {
     presetselected: function(preset) {
       if( this.mode === 'aenderung' ) {
-          preset.data.dienstverhaeltnisid = this.dvid;
+          preset.dv.data.dienstverhaeltnisid = this.dvid;
       }
       this.preset = preset;
       this.presettostore();
