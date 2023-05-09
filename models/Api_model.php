@@ -487,7 +487,8 @@ class Api_model extends DB_Model
         $employeeJson['insertvon'] = getAuthUID();
         $employeeJson['insertamum'] = $this->escape('NOW()');
 
-        if ($employeeJson['standort_id'] == 0)
+        if (isset($employeeJson['standort_id']) 
+			&& $employeeJson['standort_id'] == 0)
         {
             $employeeJson['standort_id'] = null;
         }
