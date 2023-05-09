@@ -225,7 +225,7 @@ export const EmployeeContract = {
     
                                     <div class="col-md-4">
                                         <label for="organisation" class="col-sm-6 form-label">Organisation</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="currentDV.oe_bezeichnung" >
                                     </div>
 
                                     <div class="col-md-4">
@@ -409,7 +409,42 @@ export const EmployeeContract = {
                             <div class="card-header">
                                 <h5 class="mb-0">Bruttomonatsgehalt</h5>
                             </div>
-                            <div class="card-body" style="text-align:center">
+                            <div class="card-body" style="text-align:left">
+
+                                <form  class="row g-3" v-if="currentDV != null">
+    
+                                    <div class="col-md-2">
+                                        <label for="iban" class="form-label" >Grund</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="iban" class="form-label" >Gehaltstyp</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="iban" class="form-label" >Betrag</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="iban" class="form-label" >Betrag val.</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="iban" class="form-label" >Val. Sperre bis</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="iban" class="form-label" >Anmerkung</label>
+                                        
+                                    </div>
+
+                                </form>
+
                             </div>
                         </div>
                         <br/>
@@ -418,7 +453,39 @@ export const EmployeeContract = {
                             <div class="card-header">
                                 <h5 class="mb-0">Sonstige Vereinbarung</h5>
                             </div>
-                            <div class="card-body" style="text-align:center">
+                            <div class="card-body" style="text-align:left">
+                                <form  class="row g-3" v-if="currentDV != null">
+        
+                                    <div class="col-md-3">
+                                        <label for="iban" class="form-label" >Freitexttyp</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="iban" class="form-label" >Von</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="iban" class="form-label" >Bis</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        
+                                    </div>
+
+                                    <div class="col-md-9">
+                                        <label for="iban" class="form-label" >Text</label>
+                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        
+                                    </div>
+
+                                </form>
+
                             </div>
                         </div>
                         <br/>
