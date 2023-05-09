@@ -85,7 +85,7 @@ export default {
       const that = this;
       Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
       .then((response) => {
-        that.$emit('saved', response.data.data);
+        that.$emit('validated', response.data.data);
       });
     }
   },

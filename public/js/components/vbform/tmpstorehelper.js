@@ -66,6 +66,14 @@ export default {
         }
       });
     },
+    deleteFromTmpStorePromise: function() {
+        if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
+            const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
+            
+            return Vue.$fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid);
+        }
+        return Promise.resolve('noTmpStoreUsed');
+    },
     deleteFromTmpStore: function() {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];

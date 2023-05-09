@@ -155,6 +155,10 @@ export const EmployeeContract = {
             VbformWrapperRef.value.showModal();
         }
 
+        const handleDvSaved = async () => {
+            fetchData(route.params.uid);            
+        }
+
         const getCurrentVertragsbestandteil = () => {
             let ws = filterVertragsbestandteil(vertragList.value, 'stunden');
             currentWS.value = ws[0].wochenstunden;
@@ -163,7 +167,7 @@ export const EmployeeContract = {
         return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
             //dienstverhaeltnisDialogRef,
             VbformWrapperRef, route, vbformmode, vbformDVid, 
-            createDVDialog, updateDVDialog, formatDate, dvSelectedIndex, currentDate, chartOptions }
+            createDVDialog, updateDVDialog, handleDvSaved, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -222,7 +226,9 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  id="dvZeitraum" :value="formatDate(currentDV.von) + '-' + formatDate(currentDV.bis)">
                                         </div>
                                         <div class="col-sm-1">
-                                           
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="row mb-1">
@@ -238,7 +244,9 @@ export const EmployeeContract = {
                                             <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">
                                         </div>
                                         <div class="col-sm-1">
-                                            
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -248,7 +256,9 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="currentWS">
                                         </div>
                                         <div class="col-sm-1">
-                                           
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -258,7 +268,9 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvLehre">
                                         </div>
                                         <div class="col-sm-1">
-                                            
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -268,7 +280,9 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfrist">
                                         </div>
                                         <div class="col-sm-1">
-                                            
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -278,7 +292,9 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch">
                                         </div>
                                         <div class="col-sm-1">
-                                           
+                                            <button type="button" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -701,7 +717,8 @@ export const EmployeeContract = {
         :title="'Dienstverhältnis'" 
         :mode="vbformmode" 
         :dvid="vbformDVid"
-        :mitarbeiter_uid="route.params.uid">
+        :mitarbeiter_uid="route.params.uid"
+        @dvsaved="handleDvSaved">
     </vbform_wrapper>
 
 

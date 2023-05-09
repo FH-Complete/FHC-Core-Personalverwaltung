@@ -29,6 +29,7 @@ export default {
             <vbformhelper ref="vbformhelperRef" :preset="preset" 
                 @vbhjsonready="processJSON" 
                 @saved="handleSaved"
+                @validated="handleValidated"
                 @loadedfromtmpstore="handleLoadFromTmpStore"></vbformhelper>
           </div>
 
@@ -70,6 +71,9 @@ export default {
       store: store
     };
   },
+  emits: [
+    "dvsaved"
+  ],
   components: {
     'presets_chooser': presets_chooser,
     'debug_viewer': debug_viewer,
@@ -111,8 +115,15 @@ export default {
       this.presetselected(preset);
       this.resetTmpStoreHelper();  
     },
+    handleValidated: function(payload) {
+        this.presetselected(payload);      
+    },
     handleSaved: function(payload) {
-      this.presetselected(payload);
+      this.$refs['tmpstorehelper'].deleteFromTmpStorePromise()
+        .then(() => {
+        this.presetselected(payload);
+        this.$emit('dvsaved');
+      });
     },
     handleLoadedFromTmpStore: function(payload) {
       this.presetselected(payload);
