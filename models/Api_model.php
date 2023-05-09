@@ -315,19 +315,19 @@ class Api_model extends DB_Model
         unset($personJson['updateamum']);
         unset($personJson['updatevon']);
         // set empty values to null
-        if ($personJson['sprache'] == '')
+        if (isset($personJson['sprache']) && $personJson['sprache'] == '')
         {
             $personJson['sprache'] = null;
         }
-        if ($personJson['geburtsnation'] == '')
+        if (isset($personJson['geburtsnation']) && $personJson['geburtsnation'] == '')
         {
             $personJson['geburtsnation'] = null;
         }
-        if ($personJson['staatsbuergerschaft'] == '')
+        if (isset($personJson['staatsbuergerschaft']) && $personJson['staatsbuergerschaft'] == '')
         {
             $personJson['staatsbuergerschaft'] = null;
         }
-        if ($personJson['svnr'] == '')
+        if (isset($personJson['svnr']) && $personJson['svnr'] == '')
         {
             $personJson['svnr'] = null;
         }
