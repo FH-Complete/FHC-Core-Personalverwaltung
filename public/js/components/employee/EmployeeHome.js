@@ -164,8 +164,8 @@ export default {
 			}
 		});
 
-		const personSelectedHandler = (id, uid) => {
-			console.log('personSelected: ', id);
+		const personSelectedHandler = (id, uid, date) => {
+			console.log('personSelected: ', id, uid, date);
 
 			if (verticalsplitRef.value.isCollapsed() == 'bottom') {
 				verticalsplitRef.value.showBoth();
@@ -173,7 +173,7 @@ export default {
 			}
 
 			//let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}`;
-			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}/summary`;
+			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}/summary` +(date!=null?`?d=${date}`:'');
 
 			router.push(url);
 		}
@@ -206,7 +206,7 @@ export default {
 		}
 
 		const selectRecordHandler = (e, row) => { // Tabulator handler for the rowClick event
-			personSelectedHandler(row.getData().PersonId, row.getData().UID);
+			personSelectedHandler(row.getData().PersonId, row.getData().UID, null);
 		}
 
 		const employeesTabulatorEvents = [
@@ -383,7 +383,7 @@ export default {
                         </div>
                     </template>
                     <template #bottom>
-                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :personuid="currentPersonUID" :open="isEditorOpen" @person-selected="(e) => personSelectedHandler(e.person_id, e.uid)" @close-editor="closeEditorHandler"></employee-editor>
+                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :personuid="currentPersonUID" :open="isEditorOpen" @person-selected="(e) => personSelectedHandler(e.person_id, e.uid, e.date)" @close-editor="closeEditorHandler"></employee-editor>
                     </template>
                 </verticalsplit> 
                             

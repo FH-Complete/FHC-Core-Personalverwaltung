@@ -203,17 +203,20 @@ class Api_model extends DB_Model
 		return $this->execQuery($query, array($month, $day));
     }
 
-    public function getCovidDate($person_id)
+    public function getCovidDate($person_id, $dateAsUnixTS)
     {
+        $date = DateTime::createFromFormat( 'U', $dateAsUnixTS );
+        $datestring = $date->format("Y-m-d");
+
         $query="SELECT (p.udf_values -> 'udf_3gvalid')::text::date covid_date, CASE
-            WHEN (p.udf_values -> 'udf_3gvalid')::text::date >= CURRENT_DATE::text::date THEN 1
-            WHEN (p.udf_values -> 'udf_3gvalid')::text::date < CURRENT_DATE::text::date THEN 0
+            WHEN (p.udf_values -> 'udf_3gvalid')::text::date >= ? THEN 1
+            WHEN (p.udf_values -> 'udf_3gvalid')::text::date < ? THEN 0
             ELSE -1
             END AS covidvalid
             FROM tbl_person p
             WHERE p.person_id = ?";
 
-        return $this->execQuery($query, array($person_id));
+        return $this->execQuery($query, array($datestring, $datestring, $person_id));
     }
 
     function runReport($sql, $filter)

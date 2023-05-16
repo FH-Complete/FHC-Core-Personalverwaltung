@@ -12,7 +12,7 @@ export default {
         personid: Number,
         personuid: String,
         open: Boolean,
-        isNew:  Boolean
+        isNew:  Boolean,
     },
     setup( props, {emit }) {
 
@@ -28,11 +28,12 @@ export default {
 
         const dateChanged = (params) => {
             console.log("-> date changed: ", params);
-            currentDate.value=params;
+            //currentDate.value=params;
         }
 
         Vue.onMounted(() => {
-			console.log('EmployeeEditor mounted');
+			console.log('EmployeeEditor mounted', route.path);
+            currentDate.value = route.query.d;
         })
 
         Vue.watch(
@@ -43,11 +44,19 @@ export default {
 			}
 		)
 
-        return { redirect, dateChanged, currentPersonID, currentPersonUID }
+        Vue.watch(
+			() => route.query.d,
+			d => {
+                console.log('watch route.query.d', d)
+				currentDate.value = d;
+			}
+		)
+
+        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate }
     },
-    template: `      
-        <EmployeeHeader  :personID="personid" :personUID="personuid" @person-selected="redirect" @date-changed="dateChanged" :edit-mode="true" ></EmployeeHeader> 
-        <EmployeeNav  :personID="currentPersonID" :personUID="currentPersonUID" :edit-mode="true" ></EmployeeNav> 
+    template: `    
+        <EmployeeHeader   :personID="personid" :personUID="personuid" @person-selected="redirect" @date-changed="dateChanged" :edit-mode="true" ></EmployeeHeader> 
+        <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID" :edit-mode="true" ></EmployeeNav> 
         <router-view></router-view>       
     `
 }

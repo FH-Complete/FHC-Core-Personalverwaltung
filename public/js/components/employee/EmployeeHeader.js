@@ -16,6 +16,7 @@ export const EmployeeHeader = {
     setup(props, { emit }) {
 
         const route = VueRouter.useRoute();
+        const router = VueRouter.useRouter();
         const { watch, ref, onMounted } = Vue; 
         const currentPersonID = ref(props.personID);
         const currentPersonUID  = ref(props.personUID);
@@ -30,12 +31,24 @@ export const EmployeeHeader = {
         const isFetching = ref(false);        
         const isFetchingName = ref(false);    
         
-        const currentDate = ref(new Date().toISOString().substring(0,10));
+        const currentDate = ref(null);
 
         const generateEndpointURL = (person_id,uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}&uid=${uid}`;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}&uid=${uid}${_maybeAddDate()}`;
         };
+
+        const _maybeAddDate = () => {
+            if (currentDate.value != null) {
+                return '&d=' + currentDate.value;
+            }
+        }
+
+        const formatDate = (ds) => {
+            if (ds == null) return '';
+            var d = new Date(ds);
+            return d?.toISOString().substring(0,10);
+        }
 
         const fetchHeaderData = async () => {
             isFetching.value = true;
@@ -64,7 +77,8 @@ export const EmployeeHeader = {
             () => route.params.uid,
             (newVal) => {   
                 currentPersonID.value = route.params.id;
-                currentPersonUID.value = newVal;
+                currentPersonUID.value = newVal;           
+                //currentDate.value = route.query.d || new Date();     
                 headerUrl.value = generateEndpointURL(route.params.id, newVal);
                 if (currentPersonID.value!=null) {
                     fetchHeaderData();
@@ -78,13 +92,14 @@ export const EmployeeHeader = {
         watch(
             currentDate,
             (newVal) => {
-                console.log('date changed: ', newVal);
+                console.log('header date changed: ', newVal);
                 emit('dateChanged', newVal);
             }
         )
 
         onMounted(() => {
-            console.log("EmployeeHeader mounted ", props.personID, props.personUID);
+            console.log("EmployeeHeader mounted ");
+            currentDate.value = route.query.d || new Date();
             headerUrl.value = generateEndpointURL(props.personID, props.personUID);
             fetchHeaderData();
         })
@@ -200,9 +215,17 @@ export const EmployeeHeader = {
 
         const redirect = (person_id, uid) => {
             console.log('person_id', person_id);
-            emit('personSelected', { person_id, uid });
+            let date = route.query.d;
+            emit('personSelected', { person_id, uid, date });
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
           }
+
+        const setDateHandler = (e) => {
+            console.log('setDateHandler', e.target.value);
+            let url = route.path + '?d=' + e.target.value;
+            currentDate.value = e.target.value;
+            router.push(url);
+        }
         
 
         return {
@@ -225,6 +248,8 @@ export const EmployeeHeader = {
             currentPersonID,
             currentPersonUID,
             currentDate,
+            formatDate,
+            setDateHandler,
         }
     },
     template: `
@@ -305,8 +330,8 @@ export const EmployeeHeader = {
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
                     </div>
                 </div>
-                <div class="px-2 pt-1">
-                    <input type="date" class="form-control form-control-sm"  id="currentDateSelect" v-model="currentDate" >
+                <div class="px-2 pt-1">                    
+                    <input type="date" class="form-control form-control-sm"  id="currentDateSelect" :value="formatDate(currentDate)" @change="setDateHandler" >
                 </div> 
             </div>
         

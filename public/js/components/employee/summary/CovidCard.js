@@ -3,21 +3,31 @@ import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 export const CovidCard = {
      props: {
         personID: Number,
+        date: Date,
      },
      setup( props ) {
         
         const covidData = Vue.ref();
-        //const currentDate = Vue.ref(new Date());
+        const currentDate = Vue.ref(new Date());
         const isFetching = Vue.ref(false);
         const title = Vue.ref("COVID Status");
         const currentPersonID = Vue.toRefs(props).personID        
 
         const formatDate = (ds) => {
+            if (ds == null) return '';
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        const currentDate = formatDate(new Date());
+        const getCurrentDate = () => {
+            var d = new Date();
+            return d.getFullYear()  + "-" + (d.getMonth()+1) + "-" + d.getDate()
+        }
+
+        const convert2UnixTS = (ds) => {
+            let d = new Date(ds);
+            return Math.round(d.getTime() / 1000)
+        }
 
         const capitalize = (s) => {
             return s.charAt(0).toUpperCase() + s.slice(1);
@@ -30,7 +40,8 @@ export const CovidCard = {
 			try {
 			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;  
               
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCovidState?person_id=${currentPersonID.value}`;
+              let ts = convert2UnixTS(currentDate.value);  // unix timestamp
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCovidState?person_id=${currentPersonID.value}&d=${ts}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();
@@ -49,13 +60,17 @@ export const CovidCard = {
 		}
 
         Vue.onMounted(() => {
+            currentDate.value = props.date || getCurrentDate();
             fetchCovidState();
         })
 
         Vue.watch(
-			currentPersonID,
-			() => {
-				fetchCovidState();
+			[currentPersonID,() => props.date],
+			newVal => {
+				if (newVal[1] != null) {
+                    currentDate.value = newVal[1];
+                }
+                fetchCovidState();
 			}
 		)
       
@@ -67,7 +82,7 @@ export const CovidCard = {
      <div class="card">
         <div class="card-header">
             <h5 class="mb-0">{{ title }}</h5>
-                {{ currentDate }}
+                {{ formatDate(currentDate) }}
             </div>
             <div class="card-body" style="text-align:center">
             <div v-if="isFetching" class="spinner-border" role="status">

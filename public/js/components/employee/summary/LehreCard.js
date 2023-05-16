@@ -3,22 +3,30 @@ import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 export const LehreCard = {
      props: {
         uid: String,
+        date: Date,
      },
      setup( props ) {
         
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Lehre");
+        const currentDate = Vue.ref(null);
         const currentUID = Vue.toRefs(props).uid        
 
         const formatDate = (ds) => {
+            if (ds == null) return '';
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
         const currentSemester = Vue.computed(() => {
-            const d = new Date();
-            let y= d.getFullYear(); 
+            
+            let d = new Date();
+            if (currentDate.value != null) {
+                d = new Date(currentDate.value);
+            }
+
+            let y=d.getFullYear(); 
             let semesterString = "SS";
 
             if (d.getMonth < 8 && d.getMonth > 1) return semesterString + y;
@@ -33,7 +41,7 @@ export const LehreCard = {
 
         
         const fetchCurrentDV = async () => {
-            if (currentUID.value == null) {
+            if (currentUID.value == null || currentDate.value == null) {
                 return;
             }
 			try {
@@ -58,6 +66,7 @@ export const LehreCard = {
 		}
 
         Vue.onMounted(() => {
+            currentDate.value = props.date || new Date();
             fetchCurrentDV();
         })
 
@@ -67,16 +76,26 @@ export const LehreCard = {
 				fetchCurrentDV();
 			}
 		)
+
+        Vue.watch(
+			[currentUID,() => props.date],
+			newVal => {
+                console.log('something changed: ', newVal)
+				if (newVal[1] != null) {
+                    currentDate.value = newVal[1];
+                }
+			}
+		)
       
         return {
-            courseData, isFetching, formatDate, currentSemester, title, currentUID
+            courseData, isFetching, formatDate, currentSemester, title, currentUID, currentDate,
         }
      },
      template: `
      <div class="card">
         <div class="card-header">
             <h5 class="mb-0">{{ title }}</h5>
-                {{ currentSemester }}
+                {{ currentSemester }}  ({{ formatDate(currentDate) }})
             </div>
             <div class="card-body" style="text-align:center">
             <div v-if="isFetching" class="spinner-border" role="status">

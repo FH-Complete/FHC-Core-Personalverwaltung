@@ -41,6 +41,13 @@ export const EmployeeSummary = {
 			}
 		)
 
+       /* watch(
+			() => route.query.d,
+			newDate => {
+				date = newDate;
+			}
+		)*/
+
         return {currentPersonID, currentUID}
     },
     template: `
@@ -59,8 +66,7 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        
-                        <dv-card :uid="currentUID" date="2023-01-26" ></dv-card>
+                        <dv-card :uid="currentUID" :date="date" ></dv-card>
 
                         <br>
 
@@ -70,7 +76,7 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <covid-card :personID="currentPersonID"></covid-card>
+                        <covid-card :personID="currentPersonID" :date="date"></covid-card>
 
                         <br/>
                         <div class="card">
@@ -88,7 +94,7 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <lehre-card :uid="currentUID"></lehre-card>
+                        <lehre-card :uid="currentUID" :date="date"></lehre-card>
 
                         <br/>
                         <div class="card-header">

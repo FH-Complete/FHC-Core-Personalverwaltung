@@ -15,12 +15,15 @@ export const DvCard = {
         const currentUID = toRefs(props).uid;       
 
         const formatDate = (ds) => {
+            if (ds == null) return '';
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        // const currentDate = formatDate(new Date());
-        //const currentDate = formatDate(date);
+        const convert2UnixTS = (ds) => {
+            let d = new Date(ds);
+            return Math.round(d.getTime() / 1000)
+        }
 
         const capitalize = (s) => {
             return s.charAt(0).toUpperCase() + s.slice(1);
@@ -32,8 +35,8 @@ export const DvCard = {
             }
 			try {
 			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;  
-              
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCurrentDV?uid=${currentUID.value}`;
+              let ts = convert2UnixTS(currentDate.value);  // unix timestamp
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCurrentDV?uid=${currentUID.value}&d=${ts}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();
@@ -52,7 +55,7 @@ export const DvCard = {
 		}
 
         onMounted(() => {
-            currentDate.value = props.date;
+            currentDate.value = props.date || new Date();
             fetchCurrentDV();
         })
 
@@ -60,6 +63,16 @@ export const DvCard = {
 			currentUID,
 			() => {
 				fetchCurrentDV();
+			}
+		)
+
+        watch(
+			() => props.date,
+			newDate => {
+				if (newDate != null) {
+                    currentDate.value = newDate;
+                    fetchCurrentDV();
+                }
 			}
 		)
       
@@ -84,7 +97,7 @@ export const DvCard = {
                         <tr><th scope="row">Zeitraum: </th><td>{{ formatDate(item.von) }} - {{ formatDate(item.bis) }}</td></tr>
                         <tr><th scope="row">Art</th><td>{{ item.vertragsart_kurzbz }}</td></tr>
                         <tr v-for="(salaryItem, salaryIndex) in item.gehaltsbestandteile" :key="salaryItem.gehaltsbestandteil_id">
-                            <th scope="row">{{ salaryItem.gehaltstyp_bezeichnung }}:</th><td>€ {{ new Intl.NumberFormat().format(parseFloat(salaryItem.betrag_valorisiert)) }}</td>
+                            <th scope="row">{{ salaryItem.gehaltstyp_bezeichnung }}:</th><td>€ {{ new Intl.NumberFormat().format(parseFloat(salaryItem.pgp_sym_decrypt)) }}</td>
                         </tr>
                     </tbody>
                     </table>

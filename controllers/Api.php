@@ -377,7 +377,15 @@ class Api extends Auth_Controller
             return;
         }
 
-        $data = $this->ApiModel->getCovidDate($person_id);
+        $date = $this->input->get('d', TRUE);
+
+        if ($date== null)
+        {
+            $date = time();
+        }
+
+
+        $data = $this->ApiModel->getCovidDate($person_id, $date);
         $this->outputJson($data);
 
     }
@@ -395,7 +403,14 @@ class Api extends Auth_Controller
             return;
         }
 
-        $data = $this->DVModel->getCurrentDVByPersonUID($uid);
+        $date = $this->input->get('d', TRUE);
+
+        if ($date== null)
+        {
+            $date = time();
+        }
+
+        $data = $this->DVModel->getCurrentDVByPersonUID($uid, $date);
 
         if (isSuccess($data))
         {
@@ -1155,7 +1170,7 @@ class Api extends Auth_Controller
         }
 
         $data = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
-			$dv_id, $stichtag);
+			intval($dv_id), $stichtag);
 
         
         return $this->outputJson($data);   
