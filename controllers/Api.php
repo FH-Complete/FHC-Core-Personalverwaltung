@@ -77,6 +77,7 @@ class Api extends Auth_Controller
 				'getVertragsarten' => Api::DEFAULT_PERMISSION,
                 'filterPerson' => Api::DEFAULT_PERMISSION,
                 'createEmployee' => Api::DEFAULT_PERMISSION,
+                'gbtByDV'  => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -436,6 +437,36 @@ class Api extends Auth_Controller
         }
         
 
+    }
+
+    function gbtByDV()
+    {
+        $dv_id = $this->input->get('dv_id', TRUE);
+
+        if (!is_numeric($dv_id))
+        {
+            $this->outputJsonError("dv_id is not numeric!'");
+            return;
+        }
+
+        $date = $this->input->get('d', TRUE);
+
+        if ($date== null)
+        {
+            $date = time();
+        }
+
+        // TODO add date filter
+        $gbtModel = $this->GBTModel;        
+        $gbt_data = $gbtModel->getCurrentGBTByDV($dv_id);
+
+        if (isSuccess($gbt_data))
+        {
+            $this->outputJson($gbt_data->retval);
+        } else {
+            $this->outputJsonError("Error when getting salary");
+        }
+        
     }
     
 

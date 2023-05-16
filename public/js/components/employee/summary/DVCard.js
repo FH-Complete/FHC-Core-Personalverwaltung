@@ -97,7 +97,7 @@ export const DvCard = {
                         <tr><th scope="row">Zeitraum: </th><td>{{ formatDate(item.von) }} - {{ formatDate(item.bis) }}</td></tr>
                         <tr><th scope="row">Art</th><td>{{ item.vertragsart_kurzbz }}</td></tr>
                         <tr v-for="(salaryItem, salaryIndex) in item.gehaltsbestandteile" :key="salaryItem.gehaltsbestandteil_id">
-                            <th scope="row">{{ salaryItem.gehaltstyp_bezeichnung }}:</th><td>€ {{ new Intl.NumberFormat().format(parseFloat(salaryItem.pgp_sym_decrypt)) }}</td>
+                            <th scope="row">{{ salaryItem.gehaltstyp_bezeichnung }}:</th><td>€ {{ new Intl.NumberFormat().format(parseFloat(salaryItem.grund_betrag_decrypted)) }}</td>
                         </tr>
                     </tbody>
                     </table>

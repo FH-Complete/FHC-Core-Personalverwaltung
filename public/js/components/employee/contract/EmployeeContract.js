@@ -1,11 +1,9 @@
-//import {DVDialog} from './dialog/DVDialog.js';
 import vbform_wrapper from './vbform/vbform_wrapper.js';
 
 
 export const EmployeeContract = {
     components: {	
-		//DVDialog,
-                'vbform_wrapper': vbform_wrapper,
+        'vbform_wrapper': vbform_wrapper,
        
 	},
     props: {        
@@ -13,20 +11,34 @@ export const EmployeeContract = {
     },
     setup( ) {
 
-        const { watch, ref } = Vue;
+        const { watch, ref, reactive } = Vue;
         const route = VueRouter.useRoute();
         const dvList = ref([]);
         const vertragList = ref([]);
+        const gbtList = ref([]);
         const isFetching = ref(false);
         const currentDVID = ref(null);
         const currentDV = ref(null);
         const currentVertragID = ref(null);
-        const dvSelectedIndex = ref(1);
-        const currentWS = ref(null);
+        const dvSelectedIndex = ref(1);        
+        const currentVBS = reactive({
+            funktion: {
+                zuordnung: [], 
+                taetigkeit: []
+            },
+            zeitaufzeichnung: [],
+            kuendigungsfrist: [],
+            stunden: [],
+            allIn: [],
+            befristung: [],
+            urlaubsanspruch: [],
+            zusatzvereinbarung: [],
+        });
         //const dienstverhaeltnisDialogRef = ref();
         const VbformWrapperRef = ref();
         const vbformmode = ref('neuanlage');
         const vbformDVid = ref(null);
+        const numberFormat = new Intl.NumberFormat();
         
         const currentDate = ref();
   
@@ -38,6 +50,11 @@ export const EmployeeContract = {
         const generateVertragEndpointURL = (dv_id) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}`;
+        };
+
+        const generateGBTEndpointURL = (dv_id) => {
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtByDV?dv_id=${dv_id}`;
         };
 
         const chartOptions = {
@@ -97,6 +114,22 @@ export const EmployeeContract = {
             }
         }
 
+        // Gehaltsbestandteile
+        const fetchGBT = async (dv_id) => {
+            let urlGBT = generateGBTEndpointURL(dv_id);
+            isFetching.value = true
+            try {
+              const res = await fetch(urlGBT);
+              let response = await res.json();
+              isFetching.value = false;
+              gbtList.value = response;
+              
+            } catch (error) {
+              console.log(error)
+              isFetching.value = false
+            }
+        }
+        
 
         
         fetchData(route.params.uid);
@@ -110,6 +143,7 @@ export const EmployeeContract = {
             currentDVID,
             (newVal) => {
                 fetchVertrag(newVal);
+                fetchGBT(newVal);
             }
         )
 
@@ -159,14 +193,62 @@ export const EmployeeContract = {
             fetchData(route.params.uid);            
         }
 
-        const getCurrentVertragsbestandteil = () => {
-            let ws = filterVertragsbestandteil(vertragList.value, 'stunden');
-            currentWS.value = ws[0].wochenstunden;
+        const formatNumber = (num) => {
+            return numberFormat.format(parseFloat(num));
         }
 
-        return { isFetching, dvList, vertragList, currentDV, currentDVID, currentWS, dvSelectedHandler, 
+        const getCurrentVertragsbestandteil = () => {
+            let zuordnung = [];
+            let taetigkeit = [];
+            let zeitaufzeichnung = [];
+            let kuendigungsfrist = [];
+            let stunden = [];
+            let allIn = [];
+            let befristung = [];
+            let urlaubsanspruch = [];
+            let zusatzvereinbarung = [];
+            vertragList.value.forEach(vbs => {
+                if (vbs.vertragsbestandteiltyp_kurzbz == 'funktion') {
+                    if (vbs.benutzerfunktiondata.funktion_kurzbz.match(/.*zuordnung/)) {
+                        zuordnung.push(vbs.benutzerfunktiondata);
+                    } else {
+                        taetigkeit.push(vbs.benutzerfunktiondata);
+                    }
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'freitext') {
+                    if (vbs.freitexttyp_kurzbz == 'allin') {
+                        allIn.push(vbs);
+                    } else if (vbs.freitexttyp_kurzbz == 'befristung') {
+                        befristung.push(vbs);
+                    } else  {
+                        zusatzvereinbarung.push(vbs);                        
+                    }
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'kuendigungsfrist') {
+                    kuendigungsfrist.push(vbs);
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'stunden') {
+                    stunden.push(vbs);  
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'urlaubsanspruch') {
+                    urlaubsanspruch.push(vbs);                   
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'zeitaufzeichnung') {
+                    zeitaufzeichnung.push(vbs);
+                }
+            });
+            currentVBS.funktion.zuordnung = zuordnung;
+            currentVBS.funktion.taetigkeit = taetigkeit;
+            currentVBS.zeitaufzeichnung = zeitaufzeichnung;
+            currentVBS.stunden = stunden;
+            currentVBS.kuendigungsfrist = kuendigungsfrist;
+            currentVBS.allIn = allIn;
+            currentVBS.befristung = befristung;
+            currentVBS.zusatzvereinbarung = zusatzvereinbarung;
+            currentVBS.urlaubsanspruch = urlaubsanspruch;
+           
+
+        }
+
+        return { isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, 
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef, route, vbformmode, vbformDVid, 
+            VbformWrapperRef, route, vbformmode, vbformDVid, formatNumber,
+            currentVBS,
             createDVDialog, updateDVDialog, handleDvSaved, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
     template: `
@@ -249,77 +331,122 @@ export const EmployeeContract = {
                                     </div>
 
                                     <div class="col-md-4">
+                                    <!--
                                         <label for="befristetCheck" class="form-label" >Befristet</label>
                                         <div class="col-sm-8">
-                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">
+                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">                                            
                                         </div>
+                                    -->
                                     </div>
+
+                                    <!-- Befristung -->
+                                    <div class="col-md-12"  v-if="currentVBS.befristung.length > 0"><h5 style="margin: 0.9rem 0 0 0;">Befristung</h5></div>
+
+                                    <template v-for="(item, index) in currentVBS.befristung"  >
+                                        
+                                        <div class="col-md-4">
+                                            <label for="befristet_von" class="form-label" >Von</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(item.von)" >
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="befristet_bis" class="form-label" >Bis</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(item.bis)" >
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label for="befristetCheck" class="form-label" >Befristet</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" checked>
+                                            </div>
+                                        </div>
+                                    </template>
 
                                     <!--div class="col-md-3"></div-->
 
                                     <!-- Kündigungsfrist -->
-                                    <div class="col-md-4">
-                                        <label for="dvKuendigungsfristAG" class="form-label">Kündigungsfrist AG</label>
-                                        <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAG">
-                                    </div>
-                                    
+                                    <div class="col-md-12" v-if="currentVBS.kuendigungsfrist.length >0"><h5 style="margin: 0.9rem 0 0 0;" >Kündigungsfrist</h5></div>
 
-                                    <div class="col-md-4">
-                                        <label for="dvKuendigungsfristAN" class="form-label">Kündigungsfrist AN</label>
-                                        <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAN">
-                                    </div>
+                                    <template v-for="(item, index) in currentVBS.kuendigungsfrist"  >
 
-                                    <div class="col-md-4"></div>
+                                        <div class="col-md-4">
+                                            <label for="dvKuendigungsfristAG" class="form-label">Kündigungsfrist AG</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAG" :value="item.arbeitgeber_frist">
+                                        </div>
+                                        
+
+                                        <div class="col-md-4">
+                                            <label for="dvKuendigungsfristAN" class="form-label">Kündigungsfrist AN</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAN" :value="item.arbeitnehmer_frist">
+                                        </div>
+
+                                        <div class="col-md-4"></div>
+
+                                    </template>
 
 
                                     <!-- Arbeitszeit -->
                                     <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h5></div>
-                                    <div class="col-md-4">
-                                        <label for="dvStunden" class="form-label">Wochenstunden</label>
-                                        <div class="col-sm-12">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="currentWS">
-                                        </div>
-                                        <div class="col-sm-1">
-                                            
-                                        </div>
-                                    </div>
 
-                                    <div class="col-md-4">
-                                        <label for="dvTeilzeittyp" class="form-label">Teilzeittyp</label>
-                                        <div class="col-sm-12">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp">
-                                        </div>                                        
-                                    </div>
+                                    <template v-for="(item, index) in currentVBS.stunden"  >
+                                        <div class="col-md-4">
 
-                                    <div class="col-md-4">
-                                        <label for="allInCheck" class="form-label" >AllIn</label>
-                                        <div class="col-sm-8">
-                                            <input class="form-check-input mt-2" type="checkbox" id="allInCheck">
+                                            <label for="dvStunden" class="form-label">Wochenstunden</label>
+                                            <div class="col-sm-12">
+                                                <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="formatNumber(item.wochenstunden)">
+                                            </div>
+                                            <div class="col-sm-1">
+
+                                            </div>
                                         </div>
-                                    </div>
+
+                                        <div class="col-md-4">
+                                            <label for="dvTeilzeittyp" class="form-label">Teilzeittyp</label>
+                                            <div class="col-sm-12">
+                                                <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp">
+                                            </div>                                        
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <template v-for="(item, index) in currentVBS.allIn"  >
+                                                <label for="allInCheck" class="form-label" >AllIn</label>
+                                                <div class="col-sm-8">
+                                                    <input class="form-check-input mt-2" type="checkbox" id="allInCheck" checked>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                    </template>
+
+                                    
                                     <!--div class="col-md-3"></div-->
 
                                     
 
                                     <!-- Zeitaufzeichnung -->
                                     <div class="col-md-4">
-                                        <label for="zapflichtigCheck" class="form-label" >Zeitaufzeichnung</label>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="zapflichtigCheck"> 
-                                            <label class="form-check-label" for="zapflichtigCheck">Zeitaufzeichnungspflichtig</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="azgCheck"> 
-                                            <label class="form-check-label" for="azgCheck">AZG relevant</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="homeofficeCheck">
-                                            <label class="form-check-label" for="homeofficeCheck">Homeoffice</label>
-                                        </div>
+
+                                        <template v-for="(item, index) in currentVBS.zeitaufzeichnung"  >
+                                            <label for="zapflichtigCheck" class="form-label" >Zeitaufzeichnung</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung"> 
+                                                <label class="form-check-label" for="zapflichtigCheck">Zeitaufzeichnungspflichtig</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant"> 
+                                                <label class="form-check-label" for="azgCheck">AZG relevant</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="homeofficeCheck" :checked="item.homeoffice">
+                                                <label class="form-check-label" for="homeofficeCheck">Homeoffice</label>
+                                            </div>
+                                        </template>
                                     </div>
                                     <div class="col-md-3">
-                                        <label for="dvUrlaubsanspruch" class="form-label">Urlaubsanspruch</label>
-                                        <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch">
+                                        <template v-for="(item, index) in currentVBS.urlaubsanspruch"  >
+                                            <label for="dvUrlaubsanspruch" class="form-label">Urlaubsanspruch</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch" :value="item.urlaubsanspruch">
+                                        </template>
                                     </div>
 
                                     <div class="col-md-5"></div>
@@ -413,35 +540,41 @@ export const EmployeeContract = {
 
                                 <form  class="row g-3" v-if="currentDV != null">
     
-                                    <div class="col-md-2">
-                                        <label for="iban" class="form-label" >Grund</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
-                                    </div>
+                                    <template v-for="(item, index) in gbtList"  >
 
-                                    <div class="col-md-2">
-                                        <label for="iban" class="form-label" >Gehaltstyp</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Grund (TBD)</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
+                                        </div>
 
-                                    <div class="col-md-2">
-                                        <label for="iban" class="form-label" >Betrag</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Gehaltstyp</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.gehaltstyp_bezeichnung">
+                                        </div>
 
-                                    <div class="col-md-2">
-                                        <label for="iban" class="form-label" >Betrag val.</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Betrag</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatNumber(item.grund_betrag_decrypted)">
+                                        </div>
 
-                                    <div class="col-md-2">
-                                        <label for="iban" class="form-label" >Val. Sperre bis</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Betrag val.</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatNumber(item.betrag_val_decrypted)">
+                                        </div>
 
-                                    <div class="col-md-2">
-                                        <label for="iban" class="form-label" >Anmerkung</label>
-                                        
-                                    </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Valorisierung</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-check-input" type="checkbox" :checked="item.valorisierung">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Anmerkung</label>
+                                            
+                                        </div>
+
+                                    </template>
 
                                 </form>
 
@@ -456,29 +589,33 @@ export const EmployeeContract = {
                             <div class="card-body" style="text-align:left">
                                 <form  class="row g-3" v-if="currentDV != null">
         
-                                    <div class="col-md-3">
-                                        <label for="iban" class="form-label" >Freitexttyp</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
-                                    </div>
+                                    <template v-for="(item, index) in currentVBS.zusatzvereinbarung"  >
 
-                                    <div class="col-md-3">
-                                        <label for="iban" class="form-label" >Von</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label" >Freitexttyp</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.titel" >
+                                        </div>
 
-                                    <div class="col-md-3">
-                                        <label for="iban" class="form-label" >Bis</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-3">
+                                            <label  class="form-label" >Von</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatDate(item.von)">
+                                        </div>
 
-                                    <div class="col-md-3">
-                                        
-                                    </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label" >Bis</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatDate(item.bis)">
+                                        </div>
 
-                                    <div class="col-md-9">
-                                        <label for="iban" class="form-label" >Text</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-3">
+                                            
+                                        </div>
+
+                                        <div class="col-md-9">
+                                            <label class="form-label" >Text</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.anmerkung">
+                                        </div>
+
+                                    </template>
 
                                     <div class="col-md-3">
                                         
@@ -512,65 +649,44 @@ export const EmployeeContract = {
 
                                 <form  class="row g-3" v-if="currentDV != null">
  
-                                    <div class="col-md-4">
-                                        <label for="iban" class="form-label" >Zuordnung</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="Standardkostenstelle" >
-                                    </div>
+                                    <template v-for="(item, index) in currentVBS.funktion.zuordnung"  >
 
-                                    <div class="col-md-4">
-                                        <label for="iban" class="form-label" >Abteilung</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0" >Zuordnung</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.funktion_bezeichnung" >
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <label for="iban" class="form-label" >SAP Kostenstelle</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0">Abteilung</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.oe_bezeichnung">
+                                        </div>
 
-                                    <!-- row 2 -->
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="Disziplinär" >
-                                    </div>
-
-                                    <div class="col-md-4">                                        
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        
-                                    </div>
-
-                                    <!-- row 3 -->
-                                   
-                                    <div class="col-md-4">
-                                    <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="Fachlich" >
-                                    </div>
-
-                                    <div class="col-md-4">                                        
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        
-                                    </div>
+                                    </template>
 
                                     <!-- taetigkeit -->
                                     <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Tätigkeit</h5></div>
-                                    <div class="col-md-4">
-                                        <label for="iban" class="form-label" >Tätigkeit</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" value="" >
-                                    </div>
+                                    <template v-for="(item, index) in currentVBS.funktion.taetigkeit"  >
 
-                                    <div class="col-md-4">
-                                        <label for="iban" class="form-label" >Abteilung</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0" >Zuordnung</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.funktion_bezeichnung" >
+                                        </div>
 
-                                    <div class="col-md-4">
-                                        <label for="iban" class="form-label" >Bezeichnung</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  value="">
-                                    </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0">Abteilung</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.oe_bezeichnung">
+                                        </div>
+
+                                        <div class="col-md-4">                                            
+                                        </div>
+
+
+                                    </template>
                                 
 
                                 </form>
@@ -595,7 +711,7 @@ export const EmployeeContract = {
                                     </figure>
                                 </div>
 
-                                <table class="table">
+                                <!--table class="table">
                                     <thead>
                                         <tr>
                                             <th scope="col">Zeitraum</th>
@@ -616,7 +732,7 @@ export const EmployeeContract = {
                                         </tr>                                        
                                         
                                     </tbody>
-                                </table>
+                                </table-->
                             </div>
                         </div>
 
@@ -626,7 +742,7 @@ export const EmployeeContract = {
                                 <h5 class="mb-0">Dokumente</h5>
                             </div>
                             <div class="card-body" style="text-align:center">
-                                <table class="table">
+                                <!--table class="table">
                                     <thead>
                                         <tr>
                                             <th scope="col">Zeitraum</th>
@@ -645,7 +761,7 @@ export const EmployeeContract = {
                                         </tr>                                        
                                         
                                     </tbody>
-                                </table>
+                                </table-->
                             </div>
                         </div>
                        
