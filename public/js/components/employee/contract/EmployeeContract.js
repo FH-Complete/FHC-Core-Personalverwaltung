@@ -104,10 +104,10 @@ export const EmployeeContract = {
               let response = await res.json();
               isFetching.value = false;
               vertragList.value = response;
-              if (vertragList.value.length>0) {
-                currentVertragID.value = vertragList.value[0].vertragsbestandteil_id;
+              //if (vertragList.value.length>0) {
+                //currentVertragID.value = vertragList.value[0].vertragsbestandteil_id;
                 getCurrentVertragsbestandteil();
-              }
+              //}
             } catch (error) {
               console.log(error)
               isFetching.value = false
@@ -332,9 +332,9 @@ export const EmployeeContract = {
 
                                     <div class="col-md-4">
                                     <!--
-                                        <label for="befristetCheck" class="form-label" >Befristet</label>
+                                        <label  class="form-label" >Befristet</label>
                                         <div class="col-sm-8">
-                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck">                                            
+                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" disabled >                                            
                                         </div>
                                     -->
                                     </div>
@@ -357,7 +357,7 @@ export const EmployeeContract = {
                                         <div class="col-md-4">
                                             <label for="befristetCheck" class="form-label" >Befristet</label>
                                             <div class="col-sm-8">
-                                                <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" checked>
+                                                <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" checked disabled>
                                             </div>
                                         </div>
                                     </template>
@@ -409,9 +409,9 @@ export const EmployeeContract = {
 
                                         <div class="col-md-4">
                                             <template v-for="(item, index) in currentVBS.allIn"  >
-                                                <label for="allInCheck" class="form-label" >AllIn</label>
+                                                <label  class="form-label" >AllIn</label>
                                                 <div class="col-sm-8">
-                                                    <input class="form-check-input mt-2" type="checkbox" id="allInCheck" checked>
+                                                    <input class="form-check-input mt-2" type="checkbox" id="allInCheck" checked disabled>
                                                 </div>
                                             </template>
                                         </div>
@@ -429,16 +429,16 @@ export const EmployeeContract = {
                                         <template v-for="(item, index) in currentVBS.zeitaufzeichnung"  >
                                             <label for="zapflichtigCheck" class="form-label" >Zeitaufzeichnung</label>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung"> 
-                                                <label class="form-check-label" for="zapflichtigCheck">Zeitaufzeichnungspflichtig</label>
+                                                <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung" disabled> 
+                                                <label class="form-check-label" >Zeitaufzeichnungspflichtig</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant"> 
-                                                <label class="form-check-label" for="azgCheck">AZG relevant</label>
+                                                <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant" disabled> 
+                                                <label class="form-check-label" >AZG relevant</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="homeofficeCheck" :checked="item.homeoffice">
-                                                <label class="form-check-label" for="homeofficeCheck">Homeoffice</label>
+                                                <input class="form-check-input" type="checkbox" id="homeofficeCheck" :checked="item.homeoffice" disabled>
+                                                <label class="form-check-label" >Homeoffice</label>
                                             </div>
                                         </template>
                                     </div>
@@ -565,7 +565,7 @@ export const EmployeeContract = {
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Valorisierung</label>
                                             <div class="col-sm-8">
-                                                <input class="form-check-input" type="checkbox" :checked="item.valorisierung">
+                                                <input class="form-check-input" type="checkbox" :checked="item.valorisierung" disabled>
                                             </div>
                                         </div>
 
