@@ -40,7 +40,8 @@ export const EmployeeContract = {
         const vbformDVid = ref(null);
         const numberFormat = new Intl.NumberFormat();
         
-        const currentDate = ref();
+        //const currentDate = ref();
+        const currentDate = Vue.ref(new Date());
   
         const generateDVEndpointURL = (uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -130,7 +131,13 @@ export const EmployeeContract = {
             }
         }
         
-
+        const filterActiveDV = (dvList) => {
+            return dvList?.filter((dv) => {
+                let von = new Date(dv.von);
+                let bis = dv.bis != null ? new Date(dv.bis) : null;
+                return von <= currentDate.value && (bis == null || bis >= currentDate.value);
+            } )
+        }
         
         fetchData(route.params.uid);
         watch(
@@ -247,7 +254,7 @@ export const EmployeeContract = {
 
         return { isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, 
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef, route, vbformmode, vbformDVid, formatNumber,
+            VbformWrapperRef, route, vbformmode, vbformDVid, formatNumber, filterActiveDV,
             currentVBS,
             createDVDialog, updateDVDialog, handleDvSaved, formatDate, dvSelectedIndex, currentDate, chartOptions }
     },
@@ -268,21 +275,23 @@ export const EmployeeContract = {
                         <div class="d-grid gap-2 d-md-flex ">
                             <h4>Dienstverhältnis <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></h4> 
                         </div>
-                    </div>        
-                    <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-                             
-                            <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
-                                    <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
-                                        {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
-                                    </option> 
-                            </select> 
+                    </div>     
+                    <div class="d-flex align-items-end flex-column">  
+                        <div class="d-flex flex-row gap-2 mb-2">
+                            <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #D5E8D4;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ filterActiveDV(dvList)?.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
+                            <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #F5F5F5;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ dvList?.length }} <span v-if="dvList">gesamt</span></div> 
+                        </div>
+                        <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
+                                <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                                        <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
+                                            {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
+                                        </option> 
+                                </select> 
 
-                            <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-minus"></i></button>
+                                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                        </div>
                     </div>
                 </div>
 
@@ -290,6 +299,23 @@ export const EmployeeContract = {
             
             
             <div class="col-lg-12">
+
+                <div class="row">
+                    <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
+                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
+                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
+                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
+                        <div class="btn-group" role="group">
+                            <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                weitere Aktionen
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                <li><a class="dropdown-item" href="#">Dropdown link</a></li>
+                                <li><a class="dropdown-item" href="#">Dropdown link</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="row pt-md-4">
 
