@@ -1,15 +1,15 @@
 import vbform_wrapper from './vbform/vbform_wrapper.js';
-
+import { DropDownButton } from '../../DropDownButton.js';
 
 export const EmployeeContract = {
-    components: {	
+    components: {
         'vbform_wrapper': vbform_wrapper,
-       
-	},
-    props: {        
+        'DropDownButton': DropDownButton,
+    },
+    props: {
         writePermission: { type: Boolean, required: false },  // TODO needs change
     },
-    setup( ) {
+    setup() {
 
         const { watch, ref, reactive } = Vue;
         const route = VueRouter.useRoute();
@@ -20,10 +20,10 @@ export const EmployeeContract = {
         const currentDVID = ref(null);
         const currentDV = ref(null);
         const currentVertragID = ref(null);
-        const dvSelectedIndex = ref(1);        
+        const dvSelectedIndex = ref(1);
         const currentVBS = reactive({
             funktion: {
-                zuordnung: [], 
+                zuordnung: [],
                 taetigkeit: []
             },
             zeitaufzeichnung: [],
@@ -39,10 +39,10 @@ export const EmployeeContract = {
         const vbformmode = ref('neuanlage');
         const vbformDVid = ref(null);
         const numberFormat = new Intl.NumberFormat();
-        
+
         //const currentDate = ref();
         const currentDate = Vue.ref(new Date());
-  
+
         const generateDVEndpointURL = (uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPerson?uid=${uid}`;
@@ -60,22 +60,22 @@ export const EmployeeContract = {
 
         const chartOptions = {
 
-              chart: {
+            chart: {
                 type: 'line'
-              },
-              title: {
+            },
+            title: {
                 text: 'Gehalt'
-              },
-              series: [{
+            },
+            series: [{
                 data: [4711, 4823, 4931, 5060, 5200, 5270, 5390],
                 color: '#6fcd98'
-              }]
-            
+            }]
+
         }
-        
+
 
         const fetchData = async (uid) => {
-            if (uid==null) {
+            if (uid == null) {
                 dvList.value = [];
                 vertragList.value = [];
                 return;
@@ -83,17 +83,17 @@ export const EmployeeContract = {
             let urlDV = generateDVEndpointURL(uid);
             isFetching.value = true
             try {
-              const res = await fetch(urlDV);
-              let response = await res.json();
-              isFetching.value = false;              
-              dvList.value = response.retval;
-              if (dvList.value.length>0) {
-                currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
-                currentDV.value = dvList.value[0];
-              }
+                const res = await fetch(urlDV);
+                let response = await res.json();
+                isFetching.value = false;
+                dvList.value = response.retval;
+                if (dvList.value.length > 0) {
+                    currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
+                    currentDV.value = dvList.value[0];
+                }
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+                console.log(error)
+                isFetching.value = false
             }
         }
 
@@ -101,17 +101,17 @@ export const EmployeeContract = {
             let urlVertrag = generateVertragEndpointURL(dv_id);
             isFetching.value = true
             try {
-              const res = await fetch(urlVertrag);
-              let response = await res.json();
-              isFetching.value = false;
-              vertragList.value = response;
-              //if (vertragList.value.length>0) {
+                const res = await fetch(urlVertrag);
+                let response = await res.json();
+                isFetching.value = false;
+                vertragList.value = response;
+                //if (vertragList.value.length>0) {
                 //currentVertragID.value = vertragList.value[0].vertragsbestandteil_id;
                 getCurrentVertragsbestandteil();
-              //}
+                //}
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+                console.log(error)
+                isFetching.value = false
             }
         }
 
@@ -120,31 +120,31 @@ export const EmployeeContract = {
             let urlGBT = generateGBTEndpointURL(dv_id);
             isFetching.value = true
             try {
-              const res = await fetch(urlGBT);
-              let response = await res.json();
-              isFetching.value = false;
-              gbtList.value = response;
-              
+                const res = await fetch(urlGBT);
+                let response = await res.json();
+                isFetching.value = false;
+                gbtList.value = response;
+
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+                console.log(error)
+                isFetching.value = false
             }
         }
-        
+
         const filterActiveDV = (dvList) => {
             return dvList?.filter((dv) => {
                 let von = new Date(dv.von);
                 let bis = dv.bis != null ? new Date(dv.bis) : null;
                 return von <= currentDate.value && (bis == null || bis >= currentDate.value);
-            } )
+            })
         }
-        
+
         fetchData(route.params.uid);
         watch(
-              ()=> route.params.uid,
-              (newVal) => {                    
-                  fetchData(newVal);
-              }
+            () => route.params.uid,
+            (newVal) => {
+                fetchData(newVal);
+            }
         )
         watch(
             currentDVID,
@@ -156,34 +156,34 @@ export const EmployeeContract = {
 
         const dvSelectedHandler = (e) => {
             console.log("DV selected: ", e.target);
-            dvSelectedIndex.value = e.target.selectedIndex+1;
+            dvSelectedIndex.value = e.target.selectedIndex + 1;
             currentDV.value = dvList.value[e.target.selectedIndex];
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
         }
 
         const formatDate = (d) => {
             if (d != null && d != '') {
-		        return d.substring(8, 10) + "." + d.substring(5, 7) + "." + d.substring(0, 4);
+                return d.substring(8, 10) + "." + d.substring(5, 7) + "." + d.substring(0, 4);
             } else {
                 return ''
             }
         }
 
         const filterVertragsbestandteil = (vertragsbestandteile, kurzbz) => {
-            let ws = vertragsbestandteile.filter(value => value.vertragsbestandteiltyp_kurzbz==kurzbz);
+            let ws = vertragsbestandteile.filter(value => value.vertragsbestandteiltyp_kurzbz == kurzbz);
             return ws;
         }
-/*
-        const createDVDialog = async () => {
-            const result = await dienstverhaeltnisDialogRef.value.showModal(route.params.uid);
-
-            if (result) {
-                console.log(result);
-            } else {
-                console.log("Dialog cancelled");
-            }
-        }
-*/
+        /*
+                const createDVDialog = async () => {
+                    const result = await dienstverhaeltnisDialogRef.value.showModal(route.params.uid);
+        
+                    if (result) {
+                        console.log(result);
+                    } else {
+                        console.log("Dialog cancelled");
+                    }
+                }
+        */
         const createDVDialog = () => {
             vbformmode.value = 'neuanlage';
             vbformDVid.value = null;
@@ -197,7 +197,7 @@ export const EmployeeContract = {
         }
 
         const handleDvSaved = async () => {
-            fetchData(route.params.uid);            
+            fetchData(route.params.uid);
         }
 
         const formatNumber = (num) => {
@@ -226,15 +226,15 @@ export const EmployeeContract = {
                         allIn.push(vbs);
                     } else if (vbs.freitexttyp_kurzbz == 'befristung') {
                         befristung.push(vbs);
-                    } else  {
-                        zusatzvereinbarung.push(vbs);                        
+                    } else {
+                        zusatzvereinbarung.push(vbs);
                     }
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'kuendigungsfrist') {
                     kuendigungsfrist.push(vbs);
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'stunden') {
-                    stunden.push(vbs);  
+                    stunden.push(vbs);
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'urlaubsanspruch') {
-                    urlaubsanspruch.push(vbs);                   
+                    urlaubsanspruch.push(vbs);
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'zeitaufzeichnung') {
                     zeitaufzeichnung.push(vbs);
                 }
@@ -248,15 +248,21 @@ export const EmployeeContract = {
             currentVBS.befristung = befristung;
             currentVBS.zusatzvereinbarung = zusatzvereinbarung;
             currentVBS.urlaubsanspruch = urlaubsanspruch;
-           
+
 
         }
 
-        return { isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, 
+        const dropdownLink1 = () => {
+            console.log('dropdown link clicked');
+        }
+
+        return {
+            isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler,
             //dienstverhaeltnisDialogRef,
             VbformWrapperRef, route, vbformmode, vbformDVid, formatNumber, filterActiveDV,
-            currentVBS,
-            createDVDialog, updateDVDialog, handleDvSaved, formatDate, dvSelectedIndex, currentDate, chartOptions }
+            currentVBS, dropdownLink1, 
+            createDVDialog, updateDVDialog, handleDvSaved, formatDate, dvSelectedIndex, currentDate, chartOptions
+        }
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -305,15 +311,11 @@ export const EmployeeContract = {
                         <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
                         <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
                         <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                weitere Aktionen
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <li><a class="dropdown-item" href="#">Dropdown link</a></li>
-                                <li><a class="dropdown-item" href="#">Dropdown link</a></li>
-                            </ul>
-                        </div>
+                        <!-- Drop Down Button -->
+                        <DropDownButton  :links="[{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'}]">
+                            weitere Aktionen
+                        </DropDownButton>
+                        
                     </div>
                 </div>
 
