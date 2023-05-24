@@ -336,14 +336,14 @@ export const AddressData = {
             <div class="d-flex bd-highlight">
                 <div class="flex-grow-1 bd-highlight"></div>        
                 <div class="p-2 bd-highlight">                   
-                    <button type="button" class="btn btn-outline-dark btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
+                    <button type="button" class="btn btn-outline-secondary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
                         <i class="fa fa-plus"></i>
                     </button>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-striped table-sm">
+            <table class="table table-hover table-sm">
                 <thead>                
                 <tr>
                     <th scope="col">Typ</th>
@@ -371,10 +371,10 @@ export const AddressData = {
                     <td class="align-middle">{{ address.co_name }}</td>
                     <td class="align-middle" width="5%">
                         <div class="d-grid gap-2 d-md-flex align-middle">
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(address.adresse_id)">
-                                <i class="fa fa-minus"></i>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(address.adresse_id)">
+                                <i class="fa fa-xmark"></i>
                             </button>
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(address.adresse_id)">
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(address.adresse_id)">
                                 <i class="fa fa-pen"></i>
                             </button>
                         </div>

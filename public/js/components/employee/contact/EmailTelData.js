@@ -264,13 +264,16 @@ export const EmailTelData = {
                     </div>
                 </div-->
             </div>
+         
+             
+        
         <div class="table-responsive">
-            <table class="table table-striped table-sm">
+            <table class="table table-hover table-sm">
                 <thead>
                 <tr>
                     <th colspan="4"></th>                    
                     <th scope="col">
-                        <button type="button" class="btn btn-outline-dark btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
+                        <button type="button" class="btn btn-outline-secondary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
                             <i class="fa fa-plus"></i>
                         </button>
                     </th>
@@ -293,10 +296,10 @@ export const EmailTelData = {
                         <td class="align-middle">{{ contact.anmerkung }}</td>
                         <td class="align-middle" width="5%">
                             <div class="d-grid gap-2 d-md-flex align-middle">
-                                <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(contact.kontakt_id)">
-                                    <i class="fa fa-minus"></i>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(contact.kontakt_id)">
+                                    <i class="fa fa-xmark"></i>
                                 </button>
-                                <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(contact.kontakt_id)">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(contact.kontakt_id)">
                                     <i class="fa fa-pen"></i>
                                 </button>
                             </div>
