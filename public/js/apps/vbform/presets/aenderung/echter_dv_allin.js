@@ -142,8 +142,32 @@ export default {
             {
               type: 'vertragsbestandteillist',
               guioptions: {
+                title: 'Zuordnung',
+                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'zuordnung',
+                errors: [],
+                infos: [],
+                childdefaults: {
+                  guioptions: {
+                    canhavegehaltsbestandteile: false,
+                    disabled: [
+                      'funktion'
+                    ],
+                    hidden: []
+                  },
+                  data: {
+                    funktion: "fachzuordnung"
+                  }
+                }
+              },
+              children: []
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
                 title: 'Funktion',
                 vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'funktion',
                 errors: [],
                 infos: []
               },

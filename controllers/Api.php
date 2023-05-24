@@ -1540,11 +1540,13 @@ EOSQL;
 		return;
 	}
 	
-	public function getCurrentAndFutureVBs($typ) 
+	public function getCurrentAndFutureVBs($dvid, $typ=null) 
 	{
+		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dvid);
+		
 		$this->outputJson(
 			array(
-				'data' => array(),
+				'data' => $vbs,
 				'meta' => array()
 			)
 		);

@@ -14,8 +14,8 @@ class GUIHandler
     protected $editorUID;
 	
     protected $CI;
-	protected $VertragsbestandteilLib;
-	protected $GehaltsbestandteilLib;
+	public $VertragsbestandteilLib;
+	public $GehaltsbestandteilLib;
 
 	protected $DataMapper;
 	

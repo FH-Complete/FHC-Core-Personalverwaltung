@@ -13,7 +13,7 @@ export default {
     <div class="row g-2 py-2">
       <div class="col-2">
         <div class="form-check">
-          <input v-model="mode" class="form-check-input form-check-input-sm" type="radio"
+          <input v-model="mode" :disabled="isinputdisabled('mode')" class="form-check-input form-check-input-sm" type="radio"
             @change="resetDropdowns"
             :name="'vbfunktionmode_' + config.guioptions.id" :id="'vbfunktionmode1_' + config.guioptions.id" value="neu">
           <label class="form-check-label" :for="'vbfunktionmode1_' + config.guioptions.id">Neue Funktion</label>
@@ -56,7 +56,7 @@ export default {
     </template>
     <template v-else-if="mode === 'bestehende'">
       <div class="col">
-        <select v-model="benutzerfunktionid" class="form-select form-select-sm">
+        <select v-model="benutzerfunktionid" :disabled="isinputdisabled('benutzerfunktionid')" class="form-select form-select-sm">
           <option
             v-for="bf in lists.benutzerfunktionen"
             :value="bf.value"

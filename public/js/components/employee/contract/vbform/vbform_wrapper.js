@@ -5,10 +5,11 @@ import store from '../../../vbform/vbsharedstate.js';
 import presets_chooser from '../../../vbform/presets_chooser.js';
 import {Modal} from '../../../Modal.js';
 import tmpstorehelper from '../../../vbform/tmpstorehelper.js';
+import vbgb2gui from '../../../../helpers/vbform/vbgb2gui.js';
 
 export default {
   template: `
-    <Modal :title="title + (mode=='aenderung'?' bearbeiten':' anlegen')" ref="modalRef" id="vbformModal">
+    <Modal :title="getTitle" ref="modalRef" id="vbformModal">
         <template #body>
     
         <div class="row g-2 py-2">
@@ -110,9 +111,51 @@ export default {
     processJSON: function(payload) {
       this.vbhjson = payload;
     },
+    searchforvbs: function(data, child, preset) {
+        for(const vb of data) {            
+            if( child.guioptions.vertragsbestandteiltyp === 'vertragsbestandteil' + vb.vertragsbestandteiltyp_kurzbz ) {
+                // TODO handle different funktionstypen bzw. freitexttypen
+                if(vb.vertragsbestandteiltyp_kurzbz === 'freitext') {
+                    
+                } else if( vb.vertragsbestandteiltyp_kurzbz === 'funktion' ) {
+                    if( vb.benutzerfunktiondata.funktion_kurzbz.match(/zuordnung/) && child.guioptions.filter !== 'zuordnung') {
+                        continue;
+                    } 
+                    if( !vb.benutzerfunktiondata.funktion_kurzbz.match(/zuordnung/) && child.guioptions.filter !== 'funktion') {
+                        continue;
+                    }
+                }
+                var vbgui = vbgb2gui.vb2gui(vb, this.store.mode, child);
+                console.log(JSON.stringify(vbgui, 2));
+                preset.vbs[vbgui.guioptions.id] = vbgui;
+                child.children.push(vbgui.guioptions.id);
+            }
+        }
+    },
+    iterateChilds: function(childs, data, preset) {
+        for(const child of childs) {            
+            if( child.type === 'vertragsbestandteillist' ) {
+               this.searchforvbs(data, child, preset); 
+            }
+            
+            if( child?.children !== undefined ) {
+                this.iterateChilds(child.children, data, preset);
+            }
+        }
+    },
     handlePresetSelected: function(preset) {
-      this.presetselected(preset);
-      this.resetTmpStoreHelper();  
+      if( this.mode === 'aenderung' ) {
+        var preset = JSON.parse(JSON.stringify(preset));
+        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.dvid)
+        .then((response) => {          
+          this.iterateChilds(preset.children, response.data.data, preset);          
+          this.presetselected(preset);
+          this.resetTmpStoreHelper();
+        });    
+      } else {
+        this.presetselected(preset);
+        this.resetTmpStoreHelper();
+      }
     },
     handleValidated: function(payload) {
         this.presetselected(payload);      
@@ -154,4 +197,9 @@ export default {
     }
   },
   expose: ['showModal'],
+  computed: {
+      getTitle: function() {
+          return this.title + (this.mode == 'aenderung' ? ' bearbeiten' : ' anlegen');
+      }
+  }
 };
