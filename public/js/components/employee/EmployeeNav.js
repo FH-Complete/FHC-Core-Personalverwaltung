@@ -49,7 +49,7 @@ export const EmployeeNav = {
         <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract' + maybeAddDate()" 
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route.path.indexOf('contract') > -1 }]" >
-            Verträge
+            Dienstverhältnis
         </router-link>        
         <a
         class="flex-sm-fill text-sm-center nav-link"
