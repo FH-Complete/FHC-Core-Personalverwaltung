@@ -279,7 +279,17 @@ export const EmployeeContract = {
                 <div class="d-md-flex bd-highlight pt-1">            
                     <div class="flex-grow-1 bd-highlight">
                         <div class="d-grid gap-2 d-md-flex ">
-                            <h4>Dienstverhältnis <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></h4> 
+                            <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span>
+                        </div>
+                        <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
+                            <!-- Drop Down Button -->
+                            <DropDownButton  :links="[{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'}]">
+                                weitere Aktionen
+                            </DropDownButton>
+                            
                         </div>
                     </div>     
                     <div class="d-flex align-items-end flex-column">  
@@ -306,18 +316,7 @@ export const EmployeeContract = {
             
             <div class="col-lg-12">
 
-                <div class="row">
-                    <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
-                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
-                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
-                        <!-- Drop Down Button -->
-                        <DropDownButton  :links="[{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'}]">
-                            weitere Aktionen
-                        </DropDownButton>
-                        
-                    </div>
-                </div>
+                
 
                 <div class="row pt-md-4">
 

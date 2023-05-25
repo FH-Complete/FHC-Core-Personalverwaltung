@@ -8,10 +8,9 @@ export const EmployeeStatus = {
     template: `
     <template v-for="item in statusList">
         <div class="d-flex flex-column align-items-center" >
-            <div style="font-weight:bold;font-size:1.3rem">{{ item.text }}</div><div style="font-size:0.75em;color:#666">{{ item.description }}</div>
-            
+            <span class="badge bg-secondary">{{ item.text }}</span>
         </div> 
-        <div class="vr"></div>  
+        
     </template>
    `
 }

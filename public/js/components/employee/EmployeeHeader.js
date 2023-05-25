@@ -316,6 +316,9 @@ export const EmployeeHeader = {
                     </h6>  
                     <h6 v-else class="mb-2"><p-skeleton  style="width:35%"></p-skeleton></h6> 
 
+                    <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2" >
+                        <EmployeeStatus></EmployeeStatus>
+                    </div>
                 </div>
             </div>
             
@@ -338,10 +341,7 @@ export const EmployeeHeader = {
             </div>
         
         </div>
-        <div class="d-flex align-items-start ms-sm-auto col-lg-12 p-md-2 gap-3" >
-            <EmployeeStatus></EmployeeStatus>
-            
-        </div>
+        
 
         <!-- FotoModal -->
         <Modal title="Foto" ref="modalRef">
