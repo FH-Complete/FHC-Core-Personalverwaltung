@@ -269,55 +269,39 @@ export const EmployeeContract = {
                         <template #body><h4>Vertrag gespeichert.</h4></template>
                     </Toast>
                 </div>
-
-                <div class="d-md-flex bd-highlight pt-1">            
-                    <div class="flex-grow-1 bd-highlight">
-                        <div class="d-grid gap-2 d-md-flex ">
-                            <h4>Dienstverhältnis <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></h4> 
-                        </div>
-                    </div>     
-                    <div class="d-flex align-items-end flex-column">  
-                        <div class="d-flex flex-row gap-2 mb-2">
-                            <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #D5E8D4;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ filterActiveDV(dvList)?.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
-                            <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #F5F5F5;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ dvList?.length }} <span v-if="dvList">gesamt</span></div> 
-                        </div>
-                        <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-                                <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
-                                        <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
-                                            {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
-                                        </option> 
-                                </select> 
-
-                                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                                    <i class="fa fa-plus"></i>
+                
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-end">
+                        <div><span class="badge badge-sm bg-success me-1">{{ filterActiveDV(dvList)?.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
+                        <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-auto">
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
+                            <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-plus"></i></button>                
+                            <div class="btn-group" role="group">
+                                <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Weitere Aktionen
                                 </button>
+                                <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                                    <li><a class="dropdown-item" href="#">Dropdown link</a></li>
+                                    <li><a class="dropdown-item" href="#">Dropdown link</a></li>
+                                </ul>
+                            </div>
                         </div>
+                        <div class="pt-1">
+                            <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                                    <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
+<!--                                    DV ({{ filterActiveDV(dvList)?.length }}/{{ dvList?.length }}): -->
+                                        {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
+                                    </option> 
+                            </select> 
                     </div>
-                </div>
-
-            </div>
-            
-            
-            <div class="col-lg-12">
-
-                <div class="row">
-                    <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
-                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
-                        <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                weitere Aktionen
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-                                <li><a class="dropdown-item" href="#">Dropdown link</a></li>
-                                <li><a class="dropdown-item" href="#">Dropdown link</a></li>
-                            </ul>
-                        </div>
                     </div>
-                </div>
-
-                <div class="row pt-md-4">
+                </div>           
+                <div class="row pt-md-2">
 
                     <div class="col">
                         <div class="card">
@@ -412,7 +396,7 @@ export const EmployeeContract = {
 
 
                                     <!-- Arbeitszeit -->
-                                    <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h5></div>
+                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h6></div>
 
                                     <template v-for="(item, index) in currentVBS.stunden"  >
                                         <div class="col-md-4">
@@ -695,7 +679,7 @@ export const EmployeeContract = {
                                     </template>
 
                                     <!-- taetigkeit -->
-                                    <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Tätigkeit</h5></div>
+                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Tätigkeit</h6></div>
                                     <template v-for="(item, index) in currentVBS.funktion.taetigkeit"  >
 
                                         <div class="col-md-4">
@@ -935,7 +919,7 @@ export const EmployeeContract = {
                     </div -->
 
                     
-                </div--> <!-- --> 
+                </div> <!--. row--> 
                 <br/>
 
                 
