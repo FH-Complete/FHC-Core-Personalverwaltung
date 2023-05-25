@@ -1,6 +1,7 @@
 import { Modal } from '../Modal.js';
 import { Toast } from '../Toast.js';
 import { ModalDialog } from '../ModalDialog.js';
+import { EmployeeStatus } from './EmployeeStatus.js';
 
 export const EmployeeHeader = {
     components: {
@@ -8,6 +9,7 @@ export const EmployeeHeader = {
 		Modal,
         ModalDialog,
         "p-skeleton": primevue.skeleton,
+        EmployeeStatus,
 	},	
     props: {
         personID: Number,
@@ -335,6 +337,10 @@ export const EmployeeHeader = {
                 </div> 
             </div>
         
+        </div>
+        <div class="d-flex align-items-start ms-sm-auto col-lg-12 p-md-2 gap-3" >
+            <EmployeeStatus></EmployeeStatus>
+            
         </div>
 
         <!-- FotoModal -->
