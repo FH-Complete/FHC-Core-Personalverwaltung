@@ -149,18 +149,19 @@ export const CreateWizard = {
 
             </template>
             <template #footer>
-                <button type="button" class="btn btn-secondary" @click="cancelHandler()">
-                    Abbrechen
-                </button>
-                <button type="button" class="btn btn-primary" @click="stepsRef.selectStep('Suche')" v-if="getSelectedTitle() != 'Suche'" >
-                    zurück
-                </button>
-                <button type="button" class="btn btn-primary" @click="okHandler()" v-if="getSelectedTitle() != 'Suche'" >
-                    OK
-                </button>
-                <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue.surname == ''"  @click="showCreateHandler()" v-if="getSelectedTitle() != 'Schnellanlage'">
-                    Neuanlage
-                </button>
+                <div class="float-start">
+                    <button type="button" class="btn btn-outline-secondary" @click="stepsRef.selectStep('Suche')" v-if="getSelectedTitle() != 'Suche'" >
+                        <i class="fa fa-chevron-left"></i> Zurück
+                    </button>
+                </div>
+                <div class="float-start">
+                    <button type="button" class="btn btn-primary" @click="okHandler()" v-if="getSelectedTitle() != 'Suche'" >
+                        Mitarbeiter anlegen
+                    </button>
+                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue.surname == ''"  @click="showCreateHandler()" v-if="getSelectedTitle() != 'Schnellanlage'">
+                        Person anlegen
+                    </button>
+                </div>
             </template>
 
         </Modal>`
