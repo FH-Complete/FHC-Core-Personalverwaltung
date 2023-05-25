@@ -59,6 +59,8 @@ export const EmployeeContract = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtByDV?dv_id=${dv_id}`;
         };
 
+        var dates = ["2013-06-14", "2019-06-14", "2021-04-13"],
+            salaries = [4711, 4800, 5000];
         const chartOptions = {
 
             chart: {
@@ -68,10 +70,37 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                data: [4711, 4823, 4931, 5060, 5200, 5270, 5390],
+                name: 'Gesamtgehalt',
+                data: (function() {
+                    return dates.map(function(date, i) {
+                      return [Date.parse(date), salaries[i]];
+                    });
+                  })(),
                 color: '#6fcd98',
                 step: 'left' // or 'center' or 'right'
-            }]
+                },
+            ],
+            xAxis: {
+                type: 'datetime',
+                labels: {
+                  // Format the date
+                  formatter: function() {
+                    return Highcharts.dateFormat('%d.%m.%Y', this.value);
+                  }
+                },
+                tickPositioner: function() {
+                  return dates.map(function(date) {
+                    return Date.parse(date);
+                  });
+                }
+            },
+                yAxis: {
+                //min: 0,
+                title: {
+                    text: '€'
+                }
+            },
+            
 
         }
 
