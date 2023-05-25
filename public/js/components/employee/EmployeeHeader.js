@@ -334,10 +334,7 @@ export const EmployeeHeader = {
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.uid }}</h6>  
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
                     </div>
-                </div>
-                <div class="px-2 pt-1">                    
-                    <input type="date" class="form-control form-control-sm"  id="currentDateSelect" :value="formatDate(currentDate)" @change="setDateHandler" >
-                </div> 
+                </div>                
             </div>
         
         </div>
