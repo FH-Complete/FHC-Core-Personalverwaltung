@@ -5,6 +5,7 @@ export const EmployeeContract = {
     components: {
         'vbform_wrapper': vbform_wrapper,
         'DropDownButton': DropDownButton,
+        "p-skeleton": primevue.skeleton,
     },
     props: {
         writePermission: { type: Boolean, required: false },  // TODO needs change
@@ -58,6 +59,8 @@ export const EmployeeContract = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtByDV?dv_id=${dv_id}`;
         };
 
+        var dates = ["2013-06-14", "2019-06-14", "2021-04-13"],
+            salaries = [4711, 4800, 5000];
         const chartOptions = {
 
             chart: {
@@ -67,9 +70,37 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                data: [4711, 4823, 4931, 5060, 5200, 5270, 5390],
-                color: '#6fcd98'
-            }]
+                name: 'Gesamtgehalt',
+                data: (function() {
+                    return dates.map(function(date, i) {
+                      return [Date.parse(date), salaries[i]];
+                    });
+                  })(),
+                color: '#6fcd98',
+                step: 'left' // or 'center' or 'right'
+                },
+            ],
+            xAxis: {
+                type: 'datetime',
+                labels: {
+                  // Format the date
+                  formatter: function() {
+                    return Highcharts.dateFormat('%d.%m.%Y', this.value);
+                  }
+                },
+                tickPositioner: function() {
+                  return dates.map(function(date) {
+                    return Date.parse(date);
+                  });
+                }
+            },
+                yAxis: {
+                //min: 0,
+                title: {
+                    text: '€'
+                }
+            },
+            
 
         }
 
@@ -161,12 +192,19 @@ export const EmployeeContract = {
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
         }
 
+        
         const formatDate = (d) => {
             if (d != null && d != '') {
                 return d.substring(8, 10) + "." + d.substring(5, 7) + "." + d.substring(0, 4);
             } else {
                 return ''
             }
+        }
+
+        const formatDateISO = (ds) => {
+            if (ds == null) return '';
+            var d = new Date(ds);
+            return d?.toISOString().substring(0,10);
         }
 
         const filterVertragsbestandteil = (vertragsbestandteile, kurzbz) => {
@@ -261,7 +299,7 @@ export const EmployeeContract = {
             //dienstverhaeltnisDialogRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, filterActiveDV,
             currentVBS, dropdownLink1, 
-            createDVDialog, updateDVDialog, handleDvSaved, formatDate, dvSelectedIndex, currentDate, chartOptions
+            createDVDialog, updateDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
         }
     },
     template: `
@@ -286,7 +324,7 @@ export const EmployeeContract = {
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
                             <!-- Drop Down Button -->
-                            <DropDownButton  :links="[{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'},{action:dropdownLink1,text:'Dropdown link'}]">
+                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:dropdownLink1,text:'Korrektur'},{action:dropdownLink1,text:'DV beenden'}]">
                                 weitere Aktionen
                             </DropDownButton>
                             
@@ -297,16 +335,16 @@ export const EmployeeContract = {
                             <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #D5E8D4;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ filterActiveDV(dvList)?.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
                             <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #F5F5F5;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ dvList?.length }} <span v-if="dvList">gesamt</span></div> 
                         </div>
-                        <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-                                <select class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
+                                <select  v-if="!isFetching" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
                                         <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
                                             {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
                                         </option> 
                                 </select> 
+                                <div v-else style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
 
-                                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                                    <i class="fa fa-plus"></i>
-                                </button>
+                                <input type="date" style="max-width:130px" class="form-control form-control-sm"  id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
+
                         </div>
                     </div>
                 </div>
