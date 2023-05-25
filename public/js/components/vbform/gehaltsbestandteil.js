@@ -39,6 +39,7 @@ export default {
   `,
   data: function() {
     return {
+      id: null,
       gehaltstyp : '',
       betrag: '',
       gueltig_ab: '',
@@ -62,6 +63,9 @@ export default {
   },
   methods: {
     setDataFromConfig: function() {
+      if( this.config?.data?.id !== undefined ) {
+        this.id = this.config.data.id;
+      }
       if( this.config?.data?.gehaltstyp !== undefined ) {
         this.gehaltstyp = this.config.data.gehaltstyp;
       }
@@ -80,6 +84,7 @@ export default {
         type: this.config.type,
         guioptions: JSON.parse(JSON.stringify(this.config.guioptions)),
         data: {
+          id: this.id,
           gehaltstyp: this.gehaltstyp,
           betrag: this.betrag,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),

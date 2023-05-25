@@ -5,9 +5,18 @@ export default {
   guioptions: {
     id: 'echterdv',
     label: 'Echter DV',
-    description: 'Standard Vorlage für echte Dienstverträge'
+    description: 'Standard Vorlage für echte Dienstverträge',
+    for_vertragsart_kurzbz: [
+        'echterdv'
+    ]
   },
   children: [
+    {
+      type: 'dv',
+      guioptions: {
+      },
+      children: []
+    },
     {
       type: 'tabs',
       guioptions: {},
@@ -18,13 +27,7 @@ export default {
             title: 'Allgemein',
             id: 'allgemein'
           },
-          children: [
-            {
-              type: 'dv',
-              guioptions: {
-              },
-              children: []
-            },
+          children: [            
             {
               type: 'vertragsbestandteillist',
               guioptions: {

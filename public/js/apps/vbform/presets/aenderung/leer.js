@@ -5,7 +5,8 @@ export default {
   guioptions: {
     id: 'leer',
     label: 'Leer',
-    description: 'Leere Vorlage. Alles muss manuell definiert werden.'
+    description: 'Leere Vorlage. Alles muss manuell definiert werden.',
+    for_vertragsart_kurzbz: []
   },
   children: [
     {

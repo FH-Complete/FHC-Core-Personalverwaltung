@@ -6,11 +6,8 @@ export default {
     id: 'echterdv',
     label: 'Echter DV Allin',
     description: 'Standard Vorlage für echte Dienstverträge',
-    infos: [
-        'Test Info auf oberster Ebene'
-    ],
-    errors:[
-        'Test Error auf oberster Ebene'
+    for_vertragsart_kurzbz: [
+        'echterdv'
     ]
   },
   children: [

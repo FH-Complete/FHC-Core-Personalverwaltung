@@ -48,7 +48,7 @@ export default {
       'mode',
       'title',
       'mitarbeiter_uid',
-      'dvid',
+      'curdv',
       'debug'
   ],
   data: function() {
@@ -83,18 +83,39 @@ export default {
   },
   created: function() {
     this.store.setMode(this.mode);
+    if( this.mode === 'aenderung' ) {
+        // TODO cleanup and remove again
+        store.dv.data = {};
+        store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+    }
     this.presettostore();
     this.store.mitarbeiter_uid = this.mitarbeiter_uid;
   },
   watch: {
     'mode': function() {
       this.store.setMode(this.mode);
+      if( this.mode === 'aenderung' ) {
+        // TODO cleanup and remove again
+        store.dv.data = {};
+        store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+      }
     }
   },
   methods: {
     presetselected: function(preset) {
       if( this.mode === 'aenderung' ) {
-          preset.dv.data.dienstverhaeltnisid = this.dvid;
+          preset.dv.data.dienstverhaeltnisid = this.curdv.dienstverhaeltnis_id;
+          preset.dv.data.unternehmen = this.curdv.oe_kurzbz;
+          preset.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+          preset.dv.data.gueltigkeit.data = {
+              gueltig_ab: this.curdv.von,
+              gueltig_bis: this.curdv.bis
+          };
+          preset.dv.data.gueltigkeit.guioptions.sharedstatemode = 'ignore';
+          preset.dv.data.gueltigkeit.guioptions.disabled = [
+              'gueltig_ab',
+              'gueltig_bis'
+          ]
       }
       this.preset = preset;
       this.presettostore();
@@ -146,7 +167,7 @@ export default {
     handlePresetSelected: function(preset) {
       if( this.mode === 'aenderung' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.dvid)
+        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
           this.iterateChilds(preset.children, response.data.data, preset);          
           this.presetselected(preset);

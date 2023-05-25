@@ -49,9 +49,20 @@ export default {
     },
     selectmode: function() {
       this.resetSelectedPreset();
-      this.usedpresets = ( typeof this.presets[this.store.mode] !== 'undefined')
-                       ? this.presets[this.store.mode]
-                       : [];
+      if( this.store.mode === 'aenderung' ) {
+        this.usedpresets = [];
+        const vertragsart_kurzbz = this.store.getDV().data.vertragsart_kurzbz;
+        for(const preset of this.presets[this.store.mode]) {
+            if( preset.guioptions.for_vertragsart_kurzbz.length === 0 
+             || preset.guioptions.for_vertragsart_kurzbz.indexOf(vertragsart_kurzbz) > -1  ) {
+                this.usedpresets.push(preset);
+            }
+        }
+      } else {
+        this.usedpresets = ( typeof this.presets[this.store.mode] !== 'undefined')
+                        ? this.presets[this.store.mode]
+                        : [];
+      }
       this.selectpreset();
     },
     selectpreset: function() {

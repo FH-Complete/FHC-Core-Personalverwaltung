@@ -29,6 +29,12 @@ export default {
   <div class="col-1">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
   <div class="col-1">&nbsp;</div>
+  
+  <template v-if="store.mode == 'aenderung'">
+  <div class="col-7 text-end">Änderungen gelten</div>
+  <gueltigkeit ref="gueltigkeitaenderung" :initialsharedstatemode="'set'" :config="{}"></gueltigkeit>
+  <div class="col-1">&nbsp;</div>
+  </template>
   `,
   data: function() {
     return {
