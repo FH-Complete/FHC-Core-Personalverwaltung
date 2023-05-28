@@ -76,7 +76,11 @@ export default {
                    children: [],
                    dv: {
                      data: {
-                       dienstverhaeltnisid: null
+                       dienstverhaeltnisid: null,
+                       gueltigkeit: {
+                           guioptions: {},
+                           data: {}
+                       }
                      }
                    },
                    vbs: {}

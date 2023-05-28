@@ -63,7 +63,11 @@ export default {
         children: [],
         dv: {
           data: {
-            dienstverhaeltnisid: null
+            dienstverhaeltnisid: null,
+            gueltigkeit: {
+                data: {},
+                guioptions: {}
+            }
           }
         },
         vbs: {}
@@ -115,7 +119,7 @@ export default {
           preset.dv.data.gueltigkeit.guioptions.disabled = [
               'gueltig_ab',
               'gueltig_bis'
-          ]
+          ];
       }
       this.preset = preset;
       this.presettostore();
@@ -137,12 +141,19 @@ export default {
             if( child.guioptions.vertragsbestandteiltyp === 'vertragsbestandteil' + vb.vertragsbestandteiltyp_kurzbz ) {
                 // TODO handle different funktionstypen bzw. freitexttypen
                 if(vb.vertragsbestandteiltyp_kurzbz === 'freitext') {
-                    
+                    if( child?.guioptions?.filter !== undefined 
+                            && child.guioptions.filter.freitexttyp.indexOf(vb.freitexttyp_kurzbz) === -1 ) {
+                      continue;
+                    }                    
                 } else if( vb.vertragsbestandteiltyp_kurzbz === 'funktion' ) {
-                    if( vb.benutzerfunktiondata.funktion_kurzbz.match(/zuordnung/) && child.guioptions.filter !== 'zuordnung') {
+                    if( child?.guioptions?.filter !== undefined 
+                            && vb.benutzerfunktiondata.funktion_kurzbz.match(/zuordnung/) 
+                            && child.guioptions.filter !== 'zuordnung') {
                         continue;
                     } 
-                    if( !vb.benutzerfunktiondata.funktion_kurzbz.match(/zuordnung/) && child.guioptions.filter !== 'funktion') {
+                    if( child?.guioptions?.filter !== undefined 
+                            && !vb.benutzerfunktiondata.funktion_kurzbz.match(/zuordnung/) 
+                            && child.guioptions.filter !== 'funktion') {
                         continue;
                     }
                 }

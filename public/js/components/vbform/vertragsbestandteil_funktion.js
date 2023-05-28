@@ -70,6 +70,7 @@ export default {
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
       <div class="col-1">
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
+        <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="marktodeleteVB" aria-label="Delete"><i class="fas fa-trash"></i></button>        
       </div>
     </div>
     <gehaltsbestandteilhelper v-if="canhavegehaltsbestandteile" ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>

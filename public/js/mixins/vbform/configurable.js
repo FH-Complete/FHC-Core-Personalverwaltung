@@ -17,6 +17,14 @@ export default {
     }
   },
   computed: {
+    isendable: function() {
+      return (this.config?.guioptions?.endable === undefined)
+        ? false : this.config.guioptions.endable;
+    },      
+    isdeleteable: function() {
+      return (this.config?.guioptions?.deleteable === undefined)
+        ? false : this.config.guioptions.deleteable;
+    },
     isremoveable: function() {
       return (this.config?.guioptions?.removeable === undefined)
         ? false : this.config.guioptions.removeable;

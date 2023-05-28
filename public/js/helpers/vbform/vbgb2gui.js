@@ -10,7 +10,9 @@ export default {
           guioptions: {
               id: uuid.get_uuid(),
               infos: [],
-              errors: []
+              errors: [],
+              deleteable: true, 
+              endable: true
           },
           data: {
               
@@ -162,7 +164,9 @@ export default {
                   'anmerkung',
                   'betrag',
                   'valorisierung'
-              ]
+              ],
+              endable: true,
+              deleteable: true
           },
           data: {
               id: gb.gehaltsbestandteil_id,

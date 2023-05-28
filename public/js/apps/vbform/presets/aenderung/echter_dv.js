@@ -41,6 +41,11 @@ export default {
               guioptions: {
                 title: 'Befristung',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                filter: {
+                  freitexttyp: [
+                    "befristung"
+                  ]
+                },
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
@@ -123,6 +128,12 @@ export default {
               guioptions: {
                 title: 'Zusatzvereinbarungen',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                filter: {
+                  freitexttyp: [
+                    "zusatzvereinbarung", 
+                    "sonstiges"
+                  ]
+                },
                 errors: [],
                 infos: []
               },
@@ -159,8 +170,8 @@ export default {
         errors: []
     },
     data: {
-      dienstverhaeltnisid: 1,
-      unternehmen: 'gst',
+      dienstverhaeltnisid: null,
+      unternehmen: '',
       vertragsart_kurzbz: 'echterdv',
       gueltigkeit: {
         guioptions: {

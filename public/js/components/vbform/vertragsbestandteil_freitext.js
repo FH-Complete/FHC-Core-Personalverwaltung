@@ -22,7 +22,9 @@ export default {
       </div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
       <div class="col-1">
-        <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
+        <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>        
+        <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="marktodeleteVB" aria-label="Delete"><i class="fas fa-trash"></i></button>
+        <button v-if="isendable" type="button" class="btn btn-sm p-2 float-end" @click="endVB" aria-label="End"><i class="fas fa-calendar-times"></i></button>
       </div>
     </div>
     <div class="row g-2 py-2" v-show="showinput('titel')">

@@ -18,8 +18,6 @@ export default {
             <a class="fs-6 fw-light" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus-square"></i></a>
             &nbsp;
             <em>{{ title }}{{ childcount }}</em>
-            &nbsp;
-            <a class="fs-6 fw-light" v-if="(store.getMode() === 'aenderung')" href="javascript:void(0);" @click="fetchCurrentAndFutureVBs"><i class="fas fa-sync"></i></a>
           </div>
         </div>
         <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []"></infos>
@@ -94,45 +92,6 @@ export default {
         return vbid !== payload.id;
       });
       this.children = children;
-    },
-    isAlreadyInChildren: function(vb) {
-      for( var i in this.children ) {
-        var tmpvb = this.store.getVB(this.children[i]);
-        if( (tmpvb?.data?.id !== undefined) && (vb?.data?.id !== undefined) ) {
-          return (tmpvb.data.id === vb.data.id)
-        }
-      }
-      return false;
-    },
-    addFetchedVBs: function(vbs) {
-      if( vbs.length === 0 ) {
-        if( this.preset.guioptions?.infos === undefined ) {
-          this.preset.guioptions.infos = [];
-        }
-        this.preset.guioptions.infos.push('Keine aktiven Vertragsbestandteile gefunden.');
-      }
-      var children = [];
-      for(var i in vbs) {
-        var vb = vbs[i];
-        if( !this.isAlreadyInChildren(vb) ) {
-          var vbid = uuid.get_uuid();
-          vb.guioptions.id = vbid;
-          this.store.addVB(vbid, vb);
-          children.push(vbid);
-        }
-      }
-      children = children.concat(this.children);
-      this.children = JSON.parse(JSON.stringify(children));
-    },
-    fetchCurrentAndFutureVBs: function() {
-      if( this.preset.guioptions?.infos !== undefined ) {
-        this.preset.guioptions.infos = [];
-      }
-      const options = (this.preset.guioptions?.apioptions) ? this.preset.guioptions.apioptions : undefined;
-      Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.vertragsbestandteiltyp, options)
-      .then((response) => {
-        this.addFetchedVBs(response.data.data);
-      });
     },
     getPayload: function() {
       this.payload = {

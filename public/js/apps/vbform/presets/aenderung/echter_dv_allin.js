@@ -12,22 +12,22 @@ export default {
   },
   children: [
     {
+      type: 'dv',
+      guioptions: {
+      },
+      children: []
+    },
+    {
       type: 'tabs',
       guioptions: {},
-      children: [
+      children: [        
         {
           type: 'tab',
           guioptions: {
             title: 'Allgemein',
             id: 'allgemein'
           },
-          children: [
-            {
-              type: 'dv',
-              guioptions: {
-              },
-              children: []
-            },
+          children: [            
             {
               type: 'vertragsbestandteillist',
               guioptions: {
@@ -41,8 +41,10 @@ export default {
               guioptions: {
                 title: 'Befristung',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
-                apioptions: {
-                  freitexttyp: 'befristung'
+                filter: {
+                  freitexttyp: [
+                    'befristung'
+                  ]
                 },
                 childdefaults: {
                   guioptions: {
@@ -102,8 +104,10 @@ export default {
               guioptions: {
                 title: 'All-In',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
-                apioptions: {
-                  freitexttyp: 'allin'
+                filter: {
+                  freitexttyp: [
+                    'allin'
+                  ]
                 },
                 childdefaults: {
                   guioptions: {
@@ -184,6 +188,12 @@ export default {
               guioptions: {
                 title: 'Zusatzvereinbarungen',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                filter: {
+                    freitexttyp: [
+                      "zusatzvereinbarung", 
+                      "sonstiges"
+                    ],
+                },
                 errors: [],
                 infos: []
               },
@@ -220,8 +230,8 @@ export default {
         errors: []
     },  
     data: {
-      dienstverhaeltnisid: 1,
-      unternehmen: 'gst',
+      dienstverhaeltnisid: null,
+      unternehmen: '',
       vertragsart_kurzbz: 'echterdv',
       gueltigkeit: {
         guioptions: {
