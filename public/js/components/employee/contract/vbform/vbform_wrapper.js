@@ -188,7 +188,7 @@ export default {
         });
       } else if( this.mode === 'korrektur' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
+        Vue.$fhcapi.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
           this.iterateChilds(preset.children, response.data.data, preset);          
           this.presetselected(preset);
