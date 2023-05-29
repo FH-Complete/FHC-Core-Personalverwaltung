@@ -14,6 +14,11 @@ export default {
         return true;
       }
       return !this.config.guioptions.hidden.includes(inputname);
+    },
+    markGBsEnded: function() {
+        if( this.$refs?.gbh !== undefined ) {
+          this.$refs.gbh.markGBsEnded();
+        }
     }
   },
   computed: {

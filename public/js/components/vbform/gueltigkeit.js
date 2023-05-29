@@ -26,6 +26,9 @@ export default {
       <span class="input-group-text" v-else-if="(this.sharedstatemode === 'custom')">
         <i @click="changesharedstatemode('reflect')" class="fas fa-unlink"></i>
       </span>
+      <span class="input-group-text" v-else-if="(this.isendable)">
+        <i @click="markended()" class="fas fa-calendar-times"></i>
+      </span>
       <span class="input-group-text bg-white border-0" v-else>
         <i class="fas fa-square text-white"></i>
       </span>
@@ -54,6 +57,9 @@ export default {
   },
   mixins: [
     configurable
+  ],
+  emits: [
+    "markended"
   ],
   created: function() {
     this.sharedstatemode = this.initialsharedstatemode;
@@ -118,6 +124,27 @@ export default {
     changesharedstatemode: function(mode) {
       this.sharedstatemode = mode;
       this.setDataFromSharedSate();
+    },
+    markended: function() {
+      if( this.sharedstate.gueltigkeit.gueltig_ab === '' ) {
+          alert('Bitte zuerst das Gültigkeitsdatum der Änderung festlegen.');
+          return;
+      }
+      var markended = false;
+      var tag_vor_aenderung_gueltig_ab = new Date(this.sharedstate.gueltigkeit.gueltig_ab);
+      tag_vor_aenderung_gueltig_ab.setDate(tag_vor_aenderung_gueltig_ab.getDate() - 1);
+      if( this.gueltig_bis === null || this.gueltig_bis === '' ) {
+        markended = true;        
+      } else {
+        const gueltig_bis = new Date(this.gueltig_bis);
+        if( gueltig_bis > tag_vor_aenderung_gueltig_ab ) {
+          markended = true;
+        }
+      }
+      if( markended ) {
+        this.gueltig_bis = tag_vor_aenderung_gueltig_ab.toISOString().split('T')[0];
+        this.$emit('markended');
+      }
     }
   },
   computed: {

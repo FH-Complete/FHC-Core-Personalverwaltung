@@ -12,7 +12,7 @@ export default {
     <div v-if="store.mode == 'aenderung'" class="row g-2 py-2 border-bottom mb-3">
       <div class="col-6 text-end"><strong>Änderungen gelten</strong></div>
       <div class="col-1">&nbsp;</div>
-      <gueltigkeit ref="gueltigkeitaenderung" :initialsharedstatemode="'set'" :config="{}"></gueltigkeit>
+      <gueltigkeit ref="gueltigkeitaenderung" :initialsharedstatemode="'set'" :config="getGueltigkeitsAenderung"></gueltigkeit>
       <div class="col-1">&nbsp;</div>
     </div>
     <div class="row g-2 py-2 border-bottom mb-3">
@@ -39,6 +39,9 @@ export default {
   },
   methods: {
     getPayload: function() {
+      if( this.$refs['gueltigkeitaenderung'] ) {
+          this.dv.guioptions.gueltigkeitaenderung = this.$refs['gueltigkeitaenderung'].getPayload();
+      }
       var payload = {
         type: 'dienstverhaeltnis',
         data: this.$refs.formheader.getPayload(),
@@ -47,5 +50,14 @@ export default {
       this.store.setDV(payload);
       return JSON.parse(JSON.stringify(this.preset));
     }
+  },
+  computed: {
+      getGueltigkeitsAenderung: function() {
+          var config = {};
+          if( this.dv?.guioptions?.gueltigkeitaenderung !== undefined ) {
+              config = this.dv.guioptions.gueltigkeitaenderung;
+          }
+          return config;
+      }
   }
 }

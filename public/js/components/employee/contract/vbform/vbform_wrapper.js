@@ -87,7 +87,7 @@ export default {
   },
   created: function() {
     this.store.setMode(this.mode);
-    if( this.mode === 'aenderung' ) {
+    if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
         // TODO cleanup and remove again
         store.dv.data = {};
         store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
@@ -98,7 +98,7 @@ export default {
   watch: {
     'mode': function() {
       this.store.setMode(this.mode);
-      if( this.mode === 'aenderung' ) {
+      if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
         // TODO cleanup and remove again
         store.dv.data = {};
         store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
@@ -107,19 +107,21 @@ export default {
   },
   methods: {
     presetselected: function(preset) {
-      if( this.mode === 'aenderung' ) {
-          preset.dv.data.dienstverhaeltnisid = this.curdv.dienstverhaeltnis_id;
-          preset.dv.data.unternehmen = this.curdv.oe_kurzbz;
-          preset.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
-          preset.dv.data.gueltigkeit.data = {
-              gueltig_ab: this.curdv.von,
-              gueltig_bis: this.curdv.bis
-          };
-          preset.dv.data.gueltigkeit.guioptions.sharedstatemode = 'ignore';
+      if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
+        preset.dv.data.dienstverhaeltnisid = this.curdv.dienstverhaeltnis_id;
+        preset.dv.data.unternehmen = this.curdv.oe_kurzbz;
+        preset.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+        preset.dv.data.gueltigkeit.data = {
+            gueltig_ab: this.curdv.von,
+            gueltig_bis: this.curdv.bis
+        };
+        preset.dv.data.gueltigkeit.guioptions.sharedstatemode = 'ignore';
+        if( this.mode === 'aenderung' ) {
           preset.dv.data.gueltigkeit.guioptions.disabled = [
               'gueltig_ab',
               'gueltig_bis'
           ];
+        }
       }
       this.preset = preset;
       this.presettostore();
@@ -183,7 +185,15 @@ export default {
           this.iterateChilds(preset.children, response.data.data, preset);          
           this.presetselected(preset);
           this.resetTmpStoreHelper();
-        });    
+        });
+      } else if( this.mode === 'korrektur' ) {
+        var preset = JSON.parse(JSON.stringify(preset));
+        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
+        .then((response) => {          
+          this.iterateChilds(preset.children, response.data.data, preset);          
+          this.presetselected(preset);
+          this.resetTmpStoreHelper();
+        });
       } else {
         this.presetselected(preset);
         this.resetTmpStoreHelper();
@@ -231,7 +241,21 @@ export default {
   expose: ['showModal'],
   computed: {
       getTitle: function() {
-          return this.title + (this.mode == 'aenderung' ? ' bearbeiten' : ' anlegen');
+          var suffix = '';
+          switch (this.mode) {
+              case 'korrektur':
+                  suffix = 'korrigieren';
+                  break;
+              case 'aenderung':
+                  suffix = 'bearbeiten';
+                  break;
+              case 'neuanlage':
+              default:
+                  suffix = 'anlegen';
+                  break;
+          }
+          
+          return this.title + ' ' + suffix;
       }
   }
 };

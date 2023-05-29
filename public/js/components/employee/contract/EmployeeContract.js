@@ -234,6 +234,12 @@ export const EmployeeContract = {
             VbformWrapperRef.value.showModal();
         }
 
+        const korrekturDVDialog = () => {
+            vbformmode.value = 'korrektur';
+            vbformDV.value = currentDV.value;
+            VbformWrapperRef.value.showModal();            
+        }
+
         const handleDvSaved = async () => {
             fetchData(route.params.uid);
         }
@@ -299,7 +305,7 @@ export const EmployeeContract = {
             //dienstverhaeltnisDialogRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, filterActiveDV,
             currentVBS, dropdownLink1, 
-            createDVDialog, updateDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
+            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
         }
     },
     template: `
@@ -324,7 +330,7 @@ export const EmployeeContract = {
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
                             <!-- Drop Down Button -->
-                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:dropdownLink1,text:'Korrektur'},{action:dropdownLink1,text:'DV beenden'}]">
+                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:dropdownLink1,text:'DV beenden'}]">
                                 weitere Aktionen
                             </DropDownButton>
                             

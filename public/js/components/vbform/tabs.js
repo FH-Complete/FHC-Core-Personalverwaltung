@@ -1,11 +1,14 @@
 import presetable from '../../mixins/vbform/presetable.js';
 import tab from './tab.js';
+import dv from './dv.js';
 
 export default {
   template: `
   <div class="d-flex align-items-start">
     <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-      <button v-for="(child, idx) in children"
+      <template v-for="(child, idx) in children">
+        <button
+              v-if="child.type === 'tab'"
               :key="idx"
               class="nav-link"
               :class="(this.activetab === child.guioptions.id) ? 'active' : ''"
@@ -17,16 +20,21 @@ export default {
               :aria-controls="'v-pills-' + child.guioptions.id"
               :aria-selected="(this.activetab === child.guioptions.id) ? 'true' : 'false'"
               @click="activetab = child.guioptions.id">
-        {{ child.guioptions.title }}
-      </button>
+          {{ child.guioptions.title }}
+        </button>
+      </template>
     </div>
 
     <div class="tab-content w-100" id="v-pills-tabContent">
-      <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child" :activetab="activetab"></component>
+      <template v-for="(child, idx) in children">
+        <component ref="parts" v-if="child.type === 'tab'" :is="child.type" :key="idx" :preset="child" :activetab="activetab"></component>
+        <component ref="parts" v-else="" :is="child.type" :key="idx" :preset="child"></component>
+      </template>
     </div>
   </div>
   `,
   components: {
+    "dv": dv,
     "tab": tab
   },
   mixins: [
@@ -36,7 +44,12 @@ export default {
     if( this.preset?.guioptions?.activetab !== undefined ) {
       this.activetab = this.preset.guioptions.activetab;
     } else if( this.children.length > 0 ) {
-      this.activetab = this.children[0].guioptions.id;
+      for( const child of this.children ) {
+        if( child.type === 'tab' ) {
+          this.activetab = child.guioptions.id;
+          break;
+        }
+      }        
     } else {
         this.activetab = '';
     }

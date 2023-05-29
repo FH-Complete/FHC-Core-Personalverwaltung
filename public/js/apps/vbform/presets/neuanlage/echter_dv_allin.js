@@ -15,18 +15,18 @@ export default {
       guioptions: {},
       children: [
         {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        },
+        {
           type: 'tab',
           guioptions: {
             title: 'Allgemein',
             id: 'allgemein'
           },
           children: [
-            {
-              type: 'dv',
-              guioptions: {
-              },
-              children: []
-            },
             {
               type: 'vertragsbestandteillist',
               guioptions: {

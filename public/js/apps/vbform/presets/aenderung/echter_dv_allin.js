@@ -3,24 +3,24 @@ import uuid from '../../../../helpers/vbform/uuid.js';
 export default {
   type: 'preset',
   guioptions: {
-    id: 'echterdv',
-    label: 'Echter DV Allin',
-    description: 'Standard Vorlage für echte Dienstverträge',
+    id: 'echterdv2allin',
+    label: 'Echten DV auf Allin umstellen',
+    description: 'Änderungs-Vorlage um echten Dienstvertrag auf Allin umzustellen.',
     for_vertragsart_kurzbz: [
         'echterdv'
     ]
   },
   children: [
     {
-      type: 'dv',
-      guioptions: {
-      },
-      children: []
-    },
-    {
       type: 'tabs',
       guioptions: {},
-      children: [        
+      children: [
+        {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        },
         {
           type: 'tab',
           guioptions: {
@@ -151,14 +151,10 @@ export default {
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
-                    disabled: [
-                      'funktion'
-                    ],
+                    disabled: [],
                     hidden: []
                   },
-                  data: {
-                    funktion: "fachzuordnung"
-                  }
+                  data: {}
                 }
               },
               children: []
@@ -200,25 +196,6 @@ export default {
               children: []
             }
           ]
-        },
-        {
-          type: 'tab',
-          guioptions: {
-            title: 'Sonstiges',
-            id: 'sonstiges'
-          },
-          children: [
-            {
-              type: 'vertragsbestandteillist',
-              guioptions: {
-                title: 'Kündigungsfrist',
-                vertragsbestandteiltyp: 'vertragsbestandteilkuendigungsfrist',
-                errors: [],
-                infos: []
-              },
-              children: []
-            }
-          ]
         }
       ]
     }
@@ -235,7 +212,7 @@ export default {
       vertragsart_kurzbz: 'echterdv',
       gueltigkeit: {
         guioptions: {
-          sharedstatemode: "set",
+          sharedstatemode: "ignore",
           disabled: [
             'gueltig_bis'
           ]
@@ -249,7 +226,8 @@ export default {
       guioptions: {
         id: uuid.get_uuidbyname('aenderung_allin_std'),
         infos: [],
-        errors: []
+        errors: [],
+        removeable: true
       },
       data: {
         id: null,
@@ -285,7 +263,8 @@ export default {
         hidden: [
           'titel',
           'freitext'
-        ]
+        ],
+        removeable: true
       },
       data: {
         id: null,
@@ -316,7 +295,7 @@ export default {
       "type": "vertragsbestandteilzeitaufzeichnung",
       "guioptions": {
         "id": uuid.get_uuidbyname('aenderung_allin_za'),
-        "removeable": false
+        "removeable": true
       },
       "data": {
         "id": null,

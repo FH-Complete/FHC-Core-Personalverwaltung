@@ -94,6 +94,8 @@ export default {
       getSaveButtonLabel: function() {
           if( this.store.mode === 'aenderung' ) {
               return 'Änderung speichern';
+          } else if ( this.store.mode === 'korrektur' ) {
+              return 'Korrektur speichern';
           } else {
               return 'Dienstverhältnis anlegen';
           }

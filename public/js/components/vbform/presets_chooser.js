@@ -8,6 +8,7 @@ export default {
       <select v-model="store.mode" @change="selectmode" v-if="showselectmode" class="form-select form-select-sm">
         <option value="neuanlage" selected>Neuanlage</option>
         <option value="aenderung">Änderung</option>
+        <option value="korrektur">Korrektur</option>
       </select>
 
       <select v-model="selectedpresetidx" @change="selectpreset" class="form-select form-select-sm">
@@ -49,13 +50,17 @@ export default {
     },
     selectmode: function() {
       this.resetSelectedPreset();
-      if( this.store.mode === 'aenderung' ) {
+      if( this.store.mode === 'aenderung' || this.store.mode === 'korrektur' ) {
         this.usedpresets = [];
         const vertragsart_kurzbz = this.store.getDV().data.vertragsart_kurzbz;
         for(const preset of this.presets[this.store.mode]) {
             if( preset.guioptions.for_vertragsart_kurzbz.length === 0 
              || preset.guioptions.for_vertragsart_kurzbz.indexOf(vertragsart_kurzbz) > -1  ) {
                 this.usedpresets.push(preset);
+                if( preset.guioptions?.default_for_vertragsart_kurzbz !== undefined 
+                        && preset.guioptions.default_for_vertragsart_kurzbz === vertragsart_kurzbz ) {
+                    this.selectedpresetidx = (this.usedpresets.length - 1);
+                }
             }
         }
       } else {

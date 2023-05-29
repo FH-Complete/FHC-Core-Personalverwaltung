@@ -11,8 +11,7 @@ export default {
               id: uuid.get_uuid(),
               infos: [],
               errors: [],
-              deleteable: true, 
-              endable: true
+              deleteable: ((this.store.mode === 'korrektur') ? true : false)
           },
           data: {
               
@@ -52,12 +51,17 @@ export default {
       return this.vbout;
   },
   gueltigkeit2gui: function(bt, mode) {
+      var disabled = [];
+      if( this.store.mode === 'aenderung') {
+          disabled = [
+            'gueltig_ab'
+          ];
+      }
       var gueltigkeit = {
           guioptions: {
               sharedstatemode: 'ignore',
-              disabled: [
-                  'gueltig_ab'
-              ]
+              disabled: disabled,
+              endable: ((this.store.mode === 'aenderung') ? true : false)
           },
           data: {
               gueltig_ab: bt.von,
@@ -75,11 +79,26 @@ export default {
           freitext: vb.freitext,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'freitexttyp',
+      if( this.store.mode === 'aenderung') {
+        this.vbout.guioptions.disabled = [
+            'freitexttyp',
+            'titel',
+            'freitext'
+        ];
+      }
+      if( ['allin', 'befristung'].indexOf(vb.freitexttyp_kurzbz) > -1 ) {
+        this.vbout.guioptions.hidden = [
           'titel',
           'freitext'
-      ];
+        ];
+        if( this.vbout.guioptions?.disabled === undefined ) {
+          this.vbout.guioptions.disabled = [
+            'freitexttyp'
+          ];
+        } else if ( this.vbout.guioptions.disabled.indexOf('freitexttyp') === -1 ) {
+            this.vbout.guioptions.disabled.push('freitexttyp');
+        }
+      }
   },
   funktion2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilfunktion';
@@ -92,12 +111,17 @@ export default {
           mode: 'bestehende',
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'funktion',
-          'orget',
-          'benutzerfunktionid',
-          'mode'
-      ];
+      if( this.store.mode === 'aenderung') {
+        this.vbout.guioptions.disabled = [
+            'funktion',
+            'orget',
+            'benutzerfunktionid',
+            'mode'
+        ];
+      }
+      if( vb.benutzerfunktiondata.funktion_kurzbz.match('zuordnung') ) {
+          this.vbout.guioptions.canhavegehaltsbestandteile = false;
+      }
   },
   kuendigungsfrist2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilkuendigungsfrist';
@@ -107,10 +131,12 @@ export default {
           arbeitnehmer_frist: vb.arbeitnehmer_frist,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'arbeitgeber_frist',
-          'arbeitnehmer_frist'
-      ];
+      if( this.store.mode === 'aenderung') {
+        this.vbout.guioptions.disabled = [
+            'arbeitgeber_frist',
+            'arbeitnehmer_frist'
+        ];
+      }
   },
   stunden2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilstunden';
@@ -120,10 +146,12 @@ export default {
           teilzeittyp: vb.teilzeittyp_kurzbz,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'stunden',
-          'teilzeittyp'
-      ];
+      if( this.store.mode === 'aenderung') {
+        this.vbout.guioptions.disabled = [
+            'stunden',
+            'teilzeittyp'
+        ];
+      }
   },
   urlaubsanspruch2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilurlaubsanspruch';
@@ -132,10 +160,11 @@ export default {
           tage: vb.tage,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'stunden',
-          'teilzeittyp'
-      ];
+      if( this.store.mode === 'aenderung') {
+        this.vbout.guioptions.disabled = [
+            'tage'
+        ];
+      }
   },
   zeitaufzeichnung2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilzeitaufzeichnung';
@@ -146,27 +175,32 @@ export default {
           homeoffice: vb.homeoffice,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'zeitaufzeichnung',
-          'azgrelevant',
-          'homeoffice'
-      ];
+      if( this.store.mode === 'aenderung') {
+        this.vbout.guioptions.disabled = [
+            'zeitaufzeichnung',
+            'azgrelevant',
+            'homeoffice'
+        ];
+      }
   },
   gehaltsbestandteil2gui: function(gb, mode) {
+      var disabled = [];
+      if( this.store.mode === 'aenderung') {
+          disabled = [
+            'gehaltstyp',
+            'anmerkung',
+            'betrag',
+            'valorisierung'
+          ];
+      }
       var gb = {
           type: 'gehaltsbestandteil',
           guioptions: {
               id: uuid.get_uuid(),
               infos: [],
               errors: [],
-              disabled: [
-                  'gehaltstyp',
-                  'anmerkung',
-                  'betrag',
-                  'valorisierung'
-              ],
-              endable: true,
-              deleteable: true
+              disabled: disabled,              
+              deleteable: ((this.store.mode === 'korrektur') ? true : false)
           },
           data: {
               id: gb.gehaltsbestandteil_id,
