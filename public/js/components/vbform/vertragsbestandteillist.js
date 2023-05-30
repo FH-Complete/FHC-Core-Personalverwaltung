@@ -114,7 +114,12 @@ export default {
 
       for( var i in this.children ) {
         var uuid = this.children[i];
-        vbs.push(that.store.getVB(uuid));
+        var vb = that.store.getVB(uuid);
+        if( vb !== null ) {
+          vbs.push(vb);
+        } else {
+          delete this.children[i];
+        }
       }
 
       return vbs;

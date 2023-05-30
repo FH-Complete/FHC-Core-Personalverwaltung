@@ -29,7 +29,10 @@ export default Vue.reactive({
     delete this.vbs[uuid];
   },
   getVB: function(uuid) {
-    return this.vbs[uuid];
+    if( typeof this.vbs[uuid] !== 'undefined' ) {
+      return this.vbs[uuid];
+    }  
+    return null;
   },
   getVBsPayload: function() {
     return JSON.parse(JSON.stringify(this.vbs));

@@ -51,11 +51,13 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
         {
             throw new \Exception('missing data');
         }
+		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONDataInt($this->data['arbeitnehmer_frist'], $decodedData, 'arbeitnehmer_frist');
         $this->getJSONDataInt($this->data['arbeitgeber_frist'], $decodedData, 'arbeitgeber_frist');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
 
@@ -63,7 +65,7 @@ class GUIVertragsbestandteilKuendigungsfrist extends AbstractGUIVertragsbestandt
 		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilKuendigungsfrist */
         $vbs = null;
-		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+		$id = isset($this->data['id']) ? intval($this->data['id']) : 0;
         if ($id > 0)
          {
              // load VBS            

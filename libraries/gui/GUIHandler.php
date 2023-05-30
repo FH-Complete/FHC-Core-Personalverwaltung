@@ -125,12 +125,34 @@ class GUIHandler
 				foreach($gbs as $gbmapper) 
 				{
 					$gb = $gbmapper->getGbsInstance();
-					$vb->addGehaltsbestandteil($gb);
+					if( $gbmapper->hasToBeDeleted() ) 
+					{
+						$this->GehaltsbestandteilLib->deleteGehaltsbestandteil($gb);
+					}
+					else 
+					{
+						$vb->addGehaltsbestandteil($gb);
+					}
 				}
-				$this->VertragsbestandteilLib->storeVertragsbestandteil($vb);
+				if( $vbmapper->hasToBeDeleted() )
+				{
+					$this->VertragsbestandteilLib->deleteVertragsbestandteil($vb);
+				}
+				else 
+				{
+				  $this->VertragsbestandteilLib->storeVertragsbestandteil($vb);
+				}
 			}
 
             $this->CI->db->trans_commit();
+			
+			foreach($vbs as $vbmapper) 
+			{
+				$vbmapper->removeDeletedGBs();
+			}
+			
+			$this->DataMapper->removeDeletedVBs();
+			
             $this->DataMapper->addGUIInfo('Dienstverhältnis gespeichert');
 
         } catch(Exception $ex) {

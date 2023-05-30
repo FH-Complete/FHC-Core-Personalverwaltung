@@ -194,6 +194,14 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
         return $this;
     }
 
+	public function removeDeletedGbs() {
+		foreach( $this->gbs as $idx => $gb ) {
+			if( $gb->hastoBeDeleted() ) {
+				unset($this->gbs[$idx]);
+			}
+		}		
+	}
+	
 	public function validate()
 	{
 		if( !($this->vbsinstance instanceof vertragsbestandteil\IValidation) )

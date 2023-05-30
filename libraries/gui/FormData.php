@@ -135,4 +135,12 @@ class FormData extends AbstractBestandteil {
 	{
 		return;
 	}
+	
+	public function removeDeletedVbs() {
+		foreach( $this->vbs as $idx => $vb ) {
+			if( $vb->hastoBeDeleted() ) {
+				unset($this->vbs[$idx]);
+			}
+		}		
+	}
 }

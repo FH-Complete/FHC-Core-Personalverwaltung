@@ -37,7 +37,9 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
     {
         $this->type = self::TYPE_STRING;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
-        $this->data = [ "gehaltstyp" => "",
+        $this->data = [ 
+						"id" => null,
+						"gehaltstyp" => "",
                         "betrag" => "",
                         "gueltigkeit" => [
                             "guioptions" => ["sharedstatemode" => "reflect"],
@@ -73,13 +75,14 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         {
             throw new \Exception('missing data');
         }
-        $this->getJSONData($this->data['id'], $decodedData, 'id');
+        $this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['gehaltstyp'], $decodedData, 'gehaltstyp');
         $this->getJSONDataInt($this->data['betrag'], $decodedData, 'betrag');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
         $this->getJSONData($this->data['valorisierung'], $decodedData, 'valorisierung');
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
     public function generateGehaltsbestandteil()

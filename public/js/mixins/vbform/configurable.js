@@ -19,6 +19,15 @@ export default {
         if( this.$refs?.gbh !== undefined ) {
           this.$refs.gbh.markGBsEnded();
         }
+    },
+    toggledelete: function() {
+        this.db_delete = !this.db_delete;
+        if( this.$refs?.gbh !== undefined ) {
+          this.$refs.gbh.setGBsDelete(this.db_delete);
+        }
+    },
+    setDelete: function(hastobedeleted) {
+        this.db_delete = hastobedeleted;
     }
   },
   computed: {

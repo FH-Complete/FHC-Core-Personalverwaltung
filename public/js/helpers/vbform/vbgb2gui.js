@@ -2,6 +2,7 @@ import uuid from './uuid.js';
 import store from '../../components/vbform/vbsharedstate.js';
 
 export default {
+  today: null,
   store: store,
   vbout: {},
   vb2gui: function(vb, mode, child) {
@@ -11,7 +12,7 @@ export default {
               id: uuid.get_uuid(),
               infos: [],
               errors: [],
-              deleteable: ((this.store.mode === 'korrektur') ? true : false)
+              deleteable: this.isDeleteable(vb)
           },
           data: {
               
@@ -50,9 +51,46 @@ export default {
       }
       return this.vbout;
   },
+  getToday: function() {
+    if( this.today === null ) {
+      this.today = new Date();
+      this.today.setHours(23, 59, 59, 999);
+    }
+    return this.today;
+  },
+  isEndable: function(bt) {    
+    if ( this.store.mode === 'aenderung' ) {
+      if( bt.von === null || bt.von === ''  ) {
+        return false;
+      }
+      var von = new Date(bt.von);
+      von.setHours(0, 0, 0, 0);
+      if( von > this.getToday() ) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  },  
+  isDeleteable: function(bt) {    
+    if( this.store.mode === 'korrektur' ) {
+        return true;
+    }
+    if ( this.store.mode === 'aenderung' ) {
+      if( bt.von === null || bt.von === ''  ) {
+        return false;  
+      }
+      var von = new Date(bt.von);
+      von.setHours(0, 0, 0, 0);
+      if( von > this.getToday() ) {
+        return true;
+      }
+    }
+    return false;
+  },
   gueltigkeit2gui: function(bt, mode) {
       var disabled = [];
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(bt) ) {
           disabled = [
             'gueltig_ab'
           ];
@@ -61,7 +99,7 @@ export default {
           guioptions: {
               sharedstatemode: 'ignore',
               disabled: disabled,
-              endable: ((this.store.mode === 'aenderung') ? true : false)
+              endable: this.isEndable(bt)
           },
           data: {
               gueltig_ab: bt.von,
@@ -79,7 +117,7 @@ export default {
           freitext: vb.freitext,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'freitexttyp',
             'titel',
@@ -111,7 +149,7 @@ export default {
           mode: 'bestehende',
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'funktion',
             'orget',
@@ -131,7 +169,7 @@ export default {
           arbeitnehmer_frist: vb.arbeitnehmer_frist,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'arbeitgeber_frist',
             'arbeitnehmer_frist'
@@ -146,7 +184,7 @@ export default {
           teilzeittyp: vb.teilzeittyp_kurzbz,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'stunden',
             'teilzeittyp'
@@ -160,7 +198,7 @@ export default {
           tage: vb.tage,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'tage'
         ];
@@ -175,7 +213,7 @@ export default {
           homeoffice: vb.homeoffice,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'zeitaufzeichnung',
             'azgrelevant',
@@ -185,7 +223,7 @@ export default {
   },
   gehaltsbestandteil2gui: function(gb, mode) {
       var disabled = [];
-      if( this.store.mode === 'aenderung') {
+      if( this.isEndable(gb) ) {
           disabled = [
             'gehaltstyp',
             'anmerkung',
@@ -200,7 +238,7 @@ export default {
               infos: [],
               errors: [],
               disabled: disabled,              
-              deleteable: ((this.store.mode === 'korrektur') ? true : false)
+              deleteable: this.isDeleteable(gb)
           },
           data: {
               id: gb.gehaltsbestandteil_id,
@@ -213,4 +251,5 @@ export default {
       };
       return gb;
   }
+  
 }

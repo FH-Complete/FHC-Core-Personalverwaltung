@@ -1621,7 +1621,8 @@ EOSQL;
 		$storedentries = $this->TmpStoreModel->listTmpStoreForUid($mitarbeiteruid);
 		$data = array(
 			'aenderung' => array(),
-			'neuanlage' => array()
+			'neuanlage' => array(),
+			'korrektur' => array()
 		);
 		
 		if( hasData($storedentries) ) 
