@@ -9,7 +9,8 @@ export default {
         <option value="-1" disabled>Zwischenspeicherung wählen</option>
         <option v-for="(tmpstore, idx) in tmpstores[store.mode]" :key="tmpstore.tmp_store_id"
                 :value="idx">
-                  {{ tmpstore.tmp_store_id  }} {{ tmpstore.insertvon }} - {{ tmpstore.insertamum }} {{ tmpstore.updatevon }} - {{ tmpstore.updateamum }}
+                <!-- TODO: statt uid von insertvon/updatevon bitte Nachnamen anzeigen (HR Wunsch) -->
+                  {{ tmpstore.insertamum }} - {{ tmpstore.insertvon }} {{ tmpstore.updateamum }} - {{ tmpstore.updatevon }}
                 </option>
       </select>
 
