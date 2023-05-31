@@ -117,6 +117,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     }
 	
     public function jsonSerialize() {
+		$this->syncInstanceId();
         $json = [
             "type" => $this->type,
             "guioptions" => $this->guioptions,
@@ -223,5 +224,18 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 			$valid = (!$gb->isValid()) ? false : $valid;
 		}
 		return $valid;
+	}
+	
+	protected function syncInstanceId()
+	{
+		if( !$this->vbsinstance ) 
+		{
+			return;
+		}
+		
+		if( intval($this->vbsinstance->getVertragsbestandteil_id()) > 0 ) 
+		{
+			$this->data['id'] = $this->vbsinstance->getVertragsbestandteil_id();
+		}
 	}
 }    

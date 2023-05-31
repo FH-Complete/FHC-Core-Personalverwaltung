@@ -135,4 +135,23 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
 			$this->addGUIError($this->gbsInstance->getValidationErrors());
 		}
 	}
+	
+	public function jsonSerialize()
+	{
+		$this->syncInstanceId();
+		return parent::jsonSerialize();
+	}
+	
+	protected function syncInstanceId()
+	{
+		if( !$this->gbsInstance ) 
+		{
+			return;
+		}
+		
+		if( intval($this->gbsInstance->getGehaltsbestandteil_id()) > 0 ) 
+		{
+			$this->data['id'] = $this->gbsInstance->getGehaltsbestandteil_id();
+		}
+	}
 }
