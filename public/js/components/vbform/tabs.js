@@ -1,6 +1,7 @@
 import presetable from '../../mixins/vbform/presetable.js';
 import tab from './tab.js';
 import dv from './dv.js';
+import store from './vbsharedstate.js';
 
 export default {
   template: `
@@ -61,12 +62,13 @@ export default {
     }
   },
   beforeUpdate: function() {
-    this.errorscounts = {};  
+    this.errorcounts = {};  
   },
   data: function() {
     return {
       activetab: '',
-      errorcounts: {}
+      errorcounts: {},
+      store: store
     }
   },
   methods: {
@@ -86,9 +88,35 @@ export default {
     },
     getErrorsCount: function(child) {
         if( typeof this.errorcounts[child.guioptions.id] === 'undefined' ) {
-          this.errorcounts[child.guioptions.id] = Math.floor(Math.random() * 10);
+          //this.errorcounts[child.guioptions.id] = Math.floor(Math.random() * 10);
+          this.errorcounts[child.guioptions.id] = this.calcErrorCount(child);
         }        
         return this.errorcounts[child.guioptions.id];
+    },
+    calcErrorCount: function(child) {
+        var errorcount = 0;
+        if( child?.guioptions?.errors !== undefined ) {
+            errorcount += child.guioptions.errors.length;
+        }
+        if( child.type === 'vertragsbestandteillist' ) {
+            for( var childuuid of child.children ) {
+                var sibling = this.store.getVB(childuuid);
+                if(sibling !== null) {
+                    errorcount += this.calcErrorCount(sibling);
+                }
+            }
+        } else if ( child.type.match(/^vertragsbestandteil.*$/) ) {
+            if( child?.gbs !== undefined) {
+                for( var gb of child.gbs ) {
+                    errorcount += this.calcErrorCount(gb);
+                }
+            }
+        } else if ( child?.children !== undefined ) {
+            for( var sibling of child.children ) {
+                errorcount += this.calcErrorCount(sibling);
+            }
+        }
+        return errorcount;
     }
   }
 }
