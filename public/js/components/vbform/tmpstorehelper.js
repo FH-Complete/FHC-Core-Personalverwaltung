@@ -17,13 +17,13 @@ export default {
     <div class="col-5">
         <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
             <div class="btn-group me-2" role="group" aria-label="First group">
-                <button class="btn btn-warning btn-sm float-end" @click="selecttmpstore">Laden</button>
+                <button class="btn btn-outline-secondary btn-sm float-end" @click="selecttmpstore">Laden</button>
             </div>
             <div class="btn-group me-2" role="group" aria-label="Second group">
-                <button class="btn btn-warning btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
+                <button class="btn btn-outline-secondary btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
             </div>
             <div class="btn-group" role="group" aria-label="Third group">
-                <button class="btn btn-warning btn-sm float-end" @click="deleteFromTmpStore">Löschen</button>
+                <button class="btn btn-outline-secondary btn-sm float-end" @click="deleteFromTmpStore"><i class="fa fa-xmark"></i></button>
             </div>
         </div>        
     </div>
