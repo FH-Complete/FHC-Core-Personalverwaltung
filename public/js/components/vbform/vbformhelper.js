@@ -10,20 +10,21 @@ export default {
   template: `
     <div class="vbformhelper">
       <div class="border-bottom py-2 mb-3">        
-        <div class="row g-2 py-2">
-          <div class="col-9">&nbsp;</div>
-        
-          <div class="col-3">
-            <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
-                <div class="btn-group me-2" role="group" aria-label="First group">
-                    <button class="btn btn-danger btn-sm float-end" @click="save">{{ getSaveButtonLabel }}</button>
-                </div>
-                <div class="btn-group me-2" role="group" aria-label="Second group">
-                    <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
-                </div>
-            </div>
-          </div>
-        </div>
+<!--        <div class="row g-2 py-2">-->
+<!--          <div class="col-9">&nbsp;</div>-->
+<!--        -->
+<!--          <div class="col-3">-->
+                <!--TODO in vbform_wrapper.js integrieren -->
+<!--            <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">-->
+<!--               <div class="btn-group me-2" role="group" aria-label="First group">-->
+<!--                    <button class="btn btn-danger btn-sm float-end" @click="save">{{ getSaveButtonLabel }}</button>-->
+<!--                </div>-->
+<!--                <div class="btn-group me-2" role="group" aria-label="Second group">-->
+<!--                    <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
         <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
         <errors :errors="(preset?.guioptions?.errors !== undefined) ? preset?.guioptions?.errors : []" :padright="false"></errors>
       </div>
@@ -89,14 +90,5 @@ export default {
         that.$emit('validated', response.data.data);
       });
     }
-  },
-  computed: {
-      getSaveButtonLabel: function() {
-          if( this.store.mode === 'aenderung' ) {
-              return 'Änderung speichern';
-          } else {
-              return 'Dienstverhältnis anlegen';
-          }
-      }
   }
 }
