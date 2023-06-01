@@ -4,7 +4,7 @@ export default {
   template: `
   <div class="row g-2 py-2">
     <div class="col">
-      <a href="javascript:void(0);" @click="addGB"><i class="fas fa-plus"></i> Gehaltsbestandteil hinzufuegen</a>
+      <a href="javascript:void(0);" @click="addGB"><i class="fas fa-plus"></i> Gehaltsbestandteil</a>
     </div>
   </div>
   <div class="row">

@@ -15,10 +15,12 @@ export default {
       <div>
         <div class="row g-2 py-2 border-bottom mb-3">
           <div class="col">
-            <a class="fs-6 fw-light" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus-square"></i></a>
-            &nbsp;
-            <em>{{ title }}{{ childcount }}</em>
-            &nbsp;
+            <div class="position-relative">
+              <a class="btn btn-sm btn-light fs-6 fw-light stretched-link" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus"></i></a>
+              &nbsp;
+              {{ title }}{{ childcount }}
+              &nbsp;
+            </div>
             <a class="fs-6 fw-light" v-if="(store.getMode() === 'aenderung')" href="javascript:void(0);" @click="fetchCurrentAndFutureVBs"><i class="fas fa-sync"></i></a>
           </div>
         </div>
