@@ -78,6 +78,7 @@ class Api extends Auth_Controller
                 'filterPerson' => Api::DEFAULT_PERMISSION,
                 'createEmployee' => Api::DEFAULT_PERMISSION,
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
+                'deleteDV'  => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -391,6 +392,32 @@ class Api extends Auth_Controller
 
     }
 
+    /** 
+     * Delete contract (DV). For testing only. Do not use in production!
+     * */
+    function deleteDV()
+    {
+        $dv_id = $this->input->get('dv_id', TRUE);
+        $stichtag = null;
+
+        if (!is_numeric($dv_id))
+        {
+            $this->outputJsonError('invalid parameter dv_id');
+            exit;
+        }
+
+        $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($dv_id));
+        $ret = $this->VertragsbestandteilLib->deleteDienstverhaeltnis($dv);
+
+        if ( $ret !== TRUE) {
+            return $this->outputJsonError($ret);
+        }
+        
+        return $this->outputJsonSuccess(TRUE);
+        
+    }
+
+
     /**
      * get a list of currently active contracts (DV)
      */
@@ -458,7 +485,7 @@ class Api extends Auth_Controller
 
         // TODO add date filter
         $gbtModel = $this->GBTModel;        
-        $gbt_data = $gbtModel->getCurrentGBTByDV($dv_id);
+        $gbt_data = $gbtModel->getCurrentGBTByDV($dv_id, $date);
 
         if (isSuccess($gbt_data))
         {
