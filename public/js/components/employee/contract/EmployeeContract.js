@@ -679,7 +679,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Gehaltstyp</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.gehaltstyp_bezeichnung">
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item?.gehaltstyp_bezeichnung">
                                         </div>
 
                                         <div class="col-md-2">
