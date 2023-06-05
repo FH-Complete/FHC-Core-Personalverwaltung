@@ -172,4 +172,9 @@ abstract class AbstractBestandteil implements JsonSerializable {
 
         return $this;
     }
+	
+	public function hasToBeDeleted() {
+		$toBeDeleted = (isset($this->data['db_delete'])) ? $this->data['db_delete'] :false;
+		return $toBeDeleted;
+	}
 }

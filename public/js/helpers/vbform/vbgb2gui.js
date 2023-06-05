@@ -2,6 +2,7 @@ import uuid from './uuid.js';
 import store from '../../components/vbform/vbsharedstate.js';
 
 export default {
+  today: null,
   store: store,
   vbout: {},
   vb2gui: function(vb, mode, child) {
@@ -10,7 +11,8 @@ export default {
           guioptions: {
               id: uuid.get_uuid(),
               infos: [],
-              errors: []
+              errors: [],
+              deleteable: this.isDeleteable(vb)
           },
           data: {
               
@@ -49,13 +51,55 @@ export default {
       }
       return this.vbout;
   },
+  getToday: function() {
+    if( this.today === null ) {
+      this.today = new Date();
+      this.today.setHours(23, 59, 59, 999);
+    }
+    return this.today;
+  },
+  isEndable: function(bt) {    
+    if ( this.store.mode === 'aenderung' ) {
+      if( bt.von === null || bt.von === ''  ) {
+        return false;
+      }
+      var von = new Date(bt.von);
+      von.setHours(0, 0, 0, 0);
+      if( von > this.getToday() ) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  },  
+  isDeleteable: function(bt) {    
+    if( this.store.mode === 'korrektur' ) {
+        return true;
+    }
+    if ( this.store.mode === 'aenderung' ) {
+      if( bt.von === null || bt.von === ''  ) {
+        return false;  
+      }
+      var von = new Date(bt.von);
+      von.setHours(0, 0, 0, 0);
+      if( von > this.getToday() ) {
+        return true;
+      }
+    }
+    return false;
+  },
   gueltigkeit2gui: function(bt, mode) {
+      var disabled = [];
+      if( this.isEndable(bt) ) {
+          disabled = [
+            'gueltig_ab'
+          ];
+      }
       var gueltigkeit = {
           guioptions: {
               sharedstatemode: 'ignore',
-              disabled: [
-                  'gueltig_ab'
-              ]
+              disabled: disabled,
+              endable: this.isEndable(bt)
           },
           data: {
               gueltig_ab: bt.von,
@@ -73,11 +117,26 @@ export default {
           freitext: vb.freitext,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'freitexttyp',
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'freitexttyp',
+            'titel',
+            'freitext'
+        ];
+      }
+      if( ['allin', 'befristung'].indexOf(vb.freitexttyp_kurzbz) > -1 ) {
+        this.vbout.guioptions.hidden = [
           'titel',
           'freitext'
-      ];
+        ];
+        if( this.vbout.guioptions?.disabled === undefined ) {
+          this.vbout.guioptions.disabled = [
+            'freitexttyp'
+          ];
+        } else if ( this.vbout.guioptions.disabled.indexOf('freitexttyp') === -1 ) {
+            this.vbout.guioptions.disabled.push('freitexttyp');
+        }
+      }
   },
   funktion2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilfunktion';
@@ -90,12 +149,17 @@ export default {
           mode: 'bestehende',
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'funktion',
-          'orget',
-          'benutzerfunktionid',
-          'mode'
-      ];
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'funktion',
+            'orget',
+            'benutzerfunktionid',
+            'mode'
+        ];
+      }
+      if( vb.benutzerfunktiondata.funktion_kurzbz.match('zuordnung') ) {
+          this.vbout.guioptions.canhavegehaltsbestandteile = false;
+      }
   },
   kuendigungsfrist2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilkuendigungsfrist';
@@ -105,10 +169,12 @@ export default {
           arbeitnehmer_frist: vb.arbeitnehmer_frist,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'arbeitgeber_frist',
-          'arbeitnehmer_frist'
-      ];
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'arbeitgeber_frist',
+            'arbeitnehmer_frist'
+        ];
+      }
   },
   stunden2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilstunden';
@@ -118,10 +184,12 @@ export default {
           teilzeittyp: vb.teilzeittyp_kurzbz,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'stunden',
-          'teilzeittyp'
-      ];
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'stunden',
+            'teilzeittyp'
+        ];
+      }
   },
   urlaubsanspruch2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilurlaubsanspruch';
@@ -130,10 +198,11 @@ export default {
           tage: vb.tage,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'stunden',
-          'teilzeittyp'
-      ];
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'tage'
+        ];
+      }
   },
   zeitaufzeichnung2gui: function(vb, mode) {
       this.vbout.type = 'vertragsbestandteilzeitaufzeichnung';
@@ -144,25 +213,32 @@ export default {
           homeoffice: vb.homeoffice,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      this.vbout.guioptions.disabled = [
-          'zeitaufzeichnung',
-          'azgrelevant',
-          'homeoffice'
-      ];
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'zeitaufzeichnung',
+            'azgrelevant',
+            'homeoffice'
+        ];
+      }
   },
   gehaltsbestandteil2gui: function(gb, mode) {
+      var disabled = [];
+      if( this.isEndable(gb) ) {
+          disabled = [
+            'gehaltstyp',
+            'anmerkung',
+            'betrag',
+            'valorisierung'
+          ];
+      }
       var gb = {
           type: 'gehaltsbestandteil',
           guioptions: {
               id: uuid.get_uuid(),
               infos: [],
               errors: [],
-              disabled: [
-                  'gehaltstyp',
-                  'anmerkung',
-                  'betrag',
-                  'valorisierung'
-              ]
+              disabled: disabled,              
+              deleteable: this.isDeleteable(gb)
           },
           data: {
               id: gb.gehaltsbestandteil_id,
@@ -175,4 +251,5 @@ export default {
       };
       return gb;
   }
+  
 }

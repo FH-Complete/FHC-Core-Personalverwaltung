@@ -67,27 +67,29 @@ class GUIVertragsbestandteilFreitext extends AbstractGUIVertragsbestandteil impl
         {
             throw new \Exception('missing data');
         }
+		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONDataString($this->data['freitexttyp'], $decodedData, 'freitexttyp');
         $this->getJSONDataString($this->data['titel'], $decodedData, 'titel');
         $this->getJSONDataString($this->data['freitext'], $decodedData, 'freitext');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
     public function generateVBLibInstance() {
 		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilFreitext */
         $vbs = null;
-		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+		$id = isset($this->data['id']) ? intval($this->data['id']) : 0;
         if ($id > 0)
         {
             // load VBS            
             $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
             // merge
-            $vbs->setFreitexttyp($this->data['freitexttyp']);
+            $vbs->setFreitexttypKurzbz($this->data['freitexttyp']);
             $vbs->setTitel($this->data['titel']);
-            $vbs->setFreitext($this->data['freitext']);
+            $vbs->setAnmerkung($this->data['freitext']);
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
 

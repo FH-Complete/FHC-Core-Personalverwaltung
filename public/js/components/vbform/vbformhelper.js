@@ -90,5 +90,16 @@ export default {
         that.$emit('validated', response.data.data);
       });
     }
+  },
+  computed: {
+      getSaveButtonLabel: function() {
+          if( this.store.mode === 'aenderung' ) {
+              return 'Änderung speichern';
+          } else if ( this.store.mode === 'korrektur' ) {
+              return 'Korrektur speichern';
+          } else {
+              return 'Dienstverhältnis anlegen';
+          }
+      }
   }
 }

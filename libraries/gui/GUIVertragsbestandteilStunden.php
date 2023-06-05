@@ -21,7 +21,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
         $this->type = self::TYPE_STRING;
         $this->hasGBS = true;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
-        $this->data = ["stunden" => "",
+        $this->data = ["id" => null, "stunden" => "",
                        "gueltigkeit" => [
                            "guioptions" => ["sharedstatemode" => "reflect"],
                            "data" =>       ["gueltig_ab"      => "", "gueltig_bis" => ""]
@@ -50,23 +50,20 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
         {
             throw new \Exception('missing data');
         }
-        $res = $this->getJSONDataFloat($this->data['stunden'], $decodedData, 'stunden');
-/*		
-        if ($res === false)
-        {
-            throw new \Exception('could not read stunden');
-        }
- */
+		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
+        $this->getJSONDataFloat($this->data['stunden'], $decodedData, 'stunden');
+
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
     public function generateVBLibInstance()
     {
 		$handler = GUIHandler::getInstance();
         $vbs = null;
-		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+		$id = isset($this->data['id']) ? intval($this->data['id']) : 0;
         if ($id > 0)
         {
             // load VBS            

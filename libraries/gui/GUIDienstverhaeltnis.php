@@ -122,6 +122,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 	}
 	
     public function jsonSerialize() {
+		$this->syncInstanceId();
         return [
             "type" => $this->type,
             "guioptions" => $this->guioptions,
@@ -139,6 +140,19 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 		if( !$this->dv->validate() )
 		{
 			$this->addGUIError($this->dv->getValidationErrors());
+		}
+	}
+	
+	protected function syncInstanceId()
+	{
+		if( !$this->dv ) 
+		{
+			return;
+		}
+		
+		if( intval($this->dv->getDienstverhaeltnis_id()) > 0 ) 
+		{
+			$this->data['dienstverhaeltnis_id'] = $this->dv->getDienstverhaeltnis_id();
 		}
 	}
 }

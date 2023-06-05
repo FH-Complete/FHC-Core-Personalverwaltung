@@ -30,7 +30,9 @@ export default {
     </div>
     <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
     <div class="col-1">
+      <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>        
       <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeGB" aria-label="Close"></button>
+      <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
     </div>
   </div>
   `,
@@ -41,7 +43,8 @@ export default {
       betrag: '',
       gueltig_ab: '',
       gueltig_bis: '',
-      valorisierung: ''
+      valorisierung: '',
+      db_delete: false
     }
   },
   components: {
@@ -72,6 +75,9 @@ export default {
       if( this.config?.data?.valorisierung !== undefined ) {
         this.valorisierung = this.config.data.valorisierung;
       }
+      if( this.config?.data?.db_delete !== undefined ) {
+        this.db_delete = this.config.data.db_delete;
+      }
     },
     removeGB: function() {
       this.$emit('removeGB', {id: this.config.guioptions.id});
@@ -84,10 +90,14 @@ export default {
           id: this.id,
           gehaltstyp: this.gehaltstyp,
           betrag: this.betrag,
+          db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
           valorisierung: Boolean(this.valorisierung)
         }
       };
+    },
+    markGBEnded: function() {
+        this.$refs['gueltigkeit'].markended();
     }
   }
 }

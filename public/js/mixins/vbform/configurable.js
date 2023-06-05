@@ -14,9 +14,31 @@ export default {
         return true;
       }
       return !this.config.guioptions.hidden.includes(inputname);
+    },
+    markGBsEnded: function() {
+        if( this.$refs?.gbh !== undefined ) {
+          this.$refs.gbh.markGBsEnded();
+        }
+    },
+    toggledelete: function() {
+        this.db_delete = !this.db_delete;
+        if( this.$refs?.gbh !== undefined ) {
+          this.$refs.gbh.setGBsDelete(this.db_delete);
+        }
+    },
+    setDelete: function(hastobedeleted) {
+        this.db_delete = hastobedeleted;
     }
   },
   computed: {
+    isendable: function() {
+      return (this.config?.guioptions?.endable === undefined)
+        ? false : this.config.guioptions.endable;
+    },      
+    isdeleteable: function() {
+      return (this.config?.guioptions?.deleteable === undefined)
+        ? false : this.config.guioptions.deleteable;
+    },
     isremoveable: function() {
       return (this.config?.guioptions?.removeable === undefined)
         ? false : this.config.guioptions.removeable;

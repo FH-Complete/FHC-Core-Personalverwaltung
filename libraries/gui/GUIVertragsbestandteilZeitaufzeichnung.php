@@ -48,19 +48,21 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
         {
             throw new \Exception('missing data');
         }
+		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONDataBool($this->data['zeitaufzeichnung'], $decodedData, 'zeitaufzeichnung');
         $this->getJSONDataBool($this->data['azgrelevant'], $decodedData, 'azgrelevant');
         $this->getJSONDataBool($this->data['homeoffice'], $decodedData, 'homeoffice');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
     public function generateVBLibInstance() {
 		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilZeitaufzeichnung */
         $vbs = null;
-		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+		$id = isset($this->data['id']) ? intval($this->data['id']) : 0;
         if ($id > 0)
         {
             // load VBS            

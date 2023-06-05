@@ -28,9 +28,11 @@ export default {
         </label>
       </div>
       <div class="col-1 form-check form-control-sm">&nbsp;</div>
-      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
+      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
       <div class="col-1">
+        <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
+        <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
       </div>
     </div>
   </div>
@@ -51,7 +53,8 @@ export default {
       id: null,
       zeitaufzeichnung: true,
       azgrelevant: true,
-      homeoffice: true
+      homeoffice: true,
+      db_delete: false
     };
   },
   created: function() {
@@ -71,6 +74,9 @@ export default {
       if( this.config?.data?.homeoffice !== undefined ) {
         this.homeoffice = this.config.data.homeoffice
       }
+      if( this.config?.data?.db_delete !== undefined ) {
+        this.db_delete = this.config.data.db_delete;
+      }
     },
     removeVB: function() {
       this.$emit('removeVB', {id: this.config.guioptions.id});
@@ -84,6 +90,7 @@ export default {
           zeitaufzeichnung: Boolean(this.zeitaufzeichnung),
           azgrelevant: Boolean(this.azgrelevant),
           homeoffice: Boolean(this.homeoffice),
+          db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         }
       };

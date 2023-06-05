@@ -8,5 +8,11 @@ export default {
         url = url + '?' + params.toString();
       }
       return axios.get(url);
+  },
+  getAllVBs: function(dvid) {
+    var url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
+            + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/getAllVBs/' 
+            + dvid;
+      return axios.get(url);
   }
 };

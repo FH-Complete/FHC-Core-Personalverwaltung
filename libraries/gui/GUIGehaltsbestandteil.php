@@ -37,7 +37,9 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
     {
         $this->type = self::TYPE_STRING;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
-        $this->data = [ "gehaltstyp" => "",
+        $this->data = [ 
+						"id" => null,
+						"gehaltstyp" => "",
                         "betrag" => "",
                         "gueltigkeit" => [
                             "guioptions" => ["sharedstatemode" => "reflect"],
@@ -73,13 +75,14 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         {
             throw new \Exception('missing data');
         }
-        $this->getJSONData($this->data['id'], $decodedData, 'id');
+        $this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['gehaltstyp'], $decodedData, 'gehaltstyp');
         $this->getJSONDataInt($this->data['betrag'], $decodedData, 'betrag');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
         $this->getJSONData($this->data['valorisierung'], $decodedData, 'valorisierung');
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
     public function generateGehaltsbestandteil()
@@ -130,6 +133,25 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
 		if( !$this->gbsInstance->validate() )
 		{
 			$this->addGUIError($this->gbsInstance->getValidationErrors());
+		}
+	}
+	
+	public function jsonSerialize()
+	{
+		$this->syncInstanceId();
+		return parent::jsonSerialize();
+	}
+	
+	protected function syncInstanceId()
+	{
+		if( !$this->gbsInstance ) 
+		{
+			return;
+		}
+		
+		if( intval($this->gbsInstance->getGehaltsbestandteil_id()) > 0 ) 
+		{
+			$this->data['id'] = $this->gbsInstance->getGehaltsbestandteil_id();
 		}
 	}
 }

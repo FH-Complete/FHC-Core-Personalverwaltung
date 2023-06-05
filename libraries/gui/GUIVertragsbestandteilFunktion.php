@@ -88,6 +88,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         {
             throw new \Exception('missing data');
         }
+		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['funktion'], $decodedData, 'funktion');
         $this->getJSONData($this->data['orget'], $decodedData, 'orget');
 		$this->getJSONData($this->data['mitarbeiter_uid'], $decodedData, 'mitarbeiter_uid');
@@ -97,13 +98,14 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
+		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
     }
 
     public function generateVBLibInstance() {
 		$handler = GUIHandler::getInstance();
         /** @var vertragsbestandteil\VertragsbestandteilFunktion */
         $vbs = null;
-		$id = isset($this->data['id']) ? inval($this->data['id']) : 0;
+		$id = isset($this->data['id']) ? intval($this->data['id']) : 0;
         if ($id > 0)
         {
             // load VBS            
@@ -112,8 +114,6 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 			/**
 			 * @todo refactor update
 			 */
-            $vbs->setFunktion($this->data['funktion']);
-            $vbs->setOrget($this->data['orget']);
             $vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));

@@ -2,7 +2,8 @@
 header('Content-Type: application/javascript');
 $presets = array(
 	'neuanlage' => array(),
-	'aenderung' => array()
+	'aenderung' => array(),
+	'korrektur' => array()
 );
 
 foreach (array_keys($presets) as $dir)

@@ -53,6 +53,16 @@ export default {
       }
 
       return payload;
+    },
+    markGBsEnded: function() {
+      for( var i in this.$refs.parts ) {
+        this.$refs.parts[i].markGBEnded();
+      } 
+    },
+    setGBsDelete: function(hastobedeleted) {
+      for( var i in this.$refs.parts ) {
+        this.$refs.parts[i].setDelete(hastobedeleted);
+      }
     }
   }
 }

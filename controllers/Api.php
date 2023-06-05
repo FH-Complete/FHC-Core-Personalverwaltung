@@ -69,6 +69,7 @@ class Api extends Auth_Controller
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
 				'saveVertrag' => Api::DEFAULT_PERMISSION,
 				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
+				'getAllVBs' => Api::DEFAULT_PERMISSION,
 				'storeToTmpStore' => Api::DEFAULT_PERMISSION,
 				'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
 				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
@@ -1578,6 +1579,23 @@ EOSQL;
 	
 	public function getCurrentAndFutureVBs($dvid, $typ=null) 
 	{
+		$today = new DateTime('now', new DateTimeZone('Europe/Vienna'));
+		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
+			$dvid, 
+			$today->format('Y-m-d'), 
+			$this->VertragsbestandteilLib::INCLUDE_FUTURE);
+		
+		$this->outputJson(
+			array(
+				'data' => $vbs,
+				'meta' => array()
+			)
+		);
+		return;
+	}
+
+	public function getAllVBs($dvid) 
+	{
 		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dvid);
 		
 		$this->outputJson(
@@ -1639,7 +1657,8 @@ EOSQL;
 		$storedentries = $this->TmpStoreModel->listTmpStoreForUid($mitarbeiteruid);
 		$data = array(
 			'aenderung' => array(),
-			'neuanlage' => array()
+			'neuanlage' => array(),
+			'korrektur' => array()
 		);
 		
 		if( hasData($storedentries) ) 

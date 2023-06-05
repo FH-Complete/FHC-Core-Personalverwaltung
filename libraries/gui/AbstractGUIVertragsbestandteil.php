@@ -117,6 +117,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     }
 	
     public function jsonSerialize() {
+		$this->syncInstanceId();
         $json = [
             "type" => $this->type,
             "guioptions" => $this->guioptions,
@@ -194,6 +195,14 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
         return $this;
     }
 
+	public function removeDeletedGbs() {
+		foreach( $this->gbs as $idx => $gb ) {
+			if( $gb->hastoBeDeleted() ) {
+				unset($this->gbs[$idx]);
+			}
+		}		
+	}
+	
 	public function validate()
 	{
 		if( !($this->vbsinstance instanceof vertragsbestandteil\IValidation) )
@@ -215,5 +224,18 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 			$valid = (!$gb->isValid()) ? false : $valid;
 		}
 		return $valid;
+	}
+	
+	protected function syncInstanceId()
+	{
+		if( !$this->vbsinstance ) 
+		{
+			return;
+		}
+		
+		if( intval($this->vbsinstance->getVertragsbestandteil_id()) > 0 ) 
+		{
+			$this->data['id'] = $this->vbsinstance->getVertragsbestandteil_id();
+		}
 	}
 }    
