@@ -382,42 +382,40 @@ export const EmployeeContract = {
                         <div class="d-grid gap-2 d-md-flex ">
                             <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span>
                         </div>
-                        <div class="d-grid d-sm-flex gap-2 mb-2 align-middle flex-nowrap">        
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="createDVDialog()"><i class="fa fa-plus"></i></button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="updateDVDialog()"><i class="fa fa-pen"></i></button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" ><i class="fa fa-file"></i> Bestätigung</button>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="d-flex justify-content-end">
+                        <div><span class="badge badge-sm bg-success me-1">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
+                        <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
+                    </div>
+                    <div class="d-flex">
+                        <div class="me-auto">
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
                             <!-- Drop Down Button -->
                             <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:dropdownLink1,text:'Korrektur'},{action:dropdownLink1,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
                             </DropDownButton>
-                            
-                        </div>
-                    </div>     
-                    <div class="d-flex align-items-end flex-column">  
-                        <div class="d-flex flex-row gap-2 mb-2">
-                            <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #D5E8D4;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
-                            <div style="border: 1px solid rgb(153, 153, 153);border-radius: 0.25rem;text-align: center;background-color: #F5F5F5;font-size:0.7rem;font-weight:bold" class="ps-2 pe-2">{{ dvList?.length }} <span v-if="dvList">gesamt</span></div> 
-                        </div>
-                        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
-                                <select  v-if="!isFetching" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
-                                        <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
-                                            {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
-                                        </option> 
-                                </select> 
-                                <div v-else style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
-
-                                <input type="date" style="max-width:130px;min-width:130px" class="form-control form-control-sm"  id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
-
                         </div>
                     </div>
-                </div>
+                    <div class="d-flex align-items-end flex-column">  
+                        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
+                            <select  v-if="!isFetching" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                                <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
+                                    {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
+                                </option> 
+                            </select> 
+                            <div v-else style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
 
-            </div>
-            
-            
-            <div class="col-lg-12">
-
-                <div class="row pt-md-4" v-if="dvList?.length">
+                            <input type="date" style="max-width:130px;min-width:130px" class="form-control form-control-sm" 
+                                   id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
+                        </div>
+                    </div>
+                </div>           
+                <div class="row pt-md-2" v-if="dvList?.length">
 
                     <div class="col">
                         <div class="card">
@@ -512,7 +510,7 @@ export const EmployeeContract = {
 
 
                                     <!-- Arbeitszeit -->
-                                    <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h5></div>
+                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h6></div>
 
                                     <template v-for="(item, index) in currentVBS.stunden"  >
                                         <div class="col-md-4">
@@ -798,7 +796,7 @@ export const EmployeeContract = {
                                     </template>
 
                                     <!-- taetigkeit -->
-                                    <div class="col-md-12"><h5 style="margin: 0.9rem 0 0 0;">Tätigkeit</h5></div>
+                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Tätigkeit</h6></div>
                                     <template v-for="(item, index) in currentVBS.funktion.taetigkeit"  >
 
                                         <div class="col-md-4">
@@ -1038,7 +1036,7 @@ export const EmployeeContract = {
                     </div -->
 
                     
-                </div--> <!-- --> 
+                </div> <!--. row--> 
                 <br/>
 
                 

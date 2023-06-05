@@ -6,11 +6,11 @@ export const EmployeeStatus = {
         return {statusList};
     },
     template: `
-    <template v-for="item in statusList">
-        <div class="d-flex flex-column align-items-center" >
-            <span class="badge bg-secondary">{{ item.text }}</span>
-        </div> 
-        
-    </template>
+    <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2" >
+      <template v-for="item in statusList">
+        <!-- <span class="badge badge-lg bg-success me-2">BSP AKTIV</span><span class="badge bg-secondary me-2"> BSP FIX ANGESTELLT</span><span class="badge bg-secondary me-2">BSP STATUS</span> -->
+        <span class="badge bg-secondary me-2">{{ item.text }}</span>
+      </template>
+    </div>   
    `
 }

@@ -24,7 +24,7 @@ export default {
           <input v-model="mode" class="form-check-input form-check-input-sm" type="radio"
             @change="resetDropdowns"
             :name="'vbfunktionmode_' + config.guioptions.id" :id="'vbfunktionmode2_' + config.guioptions.id" value="bestehende">
-          <label class="form-check-label" :for="'vbfunktionmode2_' + config.guioptions.id">bestehende Funktion</label>
+          <label class="form-check-label" :for="'vbfunktionmode2_' + config.guioptions.id">Bestehende Funktion</label>
         </div>
       </div>
       <div class="col-7">&nbsp;</div>

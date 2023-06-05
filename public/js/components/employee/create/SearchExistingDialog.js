@@ -140,7 +140,6 @@ export const SearchExistingDialog = {
                 placeholder="Nachname" aria-label="nachname"
                 autofocus >
         </div>
-        <div class="col-md-9"></div>
         <div class="col-md-3">
             <label for="birthdate" class="form-label">Geburtsdatum</label>
             <input id="birthdate"
@@ -149,10 +148,9 @@ export const SearchExistingDialog = {
                 v-model="currentValue.birthdate" 
                 @change="filterPerson" >
         </div>
-        <div class="col-md-9"></div>
-        <div class="col-md-12">
-            <h5>Prüfung ob Person bereits existiert</h5>
-            <p>{{ personList.length }} Übereinstimmungen</p>
+        <div class="col-md-12 pt-5">
+            <h6>Prüfung ob Person bereits existiert</h6>
+<!--            <p>{{ personList.length }} Übereinstimmungen</p>-->
             <table class="table table-sm table-striped table-hover">
                 <thead>
                     <tr><th>UID</th><th>Nachname</th><th>Vorname</th><th>Geb.Dat.</th><th>SVNr</th><th>Status</th><th>Aktion</th></tr>
@@ -171,7 +169,7 @@ export const SearchExistingDialog = {
                                     @click="take(person.person_id, person.uid)"
                                     style="white-space: nowrap"
                                     v-if="person.status=='Student' && !person.taken">
-                                    übernehmen
+                                    Als MA übernehmen
                                 </button>
                             </div>
                         </td>

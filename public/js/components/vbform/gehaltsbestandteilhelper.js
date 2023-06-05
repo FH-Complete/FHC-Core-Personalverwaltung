@@ -6,12 +6,12 @@ export default {
   template: `
   <gehaltsbestandteil ref="parts" v-for="config in children"
     v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
-  <div class="row">
-    <div class="col-1">
-      &nbsp;
-    </div>
-    <div class="col-11">
-      <a class="fs-6 fw-light" href="javascript:void(0);" @click="addGB"><i class="fas fa-plus"></i> Gehaltsbestandteil hinzufuegen</a>
+  <div class="row py-2 pb-1">
+    <div class="col-12 ps-5">
+      <div class="position-relative">
+        <a class="btn btn-sm btn-light fs-6 fw-light stretched-link" href="javascript:void(0);" @click="addGB"><i class="fas fa-plus"></i></a>
+        &nbsp;<em>Gehaltsbestandteil</em>
+      </div>
     </div>
   </div>
   `,

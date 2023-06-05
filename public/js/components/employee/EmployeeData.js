@@ -240,121 +240,119 @@ export const EmployeeData= {
     },
     template: `
     <div class="row">
-
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="toastRef">
                 <template #body><h4>Mitarbeiterdaten gespeichert.</h4></template>
             </Toast>
         </div>
+    </div>
 
-        <div class="d-flex bd-highlight">
-            <div class="flex-grow-1 bd-highlight"><h4>Mitarbeiterdaten</h4></div>        
-            <div class="p-2 bd-highlight">
-            <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                    <i class="fa fa-pen"></i>
-                </button>
-                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-minus"></i></button>
-                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-floppy-disk"></i></button>
-            </div>
-
+   <div class="row pt-md-4">      
+             <div class="col">
+                 <div class="card">
+                    <div class="card-header">
+                        <div class="h5"><h5>Mitarbeiterdaten</h5></div>        
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-xmark"></i></button>
+                                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-floppy-disk"></i></button>
+                        </div>
+                        <form class="row g-3" ref="employeeDataFrm">
+                            <div class="col-md-2">
+                                <label for="personalnummer" class="form-label">Personalnummer</label>
+                                <input type="text" readonly class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="personalnummer" v-model="currentValue.personalnummer">
+                            </div>            
+                            <div class="col-md-2">
+                                <label for="kurzbezeichnung" class="form-label">Kurzbezeichnung</label>
+                                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="alias" class="form-label">Alias</label>
+                                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="alias" v-model="currentValue.alias">
+                            </div>
+                            <div class="col-md-4"></div>
+                            <!--  -->
+                            <div class="col-md-2">
+                                <label for="stundensatz" class="form-label">Stundensatz</label>
+                                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="stundensatz" v-model="currentValue.stundensatz">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="telefonklappe" class="form-label">Telefonklappe</label>
+                                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="ausbildung" class="form-label">Ausbildung</label>
+                                <select v-if="!readonly" id="ausbildung" :readonly="readonly"  v-model="currentValue.ausbildungcode" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                    <option value="">-- keine Auswahl --</option>
+                                    <option v-for="(item, index) in ausbildung" :value="item.ausbildungcode">
+                                        {{ item.ausbildungbez }}
+                                    </option>         
+                                </select>
+                                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="ausbildung" :value="getAusbildungbez(currentValue.ausbildungcode) ">
+                            </div>
+                            <div class="col-md-4"></div>
+                            <!--Location -->
+                            <div class="col-md-4">
+                                <label for="office" class="form-label">Büro</label>
+                                <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                    <option value="">-- keine Auswahl --</option>
+                                    <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
+                                        {{ item.ort_kurzbz }}
+                                    </option>         
+                                </select>
+                                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="standort" class="form-label">Standort</label>
+                                <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                    <option value="0">-- keine Auswahl --</option>
+                                    <option v-for="(item, index) in standorte" :value="item.standort_id">
+                                        {{ item.bezeichnung }}
+                                    </option>         
+                                </select>
+                                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                            <!-- -->
+                            <div class="col-4">
+                                <label for="anmerkung" class="form-label">Anmerkung</label>
+                                <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
+                                </textarea>
+                            </div>
+                            <div class="col-4">
+                                <label for="status" class="form-label">Status</label>
+                                <div class="form-check">
+                                    <label for="aktiv" class="form-check-label">Aktiv</label>
+                                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
+                                </div>
+                                <div class="form-check">
+                                    <label for="lektor" class="form-check-label">LektorIn</label>
+                                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
+                                </div>
+                                <div class="form-check">
+                                    <label for="fixangestellt" class="form-check-label">Fixangestellt</label>
+                                    <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
+                                </div>
+                                <div class="form-check">
+                                    <label for="bismelden" class="form-check-label" >Bismelden</label>
+                                    <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
+                                </div>
+                            </div>
+                            <div class="col-4"></div>
+                            <!-- changes -->
+                            <div class="col-8">
+                                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-
-    
-    </div>
-    <div class="col-md-12 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-start pt-3 pb-2 mb-3">
-
-        <form class="row g-3" ref="employeeDataFrm">
-            <div class="col-md-2">
-                <label for="personalnummer" class="form-label">Personalnummer</label>
-                <input type="text" readonly class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="personalnummer" v-model="currentValue.personalnummer">
-            </div>            
-            <div class="col-md-2">
-                <label for="kurzbezeichnung" class="form-label">Kurzbezeichnung</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
-            </div>
-            <div class="col-md-4">
-                <label for="alias" class="form-label">Alias</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="alias" v-model="currentValue.alias">
-            </div>
-            <div class="col-md-4"></div>
-            <!--  -->
-            <div class="col-md-2">
-                <label for="stundensatz" class="form-label">Stundensatz</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="stundensatz" v-model="currentValue.stundensatz">
-            </div>
-            <div class="col-md-2">
-                <label for="telefonklappe" class="form-label">Telefonklappe</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
-            </div>
-            <div class="col-md-4">
-                <label for="ausbildung" class="form-label">Ausbildung</label>
-                <select v-if="!readonly" id="ausbildung" :readonly="readonly"  v-model="currentValue.ausbildungcode" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in ausbildung" :value="item.ausbildungcode">
-                        {{ item.ausbildungbez }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="ausbildung" :value="getAusbildungbez(currentValue.ausbildungcode) ">
-            </div>
-            <div class="col-md-4"></div>
-            <!--Location -->
-            <div class="col-md-4">
-                <label for="office" class="form-label">Büro</label>
-                <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
-                        {{ item.ort_kurzbz }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
-            </div>
-            <div class="col-md-4">
-                <label for="standort" class="form-label">Standort</label>
-                <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="0">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in standorte" :value="item.standort_id">
-                        {{ item.bezeichnung }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">
-            </div>
-            <div class="col-md-4">
-            </div>
-            <!-- -->
-            <div class="col-4">
-                <label for="anmerkung" class="form-label">Anmerkung</label>
-                <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
-                </textarea>
-            </div>
-            <div class="col-4">
-                <label for="status" class="form-label">Status</label>
-                <div class="form-check">
-                    <label for="aktiv" class="form-check-label">Aktiv</label>
-                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
-                </div>
-                <div class="form-check">
-                    <label for="lektor" class="form-check-label">LektorIn</label>
-                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
-                </div>
-                <div class="form-check">
-                    <label for="fixangestellt" class="form-check-label">Fixangestellt</label>
-                    <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
-                </div>
-                <div class="form-check">
-                    <label for="bismelden" class="form-check-label" >Bismelden</label>
-                    <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
-                </div>
-            </div>
-            <div class="col-4"></div>
-            <!-- changes -->
-            <div class="col-8">
-                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
-            </div>
-        </form>
-        
-    </div>
 
 
     <ModalDialog title="Warnung" ref="dialogRef">

@@ -309,52 +309,56 @@ export const MaterialExpensesData = {
                 <template #body><h4>Sachaufwand gelöscht.</h4></template>
             </Toast>
         </div>
-
-        <div class="d-flex bd-highlight">
-            <div class="flex-grow-1 bd-highlight"><h4>Sachaufwand</h4></div>        
-            <div class="p-2 bd-highlight">
-            <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-                    <i class="fa fa-plus"></i>
-                </button>            
-            </div>
-        </div>
-
-      
     </div>
+    <div class="row pt-md-4">      
+         <div class="col">
+             <div class="card">
+                <div class="card-header">
+                    <div class="h5"><h5>Sachaufwand</h5></div>        
+                </div>
 
-
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            <thead>                
-            <tr>
-                <th scope="col">Typ</th>
-                <th scope="col">Von</th>
-                <th scope="col">Bis</th>
-                <th scope="col">Anmerkung</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="materialdata in materialdataListArray" :key="materialdata.sachaufwand_id">
-                <td class="align-middle">{{ materialdata.sachaufwandtyp_kurzbz }}</td>
-                <td class="align-middle">{{ formatDate(materialdata.beginn) }}</td>
-                <td class="align-middle">{{ formatDate(materialdata.ende) }}</td>
-                <td class="align-middle">{{ materialdata.anmerkung }}</td>
-                <td class="align-middle" width="5%">
-                    <div class="d-grid gap-2 d-md-flex align-middle">
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(materialdata.sachaufwand_id)">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(materialdata.sachaufwand_id)">
-                            <i class="fa fa-pen"></i>
-                        </button>
+                <div class="card-body">
+                    <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
+                        <i class="fa fa-plus"></i>
+                        </button>            
                     </div>
-                </td>
-            </tr>
-
-            </tbody>
-        </table>            
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead>                
+                            <tr>
+                                <th scope="col">Typ</th>
+                                <th scope="col">Von</th>
+                                <th scope="col">Bis</th>
+                                <th scope="col">Anmerkung</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="materialdata in materialdataListArray" :key="materialdata.sachaufwand_id">
+                                <td class="align-middle">{{ materialdata.sachaufwandtyp_kurzbz }}</td>
+                                <td class="align-middle">{{ formatDate(materialdata.beginn) }}</td>
+                                <td class="align-middle">{{ formatDate(materialdata.ende) }}</td>
+                                <td class="align-middle">{{ materialdata.anmerkung }}</td>
+                                <td class="align-middle" width="5%">
+                                    <div class="d-grid gap-2 d-md-flex align-middle">
+                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(materialdata.sachaufwand_id)">
+                                            <i class="fa fa-minus"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(materialdata.sachaufwand_id)">
+                                            <i class="fa fa-pen"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                
+                            </tbody>
+                        </table>            
+                    </div>
+                </div>
+             </div>
+         </div>
     </div>
+            
 
     <!-- detail modal -->
     <Modal title="Sachaufwand" ref="modalRef">

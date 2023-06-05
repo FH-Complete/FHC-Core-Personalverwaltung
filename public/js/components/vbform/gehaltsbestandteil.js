@@ -7,11 +7,8 @@ export default {
   template: `
   <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []" :padleft="true"></infos>
   <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []" :padleft="true"></errors>
-  <div class="row g-2 py-2">
-    <div class="col-1">
-      &nbsp;
-    </div>
-    <div class="col-2">
+  <div class="row pt-2">
+    <div class="col-3 ps-5">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option value="" selected disabled>Gehaltstyp wählen</option>
         <option value="basisgehalt">Basisgehalt</option>
@@ -21,7 +18,7 @@ export default {
     </div>
     <div class="col-2">
       <div class="input-group input-group-sm mb-3">
-        <input v-model="betrag" :disabled="isinputdisabled('betrag')" type="text" class="form-control form-control-sm" placeholder="betrag" aria-label="betrag">
+        <input v-model="betrag" :disabled="isinputdisabled('betrag')" type="text" class="form-control form-control-sm" placeholder="Betrag" aria-label="betrag">
         <span class="input-group-text">&euro;</span>
       </div>
     </div>

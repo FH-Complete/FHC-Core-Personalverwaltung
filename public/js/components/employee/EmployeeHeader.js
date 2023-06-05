@@ -265,11 +265,11 @@ export const EmployeeHeader = {
             </Toast>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2" >
+        <div class="d-flex justify-content-between ms-sm-auto col-lg-12 p-md-2" >
             <div class="d-flex align-items-center flex-fill" >
             
                 <div class="fotocontainer" v-if="!isFetchingName">
-                    <img v-if="employee?.foto" class="img-thumbnail " style="padding: 0px!important;max-width:101px;border-radius: 0.25rem!important" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
+                    <img v-if="employee?.foto" class="rounded" style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
                     <div v-if="employee?.foto" class="fotobutton">
                         <div class="d-grid gap-2 d-md-flex ">
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
@@ -283,7 +283,7 @@ export const EmployeeHeader = {
                 </div>
 
                 <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
-                    <svg  class="bd-placeholder-img img-thumbnail" style="padding: 0px!important;border-radius: 0.25rem!important" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
+                    <svg  class="bd-placeholder-img rounded" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
                     <div class="fotobutton-visible" v-if="!isFetchingName">
                         <div class="d-grid gap-2 d-md-flex ">                      
                             <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
@@ -294,43 +294,42 @@ export const EmployeeHeader = {
                 </div>                             
                 
                 <div class="ms-3 flex-fill" >
-
-                    <h2 class="h2" v-if="!isFetchingName">{{ employee?.nachname }}, {{ employee?.vorname }} {{ employee?.titelpre }}</h2>
-                    <h2 class="h2" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
-
-                    <h6 v-if="employee?.abteilung && !isFetching" class="mb-2 text-muted">
-                        <b>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</b> {{ employee?.abteilung?.bezeichnung }},
-                        <b>Vorgesetzte(r) </b> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id, employee?.abteilung?.supervisor?.uid)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
-                    </h6>  
-                    <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>                
-                    
-                    <h6 v-if="!isFetchingName" class="mb-2 text-muted">
-                        <b>Email</b>&nbsp; 
-                        <span v-if="!employee?.alias">,  
-                            <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
-                        </span>
-                        <span v-if="employee?.alias">
-                            <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
-                        </span>
-                        <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <b>DW</b> {{  employee?.telefonklappe }}</span>  
-                    </h6>  
-                    <h6 v-else class="mb-2"><p-skeleton  style="width:35%"></p-skeleton></h6> 
-
-                    <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2" >
-                        <EmployeeStatus></EmployeeStatus>
+                    <div class="align-items-top">
+                        <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}</h2>
+                        <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
+    
+                        <div v-if="employee?.abteilung && !isFetching" class="mb-1 text-muted">
+                            <strong>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</strong> {{ employee?.abteilung?.bezeichnung }},
+                            <strong>Vorgesetzte(r) </strong> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id, employee?.abteilung?.supervisor?.uid)">{{ employee?.abteilung?.supervisor?.titelpre }} {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.nachname }}</a>
+                        </div>  
+                        <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>                
+                        <div v-if="!isFetchingName" class="mb-1 text-muted">
+                            <strong>Email</strong>&nbsp; 
+                            <span v-if="!employee?.alias">,  
+                                <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
+                            </span>
+                            <span v-if="employee?.alias">
+                                <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
+                            </span>
+                            <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <strong>DW</strong> {{  employee?.telefonklappe }}</span>  
+                        </div>  
+                        <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
+                    </div>
+                    <EmployeeStatus></EmployeeStatus>
                     </div>
                 </div>
+             
             </div>
             
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
                     <div class="px-2">
-                        <h3 class="mb-1">PNr</h3>
+                        <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
                     </div>
                     <div class="px-2" style="border-left: 1px solid #EEE">
-                        <h3 class="mb-1">UID</h3>
+                        <h4 class="mb-1">UID</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.uid }}</h6>  
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
                     </div>

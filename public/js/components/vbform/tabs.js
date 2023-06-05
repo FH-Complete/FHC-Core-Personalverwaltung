@@ -7,7 +7,7 @@ export default {
     <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
       <button v-for="(child, idx) in children"
               :key="idx"
-              class="nav-link"
+              class="nav-link text-start"
               :class="(this.activetab === child.guioptions.id) ? 'active' : ''"
               :id="'v-pills-' + child.guioptions.id + 'tab'"
               data-bs-toggle="pill"

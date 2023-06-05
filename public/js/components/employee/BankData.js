@@ -333,56 +333,60 @@ export const BankData = {
                 <template #body><h4>Bankdaten gelöscht.</h4></template>
             </Toast>
         </div>
-
-        <div class="d-flex bd-highlight">
-            <div class="flex-grow-1 bd-highlight"><h4>Bankdaten</h4></div>        
-            <div class="p-2 bd-highlight">
-            <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-                    <i class="fa fa-plus"></i>
-                </button>            
-            </div>
-        </div>
-
-      
     </div>
 
-
-    <div class="table-responsive">
-        <table class="table table-striped table-sm">
-            <thead>                
-            <tr>
-                <th scope="col">Bank</th>
-                <th scope="col">Anschrift</th>
-                <th scope="col">BIC</th>
-                <th scope="col">IBAN</th>
-                <th scope="col">Kontonr</th>
-                <th scope="col">Verrechnung</th>
-                <th scope="col">Aktion</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr v-for="bankdata in bankdataListArray" :key="bankdata.bankverbindung_id">
-                <td class="align-middle">{{ bankdata.name }}</td>
-                <td class="align-middle">{{ bankdata.anschrift }}</td>
-                <td class="align-middle">{{ bankdata.bic }}</td>
-                <td class="align-middle">{{ bankdata.iban }}</td>
-                <td class="align-middle">{{ bankdata.kontonr }}</td>
-                <td class="align-middle">{{ bankdata.verrechnung == true ? "X" : "" }}</td>
-                <td class="align-middle" width="5%">
-                    <div class="d-grid gap-2 d-md-flex align-middle">
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(bankdata.bankverbindung_id)">
-                            <i class="fa fa-minus"></i>
-                        </button>
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(bankdata.bankverbindung_id)">
-                            <i class="fa fa-pen"></i>
-                        </button>
+   <div class="row pt-md-4">      
+         <div class="col">
+             <div class="card">
+                <div class="card-header">
+                    <div class="h5"><h5>Bankdaten</h5></div>        
+                </div>
+        
+                <div class="card-body">
+                    <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
+                            <i class="fa fa-plus"></i>
+                        </button>            
                     </div>
-                </td>
-            </tr>
-
-            </tbody>
-        </table>            
+                    <div class="table-responsive">
+                <table class="table table-hover table-sm">
+                    <thead>                
+                    <tr>
+                        <th scope="col">Bank</th>
+                        <th scope="col">Anschrift</th>
+                        <th scope="col">BIC</th>
+                        <th scope="col">IBAN</th>
+                        <th scope="col">Kontonr</th>
+                        <th scope="col">Verrechnung</th>
+                        <th scope="col">Aktion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="bankdata in bankdataListArray" :key="bankdata.bankverbindung_id">
+                        <td class="align-middle">{{ bankdata.name }}</td>
+                        <td class="align-middle">{{ bankdata.anschrift }}</td>
+                        <td class="align-middle">{{ bankdata.bic }}</td>
+                        <td class="align-middle">{{ bankdata.iban }}</td>
+                        <td class="align-middle">{{ bankdata.kontonr }}</td>
+                        <td class="align-middle">{{ bankdata.verrechnung == true ? "X" : "" }}</td>
+                        <td class="align-middle" width="5%">
+                            <div class="d-grid gap-2 d-md-flex align-middle">
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(bankdata.bankverbindung_id)">
+                                    <i class="fa fa-xmark"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(bankdata.bankverbindung_id)">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+        
+                    </tbody>
+                </table>            
+            </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- detail modal -->

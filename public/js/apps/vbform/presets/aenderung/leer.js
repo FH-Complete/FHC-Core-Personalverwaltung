@@ -4,7 +4,7 @@ export default {
   type: 'preset',
   guioptions: {
     id: 'leer',
-    label: 'Leer',
+    label: 'Leere Vorlage',
     description: 'Leere Vorlage. Alles muss manuell definiert werden.',
     for_vertragsart_kurzbz: []
   },

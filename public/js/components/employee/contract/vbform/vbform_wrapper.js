@@ -42,6 +42,16 @@ export default {
         </div>
         
     </template>
+        <template #footer>
+         <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
+              <div class="btn-group me-2" role="group" aria-label="Second group">
+                  <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
+              </div>
+               <div class="btn-group" role="group" aria-label="First group">
+                  <button class="btn btn-primary btn-sm float-end" @click="save">{{ getSaveButtonLabel }}</button>
+              </div>
+          </div>
+        </template>
   </Modal>
   `,
   props: [
@@ -221,6 +231,13 @@ export default {
   computed: {
       getTitle: function() {
           return this.title + (this.mode == 'aenderung' ? ' bearbeiten' : ' anlegen');
+      },
+    getSaveButtonLabel: function() {
+      if( this.store.mode === 'aenderung' ) {
+        return 'Änderung speichern';
+      } else {
+        return 'Dienstverhältnis anlegen';
       }
+    }
   }
 };
