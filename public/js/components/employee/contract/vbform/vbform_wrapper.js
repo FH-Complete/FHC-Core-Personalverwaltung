@@ -27,10 +27,7 @@ export default {
         <div class="row g-2 py-2">
 
           <div class="col-12">
-            <vbformhelper ref="vbformhelperRef" :preset="preset" 
-                @vbhjsonready="processJSON" 
-                @saved="handleSaved"
-                @validated="handleValidated"></vbformhelper>
+            <vbformhelper ref="vbformhelperRef" :preset="preset"></vbformhelper>
           </div>
 
         </div>
@@ -145,9 +142,6 @@ export default {
       var dv = JSON.parse(JSON.stringify(this.preset.dv));
       this.store.setDV(dv);
     },
-    processJSON: function(payload) {
-      this.vbhjson = payload;
-    },
     searchforvbs: function(data, child, preset) {
         for(const vb of data) {            
             if( child.guioptions.vertragsbestandteiltyp === 'vertragsbestandteil' + vb.vertragsbestandteiltyp_kurzbz ) {
@@ -187,6 +181,24 @@ export default {
             }
         }
     },
+    save: function() {
+      const payload = this.$refs['vbformhelperRef'].getPayload();
+      
+      const that = this;
+      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
+      .then((response) => {
+        that.handleSaved(response.data.data);
+      });
+    },
+    validate: function() {
+      const payload = this.$refs['vbformhelperRef'].getPayload();
+      
+      const that = this;
+      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
+      .then((response) => {
+        that.handleValidated(response.data.data);
+      });
+    },        
     handlePresetSelected: function(preset) {
       if( this.mode === 'aenderung' ) {
         var preset = JSON.parse(JSON.stringify(preset));
@@ -250,29 +262,31 @@ export default {
   },
   expose: ['showModal'],
   computed: {
-      getTitle: function() {
-          var suffix = '';
-          switch (this.mode) {
-              case 'korrektur':
-                  suffix = 'korrigieren';
-                  break;
-              case 'aenderung':
-                  suffix = 'bearbeiten';
-                  break;
-              case 'neuanlage':
-              default:
-                  suffix = 'anlegen';
-                  break;
-          }
-          
-          return this.title + ' ' + suffix;
-      },
+    getTitle: function() {
+        var suffix = '';
+        switch (this.mode) {
+            case 'korrektur':
+                suffix = 'korrigieren';
+                break;
+            case 'aenderung':
+                suffix = 'bearbeiten';
+                break;
+            case 'neuanlage':
+            default:
+                suffix = 'anlegen';
+                break;
+        }
+
+        return this.title + ' ' + suffix;
+    },
     getSaveButtonLabel: function() {
-      if( this.store.mode === 'aenderung' ) {
-        return 'Änderung speichern';
-      } else {
-        return 'Dienstverhältnis anlegen';
-      }
+        if( this.store.mode === 'aenderung' ) {
+            return 'Änderung speichern';
+        } else if ( this.store.mode === 'korrektur' ) {
+            return 'Korrektur speichern';
+        } else {
+            return 'Dienstverhältnis anlegen';
+        }
     }
   }
 };

@@ -7,7 +7,7 @@ export default {
   template: `
   <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []" :padleft="true"></infos>
   <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []" :padleft="true"></errors>
-  <div class="row pt-2">
+  <div class="row g-2">
     <div class="col-3 ps-5">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option value="" selected disabled>Gehaltstyp wählen</option>
