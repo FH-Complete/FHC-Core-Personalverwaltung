@@ -61,9 +61,6 @@ export default {
         this.errorcounts = {};
     }
   },
-  beforeUpdate: function() {
-    this.errorcounts = {};  
-  },
   data: function() {
     return {
       activetab: '',
