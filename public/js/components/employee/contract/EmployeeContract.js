@@ -69,8 +69,8 @@ export const EmployeeContract = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtByDV?dv_id=${dv_id}&d=${convert2UnixTS(date)}`;
         };
 
-        var dates = ["2013-06-14", "2019-06-14", "2021-04-13"],
-            salaries = [4711, 4800, 5000];
+        var dates = ["2013-06-14", "2019-2-1", "2019-06-30", "2019-07-1", "2021-04-13"],
+        salaries =  [4711,            4800,         4750,        5000,         5000];
         const chartOptions = {
 
             chart: {
@@ -96,7 +96,8 @@ export const EmployeeContract = {
                   // Format the date
                   formatter: function() {
                     return Highcharts.dateFormat('%d.%m.%Y', this.value);
-                  }
+                  },
+                  rotation: 45
                 },
                 tickPositioner: function() {
                   return dates.map(function(date) {
