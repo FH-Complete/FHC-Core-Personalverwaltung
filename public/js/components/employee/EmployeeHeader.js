@@ -316,7 +316,7 @@ export const EmployeeHeader = {
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
                     </div>
                     <EmployeeStatus></EmployeeStatus>
-                    </div>
+                   
                 </div>
              
             </div>

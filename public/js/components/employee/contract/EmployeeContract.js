@@ -384,16 +384,9 @@ export const EmployeeContract = {
                     </Toast>
                 </div>
 
-                <div class="d-md-flex bd-highlight pt-1">            
-                    <div class="flex-grow-1 bd-highlight">
-                        <div class="d-grid gap-2 d-md-flex ">
-                            <span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="col-md-12">
-                    <div class="d-flex justify-content-end">
+                    <div class="d-flex justify-content-end mb-2">
+                        <div class="me-2"><span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></div>
                         <div><span class="badge badge-sm bg-success me-1">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
                         <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
                     </div>
@@ -407,20 +400,22 @@ export const EmployeeContract = {
                                 weitere Aktionen
                             </DropDownButton>
                         </div>
-                    </div>
-                    <div class="d-flex align-items-end flex-column">  
-                        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
-                            <select  v-if="!isFetching" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
-                                <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
-                                    {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
-                                </option> 
-                            </select> 
-                            <div v-else style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
 
-                            <input type="date" style="max-width:130px;min-width:130px" class="form-control form-control-sm" 
-                                   id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
+                        <div class="d-flex align-items-end flex-column">  
+                            <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
+                                <select  v-if="!isFetching" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                                    <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
+                                        {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
+                                    </option> 
+                                </select> 
+                                <div v-else style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
+
+                                <input type="date" style="max-width:130px;min-width:130px" class="form-control form-control-sm" 
+                                    id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
+                            </div>
                         </div>
                     </div>
+                    
                 </div>           
                 <div class="row pt-md-2" v-if="dvList?.length">
 
