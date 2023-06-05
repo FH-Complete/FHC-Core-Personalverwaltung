@@ -448,7 +448,7 @@ class Api extends Auth_Controller
              */
             $gbtModel = $this->GBTModel;
             foreach ($data->retval as $dv) {
-                $gbt_data = $gbtModel->getCurrentGBTByDV($dv->dienstverhaeltnis_id);
+                $gbt_data = $gbtModel->getCurrentGBTByDV($dv->dienstverhaeltnis_id, time());
 
                 if (isSuccess($gbt_data))
                 {
@@ -1219,7 +1219,6 @@ class Api extends Auth_Controller
     function vertragByDV()
     {
         $dv_id = $this->input->get('dv_id', TRUE);
-        $stichtag = null;
 
         if (!is_numeric($dv_id))
         {
@@ -1227,11 +1226,21 @@ class Api extends Auth_Controller
             exit;
         }
 
+        $stichtag = $this->input->get('d', TRUE);
+
+        if ($stichtag== null)
+        {
+            $stichtag = time();
+        }
+
+        $date = DateTime::createFromFormat( 'U', $stichtag );
+        $datestring = $date->format("Y-m-d");
+
         $data = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
-			intval($dv_id), $stichtag);
+			intval($dv_id), $datestring);
 
         
-        return $this->outputJson($data);   
+        return $this->outputJson($data);
     }
 
     // ----------------------------------------

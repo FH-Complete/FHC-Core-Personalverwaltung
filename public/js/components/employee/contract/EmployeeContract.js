@@ -59,9 +59,9 @@ export const EmployeeContract = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/deleteDV?dv_id=${dv_id}`;
         };
 
-        const generateVertragEndpointURL = (dv_id) => {
+        const generateVertragEndpointURL = (dv_id, date) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}`;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}&d=${convert2UnixTS(date)}`;
         };
 
         const generateGBTEndpointURL = (dv_id, date) => {
@@ -141,8 +141,8 @@ export const EmployeeContract = {
             }
         }
 
-        const fetchVertrag = async (dv_id) => {
-            let urlVertrag = generateVertragEndpointURL(dv_id);
+        const fetchVertrag = async (dv_id, date) => {
+            let urlVertrag = generateVertragEndpointURL(dv_id, date);
             isFetching.value = true
             try {
                 const res = await fetch(urlVertrag);
@@ -209,7 +209,7 @@ export const EmployeeContract = {
         watch(
             currentDVID,
             (newVal) => {
-                fetchVertrag(newVal);
+                fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
             }
         )
@@ -341,11 +341,27 @@ export const EmployeeContract = {
             deleteDV(currentDVID.value).then(() => fetchData(route.params.uid));            
         }
 
+        const capitalize = (s) => {
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        }
+
+        const formatGBTGrund = (item) => {
+            if (!item) return ''
+            if (item.vertragsbestandteiltyp_kurzbz=='funktion') {
+                return item.fkt_beschreibung + '/' + (item.fb_bezeichnung!=null?item.fb_bezeichnung:'') + (item.org_bezeichnung!=null?item.org_bezeichnung:'')
+            } else if (item.vertragsbestandteiltyp_kurzbz=='freitext') {
+                return capitalize(item.freitexttyp_kurzbz) + '/' + item.freitext_titel
+            }
+            return capitalize(item.vertragsbestandteiltyp_kurzbz)
+        }
+
+        const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
+
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler,
             //dienstverhaeltnisDialogRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV,
-            currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler,
+            currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate,
             createDVDialog, updateDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
         }
     },
@@ -652,9 +668,9 @@ export const EmployeeContract = {
     
                                     <template v-for="(item, index) in gbtList"  >
 
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Grund (TBD)</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  >
+                                        <div class="col-md-3">
+                                            <label class="form-label" v-if="index==0" >Grund</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatGBTGrund(item)">                                            
                                         </div>
 
                                         <div class="col-md-2">
@@ -672,8 +688,8 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatNumber(item.betrag_val_decrypted)">
                                         </div>
 
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Valorisierung</label>
+                                        <div class="col-md-1">
+                                            <label class="form-label" v-if="index==0" >Val.</label>
                                             <div class="col-sm-8">
                                                 <input class="form-check-input" type="checkbox" :checked="item.valorisierung" disabled>
                                             </div>
@@ -681,7 +697,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Anmerkung</label>
-                                            
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="truncate(item.anmerkung)">
                                         </div>
 
                                     </template>
@@ -703,22 +719,25 @@ export const EmployeeContract = {
 
                                         <div class="col-md-3">
                                             <label class="form-label" >Freitexttyp</label>
+                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.freitexttyp_kurzbz" >
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <label class="form-label" >Titel</label>
                                             <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.titel" >
                                         </div>
 
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label  class="form-label" >Von</label>
                                             <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatDate(item.von)">
                                         </div>
 
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label class="form-label" >Bis</label>
                                             <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
 
-                                        <div class="col-md-3">
-                                            
-                                        </div>
+                                        
 
                                         <div class="col-md-9">
                                             <label class="form-label" >Text</label>
