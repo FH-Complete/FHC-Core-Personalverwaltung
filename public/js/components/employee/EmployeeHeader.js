@@ -66,7 +66,7 @@ export const EmployeeHeader = {
                 const abteilungUrl = `${full}/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
                 const resAbteilung = await fetch(abteilungUrl);
                 response = await resAbteilung.json();
-                employee.value = { ...employee.value, ...{ abteilung: response.retval[0] } };
+                employee.value = { ...employee.value, ...{ abteilung: response.retval } };
                 isFetching.value = false;
             } catch (error) {
                 console.log(error);
@@ -299,9 +299,12 @@ export const EmployeeHeader = {
                         <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
     
                         <div v-if="employee?.abteilung && !isFetching" class="mb-1 text-muted">
-                            <strong>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</strong> {{ employee?.abteilung?.bezeichnung }},
-                            <strong>Vorgesetzte(r) </strong> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id, employee?.abteilung?.supervisor?.uid)">{{ employee?.abteilung?.supervisor?.titelpre }} {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.nachname }}</a>
-                        </div>  
+                            <template v-for="(item, index) in employee?.abteilung">
+                                <strong>{{ item?.organisationseinheittyp_kurzbz }}</strong> {{ item?.bezeichnung }},
+                                <strong>Vorgesetzte(r) </strong> <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
+                                <br v-if="index < employee?.abteilung?.length - 1" />
+                            </template>    
+                            </div>  
                         <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>                
                         <div v-if="!isFetchingName" class="mb-1 text-muted">
                             <strong>Email</strong>&nbsp; 

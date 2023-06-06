@@ -566,19 +566,24 @@ class Api extends Auth_Controller
      */
     function personAbteilung()
     {
-        $uid = $this->input->get('uid', TRUE);        
+        $uid = $this->input->get('uid', TRUE);
 
         $data = $this->ApiModel->getPersonAbteilung($uid);
 
-        $dataSupervisor = $this->ApiModel->getLeitungOrg($data->retval[0]->oe_kurzbz);
+        // a single uid can be linked with departments in different orgs
+        // -> loop all departments and get superviser
+        foreach ($data->retval as $row) {
+            $dataSupervisor = $this->ApiModel->getLeitungOrg($row->oe_kurzbz);
 
-        if ($dataSupervisor->retval[0]->uid == $uid)
-        {
-            $dataSupervisor = $this->ApiModel->getLeitungOrg($data->retval[0]->oe_kurzbz);
+            // get supervisor if there is one (some departments do not have any)
+            if (count($dataSupervisor->retval)>0)
+            {
+                $row->supervisor = $dataSupervisor->retval[0];
+            }
+            
         }
-
-        $data->retval[0]->supervisor = $dataSupervisor->retval[0];
-        return $this->outputJson($data); 
+        
+        return $this->outputJson($data);
     }
 
     function uploadPersonEmployeeFoto()
