@@ -1,9 +1,11 @@
 import vbform_wrapper from './vbform/vbform_wrapper.js';
+import enddvmodal from './vbform/enddvmodal.js';
 import { DropDownButton } from '../../DropDownButton.js';
 
 export const EmployeeContract = {
     components: {
         'vbform_wrapper': vbform_wrapper,
+        'enddvmodal': enddvmodal,
         'DropDownButton': DropDownButton,
         "p-skeleton": primevue.skeleton,
     },
@@ -39,6 +41,10 @@ export const EmployeeContract = {
         const VbformWrapperRef = ref();
         const vbformmode = ref('neuanlage');
         const vbformDV = ref(null);
+        
+        const enddvmodalRef = ref();
+        const endDV = ref(null);
+        
         const numberFormat = new Intl.NumberFormat();
         const now = ref(new Date());
 
@@ -287,11 +293,36 @@ export const EmployeeContract = {
             vbformDV.value = currentDV.value;
             VbformWrapperRef.value.showModal();            
         }
-
+        
+        const endDVDialog = () => {
+            endDV.value = {
+                    dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
+                    unternehmen: currentDV.value.oe_kurzbz,
+                    vertragsart_kurzbz: currentDV.value.vertragsart_kurzbz,
+                    gueltigkeit: {
+                        guioptions: {
+                           sharedstatemode: 'ignore',
+                           disabled: [
+                               'gueltig_ab'
+                           ] 
+                        },
+                        data: {
+                            gueltig_ab: currentDV.value.von,
+                            gueltig_bis: currentDV.value.bis,
+                        }
+                    }
+                };
+            enddvmodalRef.value.showModal();            
+        }
+        
         const handleDvSaved = async () => {
             fetchData(route.params.uid);
         }
 
+        const handleDvEnded = async () => {
+            fetchData(route.params.uid);
+        }
+        
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
@@ -383,7 +414,8 @@ export const EmployeeContract = {
             //dienstverhaeltnisDialogRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum,
-            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
+            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
+            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded
         }
     },
     template: `
@@ -402,7 +434,7 @@ export const EmployeeContract = {
                     <div class="d-flex justify-content-end mb-2">
                         <div class="me-2"><span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></div>
                         <div v-if="!isCurrentDate"><span class="badge badge-sm bg-warning me-1">Anzeigedatum ist nicht aktueller Tag</span></div> 
-                        <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
+                        <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum</span></div> 
                         <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
                     </div>
                     <div class="d-flex">
@@ -411,7 +443,7 @@ export const EmployeeContract = {
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
                             <!-- Drop Down Button -->
-                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:dropdownLink1,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
+                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
                             </DropDownButton>
                         </div>
@@ -461,7 +493,7 @@ export const EmployeeContract = {
     
                                     <div class="col-md-4">
                                         <label for="organisation" class="col-sm-6 form-label">Organisation</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="currentDV.oe_bezeichnung" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentDV.oe_bezeichnung" >
                                     </div>
 
                                     <div class="col-md-4">
@@ -476,12 +508,12 @@ export const EmployeeContract = {
                                     <!-- von bis -->
                                     <div class="col-md-4">
                                         <label for="zeitraum_von" class="form-label" >Von</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(currentDV.von)" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.von)" >
                                     </div>
 
                                     <div class="col-md-4">
                                         <label for="zeitraum_bis" class="form-label" >Bis</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(currentDV.bis)" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.bis)" >
                                     </div>
 
                                     <div class="col-md-4">
@@ -500,12 +532,12 @@ export const EmployeeContract = {
                                         
                                         <div class="col-md-4">
                                             <label for="befristet_von" class="form-label" >Von</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(item.von)" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.von)" >
                                         </div>
 
                                         <div class="col-md-4">
                                             <label for="befristet_bis" class="form-label" >Bis</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(item.bis)" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.bis)" >
                                         </div>
 
                                         <div class="col-md-4">
@@ -698,22 +730,22 @@ export const EmployeeContract = {
 
                                         <div class="col-md-3">
                                             <label class="form-label" v-if="index==0" >Grund</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatGBTGrund(item)">                                            
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatGBTGrund(item)">                                            
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Gehaltstyp</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item?.gehaltstyp_bezeichnung">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item?.gehaltstyp_bezeichnung">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Betrag</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatNumber(item.grund_betrag_decrypted)">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatNumber(item.grund_betrag_decrypted)">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Betrag val.</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatNumber(item.betrag_val_decrypted)">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatNumber(item.betrag_val_decrypted)">
                                         </div>
 
                                         <div class="col-md-1">
@@ -725,7 +757,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Anmerkung</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="truncate(item.anmerkung)">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="truncate(item.anmerkung)">
                                         </div>
 
                                     </template>
@@ -747,29 +779,29 @@ export const EmployeeContract = {
 
                                         <div class="col-md-3">
                                             <label class="form-label" >Freitexttyp</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.freitexttyp_kurzbz" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.freitexttyp_kurzbz" >
                                         </div>
 
                                         <div class="col-md-5">
                                             <label class="form-label" >Titel</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.titel" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.titel" >
                                         </div>
 
                                         <div class="col-md-2">
                                             <label  class="form-label" >Von</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatDate(item.von)">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.von)">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label" >Bis</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="formatDate(item.bis)">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
 
                                         
 
                                         <div class="col-md-9">
                                             <label class="form-label" >Text</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.anmerkung">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
                                         </div>
 
                                     </template>
@@ -810,17 +842,17 @@ export const EmployeeContract = {
 
                                         <div class="col-md-4">
                                             <label class="form-label" v-if="index == 0" >Zuordnung</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.funktion_bezeichnung" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
                                         </div>
 
                                         <div class="col-md-4">
                                             <label class="form-label" v-if="index == 0">Abteilung</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.oe_bezeichnung">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.oe_bezeichnung">
                                         </div>
 
                                         <div class="col-md-4">
                                             <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
                                         </div>
 
                                     </template>
@@ -831,12 +863,12 @@ export const EmployeeContract = {
 
                                         <div class="col-md-4">
                                             <label class="form-label" v-if="index == 0" >Zuordnung</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="item.funktion_bezeichnung" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
                                         </div>
 
                                         <div class="col-md-4">
                                             <label class="form-label" v-if="index == 0">Abteilung</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext"  :value="item.oe_bezeichnung">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.oe_bezeichnung">
                                         </div>
 
                                         <div class="col-md-4">                                            
@@ -936,141 +968,7 @@ export const EmployeeContract = {
 
                     
                 </div>  <!-- row -->
-
-                <!--div class="col-lg-12">     
                 
-
-                    <br>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover table-striped tablesorter">
-                            <thead>
-                            <tr>
-                                <th>Von <i class="fa fa-sort"></i></th>
-                                <th>Bis <i class="fa fa-sort"></i></th>
-                                <th>Art <i class="fa fa-sort"></i></th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1.12.2015</td>
-                                    <td></td>
-                                    <td>Gehalt/Stunden</td>
-                                    <td>4711,00/38,5h</td>
-                                </tr>
-                                <tr>
-                                    <td>1.12.2015</td>
-                                    <td></td>
-                                    <td>Funktion</td>
-                                    <td>Disziplinär/Virtual Technologies & Sensor Systems</td>
-                                </tr>
-                                <tr>
-                                    <td>1.12.2015</td>
-                                    <td></td>
-                                    <td>Funktion</td>
-                                    <td>Fachlich/Virtual Technologies & Sensor Systems</td>
-                                </tr>
-                                <tr>
-                                    <td>1.12.2015</td>
-                                    <td></td>
-                                    <td>Standardkostenstelle</td>
-                                    <td>Disziplinär/Virtual Technologies & Sensor Systems</td>
-                                </tr>
-                                <tr>
-                                    <td>1.12.2015</td>
-                                    <td></td>
-                                    <td>LektorIn</td>
-                                    <td></td>
-                                </tr>
-                               
-
-                            </tbody>
-                        </table>
-                    </div >  
-
-                    <!-- div class="accordion" id="accordionExample">
-                        <div v-for="(item, index) in vertragList" class="accordion-item" :key="item.vertragsbestandteil_id">
-                            <h2 class="accordion-header" :id="'heading'+index">
-                            <button class="accordion-button" :class="{ 'collapsed': index !== 0 }" type="button" data-bs-toggle="collapse" :data-bs-target="'#collapse' + index" aria-expanded="true" :aria-controls="'collapse' + index">
-                                {{ formatDate(item.von) }} - {{ formatDate(item.bis) }} | {{ item.stundenausmass }}h
-                            </button>
-                            </h2>
-                            <div :id="'collapse' + index" class="accordion-collapse collapse" :aria-labelledby="'heading' + index" data-bs-parent="#accordionExample" :class="{ 'show': index === 0 }">
-                            <div class="accordion-body">
-                                
-                                <div class="row pt-md-4">
-
-                                    <div class="col">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Details</h5>
-                                            </div>
-                                            <div class="card-body" style="text-align:center">
-                                                    <table class="table table-bordered">
-                                                    <tbody>
-                                                        <tr><th scope="row">Zeitraum: </th><td>{{ formatDate(item.von) }} - {{ formatDate(item.bis) }}</td></tr>
-                                                        <tr><th scope="row">Lektor:</th><td>{{ item.lektor }}</td></tr>
-                                                        <tr><th scope="row">Art</th><td>{{ item.vertragsart_kurzbz }}</td></tr>
-                                                        <tr v-for="(salaryItem, salaryIndex) in item.gehaltsbestandteile" :key="salaryItem.gehaltsbestandteil_id">
-                                                            <th scope="row">{{ salaryItem.gehaltstyp_bezeichnung }}:</th><td>€ {{ new Intl.NumberFormat().format(parseFloat(salaryItem.betrag_valorisiert)) }}</td>
-                                                        </tr>
-                                                        <tr><th scope="row">Funktion:</th><td></td></tr>
-                                                    </tbody>
-                                                    </table>
-                                            </div>
-                                        </div>
-
-                                    </div>          
-
-                                    <div class="col">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Notizen</h5>
-                                            </div>
-                                            <div class="card-body" style="text-align:center">
-                                                ...
-                                            </div>
-                                        </div>
-
-                                        <br/>
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Dokumente</h5>
-                                            </div>
-                                            <div class="card-body" style="text-align:center">
-                                                    ...
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5 class="mb-0">Gehalt</h5>
-                                            </div>
-                                            <div class="card-body" style="text-align:center">
-                                                ...
-                                            </div>
-                                        </div>
-
-                                        
-                                    </div>
-
-                                </div>
-
-                               
-                            </div>
-                            </div>
-                        </div>
-                        
-                    </div -->
-
-                    
-                </div> <!--. row--> 
-                <br/>
-
-                
-
             </div>
         </div>
 
@@ -1087,7 +985,11 @@ export const EmployeeContract = {
         @dvsaved="handleDvSaved">
     </vbform_wrapper>
 
-
+    <enddvmodal 
+        ref="enddvmodalRef" 
+        :curdv="endDV"
+        @dvended="handleDvEnded">
+    </enddvmodal>
 
     `
 }

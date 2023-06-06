@@ -80,6 +80,7 @@ class Api extends Auth_Controller
                 'createEmployee' => Api::DEFAULT_PERMISSION,
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
                 'deleteDV'  => Api::DEFAULT_PERMISSION,
+				'endDV'  => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -1751,4 +1752,31 @@ EOSQL;
 			return;
 		}
 	}
+	
+    function endDV()
+    {
+        $payload = json_decode($this->input->raw_input_stream);
+
+        if (!is_numeric($payload->dienstverhaeltnisid))
+        {
+            $this->outputJsonError('invalid parameter dienstverhaeltnisid');
+            return;
+        }
+
+		if( !$payload->gueltigkeit->data->gueltig_bis ) 
+		{
+			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+            return;
+		}
+		
+        $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
+        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
+
+        if ( $ret !== TRUE) {
+            return $this->outputJsonError($ret);
+        }
+        
+        return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
+        
+    }
 }
