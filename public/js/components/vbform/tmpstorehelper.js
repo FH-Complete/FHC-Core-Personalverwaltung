@@ -24,7 +24,7 @@ export default {
                 <button class="btn btn-outline-secondary btn-sm float-end" @click="saveToTmpStore">Zwischenspeichern</button>
             </div>
             <div class="btn-group" role="group" aria-label="Third group">
-                <button class="btn btn-outline-secondary btn-sm float-end" @click="deleteFromTmpStore">Löschen</i></button>
+                <button class="btn btn-outline-secondary btn-sm float-end" @click="deleteFromTmpStore">Löschen</button>
             </div>
         </div>        
     </div>

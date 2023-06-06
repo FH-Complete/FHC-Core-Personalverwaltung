@@ -81,6 +81,10 @@ export default {
         this.gueltig_bis = this.sharedstate.gueltigkeit.gueltig_bis;
       }
     },
+    'config': function() {
+      this.setGUIOptionsFromConfig();
+      this.setDataFromConfig();        
+    }
   },
   methods: {
     setDataFromConfig: function() {
