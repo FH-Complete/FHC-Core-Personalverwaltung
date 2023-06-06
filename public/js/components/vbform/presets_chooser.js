@@ -41,7 +41,9 @@ export default {
   },
   watch: {
     'store.mode': function() {
-      this.selectmode();
+      this.$nextTick(() => {
+          this.selectmode();
+      });
     }
   },
   methods: {

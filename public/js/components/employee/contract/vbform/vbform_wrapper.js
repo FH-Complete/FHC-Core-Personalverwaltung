@@ -62,7 +62,47 @@ export default {
     return {
       vbhjson: presets,
       presets: presets,
-      preset: {
+      preset: null,
+      store: store
+    };
+  },
+  emits: [
+    "dvsaved"
+  ],
+  components: {
+    'presets_chooser': presets_chooser,
+    'debug_viewer': debug_viewer,
+    'vbformhelper': vbformhelper,
+    'Modal': Modal,
+    "tmpstorehelper": tmpstorehelper
+  },
+  created: function() {
+    this.resetStoreDV();
+    this.store.setMode(this.mode);
+    this.resetpreset();
+    this.store.mitarbeiter_uid = this.mitarbeiter_uid;
+  },
+  watch: {
+    changedModeOrCurDV: function(oldval, newval) {
+      this.resetTmpStoreHelper();
+      this.resetStoreDV();
+      if( oldval[0] === newval[0] ) {
+          this.$refs['presetchooserRef'].selectmode();
+      } else {
+        this.store.setMode(this.mode);
+      }
+    }
+  },
+  methods: {
+    resetStoreDV: function() {
+      if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
+        // TODO cleanup and remove again
+        store.dv.data = {};
+        store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+      }  
+    },
+    resetpreset: function() {
+        var preset = {
         type: 'preset',
         guioptions: {
 
@@ -78,41 +118,9 @@ export default {
           }
         },
         vbs: {}
-      },
-      store: store
-    };
-  },
-  emits: [
-    "dvsaved"
-  ],
-  components: {
-    'presets_chooser': presets_chooser,
-    'debug_viewer': debug_viewer,
-    'vbformhelper': vbformhelper,
-    'Modal': Modal,
-    "tmpstorehelper": tmpstorehelper
-  },
-  created: function() {
-    this.store.setMode(this.mode);
-    if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
-        // TODO cleanup and remove again
-        store.dv.data = {};
-        store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
-    }
-    this.presettostore();
-    this.store.mitarbeiter_uid = this.mitarbeiter_uid;
-  },
-  watch: {
-    'mode': function() {
-      this.store.setMode(this.mode);
-      if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
-        // TODO cleanup and remove again
-        store.dv.data = {};
-        store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
-      }
-    }
-  },
-  methods: {
+      };
+      this.presetselected(preset);
+    },
     presetselected: function(preset) {
       if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
         preset.dv.data.dienstverhaeltnisid = this.curdv.dienstverhaeltnis_id;
@@ -164,7 +172,6 @@ export default {
                     }
                 }
                 var vbgui = vbgb2gui.vb2gui(vb, this.store.mode, child);
-                console.log(JSON.stringify(vbgui, 2));
                 preset.vbs[vbgui.guioptions.id] = vbgui;
                 child.children.push(vbgui.guioptions.id);
             }
@@ -287,6 +294,12 @@ export default {
         } else {
             return 'Dienstverhältnis anlegen';
         }
+    },
+    changedModeOrCurDV: function() {
+        return [
+            this.mode,
+            this.curdv
+        ];
     }
   }
 };

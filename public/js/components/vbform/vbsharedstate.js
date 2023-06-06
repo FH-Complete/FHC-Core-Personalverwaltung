@@ -54,7 +54,11 @@ export default Vue.reactive({
       gueltig_ab: '',
       gueltig_bis: ''
     };
-    this.dv = {};
+    this.dv = {
+        data: {
+            vertragsart_kurzbz: ''
+        }
+    };
     this.vbs = {};
   }
 });
