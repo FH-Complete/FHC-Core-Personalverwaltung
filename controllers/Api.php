@@ -80,13 +80,14 @@ class Api extends Auth_Controller
                 'createEmployee' => Api::DEFAULT_PERMISSION,
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
                 'deleteDV'  => Api::DEFAULT_PERMISSION,
+                'gbtChartDataByDV' => Api::DEFAULT_PERMISSION
 			)
 		);
 
 
 		// Loads authentication library and starts authenticationfetc
 		$this->load->library('AuthLib');
-        $this->load->library('vertragsbestandteil/VertragsbestandteilLib', 
+        $this->load->library('vertragsbestandteil/VertragsbestandteilLib',
 			null, 'VertragsbestandteilLib');
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
@@ -493,6 +494,28 @@ class Api extends Auth_Controller
             $this->outputJson($gbt_data->retval);
         } else {
             $this->outputJsonError("Error when getting salary");
+        }
+        
+    }
+
+    function gbtChartDataByDV()
+    {
+        $dv_id = $this->input->get('dv_id', TRUE);
+
+        if (!is_numeric($dv_id))
+        {
+            $this->outputJsonError("dv_id is not numeric!'");
+            return;
+        }
+
+        $gbtModel = $this->GBTModel;
+        $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);
+
+        if (isSuccess($gbt_data))
+        {
+            $this->outputJson($gbt_data->retval);
+        } else {
+            $this->outputJsonError("Error when getting salary data for chart");
         }
         
     }

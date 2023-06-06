@@ -1,11 +1,14 @@
 import vbform_wrapper from './vbform/vbform_wrapper.js';
 import { DropDownButton } from '../../DropDownButton.js';
+import { ModalDialog } from '../../ModalDialog.js';
 
 export const EmployeeContract = {
     components: {
         'vbform_wrapper': vbform_wrapper,
         'DropDownButton': DropDownButton,
         "p-skeleton": primevue.skeleton,
+        "datepicker": VueDatePicker,
+        ModalDialog,
     },
     props: {
         writePermission: { type: Boolean, required: false },  // TODO needs change
@@ -17,6 +20,7 @@ export const EmployeeContract = {
         const dvList = ref([]);
         const vertragList = ref([]);
         const gbtList = ref([]);
+        const gbtChartData = ref([]);
         const isFetching = ref(false);
         const currentDVID = ref(null);
         const currentDV = ref(null);
@@ -43,7 +47,10 @@ export const EmployeeContract = {
         const now = ref(new Date());
 
         //const currentDate = ref();
-        const currentDate = Vue.ref(now.value);
+        const currentDate = ref(now.value);
+        const finishDVRef = ref();
+        const confirmDeleteDVRef = ref();
+        const finishDVDate = ref(new Date(now.value.getFullYear(), now.value.getMonth() + 1, 0));
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -70,9 +77,18 @@ export const EmployeeContract = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtByDV?dv_id=${dv_id}&d=${convert2UnixTS(date)}`;
         };
 
-        var dates = ["2013-06-14", "2019-2-1", "2019-06-30", "2019-07-1", "2021-04-13"],
-        salaries =  [4711,            4800,         4750,        5000,         5000];
-        const chartOptions = {
+        const generateGBTChartEndpointURL = (dv_id, date) => {
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtChartDataByDV?dv_id=${dv_id}`;
+        };
+
+        // dummy data for chart
+        // var dates = ["2013-06-14", "2019-2-1", "2019-06-30", "2019-07-1", "2021-04-13"],
+        // salaries =  [4711,            4800,         4750,        5000,         5000];
+        const dates = ref([]);
+        const salaries = ref([]);
+
+        const chartOptions = reactive({
 
             chart: {
                 type: 'line'
@@ -82,11 +98,7 @@ export const EmployeeContract = {
             },
             series: [{
                 name: 'Gesamtgehalt',
-                data: (function() {
-                    return dates.map(function(date, i) {
-                      return [Date.parse(date), salaries[i]];
-                    });
-                  })(),
+                data: [],
                 color: '#6fcd98',
                 step: 'left' // or 'center' or 'right'
                 },
@@ -101,7 +113,7 @@ export const EmployeeContract = {
                   rotation: 45
                 },
                 tickPositioner: function() {
-                  return dates.map(function(date) {
+                  return dates.value.map(function(date) {
                     return Date.parse(date);
                   });
                 }
@@ -114,7 +126,7 @@ export const EmployeeContract = {
             },
             
 
-        }
+        })
 
 
         const fetchData = async (uid) => {
@@ -177,6 +189,28 @@ export const EmployeeContract = {
             }
         }
 
+        // fetch chart data
+        const fetchGBTChartData = async (dv_id, date) => {
+            let urlGBT = generateGBTChartEndpointURL(dv_id);
+            isFetching.value = true
+            try {
+                const res = await fetch(urlGBT);
+                let response = await res.json();
+                isFetching.value = false;
+                gbtChartData.value = response;
+                let tempData = [];
+                // chartOptions.series[0].data.length = 0;
+                response.forEach(element => {
+                   tempData.push([element.von, parseFloat(element.summe)]);
+                });
+                chartOptions.series[0].data = tempData;
+
+            } catch (error) {
+                console.log(error)
+                isFetching.value = false
+            }
+        }
+
         const deleteDV = async (dv_id) => {
             let url = generateDVDeleteEndpointURL(dv_id);
             isFetching.value = true
@@ -189,6 +223,14 @@ export const EmployeeContract = {
                 console.log(error)
                 isFetching.value = false
             }
+        }
+
+        const finishDV = async () => {
+            const ok = await finishDVRef.value.show();
+            if (ok) {
+            console.log("ok=", ok);
+            //currentValue.value = preservedValue.value;
+            } 
         }
 
         const activeDV = computed(() => {            
@@ -222,6 +264,7 @@ export const EmployeeContract = {
             (newVal) => {
                 fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
+                fetchGBTChartData(newVal);
             }
         )
 
@@ -305,6 +348,10 @@ export const EmployeeContract = {
             currentDate.value = new Date(currentDV.value.bis);
         }
 
+        const setDate2VonDatum = () => {
+            currentDate.value = new Date(currentDV.value.von);
+        }
+
         const getCurrentVertragsbestandteil = () => {
             let zuordnung = [];
             let taetigkeit = [];
@@ -381,8 +428,9 @@ export const EmployeeContract = {
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler,
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
-            currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum,
+            confirmDeleteDVRef, finishDVRef, finishDV,
+            VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate, finishDVDate,
+            currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
         }
     },
@@ -411,19 +459,19 @@ export const EmployeeContract = {
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
                             <!-- Drop Down Button -->
-                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:dropdownLink1,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
+                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:finishDV,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
                             </DropDownButton>
                         </div>
 
                         <div class="d-flex align-items-end flex-column">  
                             <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
-                                <select  v-if="!isFetching" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
+                                <select  v-if="!isFetching && dvList?.length>0" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
                                     <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
                                         {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
                                     </option> 
                                 </select> 
-                                <div v-else style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
+                                <div v-else-if="isFetching" style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
 
                                 <input type="date" style="max-width:130px;min-width:130px" class="form-control form-control-sm" 
                                     id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
@@ -439,6 +487,13 @@ export const EmployeeContract = {
                             <span v-if="currentDV.bis != null">
                                 Anzeigedatum auf letztgültiges Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
+                                    <i class="fa fa-pen"></i> Datum setzen
+                                </button>
+                                
+                            </span>
+                            <span v-else-if="currentDV.von != null">
+                                Anzeigedatum auf Von-Datum des Dienstverhältnisses setzen: &nbsp;
+                                <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2VonDatum">
                                     <i class="fa fa-pen"></i> Datum setzen
                                 </button>
                                 
@@ -461,7 +516,7 @@ export const EmployeeContract = {
     
                                     <div class="col-md-4">
                                         <label for="organisation" class="col-sm-6 form-label">Organisation</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="currentDV.oe_bezeichnung" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentDV.oe_bezeichnung" >
                                     </div>
 
                                     <div class="col-md-4">
@@ -476,12 +531,12 @@ export const EmployeeContract = {
                                     <!-- von bis -->
                                     <div class="col-md-4">
                                         <label for="zeitraum_von" class="form-label" >Von</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(currentDV.von)" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.von)" >
                                     </div>
 
                                     <div class="col-md-4">
                                         <label for="zeitraum_bis" class="form-label" >Bis</label>
-                                        <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(currentDV.bis)" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.bis)" >
                                     </div>
 
                                     <div class="col-md-4">
@@ -500,12 +555,12 @@ export const EmployeeContract = {
                                         
                                         <div class="col-md-4">
                                             <label for="befristet_von" class="form-label" >Von</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(item.von)" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.von)" >
                                         </div>
 
                                         <div class="col-md-4">
                                             <label for="befristet_bis" class="form-label" >Bis</label>
-                                            <input type="text" readonly class="form-control-sm" class="form-control-plaintext" :value="formatDate(item.bis)" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.bis)" >
                                         </div>
 
                                         <div class="col-md-4">
@@ -1087,7 +1142,23 @@ export const EmployeeContract = {
         @dvsaved="handleDvSaved">
     </vbform_wrapper>
 
+    <ModalDialog title="Dienstverhältnis beenden" ref="finishDVRef">
+        <template #body>
+            Dienstverhältnis mit folgendem Datum abschließen:
+            <datepicker v-model="finishDVDate"
+                v-bind:enable-time-picker="false"
+                v-bind:placeholder="'Datum'"
+                locale="de"
+                format="dd.MM.yyyy"
+                ></datepicker>
+        </template>
+    </ModalDialog>
 
+    <ModalDialog title="Warnung" ref="confirmDeleteDVRef">
+        <template #body>
+            Dienstverhältnis wirklich löschen?
+        </template>
+    </ModalDialog>
 
     `
 }
