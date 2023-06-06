@@ -40,9 +40,10 @@ export const EmployeeContract = {
         const vbformmode = ref('neuanlage');
         const vbformDV = ref(null);
         const numberFormat = new Intl.NumberFormat();
+        const now = ref(new Date());
 
         //const currentDate = ref();
-        const currentDate = Vue.ref(new Date());
+        const currentDate = Vue.ref(now.value);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -198,8 +199,17 @@ export const EmployeeContract = {
             })
         })
 
-        
+        const isCurrentDVActive = computed(() => {
+            if (currentDV.value == null) return false;
+            let von = new Date(currentDV.value.von);
+            let bis = currentDV.value.bis != null ? new Date(currentDV.value.bis) : null;
+            return von <= currentDate.value && (bis == null || bis >= currentDate.value);
+        })
 
+        const isCurrentDate = computed(() => {
+            return currentDate.value == now.value
+        })
+        
         fetchData(route.params.uid);
         watch(
             () => route.params.uid,
@@ -291,6 +301,10 @@ export const EmployeeContract = {
             currentDate.value = new Date(d.target.value);
         }
 
+        const setDate2BisDatum = () => {
+            currentDate.value = new Date(currentDV.value.bis);
+        }
+
         const getCurrentVertragsbestandteil = () => {
             let zuordnung = [];
             let taetigkeit = [];
@@ -367,8 +381,8 @@ export const EmployeeContract = {
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler,
             //dienstverhaeltnisDialogRef,
-            VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV,
-            currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate,
+            VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
+            currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, currentDate, chartOptions
         }
     },
@@ -387,6 +401,7 @@ export const EmployeeContract = {
                 <div class="col-md-12">
                     <div class="d-flex justify-content-end mb-2">
                         <div class="me-2"><span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></div>
+                        <div v-if="!isCurrentDate"><span class="badge badge-sm bg-warning me-1">Anzeigedatum ist nicht aktueller Tag</span></div> 
                         <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
                         <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
                     </div>
@@ -416,8 +431,21 @@ export const EmployeeContract = {
                         </div>
                     </div>
                     
-                </div>           
-                <div class="row pt-md-2" v-if="dvList?.length">
+                </div>      
+                
+                <div class="row justify-content-center pt-md-2" v-if="!isCurrentDVActive && dvList?.length">
+                        <div class="alert alert-warning mt-3" role="alert">
+                            Dienstverhältnis ist zum ausgewählten Datum inaktiv.
+                            <span v-if="currentDV.bis != null">
+                                Anzeigedatum auf letztgültiges Datum des Dienstverhältnisses setzen: &nbsp;
+                                <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
+                                    <i class="fa fa-pen"></i> Datum setzen
+                                </button>
+                                
+                            </span>
+                        </div>
+                </div>
+                <div class="row pt-md-2" v-if="isCurrentDVActive && dvList?.length">
 
                     <div class="col">
                         <div class="card">
