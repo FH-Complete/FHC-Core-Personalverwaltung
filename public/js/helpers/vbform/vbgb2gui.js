@@ -63,11 +63,13 @@ export default {
       if( bt.von === null || bt.von === ''  ) {
         return false;
       }
+/*
       var von = new Date(bt.von);
       von.setHours(0, 0, 0, 0);
       if( von > this.getToday() ) {
         return false;
       }
+*/
       return true;
     }
     return false;

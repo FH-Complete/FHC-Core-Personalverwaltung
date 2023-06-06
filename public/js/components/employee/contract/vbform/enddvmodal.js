@@ -59,10 +59,10 @@ export default {
     },
     handleDVEnded: function(resp) {
       if( resp.error > 0 ) {
-        this.errors.push(resp.retval);
+        this.errors = [resp.retval];
         this.infos = [];
       } else {
-        this.infos.push(resp.retval);
+        this.infos = [resp.retval];
         this.errors = [];
       }
       this.$emit('dvended', this.curdv);  
