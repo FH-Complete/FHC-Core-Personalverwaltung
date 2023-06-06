@@ -387,7 +387,7 @@ export const EmployeeContract = {
                 <div class="col-md-12">
                     <div class="d-flex justify-content-end mb-2">
                         <div class="me-2"><span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></div>
-                        <div><span class="badge badge-sm bg-success me-1">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
+                        <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum<span v-if="dvList"></span></div> 
                         <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
                     </div>
                     <div class="d-flex">
