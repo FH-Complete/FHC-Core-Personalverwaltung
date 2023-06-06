@@ -267,7 +267,9 @@ export const EmployeeContract = {
             currentDate,
             (newDate) => {
                 console.log('watch newDate=', newDate)
+                fetchVertrag(currentDVID.value, newDate);
                 fetchGBT(currentDVID.value, newDate)
+                fetchGBTChartData(currentDVID.value);
             }
         )
 
