@@ -208,9 +208,7 @@ export default {
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "ignore",
-          disabled: [
-            'gueltig_bis'
-          ]
+          disabled: []
         }
       }
     }
