@@ -265,7 +265,8 @@ export default {
             errors: [],
             disabled: [
               'gehaltstyp'
-            ]
+            ],
+            removeable: true
           },
           data: {
             gehaltstyp: 'grundgehalt',
@@ -304,7 +305,8 @@ export default {
             removeable: false,
             disabled: [
               'gehaltstyp'
-            ]
+            ],
+            removeable: true
           },
           data: {
             gehaltstyp: 'zulage',

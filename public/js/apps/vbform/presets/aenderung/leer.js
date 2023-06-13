@@ -56,6 +56,14 @@ export default {
     {
       type: 'vertragsbestandteillist',
       guioptions: {
+        title: 'Urlaubsanspruch',
+        vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
+      },
+      children: []
+    },
+    {
+      type: 'vertragsbestandteillist',
+      guioptions: {
         title: 'Arbeitszeit',
         vertragsbestandteiltyp: 'vertragsbestandteilstunden'
       },

@@ -230,7 +230,8 @@ export default {
             errors: [],
             disabled: [
               'gehaltstyp'
-            ]
+            ],
+            removeable: true
           },
           data: {
             gehaltstyp: 'basisgehalt',
@@ -263,11 +264,12 @@ export default {
     [uuid.get_uuidbyname('test2')]: {
       type: 'vertragsbestandteilfunktion',
       guioptions: {
-        id: uuid.get_uuidbyname('test2')
+        id: uuid.get_uuidbyname('test2'),
+        removeable: true
       },
       data: {
-        funktion: 'Leitung',
-        oe_kurzbz: 'core'
+        funktion: 'Mitarbeiter',
+        oe_kurzbz: ''
       },
       gbs: []
     },
