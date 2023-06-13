@@ -1051,7 +1051,8 @@ export const EmployeeContract = {
     </enddvmodal>
 
     <OffCanvasTimeline
-        ref="offCanvasRef">
+        ref="offCanvasRef"
+        :curdv="currentDV">
     </OffCanvasTimeline>
     `
 }

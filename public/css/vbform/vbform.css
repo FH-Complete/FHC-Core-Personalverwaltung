@@ -19,3 +19,11 @@
         height: 100%;
     }
 }
+
+.vertragshistorie .p-timeline-event-opposite {
+    display: none;
+}
+
+.vertragshistorie.offcanvas-end {
+    width: 500px;
+}
