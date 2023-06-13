@@ -2,6 +2,7 @@ import vbform_wrapper from './vbform/vbform_wrapper.js';
 import enddvmodal from './vbform/enddvmodal.js';
 import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
+import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 
 export const EmployeeContract = {
     components: {
@@ -11,6 +12,7 @@ export const EmployeeContract = {
         "p-skeleton": primevue.skeleton,
         "datepicker": VueDatePicker,
         ModalDialog,
+        OffCanvasTimeline,
     },
     props: {
         writePermission: { type: Boolean, required: false },  // TODO needs change
@@ -54,6 +56,8 @@ export const EmployeeContract = {
 
         const currentDate = ref(now.value);
         const confirmDeleteDVRef = ref();
+
+        const offCanvasRef = ref();
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -348,6 +352,10 @@ export const EmployeeContract = {
                 };
             enddvmodalRef.value.showModal();            
         }
+
+        const showOffCanvas = () => {
+            offCanvasRef.value.show();
+        }
         
         const handleDvSaved = async () => {
             fetchData(route.params.uid);
@@ -448,11 +456,11 @@ export const EmployeeContract = {
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         return {
-            isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, 
+            isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, offCanvasRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate, 
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
-            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded
+            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas
         }
     },
     template: `
@@ -480,9 +488,10 @@ export const EmployeeContract = {
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
                             <!-- Drop Down Button -->
-                            <DropDownButton  :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
+                            <DropDownButton class="me-2" :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
                             </DropDownButton>
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="showOffCanvas()">Vertragshistorie</button>
                         </div>
 
                         <div class="d-flex align-items-end flex-column">  
@@ -1040,5 +1049,9 @@ export const EmployeeContract = {
         :curdv="endDV"
         @dvended="handleDvEnded">
     </enddvmodal>
+
+    <OffCanvasTimeline
+        ref="offCanvasRef">
+    </OffCanvasTimeline>
     `
 }

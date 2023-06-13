@@ -1,6 +1,6 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
-export const TimelineCard = {
+export const OffCanvasTimeline = {
      components: {
         "p-timeline": primevue.timeline,
      },
@@ -12,7 +12,9 @@ export const TimelineCard = {
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Timeline");
-        const currentUID = Vue.toRefs(props).uid        
+        const currentUID = Vue.toRefs(props).uid      
+        let offCanvasEle = Vue.ref(null);
+        let thisOffCanvasObj;  
 
         const formatDate = (ds) => {
             var d = new Date(ds);
@@ -61,8 +63,19 @@ export const TimelineCard = {
 		}
 
         Vue.onMounted(() => {
-          //  fetchCurrentDV();
+            thisOffCanvasObj = new bootstrap.Offcanvas(offCanvasEle.value);
         })
+
+        const show = () => {
+            thisOffCanvasObj.show();
+        }
+        function hide() {
+            thisOffCanvasObj.hide();
+        }
+        function toggle() {
+            thisOffCanvasObj.toggle();
+        }
+        Vue.defineExpose({ show, hide, toggle});
 
         Vue.watch(
 			currentUID,
@@ -80,19 +93,21 @@ export const TimelineCard = {
         ]
       
         return {
-            courseData, isFetching, formatDate, currentSemester, title, currentUID, events,
+            courseData, isFetching, formatDate, currentSemester, title, currentUID, events, offCanvasEle, show, hide, toggle,
         }
      },
      template: `
-     <div class="card">
-        <div class="card-header">
-            <h5 class="mb-0">{{ title }}</h5>
-                echter DV
-            </div>
-            <div class="card-body" style="text-align:center">
+     <div class="offcanvas offcanvas-end" 
+        ref="offCanvasEle"
+        tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+        <div class="offcanvas-header">
+            <h5 id="offcanvasRightLabel">Vertragshistorie</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
                 <p-timeline :value="events">
                     <template #content="slotProps">
-                        {{slotProps.item.status}} <h4>Test</h4>
+                        {{slotProps.item.status}} 
                     </template>
                     <template #opposite="slotProps">
                         <small class="p-text-secondary">{{slotProps.item.date}}</small>
