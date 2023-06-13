@@ -108,7 +108,7 @@ export const OffCanvasTimeline = {
                     label = 'Zeitaufzeichnung';
                     break;
                 case 'urlaubsanspruch':
-                    label = 'urlaubsanspruch';
+                    label = 'Urlaubsanspruch';
                     break;
                 case 'kuendigungsfrist':
                     label = 'Kündigungsfrist';
@@ -251,11 +251,11 @@ export const OffCanvasTimeline = {
                                                     {{ bestandteil.vbs.titel }}
                                                 </template>
                                                 <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='urlaubsanspruch'">
-                                                    {{ bestandteil.vbs.tage }}
+                                                    {{ bestandteil.vbs.tage }} Tage
                                                 </template>
                                                 <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='kuendigungsfrist'">
-                                                    AG: {{ bestandteil.vbs.arbeitgeber_frist }}<br/>
-                                                    AN: {{ bestandteil.vbs.arbeitnehmer_frist }}
+                                                    AG: {{ bestandteil.vbs.arbeitgeber_frist }} Wochen<br/>
+                                                    AN: {{ bestandteil.vbs.arbeitnehmer_frist }} Wochen
                                                 </template>
                                                 
                                             </div>
