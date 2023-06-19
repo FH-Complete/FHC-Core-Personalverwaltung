@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
+
 
 /**
  * Dienstverhältnisse with type "echterdv" should have Vertragsbestandteil with type "stunden".
@@ -19,10 +19,12 @@ class PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0003 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
+		$this->_ci->load->library(
+			'extensions/FHC-Core-Personalverwaltung/issues/plausichecks/EchteDienstverhaeltnisseOhneStundenVertragsbestandteil'
+		);
 
 		// check if issue persists
-		$checkRes = $this->_ci->personalverwaltungplausichecklib->getEchteDienstverhaeltnisseOhneStundenVertragsbestandteil(
+		$checkRes = $this->_ci->echtedienstverhaeltnisseohnestundenvertragsbestandteil->getEchteDienstverhaeltnisseOhneStundenVertragsbestandteil(
 			$params['issue_person_id'],
 			$params['dienstverhaeltnis_id']
 		);

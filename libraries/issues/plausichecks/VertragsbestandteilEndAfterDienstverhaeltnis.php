@@ -3,7 +3,6 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once APPPATH.'libraries/issues/plausichecks/PlausiChecker.php';
-require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
 
 /**
  * Vertragsbestandteil end should not be after Dienstverhaeltnis end.
@@ -12,14 +11,13 @@ class VertragsbestandteilEndAfterDienstverhaeltnis extends PlausiChecker
 {
 	public function executePlausiCheck($params)
 	{
-		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
 		$results = array();
 
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 		$vertragsbestandteil_id = isset($params['vertragsbestandteil_id']) ? $params['vertragsbestandteil_id'] : null;
 
 		// get employee data
-		$result = $this->_ci->personalverwaltungplausichecklib->getVertragsbestandteilEndAfterDienstverhaeltnis($person_id, $vertragsbestandteil_id);
+		$result = $this->getVertragsbestandteilEndAfterDienstverhaeltnis($person_id, $vertragsbestandteil_id);
 
 		// If error occurred then return the error
 		if (isError($result)) return $result;
@@ -41,5 +39,47 @@ class VertragsbestandteilEndAfterDienstverhaeltnis extends PlausiChecker
 		}
 
 		return success($results);
+	}
+
+	/**
+	 * Bis Datum of Vertragsbestandteil shouldn't be after Dienstverhaeltnis end.
+	 * @param person_id
+	 * @param vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
+	 * @return success with data or error
+	 */
+	public function getVertragsbestandteilEndAfterDienstverhaeltnis($person_id = null, $vertragsbestandteil_id = null)
+	{
+		$params = array();
+
+		$qry = "
+			SELECT
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+			WHERE
+				dv.bis IS NOT NULL -- null means 'unlimited' with no end.
+				AND (vtb.bis > dv.bis OR vtb.bis IS NULL)
+			";
+
+		if (isset($person_id))
+		{
+			$qry .= " AND ben.person_id = ?";
+			$params[] = $person_id;
+		}
+
+		if (isset($vertragsbestandteil_id))
+		{
+			$qry .= " AND vtb.vertragsbestandteil_id = ?";
+			$params[] = $vertragsbestandteil_id;
+		}
+
+		$qry .= "
+			ORDER BY
+				person_id, dienstverhaeltnis_id, vertragsbestandteil_id";
+
+		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
 }

@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
+
 
 /**
  * Vertragsbestandteil start should not be before Dienstverhaeltnis start.
@@ -19,10 +19,10 @@ class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0001 implements IIssueResolvedCheck
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
+		$this->_ci->load->library('extensions/FHC-Core-Personalverwaltung/issues/plausichecks/VertragsbestandteilStartBeforeDienstverhaeltnis');
 
 		// check if issue persists
-		$checkRes = $this->_ci->personalverwaltungplausichecklib->getVertragsbestandteilStartBeforeDienstverhaeltnis(
+		$checkRes = $this->_ci->vertragsbestandteilstartbeforedienstverhaeltnis->getVertragsbestandteilStartBeforeDienstverhaeltnis(
 			$params['issue_person_id'],
 			$params['vertragsbestandteil_id']
 		);

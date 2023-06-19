@@ -2,7 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-require_once APPPATH.'extensions/FHC-Core-Personalverwaltung/libraries/issues/PersonalverwaltungPlausicheckLib.php';
+
 
 /**
  * Vertragsbestandteile of type "freitext" should not overlap.
@@ -22,10 +22,10 @@ class PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0004 implements IIssueResolvedCheck
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('PersonalverwaltungPlausicheckLib');
+		$this->_ci->load->library('extensions/FHC-Core-Personalverwaltung/issues/plausichecks/UeberlappendeFreitextVertragsbestandteile');
 
 		// check if issue persists
-		$checkRes = $this->_ci->personalverwaltungplausichecklib->getUeberlappendeFreitextVertragsbestandteile(
+		$checkRes = $this->_ci->ueberlappendefreitextvertragsbestandteile->getUeberlappendeFreitextVertragsbestandteile(
 			$params['issue_person_id'],
 			$params['erste_vertragsbestandteil_id'],
 			$params['zweite_vertragsbestandteil_id']
