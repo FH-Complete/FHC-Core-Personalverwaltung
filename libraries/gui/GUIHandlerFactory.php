@@ -7,6 +7,7 @@ require_once __DIR__ .'/GUIVertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ .'/GUIVertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ .'/GUIVertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ .'/GUIVertragsbestandteilFreitext.php';
+require_once __DIR__ .'/GUIVertragsbestandteilKarenz.php';
 require_once __DIR__ .'/GUIGehaltsbestandteil.php';
 
 class GUIHandlerFactory {
@@ -38,6 +39,9 @@ class GUIHandlerFactory {
                 break;
             case GUIVertragsbestandteilFreitext::TYPE_STRING:
                 $handler = new GUIVertragsbestandteilFreitext();
+                break;
+            case GUIVertragsbestandteilKarenz::TYPE_STRING:
+                $handler = new GUIVertragsbestandteilKarenz();
                 break;
 			case GUIGehaltsbestandteil::TYPE_STRING:
 				$handler = new GUIGehaltsbestandteil();

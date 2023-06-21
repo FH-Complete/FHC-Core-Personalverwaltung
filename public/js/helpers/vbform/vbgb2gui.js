@@ -26,6 +26,9 @@ export default {
           case 'funktion':
               this.funktion2gui(vb, mode);
               break;
+          case 'karenz':
+              this.karenz2gui(vb, mode);
+              break;
           case 'kuendigungsfrist':
               this.kuendigungsfrist2gui(vb, mode);
               break;
@@ -58,6 +61,14 @@ export default {
     }
     return this.today;
   },
+  isFuture: function(bt) {
+    var von = new Date(bt.von);
+    von.setHours(0, 0, 0, 0);
+    if( von > this.getToday() ) {
+      return true;
+    }
+    return false;
+  },
   isEndable: function(bt) {    
     if ( this.store.mode === 'aenderung' ) {
       if( bt.von === null || bt.von === ''  ) {
@@ -82,9 +93,7 @@ export default {
       if( bt.von === null || bt.von === ''  ) {
         return false;  
       }
-      var von = new Date(bt.von);
-      von.setHours(0, 0, 0, 0);
-      if( von > this.getToday() ) {
+      if( this.isFuture(bt) ) {
         return true;
       }
     }
@@ -92,7 +101,10 @@ export default {
   },
   gueltigkeit2gui: function(bt, mode) {
       var disabled = [];
-      if( this.isEndable(bt) ) {
+      var endable = (bt.vertragsbestandteiltyp_kurzbz !== 'karenz') 
+                  ? this.isEndable(bt) 
+                  : false;
+      if( endable || (mode === 'aenderung' && !this.isFuture(bt)) ) {
           disabled = [
             'gueltig_ab'
           ];
@@ -101,7 +113,7 @@ export default {
           guioptions: {
               sharedstatemode: 'ignore',
               disabled: disabled,
-              endable: this.isEndable(bt)
+              endable: endable
           },
           data: {
               gueltig_ab: bt.von,
@@ -161,6 +173,21 @@ export default {
       }
       if( vb.benutzerfunktiondata.funktion_kurzbz.match('zuordnung') ) {
           this.vbout.guioptions.canhavegehaltsbestandteile = false;
+      }
+  },
+  karenz2gui: function(vb, mode) {
+      this.vbout.type = 'vertragsbestandteilkarenz';
+      this.vbout.data = {
+          id: vb.vertragsbestandteil_id,
+          karenztyp_kurzbz: vb.karenztyp_kurzbz,
+          geplanter_geburtstermin: vb.geplanter_geburtstermin,
+          tatsaechlicher_geburtstermin: vb.tatsaechlicher_geburtstermin,
+          gueltigkeit: this.gueltigkeit2gui(vb, mode)
+      };
+      if( this.isEndable(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'karenztyp_kurzbz'
+        ];
       }
   },
   kuendigungsfrist2gui: function(vb, mode) {

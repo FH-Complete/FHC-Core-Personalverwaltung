@@ -74,6 +74,14 @@ export default {
                 vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
               },
               children: []
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Karenz',
+                vertragsbestandteiltyp: 'vertragsbestandteilkarenz'
+              },
+              children: []
             }
           ]
         },

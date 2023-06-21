@@ -64,6 +64,14 @@ export default {
     {
       type: 'vertragsbestandteillist',
       guioptions: {
+        title: 'Karenz',
+        vertragsbestandteiltyp: 'vertragsbestandteilkarenz'
+      },
+      children: []
+    },
+    {
+      type: 'vertragsbestandteillist',
+      guioptions: {
         title: 'Arbeitszeit',
         vertragsbestandteiltyp: 'vertragsbestandteilstunden'
       },

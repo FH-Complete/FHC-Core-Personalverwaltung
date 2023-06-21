@@ -54,8 +54,8 @@ class GUIVertragsbestandteilKarenz extends AbstractGUIVertragsbestandteil
             $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
              // merge
             $vbs->setKarenztypKurzbz($this->data['karenztyp_kurzbz']);
-            $vbs->setGeburtstermin(string2Date($this->data['tatsaechlicher_geburtstermin']));
-            $vbs->setGeburtsterminGeplant(string2Date($this->data['geplanter_geburtstermin']));            
+            $vbs->setTatsaechlicherGeburtstermin(string2Date($this->data['tatsaechlicher_geburtstermin']));
+            $vbs->setGeplanterGeburtstermin(string2Date($this->data['geplanter_geburtstermin']));            
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {
@@ -65,8 +65,8 @@ class GUIVertragsbestandteilKarenz extends AbstractGUIVertragsbestandteil
             $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
             
             $data->karenztyp_kurzbz = $this->data['karenztyp_kurzbz'];
-            $data->geplanter_geburtstermin = $this->data['geplanter_geburtstermin'];
-            $data->tatsaechlicher_geburtstermin = $this->data['tatsaechlicher_geburtstermin'];
+            $data->geplanter_geburtstermin = string2Date($this->data['geplanter_geburtstermin']);
+            $data->tatsaechlicher_geburtstermin = string2Date($this->data['tatsaechlicher_geburtstermin']);
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_KARENZ;
             
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);            
