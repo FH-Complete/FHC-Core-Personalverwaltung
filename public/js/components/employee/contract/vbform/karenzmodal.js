@@ -6,7 +6,8 @@ import infos from '../../../vbform/infos.js';
 
 export default {
   template: `
-    <Modal :title="'Karenz verwalten'" :noscroll="true" ref="modalRef" id="karenzModal">
+    <Modal :title="'Karenz verwalten'" :noscroll="true" ref="modalRef" 
+           :class="'vbformModal'" id="karenzModal">
         <template #body>
             <infos :infos="(infos !== undefined) ? infos : []"></infos>
             <errors :errors="(errors !== undefined) ? errors : []"></errors>

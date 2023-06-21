@@ -10,8 +10,7 @@
 
 @media (min-width: 992px) {
 
-    #vbFormWrapper .modal-lg,
-    #endDvModal .modal-lg {
+    .vbformModal .modal-lg {
         max-width: 70%;
     }
     

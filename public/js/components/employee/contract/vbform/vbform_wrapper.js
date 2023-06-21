@@ -9,7 +9,8 @@ import vbgb2gui from '../../../../helpers/vbform/vbgb2gui.js';
 
 export default {
   template: `
-    <Modal :title="getTitle" ref="modalRef" id="vbformModal">
+    <Modal :title="getTitle" ref="modalRef" 
+           :class="'vbformModal'" id="vbformModal">
         <template #body>
     
         <div class="row g-2 py-2">
