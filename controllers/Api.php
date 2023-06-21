@@ -81,7 +81,9 @@ class Api extends Auth_Controller
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
                 'deleteDV'  => Api::DEFAULT_PERMISSION,
                 'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
-				'endDV'  => Api::DEFAULT_PERMISSION
+				'endDV'  => Api::DEFAULT_PERMISSION,
+				'saveKarenz'  => Api::DEFAULT_PERMISSION,
+				'getKarenztypen' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -115,6 +117,7 @@ class Api extends Auth_Controller
 		$this->load->model('ressource/Funktion_model', 'FunktionModel');
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
         // get CI for transaction management
         $this->CI = &get_instance();
     }
@@ -1802,4 +1805,44 @@ EOSQL;
         return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
         
     }
+	
+	
+    function saveKarenz()
+    {
+        $payload = json_decode($this->input->raw_input_stream);
+
+        if (!is_numeric($payload->id))
+        {
+            $this->outputJsonError('invalid parameter vertragsbestandteil_id');
+            return;
+        }
+		// TODO implement
+/*		
+        $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
+        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
+*/
+        if ( $ret !== TRUE) {
+            return $this->outputJsonError($ret);
+        }
+        
+        return $this->outputJsonSuccess('Karenz gespeichert');
+    }
+	
+	public function getKarenztypen()
+	{		
+		$this->KarenztypModel->resetQuery();
+		$this->KarenztypModel->addSelect('karenztyp_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
+		$this->KarenztypModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->KarenztypModel->load();
+		if( hasData($rows) ) 
+		{
+			$this->outputJson($rows);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no karenz types found');
+			return;
+		}
+	}
 }

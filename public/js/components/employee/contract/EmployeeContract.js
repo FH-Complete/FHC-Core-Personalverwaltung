@@ -1,5 +1,6 @@
 import vbform_wrapper from './vbform/vbform_wrapper.js';
 import enddvmodal from './vbform/enddvmodal.js';
+import karenzmodal from './vbform/karenzmodal.js';
 import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
@@ -8,6 +9,7 @@ export const EmployeeContract = {
     components: {
         'vbform_wrapper': vbform_wrapper,
         'enddvmodal': enddvmodal,
+        'karenzmodal': karenzmodal,
         'DropDownButton': DropDownButton,
         "p-skeleton": primevue.skeleton,
         "datepicker": VueDatePicker,
@@ -50,6 +52,9 @@ export const EmployeeContract = {
         
         const enddvmodalRef = ref();
         const endDV = ref(null);
+
+        const karenzmodalRef = ref();
+        const curKarenz = ref(null);
         
         const numberFormat = new Intl.NumberFormat();
         const now = ref(new Date());
@@ -353,6 +358,32 @@ export const EmployeeContract = {
             enddvmodalRef.value.showModal();            
         }
 
+        const karenzDialog = () => {
+            curKarenz.value = {
+                    type: 'vertragsbestandteilkarenz',
+                    guioptions: {
+                        id: 'test'
+                    },
+                    data: {
+                        id: null,
+                        karenztyp_kurzbz: '',
+                        geplanter_geburtstermin: '',
+                        tatsaechlicher_geburtstermin: '',
+                        gueltigkeit: {
+                            guioptions: {
+                               sharedstatemode: 'ignore',
+                               disabled: [] 
+                            },
+                            data: {
+                                gueltig_ab: '',
+                                gueltig_bis: '',
+                            }
+                        }
+                    }
+                };
+            karenzmodalRef.value.showModal();            
+        }
+
         const showOffCanvas = () => {
             offCanvasRef.value.show();
         }
@@ -365,6 +396,11 @@ export const EmployeeContract = {
             fetchData(route.params.uid);
         }
         
+        const handleKarenzSaved = async () => {
+            // TODO do something sensible
+            console.log('Karenz saved');
+        }
+
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
@@ -460,7 +496,8 @@ export const EmployeeContract = {
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate, 
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
-            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas
+            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas,
+            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved
         }
     },
     template: `
@@ -488,7 +525,7 @@ export const EmployeeContract = {
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
                             <!-- Drop Down Button -->
-                            <DropDownButton class="me-2" :links="[{action:dropdownLink1,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
+                            <DropDownButton class="me-2" :links="[{action:karenzDialog,text:'Karenz'},{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
                             </DropDownButton>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="showOffCanvas()">Vertragshistorie</button>
@@ -1054,5 +1091,11 @@ export const EmployeeContract = {
         ref="offCanvasRef"
         :curdv="currentDV">
     </OffCanvasTimeline>
+    
+    <karenzmodal 
+        ref="karenzmodalRef" 
+        :curkarenz="curKarenz"
+        @karenzsaved="handleKarenzSaved">
+    </karenzmodal>
     `
 }
