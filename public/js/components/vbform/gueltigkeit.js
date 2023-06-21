@@ -9,6 +9,7 @@ export default {
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
         v-bind:placeholder="'gültig ab'"
+        auto-apply 
         locale="de"
         format="dd.MM.yyyy"
         model-type="yyyy-MM-dd"></datepicker>
@@ -17,6 +18,7 @@ export default {
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
         v-bind:placeholder="'gültig bis'"
+        auto-apply 
         locale="de"
         format="dd.MM.yyyy"
         model-type="yyyy-MM-dd"></datepicker>

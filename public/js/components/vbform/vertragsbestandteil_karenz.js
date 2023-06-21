@@ -37,6 +37,7 @@ export default {
           locale="de"
           format="dd.MM.yyyy"
           model-type="yyyy-MM-dd" 
+          auto-apply 
           class="me-2"></datepicker>      
         <datepicker v-model="tatsaechlicher_geburtstermin" 
           :disabled="isinputdisabled('tatsaechlicher_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
@@ -44,6 +45,7 @@ export default {
           v-bind:placeholder="'tatsaechlicher Geburtstermin'"
           locale="de"
           format="dd.MM.yyyy"
+          auto-apply 
           model-type="yyyy-MM-dd"></datepicker>        
       </div>
       <div class="col">
