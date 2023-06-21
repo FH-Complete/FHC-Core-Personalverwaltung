@@ -42,6 +42,7 @@ const pvApp = Vue.createApp({
 		const kontakttyp = Vue.ref([]);
 		const adressentyp = Vue.ref([]);
 		const sachaufwandtyp  = Vue.ref([]);
+		const karenztypen = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
@@ -53,6 +54,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("kontakttyp",kontakttyp);
 		Vue.provide("adressentyp",adressentyp);
 		Vue.provide("sachaufwandtyp",sachaufwandtyp);
+		Vue.provide("karenztypen",karenztypen);
 
 		fetchSprache().then((r) => {
 			sprache.value = r;
@@ -85,6 +87,10 @@ const pvApp = Vue.createApp({
 
 		fetchSachaufwandTyp().then((r) => {
 			sachaufwandtyp.value = r;
+		})
+
+		fetchKarenztypen().then((r) => {
+			karenztypen.value = r;
 		})
 
 	}
@@ -137,6 +143,13 @@ const fetchOrte = async () => {
 		'extensions/FHC-Core-Personalverwaltung/api/getOrte');
 	return CoreRESTClient.getData(res.data);
 }
+const fetchKarenztypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getKarenztypen');
+	return CoreRESTClient.getData(res.data);
+}
+
+
 
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});

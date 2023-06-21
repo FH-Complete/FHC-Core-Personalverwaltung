@@ -44,6 +44,7 @@ export const EmployeeContract = {
             befristung: [],
             urlaubsanspruch: [],
             zusatzvereinbarung: [],
+            karenz: [],
         });
         //const dienstverhaeltnisDialogRef = ref();
         const VbformWrapperRef = ref();
@@ -63,6 +64,8 @@ export const EmployeeContract = {
         const confirmDeleteDVRef = ref();
 
         const offCanvasRef = ref();
+
+        const karenztypen = Vue.inject('karenztypen');
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -428,6 +431,7 @@ export const EmployeeContract = {
             let befristung = [];
             let urlaubsanspruch = [];
             let zusatzvereinbarung = [];
+            let karenz = [];
             vertragList.value.forEach(vbs => {
                 if (vbs.vertragsbestandteiltyp_kurzbz == 'funktion') {
                     if (vbs.benutzerfunktiondata.funktion_kurzbz.match(/.*zuordnung/)) {
@@ -451,6 +455,8 @@ export const EmployeeContract = {
                     urlaubsanspruch.push(vbs);
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'zeitaufzeichnung') {
                     zeitaufzeichnung.push(vbs);
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'karenz') {
+                    karenz.push(vbs);
                 }
             });
             currentVBS.funktion.zuordnung = zuordnung;
@@ -462,6 +468,7 @@ export const EmployeeContract = {
             currentVBS.befristung = befristung;
             currentVBS.zusatzvereinbarung = zusatzvereinbarung;
             currentVBS.urlaubsanspruch = urlaubsanspruch;
+            currentVBS.karenz = karenz;
 
 
         }
@@ -489,6 +496,11 @@ export const EmployeeContract = {
             return capitalize(item.vertragsbestandteiltyp_kurzbz)
         }
 
+        const formatKarenztyp = (item) => {
+            let karenztyp = karenztypen.value.find(kt => kt.value == item);
+            return karenztyp != undefined ? karenztyp.label : item;
+        }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         return {
@@ -497,7 +509,7 @@ export const EmployeeContract = {
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas,
-            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved
+            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp
         }
     },
     template: `
@@ -911,6 +923,42 @@ export const EmployeeContract = {
                                 <h5 class="mb-0">Karenz</h5>
                             </div>
                             <div class="card-body" style="text-align:center">
+
+                                <form  class="row g-3" v-if="currentDV != null">
+        
+                                    <template v-for="(item, index) in currentVBS.karenz"  >
+
+                                        <div class="col-md-3">
+                                            <label class="form-label" v-if="index==0" >Karenztyp</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatKarenztyp(item.karenztyp_kurzbz)">                                            
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Von</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.von)">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Bis</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Geplanter Geb.termin</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.geplanter_geburtstermin)">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Tats. Geb.termin</label>
+                                            <input  readonly class="form-control-sm form-control-plaintext" type="text" :value="formatDate(item.tatsaechlicher_geburtstermin)" >
+                                        </div>
+
+
+                                    </template>
+
+                                </form>
+
+
                             </div>
                         </div>
                         <br/>
