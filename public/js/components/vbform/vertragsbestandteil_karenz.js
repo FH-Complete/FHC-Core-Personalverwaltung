@@ -9,8 +9,8 @@ export default {
   <div class="py-2" :class="vbcssclasses">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config.guioptions.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config.guioptions.errors : []"></errors>
-    <div class="row g-4">
-      <div class="col">
+    <div class="row g-2 py-2">
+      <div class="col-4">
         <select v-model="karenztyp_kurzbz" :disabled="isinputdisabled('karenztyp_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.karenztypen"
@@ -21,34 +21,41 @@ export default {
           </option>
         </select>
       </div>
+      <div class="col-3">
+        &nbsp;
+      </div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
-      <div class="col-2">
+      <div class="col-1">
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>        
       </div>
     </div>
-    <div class="row g-4">
-      <div class="col input-group input-group-sm">
-        <datepicker v-model="geplanter_geburtstermin" 
-          :disabled="isinputdisabled('geplanter_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
-          v-bind:enable-time-picker="false"
-          v-bind:placeholder="'geplanter Geburtstermin'"
-          locale="de"
-          format="dd.MM.yyyy"
-          model-type="yyyy-MM-dd" 
-          auto-apply 
-          class="me-2"></datepicker>      
-        <datepicker v-model="tatsaechlicher_geburtstermin" 
-          :disabled="isinputdisabled('tatsaechlicher_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
-          v-bind:enable-time-picker="false"
-          v-bind:placeholder="'tatsaechlicher Geburtstermin'"
-          locale="de"
-          format="dd.MM.yyyy"
-          auto-apply 
-          model-type="yyyy-MM-dd"></datepicker>        
+    <div class="row g-2 py2">
+      <div class="col-6">
+        <div class="input-group input-group-sm">
+            <datepicker v-model="geplanter_geburtstermin" 
+              :disabled="isinputdisabled('geplanter_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
+              v-bind:enable-time-picker="false"
+              v-bind:placeholder="'geplanter Geburtstermin'"
+              six-weeks="center"
+              locale="de"
+              format="dd.MM.yyyy"
+              model-type="yyyy-MM-dd" 
+              auto-apply 
+              class="me-2"></datepicker>      
+            <datepicker v-model="tatsaechlicher_geburtstermin" 
+              :disabled="isinputdisabled('tatsaechlicher_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
+              v-bind:enable-time-picker="false"
+              v-bind:placeholder="'tatsaechlicher Geburtstermin'"
+              six-weeks="center"
+              locale="de"
+              format="dd.MM.yyyy"
+              auto-apply 
+              model-type="yyyy-MM-dd"></datepicker>
+        </div>
       </div>
-      <div class="col">
+      <div class="col-6">
         &nbsp;
       </div>
     </div>
