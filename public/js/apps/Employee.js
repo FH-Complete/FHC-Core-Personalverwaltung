@@ -43,6 +43,7 @@ const pvApp = Vue.createApp({
 		const adressentyp = Vue.ref([]);
 		const sachaufwandtyp  = Vue.ref([]);
 		const karenztypen = Vue.ref([]);
+		const vertragsarten = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
@@ -55,6 +56,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("adressentyp",adressentyp);
 		Vue.provide("sachaufwandtyp",sachaufwandtyp);
 		Vue.provide("karenztypen",karenztypen);
+		Vue.provide("vertragsarten",vertragsarten);
 
 		fetchSprache().then((r) => {
 			sprache.value = r;
@@ -91,6 +93,10 @@ const pvApp = Vue.createApp({
 
 		fetchKarenztypen().then((r) => {
 			karenztypen.value = r;
+		})
+
+		fetchVertragsarten().then((r) => {
+			vertragsarten.value = r;
 		})
 
 	}
@@ -146,6 +152,11 @@ const fetchOrte = async () => {
 const fetchKarenztypen = async () => {
 	const res = await CoreRESTClient.get(
 		'extensions/FHC-Core-Personalverwaltung/api/getKarenztypen');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchVertragsarten = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getVertragsarten');
 	return CoreRESTClient.getData(res.data);
 }
 

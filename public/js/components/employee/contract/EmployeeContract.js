@@ -21,7 +21,7 @@ export const EmployeeContract = {
     },
     setup() {
 
-        const { watch, ref, reactive, computed } = Vue;
+        const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
         const dvList = ref([]);
         const vertragList = ref([]);
@@ -66,6 +66,7 @@ export const EmployeeContract = {
         const offCanvasRef = ref();
 
         const karenztypen = Vue.inject('karenztypen');
+        const vertragsarten = inject('vertragsarten');
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -501,6 +502,11 @@ export const EmployeeContract = {
             return karenztyp != undefined ? karenztyp.label : item;
         }
 
+        const formatVertragsart = (item) => {
+            let va = vertragsarten.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+          }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         return {
@@ -509,7 +515,7 @@ export const EmployeeContract = {
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas,
-            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp
+            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart
         }
     },
     template: `
@@ -547,7 +553,7 @@ export const EmployeeContract = {
                             <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
                                 <select  v-if="!isFetching && dvList?.length>0" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
                                     <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
-                                        {{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
+                                    {{ formatVertragsart(item.vertragsart_kurzbz) }}/{{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
                                     </option> 
                                 </select> 
                                 <div v-else-if="isFetching" style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
@@ -601,7 +607,7 @@ export const EmployeeContract = {
                                     <div class="col-md-4">
                                         <label for="dvArt" class="col-sm-6 form-label">Vertragsart</label>
                                         <div class="col-sm-12">
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="currentDV.vertragsart_kurzbz">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="formatVertragsart(currentDV.vertragsart_kurzbz)">
                                         </div>
                                     </div>
 
@@ -922,13 +928,13 @@ export const EmployeeContract = {
                             <div class="card-header">
                                 <h5 class="mb-0">Karenz</h5>
                             </div>
-                            <div class="card-body" style="text-align:center">
+                            <div class="card-body" style="text-align:left">
 
                                 <form  class="row g-3" v-if="currentDV != null">
         
                                     <template v-for="(item, index) in currentVBS.karenz"  >
 
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label class="form-label" v-if="index==0" >Karenztyp</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatKarenztyp(item.karenztyp_kurzbz)">                                            
                                         </div>
