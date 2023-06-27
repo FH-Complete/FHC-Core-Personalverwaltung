@@ -56,9 +56,11 @@ export const EmployeeContract = {
 
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
+
+        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
         
         const numberFormat = new Intl.NumberFormat();
-        const now = ref(new Date());
+        const now = ref(truncateDate(new Date()));
 
         const currentDate = ref(now.value);
         const confirmDeleteDVRef = ref();
@@ -72,6 +74,8 @@ export const EmployeeContract = {
             let d = new Date(ds);
             return Math.round(d.getTime() / 1000)
         }
+
+        
 
         const generateDVEndpointURL = (uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -257,7 +261,7 @@ export const EmployeeContract = {
         })
 
         const isCurrentDate = computed(() => {
-            return currentDate.value == now.value
+            return currentDate.value.getTime() == now.value.getTime()
         })
         
         fetchData(route.params.uid);
@@ -301,11 +305,16 @@ export const EmployeeContract = {
                 return ''
             }
         }
+        
 
         const formatDateISO = (ds) => {
+            let padNum = (n) => {
+                if (n<10) return '0' + n;
+                return n;
+            }
             if (ds == null) return '';
             var d = new Date(ds);
-            return d?.toISOString().substring(0,10);
+            return d.getFullYear() + "-" + padNum((d.getMonth()+1)) + "-" + padNum(d.getDate());
         }
 
         const filterVertragsbestandteil = (vertragsbestandteile, kurzbz) => {
@@ -411,7 +420,8 @@ export const EmployeeContract = {
 
         const setDateHandler = (d) => {
             console.log('date set: ', d);
-            currentDate.value = new Date(d.target.value);
+            //currentDate.value = truncateDate(new Date(d));
+            currentDate.value = truncateDate(new Date(d.target.value));
         }
 
         const setDate2BisDatum = () => {

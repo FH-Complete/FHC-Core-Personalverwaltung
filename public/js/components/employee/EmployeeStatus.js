@@ -11,11 +11,17 @@ export const EmployeeStatus = {
         const currentDate = ref(new Date());
         const isFetching = ref(false);   
         const vertragsarten = inject('vertragsarten');
+        const karenztypen = inject('karenztypen');
         
         const formatVertragsart = (item) => {
           let va = vertragsarten.value.find(kt => kt.value == item);
           return va != undefined ? va.label : item;
         }
+
+        const formatKarenztyp = (item) => {
+          let karenztyp = karenztypen.value.find(kt => kt.value == item);
+          return karenztyp != undefined ? karenztyp.label : item;
+      }
 
         /*let statusList = Vue.ref([{text:'Fix',description:'fixangestellt'}, 
             {text:'Befristet',description:'befristet bis 30.6.2023'}, 
@@ -51,9 +57,20 @@ export const EmployeeStatus = {
           }
           console.log("dvIDs", dvIDs)
           Promise.all(dvIDs.map((dvID) => Vue.$fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
-            axios.spread((...allData) => {
+            (allData) => {
+              allData.map((item) => {
+                item.data.data.map((vbs => {
+                  if (vbs.freitexttyp_kurzbz != undefined && vbs.freitexttyp_kurzbz == 'befristung') {
+                    statusList.value.push({text: 'Befristung', description: ''})
+                  } else if (vbs.karenztyp_kurzbz != undefined) {
+                    statusList.value.push({text: formatKarenztyp(vbs.karenztyp_kurzbz), description: ''})
+                  }
+                }))
+              })
+            }
+            /*axios.spread((...allData) => {
               console.log({ allData });
-            })
+            })*/
           );
 
           
