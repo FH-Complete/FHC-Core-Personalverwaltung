@@ -1609,6 +1609,23 @@ EOSQL;
 		return;
 	}
 	
+	public function getCurrentVBs($dvid) 
+	{
+		$today = new DateTime('now', new DateTimeZone('Europe/Vienna'));
+		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
+			$dvid, 
+			$today->format('Y-m-d'), 
+			$this->VertragsbestandteilLib::DO_NOT_INCLUDE_FUTURE);
+		
+		$this->outputJson(
+			array(
+				'data' => $vbs,
+				'meta' => array()
+			)
+		);
+		return;
+	}
+	
 	public function getCurrentAndFutureVBs($dvid, $typ=null) 
 	{
 		$today = new DateTime('now', new DateTimeZone('Europe/Vienna'));
