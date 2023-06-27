@@ -68,6 +68,7 @@ class Api extends Auth_Controller
 				'getContractFunctions' => Api::DEFAULT_PERMISSION,
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
 				'saveVertrag' => Api::DEFAULT_PERMISSION,
+				'getCurrentVBs' => Api::DEFAULT_PERMISSION,
 				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
 				'getAllVBs' => Api::DEFAULT_PERMISSION,
 				'storeToTmpStore' => Api::DEFAULT_PERMISSION,
