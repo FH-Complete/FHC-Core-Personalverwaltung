@@ -28,10 +28,6 @@ export const EmployeeStatus = {
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPerson?uid=${uid}`;
         };
         
-        const generateVertragEndpointURL = (dv_id, date) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}&d=${convert2UnixTS(date)}`;
-        };
 
         const convert2UnixTS = (ds) => {
           let d = new Date(ds);
@@ -54,6 +50,13 @@ export const EmployeeStatus = {
             statusList.value.unshift({text: 'parallele DV', description:''});
           }
           console.log("dvIDs", dvIDs)
+          Promise.all(dvIDs.map((dvID) => Vue.$fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
+            axios.spread((...allData) => {
+              console.log({ allData });
+            })
+          );
+
+          
           
         }
 
