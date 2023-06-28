@@ -43,6 +43,7 @@ export const EmployeeStatus = {
         const generateStatusList = () => {
           let anzDV = 0;
           let dvIDs = [];
+          statusList.value = [];
           dvList.value.forEach((dv) => {
              let von = new Date(dv.von);
              let bis = dv.bis != null ? new Date(dv.bis) : null;
