@@ -18,7 +18,7 @@ export const EmployeePerson = {
     setup() {
 
         const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(null);
+        const currentPersonID = Vue.ref(0);
         const currentPersonUID = Vue.ref(null);
         const items = ["base", "employee", "contact", "bank", "material"];
         const activeItem = Vue.ref("base");
@@ -36,16 +36,19 @@ export const EmployeePerson = {
         Vue.watch(
 			() => route.params,
 			params => {
-				currentPersonID.value = params.id;
+				currentPersonID.value = parseInt(params.id);
                 currentPersonUID.value = params.uid;
 			}
 		)
 
+        currentPersonID.value = parseInt(route.params.id);
+        currentPersonUID.value = route.params.uid;
+/*
         Vue.onMounted(() => {
-            currentPersonID.value = route.params.id;
+            currentPersonID.value = parseInt(route.params.id);
             currentPersonUID.value = route.params.uid;
         })
-
+*/
         return { items, isActive, setActive, currentPersonID, currentPersonUID }
 
     },

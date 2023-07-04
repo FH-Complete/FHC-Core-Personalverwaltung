@@ -9,7 +9,7 @@ export default {
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
         v-bind:placeholder="'gültig ab'"
-        six-weeks="center"
+        six-weeks
         auto-apply 
         locale="de"
         format="dd.MM.yyyy"
@@ -19,7 +19,7 @@ export default {
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
         v-bind:placeholder="'gültig bis'"
-        six-weeks="center"
+        six-weeks
         auto-apply 
         locale="de"
         format="dd.MM.yyyy"

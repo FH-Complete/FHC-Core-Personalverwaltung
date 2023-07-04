@@ -32,13 +32,7 @@ export const EmployeeStatus = {
         const generateDVEndpointURL = (uid) => {
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPerson?uid=${uid}`;
-        };
-        
-
-        const convert2UnixTS = (ds) => {
-          let d = new Date(ds);
-          return Math.round(d.getTime() / 1000)
-        }
+        };      
 
         const generateStatusList = () => {
           let anzDV = 0;
@@ -69,29 +63,9 @@ export const EmployeeStatus = {
                 }))
               })
             }
-            /*axios.spread((...allData) => {
-              console.log({ allData });
-            })*/
           );
-
           
-          
-        }
-
-        const fetchVBS = async(dv_id) => {
-          let urlVertrag = generateVertragEndpointURL(dv_id);
-          isFetching.value = true
-          try {
-            const res = await fetch(urlVertrag);
-            const response = await res.json();            
-            isFetching.value = false;
-            return response.retval;              
-          } catch (error) {
-            console.log(error)
-            isFetching.value = false
-          }
-
-        }
+        }  
 
         const fetchData = async (uid) => {
           if (uid == null) {

@@ -40,7 +40,7 @@ export default {
 		watch(
 			() => route.params,
 			params => {
-				currentPersonID.value = params.id;
+				currentPersonID.value = parseInt(params.id);
 				currentPersonUID.value = params.uid;	
 				console.log('*** EmployeeHome params changed', currentPersonID.value);
 			}
@@ -178,12 +178,6 @@ export default {
 			router.push(url);
 		}
 
-		//personSelectedRef.callback = personSelectedHandler;
-
-		const closeEditorHandler = () => {
-			//isEditorOpen.value=false;
-		}
-
 		const openCreateWizard = () => {
 			createWizardRef.value.showModal().then((action) => {
 				console.log('create wizard closed. action: ', action);
@@ -304,7 +298,6 @@ export default {
 
 		return {
 			personSelectedHandler,
-			closeEditorHandler,
 			newSideMenuEntryHandler,
 			searchfunction,
 			selectRecordHandler,
@@ -350,7 +343,7 @@ export default {
         <div class="container-fluid">
             <div class="row">
                 
-            <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+            <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-3">
                         
@@ -383,7 +376,7 @@ export default {
                         </div>
                     </template>
                     <template #bottom>
-                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :personuid="currentPersonUID" :open="isEditorOpen" @person-selected="(e) => personSelectedHandler(e.person_id, e.uid, e.date)" @close-editor="closeEditorHandler"></employee-editor>
+                        <employee-editor  v-if="currentPersonID!=null" :personid="currentPersonID" :personuid="currentPersonUID" :open="isEditorOpen" @person-selected="(e) => personSelectedHandler(e.person_id, e.uid, e.date)" ></employee-editor>
                     </template>
                 </verticalsplit> 
                             

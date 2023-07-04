@@ -11,6 +11,7 @@ export const CreateEmployeeFrm = {
     props: {
         defaultval: { type: Object, required: false },
     },
+    expose: [ 'save', 'reset'],
     setup( props ) {
 
         const router = VueRouter.useRouter();
@@ -178,7 +179,6 @@ export const CreateEmployeeFrm = {
 			router.push(url);            
 		}
 
-        Vue.defineExpose({ save, reset, })
 
         return { 
             createEmployeeFrm, 

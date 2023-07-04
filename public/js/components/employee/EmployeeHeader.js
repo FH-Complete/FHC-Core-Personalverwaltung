@@ -15,6 +15,7 @@ export const EmployeeHeader = {
         personID: Number,
         personUID: String,
     },
+    emits: ['personSelected'],
     setup(props, { emit }) {
 
         const route = VueRouter.useRoute();
@@ -95,7 +96,6 @@ export const EmployeeHeader = {
             currentDate,
             (newVal) => {
                 console.log('header date changed: ', newVal);
-                emit('dateChanged', newVal);
             }
         )
 

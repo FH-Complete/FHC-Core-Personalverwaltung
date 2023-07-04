@@ -14,6 +14,7 @@ export default {
         open: Boolean,
         isNew:  Boolean,
     },
+    emits: ['personSelected'],
     setup( props, {emit }) {
 
         const router = VueRouter.useRouter();
@@ -55,8 +56,8 @@ export default {
         return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate }
     },
     template: `    
-        <EmployeeHeader   :personID="personid" :personUID="personuid" @person-selected="redirect" @date-changed="dateChanged" :edit-mode="true" ></EmployeeHeader> 
-        <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID" :edit-mode="true" ></EmployeeNav> 
+        <EmployeeHeader   :personID="personid" :personUID="personuid" @person-selected="redirect"   ></EmployeeHeader> 
+        <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
         <router-view></router-view>       
     `
 }

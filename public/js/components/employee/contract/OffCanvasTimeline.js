@@ -8,7 +8,8 @@ export const OffCanvasTimeline = {
         uid: String,
         curdv: Object,
      },
-     setup( props ) {
+     //expose: ['show', 'hide', 'toggle'],
+     setup( props, { expose } ) {
 
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
@@ -70,7 +71,7 @@ export const OffCanvasTimeline = {
         })
 
         function show() {
-            Vue.$fhcapi.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
+            Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
                     .then((response) => {
                         console.log(response);
                         events.value = generateTimeline(response.data.data);
@@ -84,7 +85,6 @@ export const OffCanvasTimeline = {
         function toggle() {
             thisOffCanvasObj.toggle();
         }
-        Vue.defineExpose({ show, hide, toggle});
 
         function getFreitextLabel(freitexttyp) {
             const freitexttypMap = {
@@ -202,6 +202,8 @@ export const OffCanvasTimeline = {
             {status: 'Valorisierung (1,5%), Gehalt: € 3150', date: '1/9/2021', icon: 'pi pi-shopping-cart', color: '#FF9800'},
             {status: 'Eintritt, Gehalt: € 3045', date: '16/10/2020', icon: 'pi pi-check', color: '#607D8B'}
         ]*/
+
+        expose({show, hide, toggle});
 
         return {
             courseData, isFetching, formatDate, formatNumber, currentSemester, title, currentUID, events, offCanvasEle, show, hide, toggle,

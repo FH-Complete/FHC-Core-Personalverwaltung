@@ -38,7 +38,7 @@ export default {
               :disabled="isinputdisabled('geplanter_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'geplanter Geburtstermin'"
-              six-weeks="center"
+              six-weeks
               locale="de"
               format="dd.MM.yyyy"
               model-type="yyyy-MM-dd" 
@@ -48,7 +48,7 @@ export default {
               :disabled="isinputdisabled('tatsaechlicher_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'tatsaechlicher Geburtstermin'"
-              six-weeks="center"
+              six-weeks
               locale="de"
               format="dd.MM.yyyy"
               auto-apply 

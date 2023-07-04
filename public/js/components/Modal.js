@@ -4,6 +4,7 @@ export const Modal = {
         title: String,
         noscroll: Boolean
     },
+    expose: ['show', 'hide'],
     setup(props, { emit }) {
        
         let modalEle = Vue.ref(null);
@@ -18,7 +19,6 @@ export const Modal = {
         function hide() {
             thisModalObj.hide();
         }
-        Vue.defineExpose({ show, hide});
 
         return { modalEle, show, hide };
     },

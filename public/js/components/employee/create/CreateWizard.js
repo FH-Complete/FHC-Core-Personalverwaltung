@@ -15,6 +15,7 @@ export const CreateWizard = {
     props: {
         
     },
+    expose: ['showModal'],
     setup( props ) {
 
         // Modal 
@@ -125,9 +126,7 @@ export const CreateWizard = {
 
         };
 
-        
-        Vue.defineExpose({ showModal });
-
+    
         return { modalRef, stepsRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
             okHandler,cancelHandler, currentValue, showCreateHandler, getSelectedTitle,
             searchCriteriaHandler };

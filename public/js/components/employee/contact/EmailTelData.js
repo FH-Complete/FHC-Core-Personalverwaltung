@@ -11,7 +11,6 @@ export const EmailTelData = {
     props: {
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },  
     setup(props) {
@@ -29,6 +28,8 @@ export const EmailTelData = {
         const confirmDeleteRef = Vue.ref();
 
         const kontakttyp = Vue.inject('kontakttyp');
+
+        const readonly = Vue.ref(false);
 
         Vue.watch(personID, (currentValue, oldValue) => {
             console.log('ContactData watch',currentValue);
@@ -237,7 +238,7 @@ export const EmailTelData = {
             currentContact, showEditModal, showAddModal, showDeleteModal, hideModal, modalRef,
             kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef,
             // form handling
-            validKontakt, frmState, contactDataFrm, 
+            validKontakt, frmState, contactDataFrm, readonly
         }
     },
     template: `

@@ -72,7 +72,7 @@ export const ContactData = {
                                 aria-labelledby="nav-home-tab"
                             >
                                 <!-- -->
-                                <address-data :personID="personID"></address-data>
+                                <address-data :personID="personID" editMode ></address-data>
                                 <!-- -->
                             </div>
                             <div
@@ -83,7 +83,7 @@ export const ContactData = {
                                 aria-labelledby="nav-profile-tab"
                             >
                                 <!-- -->
-                                <email-tel-data :personID="personID"></email-tel-data>
+                                <email-tel-data :personID="personID" editMode></email-tel-data>
                                 <!-- -->
                             </div>
                         </div>

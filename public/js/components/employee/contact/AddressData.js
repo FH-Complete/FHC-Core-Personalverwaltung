@@ -11,7 +11,6 @@ export const AddressData = {
     props: {
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },  
     setup(props) {
@@ -36,6 +35,8 @@ export const AddressData = {
         const gemeinden = Vue.ref([]);
 
         const ortschaften = Vue.ref([]);
+
+        const readonly = Vue.ref(false);
 
         Vue.watch(personID, (currentValue, oldValue) => {
             console.log('AddressData watch',currentValue);
@@ -314,7 +315,7 @@ export const AddressData = {
             modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
             gemeinden, ortschaften, adressentyp,
             // form handling
-            validOrt, validPLZ, validTyp, frmState, addressDataFrm, 
+            validOrt, validPLZ, validTyp, frmState, addressDataFrm, readonly
         }
         
     },

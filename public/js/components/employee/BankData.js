@@ -402,7 +402,7 @@ export const BankData = {
                 <!--  -->
                 <div class="col-md-4">
                     <label for="iban" class="required form-label" >IBAN</label>
-                    <input type="text" required  @blur="frmState.ibanBlured = true" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validIban(currentValue.iban) && frmState.ibanBlured}" id="iban" v-model="currentValue.iban" id="iban" maxlength="34" v-model="currentValue.iban" >
+                    <input type="text" required  @blur="frmState.ibanBlured = true" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validIban(currentValue.iban) && frmState.ibanBlured}" id="iban" v-model="currentValue.iban"  maxlength="34"  >
                 </div>
                 <div class="col-md-4">
                     <label for="bic" class="form-label">BIC</label>

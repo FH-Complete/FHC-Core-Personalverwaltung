@@ -15,6 +15,7 @@ export const SalaryDialog = {
         writePermission: { type: Boolean, required: false },
         //currentValue: { type: Object, required: true },
     },
+    expose: ['showModal'],
     setup( props ) {
 
         // Modal 
@@ -155,8 +156,6 @@ export const SalaryDialog = {
 
         };
         
-        Vue.defineExpose({ showModal });
-
         return { modalRef, showModal, hideModal, okHandler,cancelHandler, currentValue, validVon, validBis,
                  dienstvehaeltnisFrm, unternehmenSelectedHandler, vertragsartSelectedHandler, frmState };
     },

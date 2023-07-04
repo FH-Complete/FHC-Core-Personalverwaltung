@@ -359,6 +359,6 @@ export const EmployeeData= {
       <template #body>
         Mitarbeiterdaten schließen? Geänderte Daten gehen verloren!
       </template>
-    </ModalDialog
+    </ModalDialog>
     `
 }

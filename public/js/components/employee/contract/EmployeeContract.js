@@ -4,6 +4,7 @@ import karenzmodal from './vbform/karenzmodal.js';
 import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
+import { Toast } from '../../Toast.js';
 
 export const EmployeeContract = {
     components: {
@@ -15,6 +16,7 @@ export const EmployeeContract = {
         "datepicker": VueDatePicker,
         ModalDialog,
         OffCanvasTimeline,
+        Toast,
     },
     props: {
         writePermission: { type: Boolean, required: false },  // TODO needs change
@@ -69,6 +71,8 @@ export const EmployeeContract = {
 
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
+
+        const readonly = ref(false);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -525,7 +529,8 @@ export const EmployeeContract = {
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas,
-            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart
+            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart,
+            readonly,
         }
     },
     template: `

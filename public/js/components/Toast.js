@@ -5,6 +5,7 @@ export const Toast = {
             default: "<<Text goes here>>",
         }
     },
+    expose: ['show', 'hide'],
     setup() {
 
         let toastEle = Vue.ref(null);
@@ -21,8 +22,6 @@ export const Toast = {
         const hide = () => {
             thisToastObj.hide();
         }
-
-        Vue.defineExpose({ show, hide });
 
         return { show, hide, toastEle };
 

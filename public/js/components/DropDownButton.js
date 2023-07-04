@@ -2,6 +2,7 @@ export const DropDownButton = {
     props: {
         links: { type: Array, required: true }
     },
+    expose: [ 'show', 'toggle', 'hide'],
     setup() {
 
         let buttonEle = Vue.ref(null);
@@ -22,8 +23,6 @@ export const DropDownButton = {
         const hide = () => {
             thisDropDownButtonObj.hide();
         }
-
-        Vue.defineExpose({ show, toggle, hide });
 
         return { show, toggle, hide, buttonEle };
 

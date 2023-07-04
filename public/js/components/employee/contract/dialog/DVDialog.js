@@ -23,6 +23,7 @@ export const DVDialog = {
         writePermission: { type: Boolean, required: false },
         //currentValue: { type: Object, required: true },
     },
+    expose: ['showModal'],
     setup( props ) {
 
         // Modal 
@@ -175,9 +176,7 @@ export const DVDialog = {
 
         };
 
-        const openTab = () =>  {}
-        
-        Vue.defineExpose({ showModal });
+        const openTab = () =>  {}       
 
         return { modalRef, showModal, hideModal, okHandler,cancelHandler, currentValue, validVon, validBis, 
                  dienstvehaeltnisFrm, unternehmenSelectedHandler, vertragsartSelectedHandler, frmState,openTab };

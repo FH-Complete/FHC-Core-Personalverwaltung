@@ -3,6 +3,7 @@ export const ModalDialog = {
         type: String,
         title: String,
     },
+    expose: ['show', 'hide'],
     setup(props, { emit }) {
        
         let modalConfirmEle = Vue.ref(null);
@@ -32,9 +33,7 @@ export const ModalDialog = {
           
         const cancel = () =>  {
             _resolve(false);
-        }
-
-        Vue.defineExpose({ show, hide});
+        }        
 
         return { modalConfirmEle, show, hide, ok, cancel };
     },
