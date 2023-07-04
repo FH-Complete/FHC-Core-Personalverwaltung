@@ -12,13 +12,13 @@ export default {
     <div class="row g-2">
       <div class="col-3">
         <div class="input-group input-group-sm mb-3">
-          <input v-model="arbeitgeber_frist" type="text" class="form-control form-control-sm" placeholder="Arbeitgeber Frist" aria-label="arbeitgeber_frist">
+          <input v-model="arbeitgeber_frist" :disabled="isinputdisabled('arbeitgeber_frist')" type="text" class="form-control form-control-sm" placeholder="Arbeitgeber Frist" aria-label="arbeitgeber_frist">
           <span class="input-group-text">Wochen</span>
         </div>
       </div>
       <div class="col-3">
         <div class="input-group input-group-sm mb-3">
-          <input v-model="arbeitnehmer_frist" type="text" class="form-control form-control-sm" placeholder="Arbeitnehmer Frist" aria-label="arbeitnehmer_frist">
+          <input v-model="arbeitnehmer_frist" :disabled="isinputdisabled('arbeitnehmer_frist')" type="text" class="form-control form-control-sm" placeholder="Arbeitnehmer Frist" aria-label="arbeitnehmer_frist">
           <span class="input-group-text">Wochen</span>
         </div>
       </div>
