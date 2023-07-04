@@ -224,8 +224,8 @@ export const EmployeeContract = {
                 gbtChartData.value = response;
                 let tempData = [];
                 // chartOptions.series[0].data.length = 0;
-                response.forEach(element => {
-                   tempData.push([element.von, parseFloat(element.summe)]);
+                Object.keys(response).forEach(element => {
+                   tempData.push([element, parseFloat(response[element])]);
                 });
                 chartOptions.series[0].data = tempData;
 

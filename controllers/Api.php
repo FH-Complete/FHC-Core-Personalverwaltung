@@ -93,6 +93,9 @@ class Api extends Auth_Controller
 		$this->load->library('AuthLib');
         $this->load->library('vertragsbestandteil/VertragsbestandteilLib',
 			null, 'VertragsbestandteilLib');
+        $this->load->library('vertragsbestandteil/GehaltsbestandteilLib',
+			null, 'GehaltsbestandteilLib');
+
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
         $this->load->model('person/Person_model','PersonModel');
@@ -513,15 +516,69 @@ class Api extends Auth_Controller
             return;
         }
 
-        $gbtModel = $this->GBTModel;
-        $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);
+        /*$gbtModel = $this->GBTModel;
+        $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);*/
 
-        if (isSuccess($gbt_data))
-        {
-            $this->outputJson($gbt_data->retval);
-        } else {
-            $this->outputJsonError("Error when getting salary data for chart");
+        $data = array();
+        $gbtList = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dv_id, null, false);
+
+        $hasFutureDate = false;
+
+        $now = (new DateTime())->setTime(0,0,0,0);
+
+        foreach ($gbtList as $value) {
+
+            if (!isset($data[$value->getVon()])) {
+                $data[$value->getVon()] = 0;
+
+                if ($now < $value->getBisDateTime()) {
+                    $hasFutureDate = true;
+                }
+            } 
+            if ($value->getBis() != null) {
+                
+                $bisDatum = $value->getBisDateTime()->add(new DateInterval("P1D"));
+
+                if (!isset($data[$bisDatum->format("Y-m-d")])) {
+                    $data[$bisDatum->format("Y-m-d")] = 0;
+
+                    if ($now < $value->getBisDateTime()) {
+                        $hasFutureDate = true;
+                    }
+                }
+            } 
         }
+
+        if (!$hasFutureDate) {
+            $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis($dv_id);
+
+            if ($dv->getBis() != null) {
+                $dvBis = new DateTime($dv->getBis());
+                if (!isset($data[$dvBis->format("Y-m-d")])) {
+                    $data[$dvBis->format("Y-m-d")] = 0;
+                }
+            } else {
+                if (!isset($data[$now->format("Y-m-d")])) {
+                    $data[$now->format("Y-m-d")] = 0;
+                }
+            }
+        }
+
+        foreach ($data as $datum => $summe) {
+            $datumDateTime = new DateTimeImmutable($datum);
+
+            foreach ($gbtList as $gbt) {
+
+                if ($gbt->getVonDateTime() <= $datumDateTime
+                    && ($gbt->getBisDateTime() == null || $gbt->getBisDateTime()>=$datumDateTime)) {
+                        $data[$datum] += $gbt->getGrundbetrag();
+                }
+            }
+        }
+
+        ksort($data);
+        
+        $this->outputJson($data);       
         
     }
     
