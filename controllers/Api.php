@@ -524,7 +524,15 @@ class Api extends Auth_Controller
 
         $hasFutureDate = false;
 
-        $now = (new DateTime())->setTime(0,0,0,0);
+        $now = new DateTime();
+		if( version_compare(phpversion(), '7.1.0', 'lt') ) 
+		{
+			$now->setTime(0,0,0);
+		}
+		else 
+		{
+			$now->setTime(0,0,0,0);
+		}
 
         foreach ($gbtList as $value) {
 
