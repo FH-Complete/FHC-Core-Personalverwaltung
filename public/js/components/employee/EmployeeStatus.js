@@ -49,12 +49,17 @@ export const EmployeeStatus = {
              let bis = dv.bis != null ? new Date(dv.bis) : null;
              if (currentDate.value >= von && (bis == null || bis >= currentDate.value)) {
               anzDV++;
-              statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: ''})
+              let vaExists = statusList.value.find((item) => item.text == formatVertragsart(dv.vertragsart_kurzbz))
+              if (!vaExists) {
+                statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: '', css: 'bg-dv'})
+              }
               dvIDs.push(dv.dienstverhaeltnis_id)
              }
           })
           if (anzDV > 1) {
-            statusList.value.unshift({text: 'parallele DV', description:''});
+            statusList.value.unshift({text: 'parallele DVs', description:'', css: 'bg-dv'});
+          } else if (anzDV == 0) {
+            statusList.value.unshift({text: 'derzeit kein aktives DV', description:'', css: 'bg-dv'});
           }
           console.log("dvIDs", dvIDs)
           Promise.all(dvIDs.map((dvID) => Vue.$fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
@@ -64,19 +69,19 @@ export const EmployeeStatus = {
                   switch (vbs.vertragsbestandteiltyp_kurzbz) {
                     case 'freitext':
                       if (vbs.freitexttyp_kurzbz == 'befristung') {
-                        statusList.value.push({text: 'Befristung', description: ''})
+                        statusList.value.push({text: 'Befristung', description: '', css: 'bg-dv'})
                       } else if (vbs.freitexttyp_kurzbz == 'allin') {
-                        statusList.value.push({text: 'All-In', description: ''})
+                        statusList.value.push({text: 'All-In', description: '', css: 'bg-allin'})
                       } else if (vbs.freitexttyp_kurzbz == 'ersatzarbeitskraft') {
-                        statusList.value.push({text: 'Ersatzarbeitskraft', description: ''})
+                        statusList.value.push({text: 'Ersatzarbeitskraft', description: '', css: 'bg-dv'})
                       }
                       break;
                     case 'karenz':
-                        statusList.value.push({text: formatKarenztyp(vbs.karenztyp_kurzbz), description: ''})
+                        statusList.value.push({text: formatKarenztyp(vbs.karenztyp_kurzbz), description: '', css: 'bg-karenz'})
                       break;
                     case 'stunden':
                       if (vbs.teilzeittyp_kurzbz != undefined) {
-                        statusList.value.push({text: formatTeilzeittyp(vbs.teilzeittyp_kurzbz), description: ''})
+                        statusList.value.push({text: formatTeilzeittyp(vbs.teilzeittyp_kurzbz), description: '', css: 'bg-teilzeit'})
                       }
                       break;
                     default:
@@ -133,8 +138,7 @@ export const EmployeeStatus = {
     template: `
     <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2" >
       <template v-for="item in statusList">
-        <!-- <span class="badge badge-lg bg-success me-2">BSP AKTIV</span><span class="badge bg-secondary me-2"> BSP FIX ANGESTELLT</span><span class="badge bg-secondary me-2">BSP STATUS</span> -->
-        <span class="badge bg-secondary me-2">{{ item.text }}</span>
+        <span class="badge me-2" :class="(item?.css != undefined) ? item.css : 'bg-secondary'" >{{ item.text }}</span>
       </template>
     </div>   
    `

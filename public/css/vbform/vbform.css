@@ -26,3 +26,16 @@
 .vertragshistorie.offcanvas-end {
     width: 600px;
 }
+
+.bg-dv {
+    background-color: #6f42c1 !important;
+}
+
+
+.bg-allin, .bg-teilzeit {
+    background-color: #6f42c1 !important;
+}
+
+.bg-karenz {
+    background-color: #1f7762 !important;
+}
