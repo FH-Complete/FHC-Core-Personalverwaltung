@@ -260,8 +260,8 @@ export const EmployeeContract = {
 
         const isCurrentDVActive = computed(() => {
             if (currentDV.value == null) return false;
-            let von = new Date(currentDV.value.von);
-            let bis = currentDV.value.bis != null ? new Date(currentDV.value.bis) : null;
+            let von = truncateDate(new Date(currentDV.value.von));
+            let bis = currentDV.value.bis != null ? truncateDate(new Date(currentDV.value.bis)) : null;
             return von <= currentDate.value && (bis == null || bis >= currentDate.value);
         })
 
@@ -429,6 +429,11 @@ export const EmployeeContract = {
             currentDate.value = truncateDate(new Date(d.target.value));
         }
 
+        // event hander for vertragshistorie
+        const dateSelectedHandler = (d) => {
+            currentDate.value = new Date(d);
+        }
+
         const setDate2BisDatum = () => {
             currentDate.value = new Date(currentDV.value.bis);
         }
@@ -534,7 +539,7 @@ export const EmployeeContract = {
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate, 
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
-            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas,
+            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly,
         }
@@ -1186,6 +1191,7 @@ export const EmployeeContract = {
 
     <OffCanvasTimeline
         ref="offCanvasRef"
+        @dateSelected="dateSelectedHandler"
         :curdv="currentDV">
     </OffCanvasTimeline>
     

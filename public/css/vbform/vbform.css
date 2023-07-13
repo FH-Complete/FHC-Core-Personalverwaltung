@@ -39,3 +39,13 @@
 .bg-karenz {
     background-color: #1f7762 !important;
 }
+
+.calendar-icon {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    font-size: 1rem;
+    line-height: 1.9rem;
+    padding: 6px 6px 10px 2px;
+    box-sizing: content-box;
+}
