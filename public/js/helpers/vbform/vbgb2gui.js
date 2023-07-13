@@ -210,13 +210,13 @@ export default {
       this.vbout.data = {
           id: vb.vertragsbestandteil_id,
           stunden: vb.wochenstunden,
-          teilzeittyp: vb.teilzeittyp_kurzbz,
+          teilzeittyp_kurzbz: vb.teilzeittyp_kurzbz,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
       if( this.isEndable(vb) ) {
         this.vbout.guioptions.disabled = [
             'stunden',
-            'teilzeittyp'
+            'teilzeittyp_kurzbz'
         ];
       }
   },

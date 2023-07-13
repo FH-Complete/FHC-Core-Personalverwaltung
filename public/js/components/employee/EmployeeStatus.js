@@ -12,6 +12,7 @@ export const EmployeeStatus = {
         const isFetching = ref(false);   
         const vertragsarten = inject('vertragsarten');
         const karenztypen = inject('karenztypen');
+        const teilzeittypen = inject('teilzeittypen');
         
         const formatVertragsart = (item) => {
           let va = vertragsarten.value.find(kt => kt.value == item);
@@ -21,7 +22,12 @@ export const EmployeeStatus = {
         const formatKarenztyp = (item) => {
           let karenztyp = karenztypen.value.find(kt => kt.value == item);
           return karenztyp != undefined ? karenztyp.label : item;
-      }
+        }
+
+        const formatTeilzeittyp = (item) => {
+          let teilzeittyp = teilzeittypen.value.find(kt => kt.value == item);
+          return teilzeittyp != undefined ? teilzeittyp.label : item;
+        }
 
         /*let statusList = Vue.ref([{text:'Fix',description:'fixangestellt'}, 
             {text:'Befristet',description:'befristet bis 30.6.2023'}, 
@@ -55,11 +61,27 @@ export const EmployeeStatus = {
             (allData) => {
               allData.map((item) => {
                 item.data.data.map((vbs => {
-                  if (vbs.freitexttyp_kurzbz != undefined && vbs.freitexttyp_kurzbz == 'befristung') {
-                    statusList.value.push({text: 'Befristung', description: ''})
-                  } else if (vbs.karenztyp_kurzbz != undefined) {
-                    statusList.value.push({text: formatKarenztyp(vbs.karenztyp_kurzbz), description: ''})
-                  }
+                  switch (vbs.vertragsbestandteiltyp_kurzbz) {
+                    case 'freitext':
+                      if (vbs.freitexttyp_kurzbz == 'befristung') {
+                        statusList.value.push({text: 'Befristung', description: ''})
+                      } else if (vbs.freitexttyp_kurzbz == 'allin') {
+                        statusList.value.push({text: 'All-In', description: ''})
+                      } else if (vbs.freitexttyp_kurzbz == 'ersatzarbeitskraft') {
+                        statusList.value.push({text: 'Ersatzarbeitskraft', description: ''})
+                      }
+                      break;
+                    case 'karenz':
+                        statusList.value.push({text: formatKarenztyp(vbs.karenztyp_kurzbz), description: ''})
+                      break;
+                    case 'stunden':
+                      if (vbs.teilzeittyp_kurzbz != undefined) {
+                        statusList.value.push({text: formatTeilzeittyp(vbs.teilzeittyp_kurzbz), description: ''})
+                      }
+                      break;
+                    default:
+                      break;
+                  }                  
                 }))
               })
             }

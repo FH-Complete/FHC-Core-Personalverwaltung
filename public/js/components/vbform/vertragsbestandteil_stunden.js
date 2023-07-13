@@ -16,7 +16,17 @@ export default {
           <span class="input-group-text">Std/Woche</span>
         </div>
       </div>
-      <div class="col-4">&nbsp;</div>
+      <div class="col-4">
+        <select v-model="teilzeittyp_kurzbz" :disabled="isinputdisabled('teilzeittyp_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option
+            v-for="f in lists.teilzeittypen"
+            :value="f.value"
+            :selected="isselected(f.value, this.teilzeittyp_kurzbz)"
+            :disabled="f.disabled">
+            {{ f.label }}
+          </option>
+        </select>
+      </div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
       <div class="col-1">
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
@@ -43,13 +53,21 @@ export default {
     return {
       id: null,
       stunden: '',
+      teilzeittyp_kurzbz: '',
+      lists: {
+        teilzeittypen: []
+      },
       db_delete: false
     };
   },
   created: function() {
+    this.getTeilzeittypen();
     this.setDataFromConfig();
   },
   methods: {
+    isselected: function(optvalue, selvalue) {
+      return (optvalue === selvalue);
+    },
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;
@@ -60,9 +78,23 @@ export default {
         }
         this.stunden = this.config.data.stunden.replace('.', ',');
       }
+      if( this.config?.data?.teilzeittyp_kurzbz !== undefined) {
+        this.teilzeittyp_kurzbz = this.config.data.teilzeittyp_kurzbz != null 
+            ? this.config.data.teilzeittyp_kurzbz : '';
+      }
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
       }
+    },
+    getTeilzeittypen: async function() {
+      const response = await Vue.$fhcapi.Stunden.getTeilzeittypen();
+      const teilzeittypen = response.data.retval;
+      teilzeittypen.unshift({
+        value: '',
+        label: 'Teilzeittyp wählen',
+        disabled: false
+      });
+      this.lists.teilzeittypen = teilzeittypen;
     },
     removeVB: function() {
       this.$emit('removeVB', {id: this.config.guioptions.id});
@@ -74,8 +106,9 @@ export default {
         data: {
           id: this.id,
           stunden: this.stunden.replace(',', '.'),
+          teilzeittyp_kurzbz: this.teilzeittyp_kurzbz, 
           db_delete: this.db_delete,
-          gueltigkeit: this.$refs.gueltigkeit.getPayload(),
+          gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
         gbs: this.$refs.gbh.getPayload()
       };

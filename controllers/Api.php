@@ -84,7 +84,8 @@ class Api extends Auth_Controller
                 'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
 				'endDV'  => Api::DEFAULT_PERMISSION,
 				'saveKarenz'  => Api::DEFAULT_PERMISSION,
-				'getKarenztypen' => Api::DEFAULT_PERMISSION
+				'getKarenztypen' => Api::DEFAULT_PERMISSION,
+				'getTeilzeittypen' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -122,6 +123,7 @@ class Api extends Auth_Controller
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
         // get CI for transaction management
         $this->CI = &get_instance();
     }
@@ -1925,6 +1927,24 @@ EOSQL;
 		else
 		{
 			$this->outputJsonError('no karenz types found');
+			return;
+		}
+	}
+	
+	public function getTeilzeittypen()
+	{		
+		$this->TeilzeittypModel->resetQuery();
+		$this->TeilzeittypModel->addSelect('teilzeittyp_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
+		$this->TeilzeittypModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->TeilzeittypModel->load();
+		if( hasData($rows) ) 
+		{
+			$this->outputJson($rows);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no teilzeit types found');
 			return;
 		}
 	}

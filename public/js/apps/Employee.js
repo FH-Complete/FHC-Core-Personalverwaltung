@@ -43,6 +43,7 @@ const pvApp = Vue.createApp({
 		const adressentyp = Vue.ref([]);
 		const sachaufwandtyp  = Vue.ref([]);
 		const karenztypen = Vue.ref([]);
+                const teilzeittypen = Vue.ref([]);
 		const vertragsarten = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
@@ -56,6 +57,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("adressentyp",adressentyp);
 		Vue.provide("sachaufwandtyp",sachaufwandtyp);
 		Vue.provide("karenztypen",karenztypen);
+                Vue.provide("teilzeittypen",teilzeittypen);
 		Vue.provide("vertragsarten",vertragsarten);
 
 		fetchSprache().then((r) => {
@@ -93,6 +95,10 @@ const pvApp = Vue.createApp({
 
 		fetchKarenztypen().then((r) => {
 			karenztypen.value = r;
+		})
+
+                fetchTeilzeittypen().then((r) => {
+			teilzeittypen.value = r;
 		})
 
 		fetchVertragsarten().then((r) => {
@@ -159,8 +165,11 @@ const fetchVertragsarten = async () => {
 		'extensions/FHC-Core-Personalverwaltung/api/getVertragsarten');
 	return CoreRESTClient.getData(res.data);
 }
-
-
+const fetchTeilzeittypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getTeilzeittypen');
+	return CoreRESTClient.getData(res.data);
+}
 
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});

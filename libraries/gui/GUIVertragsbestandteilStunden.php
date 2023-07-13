@@ -52,6 +52,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
         }
 		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONDataFloat($this->data['stunden'], $decodedData, 'stunden');
+		$this->getJSONDataString($this->data['teilzeittyp_kurzbz'], $decodedData, 'teilzeittyp_kurzbz');
 
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
@@ -70,6 +71,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
             $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
              // merge
             $vbs->setWochenstunden($this->data['stunden']);
+			$vbs->setTeilzeittyp_kurzbz($this->data['teilzeittyp_kurzbz']);
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {
@@ -79,6 +81,7 @@ class GUIVertragsbestandteilStunden extends AbstractGUIVertragsbestandteil
             $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
             
             $data->wochenstunden = $this->data['stunden'];
+			$data->teilzeittyp_kurzbz = $this->data['teilzeittyp_kurzbz'];
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_STUNDEN;
             
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);            
