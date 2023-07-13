@@ -45,7 +45,7 @@ const pvApp = Vue.createApp({
 		const karenztypen = Vue.ref([]);
                 const teilzeittypen = Vue.ref([]);
 		const vertragsarten = Vue.ref([]);
-		const freitextypen = Vue.ref([]);
+		const freitexttypen = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
@@ -108,7 +108,7 @@ const pvApp = Vue.createApp({
 		})
 
 		fetchFreitexttypen().then((r) => {
-			freitextypen.value = r;
+			freitexttypen.value = r;
 		})
 	}
 }).use(router);
