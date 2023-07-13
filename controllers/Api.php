@@ -85,7 +85,8 @@ class Api extends Auth_Controller
 				'endDV'  => Api::DEFAULT_PERMISSION,
 				'saveKarenz'  => Api::DEFAULT_PERMISSION,
 				'getKarenztypen' => Api::DEFAULT_PERMISSION,
-				'getTeilzeittypen' => Api::DEFAULT_PERMISSION
+				'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
+				'getFreitexttypen' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -124,6 +125,7 @@ class Api extends Auth_Controller
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
         // get CI for transaction management
         $this->CI = &get_instance();
     }
@@ -1945,6 +1947,24 @@ EOSQL;
 		else
 		{
 			$this->outputJsonError('no teilzeit types found');
+			return;
+		}
+	}
+	
+	public function getFreitexttypen()
+	{		
+		$this->FreitexttypModel->resetQuery();
+		$this->FreitexttypModel->addSelect('freitexttyp_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
+		$this->FreitexttypModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->FreitexttypModel->load();
+		if( hasData($rows) ) 
+		{
+			$this->outputJson($rows);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no freitext types found');
 			return;
 		}
 	}
