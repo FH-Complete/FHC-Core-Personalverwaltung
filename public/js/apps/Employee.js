@@ -45,6 +45,7 @@ const pvApp = Vue.createApp({
 		const karenztypen = Vue.ref([]);
                 const teilzeittypen = Vue.ref([]);
 		const vertragsarten = Vue.ref([]);
+		const freitextypen = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
@@ -59,6 +60,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("karenztypen",karenztypen);
                 Vue.provide("teilzeittypen",teilzeittypen);
 		Vue.provide("vertragsarten",vertragsarten);
+		Vue.provide("freitexttypen",freitexttypen);
 
 		fetchSprache().then((r) => {
 			sprache.value = r;
@@ -105,6 +107,9 @@ const pvApp = Vue.createApp({
 			vertragsarten.value = r;
 		})
 
+		fetchFreitexttypen().then((r) => {
+			freitextypen.value = r;
+		})
 	}
 }).use(router);
 
@@ -168,6 +173,11 @@ const fetchVertragsarten = async () => {
 const fetchTeilzeittypen = async () => {
 	const res = await CoreRESTClient.get(
 		'extensions/FHC-Core-Personalverwaltung/api/getTeilzeittypen');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchFreitexttypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getFreitexttypen');
 	return CoreRESTClient.getData(res.data);
 }
 

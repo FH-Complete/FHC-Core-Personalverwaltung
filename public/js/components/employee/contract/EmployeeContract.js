@@ -71,6 +71,7 @@ export const EmployeeContract = {
 
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
+        const freitexttypen = inject('freitexttypen');
 
         const readonly = ref(false);
 
@@ -519,6 +520,11 @@ export const EmployeeContract = {
         const formatVertragsart = (item) => {
             let va = vertragsarten.value.find(kt => kt.value == item);
             return va != undefined ? va.label : item;
+        }
+
+        const formatFreitexttyp = (item) => {
+            let va = freitexttypen.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
           }
 
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
@@ -529,7 +535,7 @@ export const EmployeeContract = {
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas,
-            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart,
+            karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly,
         }
     },
@@ -902,7 +908,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-3">
                                             <label class="form-label" >Freitexttyp</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.freitexttyp_kurzbz" >
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatFreitexttyp(item.freitexttyp_kurzbz)" >
                                         </div>
 
                                         <div class="col-md-5">
