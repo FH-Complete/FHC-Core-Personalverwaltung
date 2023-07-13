@@ -3,6 +3,7 @@ import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Naviga
 
 import verticalsplit from "../../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
+import {searchbaroptions, searchfunction } from "../../apps/common.js";
 import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
 import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
@@ -15,7 +16,7 @@ export default {
     components: {
 		Sidebar,
 		CoreNavigationCmpt,
-    	CoreFilterCmpt,
+                CoreFilterCmpt,
 		EmployeeEditor,		
 		verticalsplit,
 		searchbar,
@@ -26,7 +27,7 @@ export default {
 
 		const { watch, ref } = Vue;
 		const router = VueRouter.useRouter();
-    	const route = VueRouter.useRoute();
+                const route = VueRouter.useRoute();
 
 		const isEditorOpen = ref(false);
 		const currentPersonID = ref(null);
@@ -45,124 +46,6 @@ export default {
 				console.log('*** EmployeeHome params changed', currentPersonID.value);
 			}
 		)
-
-		const searchbaroptions = ref({
-			types: [
-			  "person",
-			  "raum",
-			  "mitarbeiter",
-			  "student",
-			  "prestudent",
-			  "document",
-			  "cms",
-			  "organisationunit"
-			],
-			actions: {
-				person: {
-					defaultaction: {
-					  type: "link",
-					  action: function(data) { 
-						return data.profil;
-					  }
-					},
-					childactions: [
-						{
-							label: "testchildaction1",
-							icon: "fas fa-check-circle",
-							type: "function",
-							action: function(data) { 
-								alert('person testchildaction 01 ' + JSON.stringify(data)); 
-							}
-						},
-						{
-							label: "testchildaction2",
-							icon: "fas fa-file-csv",
-							type: "function",
-							action: function(data) { 
-								alert('person testchildaction 02 ' + JSON.stringify(data)); 
-							}
-						}
-					]
-				},
-				raum: {
-					defaultaction: {
-					  type: "function",
-					  action: function(data) { 
-						alert('raum defaultaction ' + JSON.stringify(data)); 
-					  }
-					},
-					childactions: [                      
-					   {
-							label: "Rauminformation",
-							icon: "fas fa-info-circle",
-							type: "link",
-							action: function(data) { 
-								return data.infolink;
-							}
-						},
-						{
-							label: "Raumreservierung",
-							icon: "fas fa-bookmark",
-							type: "link",
-							action: function(data) { 
-								return data.booklink;
-							}
-						}
-					]
-				},
-				employee: {
-					defaultaction: {
-					  type: "function",
-					  action: (data) =>  { 
-							return personSelectedHandler(data.person_id, data.uid);
-					  }
-					},
-					childactions: [
-						{
-							label: "testchildaction1",
-							icon: "fas fa-address-book",
-							type: "function",
-							action: function(data) { 
-								alert('employee testchildaction 01 ' + JSON.stringify(data)); 
-							}
-						},
-						{
-							label: "testchildaction2",
-							icon: "fas fa-user-slash",
-							type: "function",
-							action: function(data) { 
-								alert('employee testchildaction 02 ' + JSON.stringify(data)); 
-							}
-						},
-						{
-							label: "testchildaction3",
-							icon: "fas fa-bell",
-							type: "function",
-							action: function(data) { 
-								alert('employee testchildaction 03 ' + JSON.stringify(data)); 
-							}
-						},
-						{
-							label: "testchildaction4",
-							icon: "fas fa-calculator",
-							type: "function",
-							action: function(data) { 
-								alert('employee testchildaction 04 ' + JSON.stringify(data)); 
-							}
-						}
-					]
-				},
-				organisationunit: {
-					defaultaction: {
-					  type: "function",
-					  action: function(data) { 
-						alert('organisationunit defaultaction ' + JSON.stringify(data)); 
-					  }
-					},
-					childactions: []
-				}
-			}
-		});
 
 		const personSelectedHandler = (id, uid, date) => {
 			console.log('personSelected: ', id, uid, date);
@@ -189,14 +72,6 @@ export default {
 		
 		const newSideMenuEntryHandler = (payload) => {
 			appSideMenuEntries.value = payload;
-		}	
-		
-		const searchfunction = (searchsettings) => {
-			return Vue.$fhcapi.Search.search(searchsettings);  
-		}
-
-		const searchfunctiondummy = (searchsettings) => {
-			return Vue.$fhcapi.Search.searchdummy(searchsettings);  
 		}
 
 		const selectRecordHandler = (e, row) => { // Tabulator handler for the rowClick event
@@ -294,14 +169,18 @@ export default {
 			if (!answer) return false*/
 		  })
 
-
+                searchbaroptions.actions.employee.defaultaction = {
+                    type: "function",
+                    action: (data) => {
+                        return personSelectedHandler(data.person_id, data.uid);
+                    }
+                };
 
 		return {
 			personSelectedHandler,
 			newSideMenuEntryHandler,
 			searchfunction,
 			selectRecordHandler,
-			searchfunctiondummy,
 			openCreateWizard,			
 
 			createWizardRef,
