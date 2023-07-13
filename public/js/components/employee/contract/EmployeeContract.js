@@ -703,6 +703,10 @@ export const EmployeeContract = {
                                     <!-- Arbeitszeit -->
                                     <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h6></div>
 
+                                    <div class="col-md-12" v-if="currentVBS.stunden.length == 0">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                    </div>
+
                                     <template v-for="(item, index) in currentVBS.stunden"  >
                                         <div class="col-md-4">
 
@@ -855,6 +859,10 @@ export const EmployeeContract = {
 
                                 <form  class="row g-3" v-if="currentDV != null">
     
+                                    <div class="col-md-12" v-if="gbtList.length == 0">
+                                        Kein aktiver Gehaltsbestandteil vorhanden.
+                                    </div>
+
                                     <template v-for="(item, index) in gbtList"  >
 
                                         <div class="col-md-3">
@@ -904,6 +912,10 @@ export const EmployeeContract = {
                             <div class="card-body" style="text-align:left">
                                 <form  class="row g-3" v-if="currentDV != null">
         
+                                    <div class="col-md-12" v-if="currentVBS.zusatzvereinbarung.length == 0">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                    </div>
+
                                     <template v-for="(item, index) in currentVBS.zusatzvereinbarung"  >
 
                                         <div class="col-md-3">
@@ -952,6 +964,10 @@ export const EmployeeContract = {
                             <div class="card-body" style="text-align:left">
 
                                 <form  class="row g-3" v-if="currentDV != null">
+
+                                    <div class="col-md-12" v-if="currentVBS.karenz.length == 0">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                    </div>
         
                                     <template v-for="(item, index) in currentVBS.karenz"  >
 
@@ -1002,7 +1018,7 @@ export const EmployeeContract = {
                             <div class="card-body" style="text-align:left">
 
                                 <form  class="row g-3" v-if="currentDV != null">
- 
+
                                     <template v-for="(item, index) in currentVBS.funktion.zuordnung"  >
 
                                         <div class="col-md-4">
@@ -1041,6 +1057,12 @@ export const EmployeeContract = {
 
 
                                     </template>
+
+                                    <div class="col-md-12" v-if="currentVBS.funktion.taetigkeit.length == 0">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                    </div>
+
+                                    
                                 
 
                                 </form>
