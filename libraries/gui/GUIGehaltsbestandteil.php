@@ -83,6 +83,8 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         $this->data['gueltigkeit'] = $gueltigkeit;
         $this->getJSONData($this->data['valorisierung'], $decodedData, 'valorisierung');
 		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
+		$this->getJSONData($this->data['valorisierungssperre'], $decodedData, 'valorisierungssperre');
+		$this->getJSONDataInt($this->data['auszahlungen'], $decodedData, 'auszahlungen');
     }
 
     public function generateGehaltsbestandteil()
@@ -99,8 +101,9 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $gbs->setGrundbetrag($this->data['betrag']);
 			// TODO take a look
             $gbs->setBetrag_valorisiert($this->data['betrag']);
-            //$gbs->setValorisierungssperre($this->data['valorisierungssperre']);
-            $gbs->setValorisierung($this->data['valorisierung']);            
+            $gbs->setAuszahlungen($this->data['auszahlungen']);
+			$gbs->setValorisierungssperre($this->data['valorisierungssperre']);
+            $gbs->setValorisierung($this->data['valorisierung']);
             $gbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $gbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {
@@ -113,7 +116,8 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $data->grundbetrag = $this->data['betrag'];
 			// TODO take a look
             $data->betrag_valorisiert = $this->data['betrag'];
-            //$data->valorisierungssperre = $this->data['valorisierungssperre'];
+			$data->auszahlungen = $this->data['auszahlungen'];			
+            $data->valorisierungssperre = $this->data['valorisierungssperre'];
             $data->valorisierung = $this->data['valorisierung'];
             
             $gbs = new Gehaltsbestandteil();

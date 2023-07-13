@@ -3,7 +3,7 @@ import sharedstate from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="col-4">
+  <div class="col-4 vbform_gueltigkeit">
     <div class="input-group input-group-sm">
       <datepicker v-model="gueltig_ab" :disabled="isdisabled || isinputdisabled('gueltig_ab')"
         @update:model-value="gueltigkeitchanged"
