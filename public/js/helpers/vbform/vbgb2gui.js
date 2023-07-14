@@ -257,7 +257,9 @@ export default {
             'gehaltstyp',
             'anmerkung',
             'betrag',
-            'valorisierung'
+            'valorisierung',
+            'valorisierungssperre',
+            'auszahlungen'
           ];
       }
       var gb = {
