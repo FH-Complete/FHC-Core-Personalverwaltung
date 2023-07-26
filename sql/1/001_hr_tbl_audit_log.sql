@@ -1,12 +1,11 @@
 CREATE TABLE IF NOT EXISTS hr.tbl_audit_log (
-  audit_log_id bigserial  NOT NULL,
+  audit_log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   mtime timestamptz not null default now(),
   action char not null check (action in ('I', 'U', 'D')),
   username text not null,
   table_name text not null,
   diff_data jsonb not null,
-  row_data jsonb not null,
-  CONSTRAINT tbl_audit_log_pkey PRIMARY KEY (audit_log_id)
+  row_data jsonb not null
 );
 
 CREATE INDEX IF NOT EXISTS idx_tbl_audit_log_mtime ON hr.tbl_audit_log USING brin (mtime);
