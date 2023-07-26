@@ -39,7 +39,7 @@ export default {
     <div class="col-2 ps-5">&nbsp;</div>
     <div class="col-3">
       <div class="input-group input-group-sm">
-        <datepicker v-model="valorisierungssperre" :disabled="isdisabled || isinputdisabled('valorisierungssperre')"
+        <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
           v-bind:enable-time-picker="false"
           v-bind:placeholder="'Valorisierungssperre bis'"
           six-weeks
