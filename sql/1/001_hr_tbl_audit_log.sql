@@ -55,8 +55,6 @@ END;
 $function$;
 
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_audit_log TO vilesci;
-GRANT SELECT,UPDATE ON SEQUENCE hr.tbl_audit_log_audit_log_id_seq TO vilesci; 
-
 
 DROP TRIGGER IF EXISTS log_generic ON hr.tbl_dienstverhaeltnis;
 CREATE TRIGGER log_generic AFTER INSERT OR UPDATE OR DELETE ON hr.tbl_dienstverhaeltnis FOR EACH ROW EXECUTE FUNCTION hr.generic_log_diffed();
