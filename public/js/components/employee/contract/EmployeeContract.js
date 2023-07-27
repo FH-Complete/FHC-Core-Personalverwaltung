@@ -425,8 +425,8 @@ export const EmployeeContract = {
 
         const setDateHandler = (d) => {
             console.log('date set: ', d);
-            //currentDate.value = truncateDate(new Date(d));
-            currentDate.value = truncateDate(new Date(d.target.value));
+            currentDate.value = truncateDate(new Date(d));
+            //currentDate.value = truncateDate(new Date(d.target.value));
         }
 
         // event hander for vertragshistorie
@@ -584,8 +584,17 @@ export const EmployeeContract = {
                                 </select> 
                                 <div v-else-if="isFetching" style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
 
-                                <input type="date" style="max-width:130px;min-width:130px" class="form-control form-control-sm" 
-                                    id="currentDateSelect" :value="formatDateISO(currentDate)" @change="setDateHandler" >
+                                <datepicker id="currentDateSelect" :modelValue="formatDateISO(currentDate)" 
+                                    @update:model-value="setDateHandler"
+                                    v-bind:enable-time-picker="false"   
+                                    :clearable="false"                                 
+                                    six-weeks
+                                    auto-apply 
+                                    locale="de"
+                                    format="dd.MM.yyyy"
+                                    model-type="yyyy-MM-dd"
+                                    input-class-name="dp-custom-input"
+                                    style="max-width:140px;min-width:140px" ></datepicker>
                             </div>
                         </div>
                     </div>

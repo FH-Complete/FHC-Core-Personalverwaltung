@@ -97,3 +97,7 @@ label.required.form-label:after {
     cursor: pointer;
     transition: 0.3s;
   }
+
+  .dp-custom-input {
+    font-size: 0.875rem !important;
+  }
