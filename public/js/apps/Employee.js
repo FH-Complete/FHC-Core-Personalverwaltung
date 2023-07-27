@@ -43,24 +43,11 @@ const pvApp = Vue.createApp({
 		const adressentyp = Vue.ref([]);
 		const sachaufwandtyp  = Vue.ref([]);
 		const karenztypen = Vue.ref([]);
-                const teilzeittypen = Vue.ref([]);
+        const teilzeittypen = Vue.ref([]);
 		const vertragsarten = Vue.ref([]);
 		const freitexttypen = Vue.ref([]);
 
-		const currentDate = Vue.ref('2022-03-04');
-
-		Vue.provide("sprache",sprache);
-		Vue.provide("nations",nations);
-		Vue.provide("standorte",standorte);
-		Vue.provide("orte",orte);
-		Vue.provide("ausbildung",ausbildung);
-		Vue.provide("kontakttyp",kontakttyp);
-		Vue.provide("adressentyp",adressentyp);
-		Vue.provide("sachaufwandtyp",sachaufwandtyp);
-		Vue.provide("karenztypen",karenztypen);
-                Vue.provide("teilzeittypen",teilzeittypen);
-		Vue.provide("vertragsarten",vertragsarten);
-		Vue.provide("freitexttypen",freitexttypen);
+		const currentDate = Vue.ref('2022-03-04');		
 
 		fetchSprache().then((r) => {
 			sprache.value = r;
@@ -110,8 +97,25 @@ const pvApp = Vue.createApp({
 		fetchFreitexttypen().then((r) => {
 			freitexttypen.value = r;
 		})
+				
+
+		Vue.provide("sprache",sprache);
+		Vue.provide("nations",nations);
+		Vue.provide("standorte",standorte);
+		Vue.provide("orte",orte);
+		Vue.provide("ausbildung",ausbildung);
+		Vue.provide("kontakttyp",kontakttyp);
+		Vue.provide("adressentyp",adressentyp);
+		Vue.provide("sachaufwandtyp",sachaufwandtyp);
+		Vue.provide("karenztypen",karenztypen);
+		Vue.provide("teilzeittypen",teilzeittypen);
+		Vue.provide("vertragsarten",vertragsarten);
+		Vue.provide("freitexttypen",freitexttypen);
+
 	}
 }).use(router);
+
+
 
 const fetchNations = async () => {
 	const res = await CoreRESTClient.get(
