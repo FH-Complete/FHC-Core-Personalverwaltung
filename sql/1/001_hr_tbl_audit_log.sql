@@ -24,7 +24,7 @@ DECLARE
 BEGIN
   
   IF TG_OP = 'DELETE' THEN    
-    INSERT INTO hr.tbl_audit_log (mtime, action, username, table_name, diff_data, row_data) VALUES (now(), 'D', session_user, TG_TABLE_NAME, to_jsonb(row()), to_jsonb(OLD));
+    INSERT INTO hr.tbl_audit_log (mtime, action, username, table_name, diff_data, row_data) VALUES (now(), 'D', coalesce(current_setting('pv21.uid',true),'not set'), TG_TABLE_NAME, to_jsonb(row()), to_jsonb(OLD));
   
   ELSIF TG_OP = 'UPDATE' THEN
     old_row := to_jsonb(OLD);
@@ -39,7 +39,7 @@ BEGIN
     
     -- any cols changed?
     IF changed_cols != jsonb_build_object() THEN
-      INSERT INTO hr.tbl_audit_log (mtime, action, username, table_name, diff_data, row_data) VALUES (now(), 'U', session_user, TG_TABLE_NAME, to_jsonb(changed_cols), to_jsonb(OLD));
+      INSERT INTO hr.tbl_audit_log (mtime, action, username, table_name, diff_data, row_data) VALUES (now(), 'U', coalesce(current_setting('pv21.uid',true),'not set'), TG_TABLE_NAME, to_jsonb(changed_cols), to_jsonb(OLD));
     ELSE
       NULL;
       -- RAISE WARNING 'No changes detected for tbl %, OLD: %s, NEW: %s', TG_TABLE_NAME, OLD, NEW;
@@ -47,7 +47,7 @@ BEGIN
     END IF;
   
   ELSIF TG_OP = 'INSERT' THEN
-    INSERT INTO hr.tbl_audit_log (mtime, action, username, table_name, diff_data, row_data) VALUES (now(), 'I' , session_user, TG_TABLE_NAME, to_jsonb(NEW), to_jsonb(row()));
+    INSERT INTO hr.tbl_audit_log (mtime, action, username, table_name, diff_data, row_data) VALUES (now(), 'I' , coalesce(current_setting('pv21.uid',true),'not set'), TG_TABLE_NAME, to_jsonb(NEW), to_jsonb(row()));
   END IF;
 
   RETURN NULL;
