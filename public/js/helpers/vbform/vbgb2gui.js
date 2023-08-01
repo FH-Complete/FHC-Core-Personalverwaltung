@@ -277,6 +277,8 @@ export default {
               anmerkung: gb.anmerkung,
               betrag: gb.grundbetrag,
               valorisierung: gb.valorisierung,
+              valorisierungssperre: gb.valorisierungsperre,
+              auszahlungen: gb.auszahlungen,
               gueltigkeit: this.gueltigkeit2gui(gb, mode)
           }
       };
