@@ -1,3 +1,6 @@
+/**
+ * @deprecated replaced by filter widget
+ */
 const EmployeeChooser = {
   props: {
     placeholder: String,

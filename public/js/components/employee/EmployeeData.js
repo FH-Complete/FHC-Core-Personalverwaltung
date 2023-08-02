@@ -28,26 +28,19 @@ export const EmployeeData= {
         const standorte = Vue.inject('standorte');
         const orte = Vue.inject('orte');
 
-        const generateEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personEmployeeData?person_id=${person_id}`;
-        };
-
         const fetchData = async () => {
             if (personID.value==null) {                
                 return;
             }
-            isFetching.value = true
+            isFetching.value = true;
             try {
-              console.log('url',url.value);
-              const res = await fetch(url.value);
-              let response = await res.json()              
-              currentValue.value = response.retval[0];
-              isFetching.value = false              
+              const res = await Vue.$fhcapi.Person.personEmployeeData(personID.value);                    
+              currentValue.value = res.data.retval[0];
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
-            }
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }   
           }
 
           const createShape = () => {
@@ -77,8 +70,7 @@ export const EmployeeData= {
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());
 
-        Vue.watch(personID, (currentVal, oldVal) => {
-            url.value = generateEndpointURL(currentVal);   
+        Vue.watch(personID, (currentVal, oldVal) => { 
             fetchData();         
         });
 
@@ -103,9 +95,10 @@ export const EmployeeData= {
 
         Vue.onMounted(() => {
             currentValue.value = createShape();
-            url.value = generateEndpointURL(props.personID); 
-            fetchData();
-            console.log("EmployeeData mounted");
+            if (props.personID) {
+                fetchData();
+            }
+            console.log("EmployeeData mounted", props.personID);
         })
 
         const getAusbildungbez = (code) => {
@@ -161,48 +154,21 @@ export const EmployeeData= {
             } else {
 
                 // submit
-                isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonEmployeeData`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(currentValue.value),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
+                try {
+                    const response = await Vue.$fhcapi.Person.updatePersonEmployeeData(currentValue.value);                    
+                    showToast();
+                    currentValue.value = response.data.retval[0];
+                    preservedValue.value = currentValue.value;
+                    toggleMode();  
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
                 }
-                let response = await res.json();
-            
-                isFetching.value = false;
-
-                showToast();
-                currentValue.value = response.retval[0];
-                preservedValue.value = currentValue.value;
-                toggleMode();
+                
             }
 
             frmState.wasValidated  = true;  
-        }
-
-        const submitFormHandler = (event) => {
-        
-            if (!employeeDataFrm.value.checkValidity()) {
-                console.log("form invalid!!!");
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            console.log("form valid");
-            //form.classList.add('was-validated');
         }
 
         const hasChanged = Vue.computed(() => {

@@ -4,7 +4,10 @@ import TmpStore from "./tmpstore.js";
 import DV from "./dv.js";
 import Karenz from "./karenz.js";
 import Stunden from "./stunden.js";
-import Funktion from "./funktion.js"
+import Funktion from "./funktion.js";
+import Employee from "./employee.js";
+import Gehaltsbestandteil from "./gehaltsbestandteil.js";
+import Person from "./person.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -13,5 +16,8 @@ export default {
     "DV": DV,
     "Karenz": Karenz,
     "Stunden": Stunden,
-    "Funktion": Funktion
+    "Funktion": Funktion,
+    "Employee": Employee,
+    "Gehaltsbestandteil": Gehaltsbestandteil,
+    "Person": Person,
 };

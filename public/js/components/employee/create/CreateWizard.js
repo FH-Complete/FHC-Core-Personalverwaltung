@@ -25,7 +25,6 @@ export const CreateWizard = {
         const searchExistingRef = ref();
         const schnellanlageRef = ref();
         const currentValue = ref();
-        const isFetching = ref(false);
         let _resolve;
         let _reject;
 
@@ -99,34 +98,6 @@ export const CreateWizard = {
             currentValue.value = e;
         }
 
-
-        const postData = async () => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/createEmployee`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(currentValue.value),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-
-    
         return { modalRef, stepsRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
             okHandler,cancelHandler, currentValue, showCreateHandler, getSelectedTitle,
             searchCriteriaHandler };

@@ -33,11 +33,6 @@ export const BaseData = {
             x: 'divers', 
             u: 'unbekannt'};
 
-        const generateEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personBaseData?person_id=${person_id}`;
-        };
-
         const printNation = (code) => {
             if (!code) return '';
             let result = nations.value?.filter((item) => item.nation_code == code);
@@ -53,16 +48,14 @@ export const BaseData = {
             }
             isFetching.value = true
             try {
-              console.log('url',url.value);
-              const res = await fetch(url.value);
-              let response = await res.json()              
-              currentValue.value = response.retval[0];
-              isFetching.value = false              
+              const res = await Vue.$fhcapi.Person.personBaseData(personID.value);                    
+              currentValue.value = res.data.retval[0];
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
-            }
-          }
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }          
+        }
 
         const createShape = () => {
             return {
@@ -88,30 +81,10 @@ export const BaseData = {
         }
 
 
-        let fakeEmployee = {
-            uid: "jonconnor",
-            person_id: 243,
-            kurzbz: "jonconnor",
-            aktiv: true,
-            alias: "",
-            anrede: "Hofrat",
-            titelpre: "Dr",
-            titelpost: "",
-            nachname: "Conner",
-            vorname: "Jon",
-            vornamen: "",
-            geschlecht: "m",
-            sprache: "",
-            anmerkung: "",
-            homepage: "",
-        };
-
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());        
 
-        Vue.watch(personID, (currentVal, oldVal) => {
-            console.log('BaseData watch',currentVal);
-            url.value = generateEndpointURL(currentVal);   
+        Vue.watch(personID, (currentVal, oldVal) => {  
             fetchData();         
         });
 
@@ -138,7 +111,6 @@ export const BaseData = {
             console.log('BaseData mounted', props.personID);
             currentValue.value = createShape();
             if (props.personID) {
-                url.value = generateEndpointURL(props.personID); 
                 fetchData();
             }
             
@@ -213,33 +185,18 @@ export const BaseData = {
             } else {
 
                 // submit
-                isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonBaseData`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(currentValue.value),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
+                try {
+                    const response = await Vue.$fhcapi.Person.updatePersonBaseData(currentValue.value);                    
+                    showToast();
+                    currentValue.value = response.data.retval[0];
+                    preservedValue.value = currentValue.value;
+                    toggleMode();  
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
                 }
-                let response = await res.json();
-            
-                isFetching.value = false;
-
-                showToast();
-                currentValue.value = response.retval[0];
-                preservedValue.value = currentValue.value;
-                toggleMode();
+               
             }
 
             frmState.wasValidated  = true;  

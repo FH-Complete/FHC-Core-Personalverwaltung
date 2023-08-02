@@ -47,10 +47,20 @@ export const MaterialExpensesData = {
  
             const urlMaterial = `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
             const urlUID = `${full}/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
+            
+            // submit
             try {
-              const res = await fetch(urlMaterial);
-              let response = await res.json()              
-              materialdataList.value = response.retval;
+                const response = await Vue.$fhcapi.Person.personMaterialExpenses(currentPersonID.value, currentPersonUID.value);                    
+                materialdataList.value = response.data.retval;
+            } catch (error) {
+                console.log(error)              
+            } finally {
+                isFetching.value = false
+            }
+            
+            /*
+            try {
+              
               // get uid
               const resUID = await fetch(urlUID);
               let responseUID = await resUID.json();
@@ -59,13 +69,13 @@ export const MaterialExpensesData = {
             } catch (error) {
               console.log(error)
               isFetching.value = false;
-            }
+            }*/
         }
 
         const createShape = () => {
             return {
                 sachaufwand_id: 0,
-                mitarbeiter_uid: uid?.value,
+                mitarbeiter_uid: currentPersonUID.value,
                 sachaufwandtyp_kurzbz: "",
                 beginn: "",
                 ende: "",  
@@ -137,36 +147,42 @@ export const MaterialExpensesData = {
             
             if (ok) {   
 
-                postDelete(id)
-                    .then((r) => {
-                        if (r.error == 0) {
-                            delete materialdataList.value[id];
-                            showDeletedToast();
-                        }
-                    });
+                try {
+                    const res = await Vue.$fhcapi.Person.deletePersonMaterialExpenses(id);                    
+                    if (res.data.error == 0) {
+                        delete materialdataList.value[id];
+                        showDeletedToast();
+                    }
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                      isFetching.value = false
+                }   
                 
             }
         }
 
 
-        const okHandler = () => {
+        const okHandler = async () => {
             if (!validate()) {
 
                 console.log("form invalid");
 
             } else {
-                postData()
-                    .then((r) => {
-                        if (r.error == 0) {
-                            materialdataList.value[r.retval[0].sachaufwand_id] = r.retval[0];
-                            console.log('materialdata successfully saved');
-                            showToast();
-                        }                       
-                    }
-                    )
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+
+                // submit
+                try {
+                    const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
+                    if (r.data.error == 0) {
+                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
+                        console.log('materialdata successfully saved');
+                        showToast();
+                    }  
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
                 
                 hideModal();
             }
@@ -192,67 +208,6 @@ export const MaterialExpensesData = {
             return false;
         }
         
-        // save
-        const postData = async () => {
-            console.log('haschanged: ', hasChanged);
-            console.log('frmState: ', frmState);
-
-            // submit
-            isFetching.value = true;
-
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonMaterialExpenses`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(currentValue.value),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-
-            showToast();
-            preservedValue.value = currentValue.value;
-            return response;
-               
-         
-        }
-
-        const postDelete = async (id) => {
-            isFetching.value = true
-
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonMaterialExpenses`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({sachaufwand_id: id}),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-
 
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])

@@ -17,21 +17,10 @@ export const BankData = {
     setup( props ) {
 
         const readonly = Vue.ref(false);
-
         const { personID } = Vue.toRefs(props);
-
         const dialogRef = Vue.ref();
-
-        const url = Vue.ref("");
-
         const isFetching = Vue.ref(false);
-
         const bankdataList = Vue.ref([]);
-
-        const generateEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personBankData?person_id=${person_id}`;
-        };
 
         const fetchData = async () => {
             if (personID.value==null) {    
@@ -40,14 +29,12 @@ export const BankData = {
             }
             isFetching.value = true
             try {
-              console.log('url',url.value);
-              const res = await fetch(url.value);
-              let response = await res.json()              
-              bankdataList.value = response.retval;
-              isFetching.value = false              
+              const res = await Vue.$fhcapi.Person.personBankData(personID.value);                    
+              bankdataList.value = res.data.retval;
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+              console.log(error)              
+            } finally {
+                isFetching.value = false
             }
         }
 
@@ -70,7 +57,6 @@ export const BankData = {
         const preservedValue = Vue.ref(createShape());
 
         Vue.watch(personID, (currentVal, oldVal) => {
-            url.value = generateEndpointURL(currentVal);   
             fetchData();         
         });
 
@@ -96,7 +82,6 @@ export const BankData = {
         Vue.onMounted(() => {
             console.log('BankData mounted', props.personID);
             currentValue.value = createShape();
-            url.value = generateEndpointURL(props.personID); 
             fetchData();
             
         })
@@ -131,36 +116,46 @@ export const BankData = {
             
             if (ok) {   
 
-                postDelete(id)
-                    .then((r) => {
-                        if (r.error == 0) {
-                            delete bankdataList.value[id];
-                            showDeletedToast();
-                        }
-                    });
+                isFetching.value = true
+                try {
+                  const res = await Vue.$fhcapi.Person.deletePersonBankData(id);                    
+                  if (res.data.error == 0) {
+                    delete bankdataList.value[id];
+                    showDeletedToast();
+                  }
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
                 
             }
         }
 
 
-        const okHandler = () => {
+        const okHandler = async () => {
+            // console.log('haschanged: ', hasChanged);
+            // console.log('frmState: ', frmState);
+
             if (!validate()) {
 
                 console.log("form invalid");
 
             } else {
-                postData()
-                    .then((r) => {
-                        if (r.error == 0) {
-                            bankdataList.value[r.retval[0].bankverbindung_id] = r.retval[0];
-                            console.log('bankdata successfully saved');
-                            showToast();
-                        }                       
-                    }
-                    )
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+
+                try {
+                    const r = await Vue.$fhcapi.Person.upsertPersonBankData(currentValue.value);                    
+                    if (r.data.error == 0) {
+                        bankdataList.value[r.data.retval[0].bankverbindung_id] = r.data.retval[0];
+                        console.log('bankdata successfully saved');
+                        preservedValue.value = currentValue.value;
+                        showToast();
+                    }     
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
                 
                 hideModal();
             }
@@ -205,86 +200,6 @@ export const BankData = {
             }
             return false;
         }
-
-       /* if (!bankDataFrm.value.checkValidity()) {
-
-            console.log("form invalid");
-
-        } else {
-
-*/
-
-        // save
-        const postData = async () => {
-            console.log('haschanged: ', hasChanged);
-            console.log('frmState: ', frmState);
-
-            //if (!bankDataFrm.value.checkValidity()) {
-
-
-              //  console.log("form invalid");
-
-            //} else {
-
-                // submit
-                isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonBankData`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(currentValue.value),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
-                }
-                let response = await res.json();
-            
-                isFetching.value = false;
-
-                showToast();
-                preservedValue.value = currentValue.value;
-                return response;
-               
-            //}
-
-            //frmState.wasValidated  = true;  
-        }
-
-        const postDelete = async (id) => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonBankData`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({bankverbindung_id: id}),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-
 
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])

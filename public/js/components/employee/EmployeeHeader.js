@@ -25,27 +25,13 @@ export const EmployeeHeader = {
         const currentPersonUID  = ref(props.personUID);
 
         const employee = ref();
-
-        const headerUrl = ref("");
-
         const fileInput = ref();
         const previewImage = ref();
 
         const isFetching = ref(false);        
         const isFetchingName = ref(false);    
         
-        const currentDate = ref(null);
-
-        const generateEndpointURL = (person_id,uid) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}&uid=${uid}${_maybeAddDate()}`;
-        };
-
-        const _maybeAddDate = () => {
-            if (currentDate.value != null) {
-                return '&d=' + currentDate.value;
-            }
-        }
+        const currentDate = ref(null);        
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -53,24 +39,21 @@ export const EmployeeHeader = {
             return d?.toISOString().substring(0,10);
         }
 
-        const fetchHeaderData = async () => {
+        const fetchHeaderData = async (personID, uid) => {
             isFetching.value = true;
             isFetchingName.value = true;
             try {
                 // fetch header data
-                const res = await fetch(headerUrl.value);
-                let response = await res.json();
-                employee.value = response.retval[0];
+                const res = await Vue.$fhcapi.Employee.personHeaderData(personID, uid);
+                employee.value = res.data.retval[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
-                const abteilungUrl = `${full}/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
-                const resAbteilung = await fetch(abteilungUrl);
-                response = await resAbteilung.json();
-                employee.value = { ...employee.value, ...{ abteilung: response.retval } };
-                isFetching.value = false;
+                const resAbteilung = await Vue.$fhcapi.Employee.personAbteilung(employee.value.uid);
+               // response = await resAbteilung.json();
+                employee.value = { ...employee.value, ...{ abteilung: resAbteilung.data.retval } };
             } catch (error) {
                 console.log(error);
+            } finally {
                 isFetching.value = false;
                 isFetchingName.value = false;
             }
@@ -81,10 +64,8 @@ export const EmployeeHeader = {
             (newVal) => {   
                 currentPersonID.value = route.params.id;
                 currentPersonUID.value = newVal;           
-                //currentDate.value = route.query.d || new Date();     
-                headerUrl.value = generateEndpointURL(route.params.id, newVal);
                 if (currentPersonID.value!=null) {
-                    fetchHeaderData();
+                    fetchHeaderData(route.params.id, newVal);
                 } else {
                     previewImage.value = null;
                     fileInput.value.value = null;
@@ -102,8 +83,8 @@ export const EmployeeHeader = {
         onMounted(() => {
             console.log("EmployeeHeader mounted ");
             currentDate.value = route.query.d || new Date();
-            headerUrl.value = generateEndpointURL(props.personID, props.personUID);
-            fetchHeaderData();
+           // headerUrl.value = generateEndpointURL(props.personID, props.personUID);
+            fetchHeaderData(props.personID, props.personUID);
         })
 
         // Toast 
@@ -131,60 +112,30 @@ export const EmployeeHeader = {
         }
 
         const postFile = async () => {
-            isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/uploadPersonEmployeeFoto`;
-                
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({person_id: props.personID,imagedata: previewImage.value}),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
-                }
-                let response = await res.json();
-
-                fetchHeaderData();
+            try  {
+                isFetching.value = true
+                const res = await Vue.$fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);                
+                fetchHeaderData(props.personID, props.personUID);
                 showToast();
-            
+            } catch (error) {
+                console.log(error);                
+            } finally {
                 isFetching.value = false;
+            }
         }
 
 
         const postDeleteFile = async () => {
-            isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonEmployeeFoto`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({person_id: props.personID}),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
-                }
-                let response = await res.json();
-
-                fetchHeaderData();
+            try  {
+                isFetching.value = true
+                const res = await Vue.$fhcapi.Employee.deletePersonEmployeeFoto(props.personID);                
+                fetchHeaderData(props.personID, props.personUID);
                 showDeleteToast();
-            
+            } catch (error) {
+                console.log(error);                
+            } finally {
                 isFetching.value = false;
+            }            
         }
 
         // Modal 

@@ -19,7 +19,7 @@ export const EmployeeContract = {
         Toast,
     },
     props: {
-        writePermission: { type: Boolean, required: false },  // TODO needs change
+         
     },
     setup() {
 
@@ -80,33 +80,6 @@ export const EmployeeContract = {
             return Math.round(d.getTime() / 1000)
         }
 
-        
-
-        const generateDVEndpointURL = (uid) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPerson?uid=${uid}`;
-        };
-
-        const generateDVDeleteEndpointURL = (dv_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/deleteDV?dv_id=${dv_id}`;
-        };
-
-        const generateVertragEndpointURL = (dv_id, date) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/vertragByDV?dv_id=${dv_id}&d=${convert2UnixTS(date)}`;
-        };
-
-        const generateGBTEndpointURL = (dv_id, date) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtByDV?dv_id=${dv_id}&d=${convert2UnixTS(date)}`;
-        };
-
-        const generateGBTChartEndpointURL = (dv_id, date) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/gbtChartDataByDV?dv_id=${dv_id}`;
-        };
-
         // dummy data for chart
         // var dates = ["2013-06-14", "2019-2-1", "2019-06-30", "2019-07-1", "2021-04-13"],
         // salaries =  [4711,            4800,         4750,        5000,         5000];
@@ -160,93 +133,84 @@ export const EmployeeContract = {
                 vertragList.value = [];
                 return;
             }
-            let urlDV = generateDVEndpointURL(uid);
             isFetching.value = true
             try {
-                const res = await fetch(urlDV);
-                let response = await res.json();
+              const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
+                dvList.value = res.data.retval;          
                 isFetching.value = false;
-                dvList.value = response.retval;
                 if (dvList.value.length > 0) {
                     currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
                     currentDV.value = dvList.value[0];
                 } else {
                     currentDVID.value = null;
                     currentDV.value = null;
-                }
+                }          
             } catch (error) {
                 console.log(error)
                 isFetching.value = false
             }
+
+            
         }
 
         const fetchVertrag = async (dv_id, date) => {
-            let urlVertrag = generateVertragEndpointURL(dv_id, date);
             isFetching.value = true
             try {
-                const res = await fetch(urlVertrag);
-                let response = await res.json();
-                isFetching.value = false;
-                vertragList.value = response;
-                //if (vertragList.value.length>0) {
-                //currentVertragID.value = vertragList.value[0].vertragsbestandteil_id;
+                const res = await Vue.$fhcapi.Vertrag.vertragByDV(dv_id, convert2UnixTS(date));
+                vertragList.value = res.data;
                 getCurrentVertragsbestandteil();
                 //}
             } catch (error) {
-                console.log(error)
+                console.log(error)                
+            } finally {
                 isFetching.value = false
             }
         }
 
         // Gehaltsbestandteile
         const fetchGBT = async (dv_id, date) => {
-            let urlGBT = generateGBTEndpointURL(dv_id, date);
+
             isFetching.value = true
             try {
-                const res = await fetch(urlGBT);
-                let response = await res.json();
-                isFetching.value = false;
-                gbtList.value = response;
-
+                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
+                gbtList.value = res.data;
             } catch (error) {
-                console.log(error)
+                console.log(error)                
+            } finally {
                 isFetching.value = false
             }
+           
         }
 
         // fetch chart data
         const fetchGBTChartData = async (dv_id, date) => {
-            let urlGBT = generateGBTChartEndpointURL(dv_id);
             isFetching.value = true
             try {
-                const res = await fetch(urlGBT);
-                let response = await res.json();
-                isFetching.value = false;
-                gbtChartData.value = response;
+                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                gbtChartData.value = res.data;
                 let tempData = [];
                 // chartOptions.series[0].data.length = 0;
-                Object.keys(response).forEach(element => {
-                   tempData.push([element, parseFloat(response[element])]);
+                Object.keys(res.data).forEach(element => {
+                   tempData.push([element, parseFloat(res.data[element])]);
                 });
                 chartOptions.series[0].data = tempData;
-
             } catch (error) {
-                console.log(error)
+                console.log(error)                
+            } finally {
                 isFetching.value = false
             }
+           
         }
 
         const deleteDV = async (dv_id) => {
-            let url = generateDVDeleteEndpointURL(dv_id);
-            isFetching.value = true
+            isFetching.value = true            
             try {
-                const res = await fetch(url);
-                let response = await res.json();
-                isFetching.value = false;
-                console.log(response);
+                const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
+                employee.value = res.data.retval[0];
             } catch (error) {
-                console.log(error)
-                isFetching.value = false
+                console.log(error);
+            } finally {
+                isFetching.value = false;
             }
         }
 
@@ -326,17 +290,7 @@ export const EmployeeContract = {
             let ws = vertragsbestandteile.filter(value => value.vertragsbestandteiltyp_kurzbz == kurzbz);
             return ws;
         }
-        /*
-                const createDVDialog = async () => {
-                    const result = await dienstverhaeltnisDialogRef.value.showModal(route.params.uid);
         
-                    if (result) {
-                        console.log(result);
-                    } else {
-                        console.log("Dialog cancelled");
-                    }
-                }
-        */
         const createDVDialog = () => {
             vbformmode.value = 'neuanlage';
             vbformDV.value = null;

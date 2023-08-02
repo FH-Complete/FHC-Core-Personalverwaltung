@@ -129,43 +129,35 @@ export const CreateEmployeeFrm = {
 
                 // submit
                 isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/createEmployee`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ action: "quick", payload: {...currentValue.value}}),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
+                try {
+                    const response = await Vue.$fhcapi.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
+                    redirect2Employee(response.data.retval.person_id, response.data.retval.uid);
+                } catch (error) {
+                    console.log(error);                    
+                } finally {
+                    isFetching.value = false;           
                 }
-                let response = await res.json();            
-                isFetching.value = false;  
-
-                if (response.error == 1) {
-                    // error handling
-                    const message = `error when creating employee`;
-                    console.log(message, reponse.retval);
-                    throw new Error(message);
-                } else {
-                    redirect2Employee(response.retval.person_id, response.retval.uid);
-                }
-
-                //currentValue.value = response.retval[0];
-                //preservedValue.value = currentValue.value;
                 
             }
 
             frmState.wasValidated  = true;  
         }
+
+        const take = async (person_id, uid) => {
+                                
+            try {
+                isFetching.value = true
+                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid}});             
+                isFetching.value = false;                
+                personSelectedHandler(person_id, res.data.retval.uid);
+
+            } catch (error) {
+                console.log(error);
+                isFetching.value = false;           
+            }	
+            
+        }
+
 
         const reset = () => {
             currentValue.value = createShape();

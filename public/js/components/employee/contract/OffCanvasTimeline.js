@@ -46,32 +46,6 @@ export const OffCanvasTimeline = {
             hide();
         }
 
-
-        const fetchCurrentDV = async () => {
-            if (currentUID.value == null) {
-                return;
-            }
-			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCourseHours?uid=${currentUID.value}&semester=${currentSemester.value}`;
-              isFetching.value = true;
-			  const res = await fetch(url)
-			  let response = await res.json();
-              isFetching.value = false;
-			  console.log(response.retval);
-              if (response.retval.length>0) {
-                courseData.value = response.retval[0];
-              } else {
-                courseData.value = null;
-              }
-
-			} catch (error) {
-			  console.log(error);
-              isFetching.value = false;
-			}
-		}
-
         Vue.onMounted(() => {
             thisOffCanvasObj = new bootstrap.Offcanvas(offCanvasEle.value);
         })

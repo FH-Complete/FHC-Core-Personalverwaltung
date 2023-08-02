@@ -29,16 +29,7 @@ export const EmployeeStatus = {
           return teilzeittyp != undefined ? teilzeittyp.label : item;
         }
 
-        /*let statusList = Vue.ref([{text:'Fix',description:'fixangestellt'}, 
-            {text:'Befristet',description:'befristet bis 30.6.2023'}, 
-            {text:'Karenz',description:'Elternkarenz bis 30.11.2023'}]);*/
-
-        let statusList = Vue.ref([]);
-
-        const generateDVEndpointURL = (uid) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/dvByPerson?uid=${uid}`;
-        };      
+        let statusList = Vue.ref([]);    
 
         const generateStatusList = () => {
           let anzDV = 0;
@@ -100,12 +91,10 @@ export const EmployeeStatus = {
               vertragList.value = [];
               return;
           }
-          let urlDV = generateDVEndpointURL(uid);
           isFetching.value = true
           try {
-              let res = await fetch(urlDV);
-              let response = await res.json();
-              dvList.value = response.retval;          
+            const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
+              dvList.value = res.data.retval;          
               isFetching.value = false;
               generateStatusList();           
           } catch (error) {

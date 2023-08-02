@@ -39,32 +39,13 @@ export const SearchExistingDialog = {
                 personList.value = [];
                 return;
             }
-            
 
             try {
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
-                console.log('filter existing surname=' + currentValue.surname);
-                const endpoint = `${full}/extensions/FHC-Core-Personalverwaltung/api/filterPerson`;
                 isFetching.value = true;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(currentValue),
-                });   
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
-                }
-
-			    let response = await res.json();
+                const res = await Vue.$fhcapi.Employee.filterPerson(currentValue);                
                 isFetching.value = false;              
-			    console.log(response.retval);	  
-			    personList.value = response.retval;
+			    console.log(res.data);	  
+			    personList.value = res.data.retval;
 
             } catch (error) {
                 console.log(error);
@@ -83,31 +64,17 @@ export const SearchExistingDialog = {
         // create new employee based on student
         const take = async (person_id, uid) => {
                                 
-            // submit
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            try {
+                isFetching.value = true
+                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid}});             
+                isFetching.value = false;                
+                personSelectedHandler(person_id, res.data.retval.uid);
 
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/createEmployee`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ action: "take", payload: { person_id, uid}}),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;                
-            personSelectedHandler(person_id, response.retval.uid);
-                    
+            } catch (error) {
+                console.log(error);
+                isFetching.value = false;           
+            }	
+            
         }
 
 
