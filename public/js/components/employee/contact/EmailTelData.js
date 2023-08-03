@@ -33,36 +33,29 @@ export const EmailTelData = {
 
         Vue.watch(personID, (currentValue, oldValue) => {
             console.log('ContactData watch',currentValue);
-            urlContactData.value = generateContactDataEndpointURL(currentValue);
             fetchData();
         });
 
-        const generateContactDataEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personContactData?person_id=${person_id}`;
-        };
 
         const fetchData = async () => {
             if (personID.value==null) {
                 contactList.value = [];
                 return;
             }
-            isFetching.value = true
+            // submit
             try {
-              const res = await fetch(urlContactData.value)
-              let response = await res.json()
-              isFetching.value = false
-              console.log(response.retval);
-              contactList.value = response.retval;
+                const response = await Vue.$fhcapi.Person.personContactData(personID.value);
+                contactList.value = response.data.retval;
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+                console.log(error)              
+            } finally {
+                isFetching.value = false
             }
-          }
+            
+        }
 
         Vue.onMounted(() => {
-            console.log('ContactData mounted', props.personID);            
-            urlContactData.value = generateContactDataEndpointURL(props.personID); 
+            console.log('ContactData mounted', props.personID);                        
             fetchData();
             
         })
@@ -111,91 +104,46 @@ export const EmailTelData = {
             
             if (ok) {
 
-                postDelete(id)
-                    .then((r) => {
-                        if (r.error == 0) {
-                            delete contactList.value[id];
-                            showDeleteToast();
-                        }
-                    });
-                
+                try {
+                    const res = await Vue.$fhcapi.Person.deletePersonContactData(id);                    
+                    if (res.data.error == 0) {
+                        delete contactList.value[id];
+                        showDeleteToast();
+                    }
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                      isFetching.value = false
+                }   
+
             }
         }
 
         const hideModal = () => {
             modalRef.value.hide();
-        }
+        }        
 
-        const postData = async () => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonContactData`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(currentContact.value),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-            
-
-        const postDelete = async (id) => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonContactData`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({kontakt_id: id}),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-
-        const okHandler = () => {
+        const okHandler =  async() => {
             if (!validate()) {
 
                 console.log("form invalid");
 
             } else {
-                postData()
-                    .then((r) => {
-                        if (r.error == 0) {
-                            contactList.value[r.retval[0].kontakt_id] = r.retval[0];
-                            console.log('contact successfully saved');
-                            showToast();
-                        }                        
-                    })
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+
+                // submit
+                try {
+                    const r = await Vue.$fhcapi.Person.upsertPersonContactData(currentContact.value);                    
+                    if (r.data.error == 0) {
+                        contactList.value[r.data.retval[0].kontakt_id] = r.data.retval[0];
+                        console.log('contact successfully saved');
+                        showToast();
+                    }  
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
+               
                 
                 hideModal();
             }

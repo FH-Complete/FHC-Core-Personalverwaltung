@@ -8,6 +8,7 @@ import Funktion from "./funktion.js";
 import Employee from "./employee.js";
 import Gehaltsbestandteil from "./gehaltsbestandteil.js";
 import Person from "./person.js";
+import Common from "./common.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -20,4 +21,5 @@ export default {
     "Employee": Employee,
     "Gehaltsbestandteil": Gehaltsbestandteil,
     "Person": Person,
+    "Common": Common,
 };

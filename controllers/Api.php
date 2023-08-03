@@ -221,7 +221,7 @@ class Api extends Auth_Controller
             $this->outputJsonError("plz '$plz' is not numeric!'");            
         } else {
             $data = $this->ApiModel->getGemeinden($plz);
-            $this->outputJsonSuccess($data); 
+            $this->outputJson($data); 
         }
     }
 
@@ -233,7 +233,7 @@ class Api extends Auth_Controller
             $this->outputJsonError("plz '$plz' is not numeric!'");     
 
         $data = $this->ApiModel->getOrtschaften($plz);
-        $this->outputJsonSuccess($data); 
+        $this->outputJson($data); 
     }
 
     // ---------------------------------------

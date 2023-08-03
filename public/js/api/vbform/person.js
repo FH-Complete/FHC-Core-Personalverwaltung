@@ -55,6 +55,50 @@ export default {
       return axios.get(url, { params: { person_id: person_id} });
     },
 
+    personAddressData: function(person_id) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/personAddressData';
+      return axios.get(url, { params: { person_id: person_id} });
+    },
+    deletePersonAddressData: function(adresse_id) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/deletePersonAddressData';
+      return axios.post(url, {adresse_id: adresse_id}, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
+    upsertPersonAddressData: function(payload) {
+        var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/upsertPersonAddressData';
+        return axios.post(url, payload, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    },
+
+    personContactData: function(person_id) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/personContactData';
+      return axios.get(url, { params: { person_id: person_id} });
+    },
+    deletePersonContactData: function(kontakt_id) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/deletePersonContactData';
+      return axios.post(url, {kontakt_id: kontakt_id}, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
+    upsertPersonContactData: function(payload) {
+        var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/upsertPersonContactData';
+        return axios.post(url, payload, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+    },
+
+
+
     uidByPerson: function(person_id, uid) {
         var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/uidByPerson';
         return axios.get(url, { params: { person_id: person_id, person_uid: uid} });

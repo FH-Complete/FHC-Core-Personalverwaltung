@@ -39,19 +39,9 @@ export const AddressData = {
         const readonly = Vue.ref(false);
 
         Vue.watch(personID, (currentValue, oldValue) => {
-            console.log('AddressData watch',currentValue);
-            urlAddressData.value = generateAddressDataEndpointURL(currentValue);
+            console.log('AddressData watch',currentValue);            
             fetchData();
         });
-
-        
-
-        const generateAddressDataEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personAddressData?person_id=${person_id}`;
-        };
-
-
 
         const fetchData = async () => {
             if (personID.value==null) {
@@ -59,60 +49,48 @@ export const AddressData = {
                 return;
             }
             isFetching.value = true
+            // submit
             try {
-              const res = await fetch(urlAddressData.value)
-              let response = await res.json()
-              isFetching.value = false
-              console.log(response.retval);
-              addressList.value = response.retval;
+                const response = await Vue.$fhcapi.Person.personAddressData(personID.value);                    
+                addressList.value = response.data.retval;
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+                console.log(error)              
+            } finally {
+                isFetching.value = false
             }
-          }
-
-        const fetchGemeinden = async () => {
-            try {
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getGemeinden?plz=${currentAddress.value.plz}`;
-        
-              const res = await fetch(url)
-              let response = await res.json()              
-              return response.retval;
-            } catch (error) {
-              console.log(error)              
-            }		
+            
         }
 
-        const fetchOrtschaften = async () => {
-            try {
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrtschaften?plz=${currentAddress.value.plz}`;
-        
-              const res = await fetch(url)
-              let response = await res.json()              
-              return response.retval;
-            } catch (error) {
-              console.log(error)              
-            }		
-        }
 
         Vue.watchEffect(async () => {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
-                const response = await fetchGemeinden();
-                gemeinden.value = response?.retval;
+                try  {
+                    isFetching.value = true
+                    const response = await Vue.$fhcapi.Common.getGemeinden(currentAddress.value.plz);     
+                    gemeinden.value = response.data.retval;
+                } catch (error) {
+                    console.log(error)                    
+                } finally {
+                    isFetching.value = false
+                }
             }            
         })
 
         Vue.watchEffect(async () => {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
-                const response = await fetchOrtschaften();
-                ortschaften.value = response?.retval;
+                try  {
+                    isFetching.value = true
+                    const response = await Vue.$fhcapi.Common.getOrtschaften(currentAddress.value.plz);     
+                    ortschaften.value = response.data.retval;
+                } catch (error) {
+                    console.log(error)                    
+                } finally {
+                    isFetching.value = false
+                }
             }            
         })
 
-        Vue.onMounted(() => {
-            urlAddressData.value = generateAddressDataEndpointURL(props.personID); 
+        Vue.onMounted(() => {            
             fetchData();
             
         })
@@ -134,13 +112,17 @@ export const AddressData = {
             
             if (ok && !currentAddress.value.heimatadresse) {   
 
-                postDelete(id)
-                    .then((r) => {
-                        if (r.error == 0) {
-                            delete addressList.value[id];
-                            showDeletedToast();
-                        }
-                    });
+                try {
+                    const res = await Vue.$fhcapi.Person.deletePersonAddressData(id);                    
+                    if (res.data.error == 0) {
+                        delete addressList.value[id];
+                        showDeletedToast();
+                    }
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                      isFetching.value = false
+                }                  
                 
             }
         }
@@ -185,83 +167,28 @@ export const AddressData = {
             modalRef.value.hide();
         }
 
-        const postData = async () => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonAddressData`;
+       
 
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(currentAddress.value),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-            
-
-        const postDelete = async (id) => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonAddressData`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({adresse_id: id}),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-
-        const okHandler = () => {
+        const okHandler = async () => {
             if (!validate()) {
 
                 console.log("form invalid");
 
             } else {
-                postData()
-                    .then((r) => {
-                        if (r.error == 0) {
-                            addressList.value[r.retval[0].adresse_id] = r.retval[0];
-                            console.log('address successfully saved');
-                            showToast();
-                        }
-                        /*
-                        if (currentAddress.value) {
-                            addressList.value[currentAddress.value.adresse_id] = currentAddress.value;
-                            console.log('address successfully saved');
-                            showToast();
-                        }*/
+
+                // submit
+                try {
+                    const r = await Vue.$fhcapi.Person.upsertPersonAddressData(currentAddress.value);                    
+                    if (r.data.error == 0) {
+                        addressList.value[r.data.retval[0].adresse_id] = r.data.retval[0];
+                        console.log('address successfully saved');
+                        showToast();
                     }
-                    )
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
                 
                 hideModal();
             }
