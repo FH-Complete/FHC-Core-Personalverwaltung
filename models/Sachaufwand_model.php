@@ -26,7 +26,7 @@ class Sachaufwand_model extends DB_Model
 			$parametersArray['person_id'] = $person_id;
 		}
 
-		if (count($parametersArray) > 0)
+		if (numberOfElements($parametersArray) > 0)
 		{
 			$result = $this->loadWhere($parametersArray);
 		}
