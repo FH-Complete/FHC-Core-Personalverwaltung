@@ -284,7 +284,7 @@ export const MaterialExpensesData = {
                             </thead>
                             <tbody>
                             <tr v-for="materialdata in materialdataListArray" :key="materialdata.sachaufwand_id">
-                                <td class="align-middle">{{ materialdata.sachaufwandtyp_kurzbz }}</td>
+                                <td class="align-middle">{{ materialdata.bezeichnung }}</td>
                                 <td class="align-middle">{{ formatDate(materialdata.beginn) }}</td>
                                 <td class="align-middle">{{ formatDate(materialdata.ende) }}</td>
                                 <td class="align-middle">{{ materialdata.anmerkung }}</td>
