@@ -34,10 +34,6 @@ export const MaterialExpensesData = {
 
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
-        const generateEndpointURL = (person_id,uid) => {           
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${person_id}&person_uid=${uid}`;
-        };
-
         const fetchData = async () => {
             if (currentPersonID.value==null) {    
                 materialdataList.value = [];            
@@ -87,7 +83,6 @@ export const MaterialExpensesData = {
         const preservedValue = Vue.ref(createShape());
 
         Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
-            url.value = generateEndpointURL(id, uid);   
             fetchData();                     
         });
 
@@ -113,7 +108,6 @@ export const MaterialExpensesData = {
         Vue.onMounted(() => {
             console.log('MaterialData mounted', props.personID);
             currentValue.value = createShape();
-            url.value = generateEndpointURL(props.personID, props.personUID); 
             fetchData();
             
         })
