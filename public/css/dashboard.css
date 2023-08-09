@@ -162,3 +162,7 @@ div#collapseTable.minimized {
 .filter-filter-options {
   margin-bottom: 15px;
 } 
+
+table.dvcard  th {
+  text-align: left;
+}

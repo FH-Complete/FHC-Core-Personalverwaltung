@@ -2,14 +2,14 @@
 import { CovidCard } from './CovidCard.js';
 import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
-import { TimelineCard } from './TimelineCard.js';
+import { IssuesCard } from './IssuesCard.js';
 
 export const EmployeeSummary = {
     components: {
         CovidCard,
         DvCard,
         LehreCard,
-        TimelineCard,
+        IssuesCard,
     },
     props: {
         date: Date,
@@ -62,16 +62,14 @@ export const EmployeeSummary = {
                     <div class="col">
                         
                         <dv-card :uid="currentUID" :date="date" ></dv-card>
-
-                        <br>
-
-                        <timeline-card :uid="currentUID"></timeline-card>
-
+            
                     </div>          
 
                     <div class="col">
                         
-                        <covid-card :personID="currentPersonID" :date="date"></covid-card>
+                        <!--covid-card :personID="currentPersonID" :date="date"></covid-card-->
+
+                        <issues-card></issues-card>
 
                         <br/>
                         <div class="card">

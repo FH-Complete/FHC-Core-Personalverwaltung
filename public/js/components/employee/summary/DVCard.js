@@ -24,34 +24,27 @@ export const DvCard = {
             let d = new Date(ds);
             return Math.round(d.getTime() / 1000)
         }
-
-        const capitalize = (s) => {
-            return s.charAt(0).toUpperCase() + s.slice(1);
-        }
         
         const fetchCurrentDV = async () => {
             if (currentUID.value == null) {
                 return;
             }
 			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;  
               let ts = convert2UnixTS(currentDate.value);  // unix timestamp
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCurrentDV?uid=${currentUID.value}&d=${ts}`;
               isFetching.value = true;
-			  const res = await fetch(url)
-			  let response = await res.json();
+              const response = await Vue.$fhcapi.Employee.getCurrentDV(currentUID.value, ts);
               isFetching.value = false;              
-			  console.log(response.retval);	  
-              if (response.retval.length>0) {
-                dvData.value = response.retval;
+			  console.log(response.data.retval);	  
+              if (response.data.retval.length>0) {
+                dvData.value = response.data.retval;
               } else {
                 dvData.value = null;
               }
-			  			  
 			} catch (error) {
 			  console.log(error);
-              isFetching.value = false;           
-			}		
+			} finally {
+                isFetching.value = false;
+            }	
 		}
 
         onMounted(() => {
@@ -92,7 +85,7 @@ export const DvCard = {
             </div>     
             <div v-if="!isFetching && dvData!=null">
                 <div v-for="(item, index) in dvData" :key="item.dienstverhaeltnis_id">
-                    <table class="table table-bordered">
+                    <table class="dvcard table table-bordered">
                     <tbody>
                         <tr><th scope="row">Zeitraum: </th><td>{{ formatDate(item.von) }} - {{ formatDate(item.bis) }}</td></tr>
                         <tr><th scope="row">Art</th><td>{{ item.vertragsart_kurzbz }}</td></tr>

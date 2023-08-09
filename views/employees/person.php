@@ -11,8 +11,7 @@
       'vue3' => true, 
 			'ajaxlib' => true,
 			'navigationwidget' => false,
-			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css'],       
+			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css'],       
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/EmployeeChooser.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
                       // Base

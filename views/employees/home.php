@@ -19,7 +19,6 @@
 			'customCSSs' => [
 				'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
-				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
 				'public/css/components/verticalsplit.css',

@@ -27,6 +27,10 @@ export default {
     var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/dvByPerson';
     return axios.get(url, { params: { uid: uid  } });
   },
+  getCurrentDV: function(uid, ts) {
+    var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/getCurrentDV';
+    return axios.get(url, { params: { uid: uid, d: ts  } });
+  },
   deleteDV: function(dv_id) {
     var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/deleteDV';
     return axios.get(url, { params: { dv_id: dv_id  } });
