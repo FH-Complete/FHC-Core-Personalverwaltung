@@ -15,7 +15,8 @@ class Issue extends Auth_Controller
         parent::__construct(
 			array(
 				'index' => Self::DEFAULT_PERMISSION,
-				'byPerson' => Self::DEFAULT_PERMISSION
+				'byPerson' => Self::DEFAULT_PERMISSION,
+				'PersonenMitOffenenIssues' => self::DEFAULT_PERMISSION
 			)
 		);
 
@@ -73,5 +74,37 @@ class Issue extends Auth_Controller
     }
 
 
-
+	public function PersonenMitOffenenIssues()
+	{
+		$sql = <<<EOSQL
+			SELECT 
+				person_id, vorname, nachname, count(*) AS openissues 
+			FROM 
+				system.tbl_issue 
+			JOIN 
+				system.tbl_fehler USING (fehlercode) 
+			JOIN 
+				public.tbl_person USING (person_id) 
+			WHERE 
+				app = 'personalverwaltung' AND verarbeitetamum IS NULL 
+			GROUP BY 
+				person_id, vorname, nachname 
+			HAVING 
+				count(*) > 0 
+			ORDER BY 
+				count(*) DESC;
+EOSQL;
+		
+		$personenmitissues = $this->IssueModel->execReadOnlyQuery($sql);
+		if( hasData($personenmitissues) ) 
+		{
+			$this->outputJson($personenmitissues);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no persons with open issues found');
+			return;
+		}
+	}
 }
