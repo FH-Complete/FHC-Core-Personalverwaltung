@@ -4,13 +4,13 @@ const IssuesCountCard = {
      setup( props ) {
         
         const isFetching = Vue.ref(false);
-        const title = Vue.ref("Issues");
+        const title = Vue.ref("Mitarbeiter*innen mit Issues");
         const issues = Vue.ref([]);
 
         const getOpenIssues = async () =>  {
             try {
                 let res = await Vue.$fhcapi.Issue.openIssuesPersons();
-                issues.value = res.data;
+                issues.value = res.data.retval;
                 console.log(res);
                 return res;
             } catch(error) {
