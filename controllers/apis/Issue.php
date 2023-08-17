@@ -78,17 +78,21 @@ class Issue extends Auth_Controller
 	{
 		$sql = <<<EOSQL
 			SELECT 
-				person_id, vorname, nachname, count(*) AS openissues 
+				person_id, uid, vorname, nachname, count(*) AS openissues 
 			FROM 
 				system.tbl_issue 
 			JOIN 
 				system.tbl_fehler USING (fehlercode) 
 			JOIN 
 				public.tbl_person USING (person_id) 
+			JOIN 
+				public.tbl_benutzer USING (person_id) 
+			JOIN 
+				public.tbl_mitarbeiter ON uid = mitarbeiter_uid 
 			WHERE 
 				app = 'personalverwaltung' AND verarbeitetamum IS NULL 
 			GROUP BY 
-				person_id, vorname, nachname 
+				person_id, uid, vorname, nachname 
 			HAVING 
 				count(*) > 0 
 			ORDER BY 
