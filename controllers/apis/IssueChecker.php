@@ -3,6 +3,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class IssueChecker extends Auth_Controller
 {
+	const DEBUG = false;
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 
 	const CI_PATH = 'application';
@@ -26,6 +27,7 @@ class IssueChecker extends Auth_Controller
         parent::__construct(
 			array(
 				'checkPerson' => self::DEFAULT_PERMISSION,
+				'countPersonOpenIssues' => self::DEFAULT_PERMISSION
 			)
 		);
 		
@@ -74,34 +76,90 @@ class IssueChecker extends Auth_Controller
 
 	public function checkPerson($personid)
 	{
-		// TODO validate
-		$this->personid = $personid;
+		$this->personid = intval($personid);
+
 		$persres = $this->PersonModel->load($this->personid);
+		$openissues = null;
 		if(hasData($persres)) 
 		{
-			$this->produceIssues();
-			$this->resolveIssues();			
+			if( $this->input->method(TRUE) === 'POST' ) 
+			{
+				$this->produceIssues();
+				$this->resolveIssues();
+				$this->produceIssues();
+			}
+			else 
+			{
+				$this->errors[] = 'Not called via POST so Plausichecks were not executed.';
+			}		
+			$openissues = $this->countOpenIssues();
 		}
 		else 
 		{
 			$this->errors[] = 'Person with id ' . $this->personid . ' not found.';
+		}		
+		
+		$data = array(
+			'personid' => $this->personid, 
+			'openissues' => $openissues
+		);
+		
+		$meta = array(
+			'errors' => $this->errors,
+			'infos' => $this->infos
+		);
+		if(self::DEBUG) 
+		{
+			$meta['mapping'] = $this->PlausicheckDefinitionLib->getFehlerLibMappings();
+			$meta['debug'] = $this->debug;
 		}
 		
 		$this->outputJson(
 			array(
-				'data' => array(
-					'personid' => $this->personid
-				), 
-				'meta' => array(
-					'errors' => $this->errors,
-					'infos' => $this->infos,
-					'mapping' => $this->PlausicheckDefinitionLib->getFehlerLibMappings(),
-					'debug' => $this->debug
-				)
+				'data' => $data, 
+				'meta' => $meta
 			)
 		);
 		return;
 	}
+
+	public function countPersonOpenIssues($personid)
+	{
+		$this->personid = intval($personid);
+		$persres = $this->PersonModel->load($this->personid);
+		$openissues = null;
+		if(hasData($persres)) 
+		{
+			$openissues = $this->countOpenIssues();
+		}
+		else
+		{
+			$this->errors[] = 'Person with id ' . $this->personid . ' not found.';
+		}
+
+		$data = array(
+			'personid' => $this->personid, 
+			'openissues' => $openissues
+		);
+		
+		$meta = array(
+			'errors' => $this->errors,
+			'infos' => $this->infos
+		);
+		if(self::DEBUG) 
+		{
+			$meta['mapping'] = $this->PlausicheckDefinitionLib->getFehlerLibMappings();
+			$meta['debug'] = $this->debug;
+		}
+		
+		$this->outputJson(
+			array(
+				'data' => $data, 
+				'meta' => $meta
+			)
+		);
+		return;
+	}	
 	
 	protected function produceIssues()
 	{
@@ -114,7 +172,11 @@ class IssueChecker extends Auth_Controller
 					'person_id' => $this->personid
 				)
 			);
-		    $this->debug[$fehler_kurzbz] = $plausicheckRes;
+			
+			if(self::DEBUG) 
+			{
+				$this->debug[$fehler_kurzbz] = $plausicheckRes;
+			}
 			
 			if (hasData($plausicheckRes))
 			{
@@ -139,6 +201,26 @@ class IssueChecker extends Auth_Controller
 				}
 			}
 		}
+	}
+	
+	protected function countOpenIssues() 
+	{
+		// load open issues with given errorcodes
+		$openIssuesRes = $this->IssueModel->getOpenIssues(
+			array_keys($this->_codeLibMappings),
+			$this->personid
+		);
+
+		// log error if occured
+		if (isError($openIssuesRes))
+		{
+			$this->errors[] = getError($openIssuesRes);
+			return null;
+		}
+		
+		$issues = getData($openIssuesRes);
+		$issuescount = (is_countable($issues)) ? count($issues) : 0;
+		return $issuescount;
 	}
 	
 	protected function resolveIssues() 

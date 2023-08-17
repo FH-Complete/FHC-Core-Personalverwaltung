@@ -29,9 +29,12 @@ export const EmployeeHeader = {
         const previewImage = ref();
 
         const isFetching = ref(false);        
-        const isFetchingName = ref(false);    
+        const isFetchingName = ref(false);
+        const isFetchingIssues = ref(false);
         
         const currentDate = ref(null);        
+
+        const openissuescount = ref();
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -56,6 +59,30 @@ export const EmployeeHeader = {
             } finally {
                 isFetching.value = false;
                 isFetchingName.value = false;
+            }
+        };
+
+        const fetchOpenIssuesCount = async(personID) => {
+            isFetchingIssues.value = true;
+            try {
+                const res = await Vue.$fhcapi.Issue.countPersonOpenIssues(personID);
+                openissuescount.value = res.data.data.openissues;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                isFetchingIssues.value = false;
+            }
+        };
+
+        const checkPerson = async() => {
+            isFetchingIssues.value = true;
+            try {            
+                const res = await Vue.$fhcapi.Issue.checkPerson(props.personID);
+                openissuescount.value = res.data.data.openissues;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                isFetchingIssues.value = false;
             }
         };
 
@@ -85,6 +112,7 @@ export const EmployeeHeader = {
             currentDate.value = route.query.d || new Date();
            // headerUrl.value = generateEndpointURL(props.personID, props.personUID);
             fetchHeaderData(props.personID, props.personUID);
+            fetchOpenIssuesCount(props.personID);
         })
 
         // Toast 
@@ -198,11 +226,14 @@ export const EmployeeHeader = {
             previewImage,
             isFetching,
             isFetchingName,
+            isFetchingIssues,
             currentPersonID,
             currentPersonUID,
             currentDate,
             formatDate,
             setDateHandler,
+            checkPerson,
+            openissuescount
         }
     },
     template: `
@@ -277,6 +308,11 @@ export const EmployeeHeader = {
             
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
+                    <div class="px-2">
+                        <h4 class="mb-1">Issues<a href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
+                        <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6> 
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6> 
+                    </div>
                     <div class="px-2">
                         <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
