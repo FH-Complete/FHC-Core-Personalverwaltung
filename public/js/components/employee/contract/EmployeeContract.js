@@ -404,7 +404,7 @@ export const EmployeeContract = {
         }
 
         const setDate2BisDatum = () => {
-            currentDate.value = new Date(currentDV.value.bis);
+            currentDate.value = truncateDate(new Date(currentDV.value.bis));
         }
 
         const setDate2VonDatum = () => {
