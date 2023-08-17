@@ -20,5 +20,11 @@ export default {
             + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/getAllVBs/' 
             + dvid;
       return axios.get(url);
+  },
+  getVB: function(vbid) {
+    var url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
+            + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/getVB/' 
+            + vbid;
+      return axios.get(url);
   }
 };

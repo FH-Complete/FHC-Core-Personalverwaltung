@@ -76,7 +76,9 @@ class Api extends Auth_Controller
 				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
 				'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
 				'getUnternehmen' => Api::DEFAULT_PERMISSION,
+                'getGehaltstypen' => Api::DEFAULT_PERMISSION,
 				'getVertragsarten' => Api::DEFAULT_PERMISSION,
+                'getVertragsbestandteiltypen' => Api::DEFAULT_PERMISSION,
                 'filterPerson' => Api::DEFAULT_PERMISSION,
                 'createEmployee' => Api::DEFAULT_PERMISSION,
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
@@ -86,7 +88,10 @@ class Api extends Auth_Controller
 				'saveKarenz'  => Api::DEFAULT_PERMISSION,
 				'getKarenztypen' => Api::DEFAULT_PERMISSION,
 				'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
-				'getFreitexttypen' => Api::DEFAULT_PERMISSION
+				'getFreitexttypen' => Api::DEFAULT_PERMISSION,
+                'getVB' => Api::DEFAULT_PERMISSION,
+                'getGB' => Api::DEFAULT_PERMISSION,
+                'dvByID'=> Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -118,8 +123,10 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
         $this->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 'DVModel');
         $this->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GBTModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltstyp_model', 'GehaltstypModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
 		$this->load->model('ressource/Funktion_model', 'FunktionModel');
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
@@ -1319,6 +1326,56 @@ class Api extends Auth_Controller
         return $this->outputJson($data);   
     }
 
+    function dvByID($dvid)
+    {
+
+        if (!is_numeric($dvid))
+        {
+            $this->outputJsonError('invalid parameter dvid');
+            exit;
+        }
+
+        $result = $this->DVModel->getDVByID($dvid);
+
+        if (isSuccess($result))
+			$this->outputJson($result->retval[0]);
+		else
+			$this->outputJsonError('Error fetching DV');
+        
+    }
+
+    function getVB($vertragsbestandteil_id)
+    {
+
+        if (!is_numeric($vertragsbestandteil_id))
+        {
+            $this->outputJsonError('invalid parameter vbid');
+            exit;
+        }
+
+        $data = $this->VertragsbestandteilLib->fetchVertragsbestandteil(
+			intval($vertragsbestandteil_id));
+
+        
+        return $this->outputJson($data);
+    }
+
+    function getGB($gehaltsbestandteil_id)
+    {
+
+        if (!is_numeric($gehaltsbestandteil_id))
+        {
+            $this->outputJsonError('invalid parameter vbid');
+            exit;
+        }
+
+        $data = $this->GehaltsbestandteilLib->fetchGehaltsbestandteil(
+			intval($gehaltsbestandteil_id));
+
+        
+        return $this->outputJson($data);
+    }
+
     function vertragByDV()
     {
         $dv_id = $this->input->get('dv_id', TRUE);
@@ -1848,6 +1905,25 @@ EOSQL;
 		}
 	}
 	
+    
+    public function getGehaltstypen()
+	{		
+		$this->GehaltstypModel->resetQuery();
+		$this->GehaltstypModel->addSelect('gehaltstyp_kurzbz AS value, bezeichnung AS label');
+		$this->GehaltstypModel->addOrder('sort', 'ASC');
+		$gehaltstypen = $this->GehaltstypModel->load();
+		if( hasData($gehaltstypen) ) 
+		{
+			$this->outputJson($gehaltstypen);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no contract types found');
+			return;
+		}
+	}
+
 	public function getVertragsarten()
 	{		
 		$this->VertragsartModel->resetQuery();
@@ -1857,6 +1933,23 @@ EOSQL;
 		if( hasData($unternehmen) ) 
 		{
 			$this->outputJson($unternehmen);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no contract types found');
+			return;
+		}
+	}
+
+    public function getVertragsbestandteiltypen()
+	{		
+		$this->VertragsbestandteiltypModel->resetQuery();
+		$this->VertragsbestandteiltypModel->addSelect('vertragsbestandteiltyp_kurzbz AS value, bezeichnung AS label');
+        $vbtypen = $this->VertragsbestandteiltypModel->load();
+		if( hasData($vbtypen) ) 
+		{
+			$this->outputJson($vbtypen);
 			return;
 		}
 		else

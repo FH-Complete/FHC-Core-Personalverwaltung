@@ -139,8 +139,13 @@ export const EmployeeContract = {
                 dvList.value = res.data.retval;          
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
-                    currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
-                    currentDV.value = dvList.value[0];
+                    if (route.params.dienstverhaeltnis_id != undefined) {
+                        currentDVID.value = route.params.dienstverhaeltnis_id;
+                        currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == route.params.dienstverhaeltnis_id);
+                    } else {
+                        currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
+                        currentDV.value = dvList.value[0];
+                    }
                 } else {
                     currentDVID.value = null;
                     currentDV.value = null;

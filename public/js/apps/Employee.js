@@ -22,6 +22,7 @@ const router = VueRouter.createRouter(
 				children: [					
 					{ path: '', component: EmployeePerson, name: 'person' },
 					{ path: 'contract', component: EmployeeContract },
+					{ path: 'contract/:dienstverhaeltnis_id', component: EmployeeContract },
 					{ path: 'salary', component: EmployeeContract, name: 'salary' },
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
@@ -45,7 +46,9 @@ const pvApp = Vue.createApp({
 		const karenztypen = Vue.ref([]);
         const teilzeittypen = Vue.ref([]);
 		const vertragsarten = Vue.ref([]);
+		const vertragsbestandteiltypen = Vue.ref([]);
 		const freitexttypen = Vue.ref([]);
+		const gehaltstypen = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');		
 
@@ -86,12 +89,20 @@ const pvApp = Vue.createApp({
 			karenztypen.value = r;
 		})
 
-                fetchTeilzeittypen().then((r) => {
+		fetchTeilzeittypen().then((r) => {
 			teilzeittypen.value = r;
 		})
 
 		fetchVertragsarten().then((r) => {
 			vertragsarten.value = r;
+		})
+
+		fetchGehaltstypen().then((r) => {
+			gehaltstypen.value = r;
+		})
+
+		fetchVertragsbestandteiltypen().then((r) => {
+			vertragsbestandteiltypen.value = r;
 		})
 
 		fetchFreitexttypen().then((r) => {
@@ -110,6 +121,8 @@ const pvApp = Vue.createApp({
 		Vue.provide("karenztypen",karenztypen);
 		Vue.provide("teilzeittypen",teilzeittypen);
 		Vue.provide("vertragsarten",vertragsarten);
+		Vue.provide("vertragsbestandteiltypen",vertragsbestandteiltypen);
+		Vue.provide("gehaltstypen",gehaltstypen);
 		Vue.provide("freitexttypen",freitexttypen);
 
 	}
@@ -169,9 +182,19 @@ const fetchKarenztypen = async () => {
 		'extensions/FHC-Core-Personalverwaltung/api/getKarenztypen');
 	return CoreRESTClient.getData(res.data);
 }
+const fetchGehaltstypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getGehaltstypen');
+	return CoreRESTClient.getData(res.data);
+}
 const fetchVertragsarten = async () => {
 	const res = await CoreRESTClient.get(
 		'extensions/FHC-Core-Personalverwaltung/api/getVertragsarten');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchVertragsbestandteiltypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getVertragsbestandteiltypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchTeilzeittypen = async () => {
