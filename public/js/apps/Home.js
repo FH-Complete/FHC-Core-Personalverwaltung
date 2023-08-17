@@ -2,8 +2,9 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import pv21apifactory from "../api/vbform/api.js";
 
-Vue.$fhcapi = fhcapifactory;
+Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 const pvApp = Vue.createApp(	{
 	components: {
