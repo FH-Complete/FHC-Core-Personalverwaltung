@@ -10,6 +10,7 @@ const pvApp = Vue.createApp(	{
 		CoreNavigationCmpt,	
 		ContractCountCard,
 		BirthdayCountCard,
+		IssuesCountCard,
 		DeadlineIssueTable,
 		searchbar,
 	},
