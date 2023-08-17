@@ -93,6 +93,7 @@ export const EmployeeHeader = {
                 currentPersonUID.value = newVal;           
                 if (currentPersonID.value!=null) {
                     fetchHeaderData(route.params.id, newVal);
+                    fetchOpenIssuesCount(route.params.id);
                 } else {
                     previewImage.value = null;
                     fileInput.value.value = null;
@@ -309,7 +310,7 @@ export const EmployeeHeader = {
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
                     <div class="px-2">
-                        <h4 class="mb-1">Issues<a href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
+                        <h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
                         <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6> 
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6> 
                     </div>
