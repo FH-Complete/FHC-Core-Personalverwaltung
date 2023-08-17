@@ -25,6 +25,7 @@ export const EmployeeContract = {
 
         const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
+        const router = VueRouter.useRouter();
         const dvList = ref([]);
         const vertragList = ref([]);
         const gbtList = ref([]);
@@ -253,6 +254,13 @@ export const EmployeeContract = {
                 fetchGBTChartData(newVal);
             }
         )
+        watch(
+            () => route.params.dienstverhaeltnis_id,
+            (newVal) => {
+                currentDVID.value = route.params.dienstverhaeltnis_id;
+                currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == route.params.dienstverhaeltnis_id);
+            }
+        )
 
         watch(
             currentDate,
@@ -269,6 +277,8 @@ export const EmployeeContract = {
             dvSelectedIndex.value = e.target.selectedIndex + 1;
             currentDV.value = dvList.value[e.target.selectedIndex];
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
+            let url = '/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/' + route.params.id + '/' + route.params.uid + '/contract/' + currentDV.value.dienstverhaeltnis_id;
+            router.push( url );
         }
 
         
