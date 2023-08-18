@@ -219,7 +219,9 @@ class IssueChecker extends Auth_Controller
 		}
 		
 		$issues = getData($openIssuesRes);
-		$issuescount = (is_countable($issues)) ? count($issues) : 0;
+		$issuescount = (is_array($issues) || $issues instanceof Countable) 
+					 ? count($issues) 
+					 : 0;
 		return $issuescount;
 	}
 	
