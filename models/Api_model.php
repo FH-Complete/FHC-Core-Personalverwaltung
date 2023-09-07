@@ -168,19 +168,19 @@ class Api_model extends DB_Model
         $startDate = \DateTime::createFromFormat("Y-m-d", "$year-$month-1")->format("Y-m-d");
         $endDate = \DateTime::createFromFormat("Y-m-d", "$year-$month-1")->format("Y-m-t");
 
-        $where = "where bv.ende>='$startDate' and bv.ende<='$endDate' ";
-        $order = "order by ende asc";
+        $where = "where dv.bis>='$startDate' and dv.bis<='$endDate' ";
+        $order = "order by bis asc";
 
         if (!$expire)
         {
-            $where = "where bv.beginn>='$startDate' and bv.beginn<='$endDate' ";
-            $order = "order by beginn asc";
+            $where = "where dv.von>='$startDate' and dv.von<='$endDate' ";
+            $order = "order by von asc";
         }
 
         $qry="
-        select m.personalnummer, b.uid, p.nachname || ', ' || coalesce(p.vorname,'') || ' ' || coalesce(p.titelpre,'') as name,bv.mitarbeiter_uid,bv.beginn,bv.ende, m.fixangestellt, bv.vertragsstunden,bv.dv_art,bv.hauptberuflich
-        from bis.tbl_bisverwendung bv join public.tbl_benutzer b on  (bv.mitarbeiter_uid=b.uid)  join public.tbl_person p using(person_id)
-        join public.tbl_mitarbeiter m  on (b.uid=m.mitarbeiter_uid)
+        select m.personalnummer, p.person_id, b.uid, p.nachname, p.vorname, p.nachname || ', ' || coalesce(p.vorname,'') || ' ' || coalesce(p.titelpre,'') as name,dv.mitarbeiter_uid,dv.von,dv.bis
+        from hr.tbl_dienstverhaeltnis dv join public.tbl_benutzer b on  (dv.mitarbeiter_uid=b.uid)  join public.tbl_person p using(person_id)
+             join public.tbl_mitarbeiter m  on (b.uid=m.mitarbeiter_uid)
         $where
         $order
         ";
