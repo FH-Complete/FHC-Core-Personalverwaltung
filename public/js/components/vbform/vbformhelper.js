@@ -1,5 +1,6 @@
 import presetable from '../../mixins/vbform/presetable.js';
 import tabs from './tabs.js';
+import vblistgroup from './vblistgroup.js';
 import vertragsbestandteillist from './vertragsbestandteillist.js';
 import dv from './dv.js';
 import store from './vbsharedstate.js';
@@ -18,6 +19,7 @@ export default {
   `,
   components: {
     "tabs": tabs,
+    "vblistgroup": vblistgroup, 
     "dv": dv,
     "vertragsbestandteillist": vertragsbestandteillist,
     "infos": infos,

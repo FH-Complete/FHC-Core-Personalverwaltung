@@ -55,3 +55,8 @@
     padding-left: 3px;
     color: black;
 }
+
+.p-autocomplete-panel {
+    z-index: 99999 !important;
+}
+
