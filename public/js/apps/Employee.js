@@ -31,6 +31,14 @@ const router = VueRouter.createRouter(
 	}
 );
 
+Highcharts.setOptions({
+	lang: {
+		thousandsSep: '.',
+		decimalPoint: ',',
+		dateFormat: 'dd.mm.YYYY', 
+	}
+  })
+
 const pvApp = Vue.createApp({
 	setup() {
 
