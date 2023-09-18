@@ -33,4 +33,7 @@ const pvApp = Vue.createApp(	{
 			appSideMenuEntries, newSideMenuEntryHandler,
 		}
 	}
-}).mount('#wrapper');
+});
+
+pvApp.use(primevue.config.default);
+pvApp.mount('#wrapper');

@@ -1,4 +1,9 @@
 const ContractCountCard = {
+     components: {
+        "p-overlaypanel": primevue.overlaypanel,
+        "p-datatable": primevue.datatable,
+        "p-column": primevue.column,
+     },
      props: {
         showNew: Boolean
      },
@@ -10,6 +15,13 @@ const ContractCountCard = {
         const currentYear = Vue.ref(currentDate.value.getFullYear());
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Dienstantritte");
+        const contractsOverlay = Vue.ref();
+        const selectedPerson = Vue.ref();
+
+        const toggle = (event) => {
+            contractsOverlay.value.toggle(event);
+        }
+
 
         const formatDate = (ds) => {
             var d = new Date(ds);
@@ -45,13 +57,19 @@ const ContractCountCard = {
         Vue.onMounted(() => {
             fetchContractsNew();
         })
+
+        const onPersonSelect = (event) => {
+            contractsOverlay.value.hide();
+            let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+            window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${event.data.person_id}/${event.data.uid}/summary`;
+        }
       
         return {
-            contractDataNew, currentYear, currentMonth, isFetching, title,
+            contractDataNew, currentYear, currentMonth, isFetching, title, contractsOverlay, onPersonSelect, selectedPerson, toggle,
         }
      },
      template: `
-     <div class="card">
+     <div class="card" @click="toggle">
         <div class="card-header">
             <h5 class="mb-0">{{ title }}</h5>
                 {{currentMonth}}/{{ currentYear }}
@@ -63,6 +81,13 @@ const ContractCountCard = {
             <h3 v-if="!isFetching">{{ contractDataNew?.length }}</h3>
         </div>
      </div>
+
+     <p-overlaypanel ref="contractsOverlay">
+        <p-datatable v-model:selection="selectedPerson" :value="contractDataNew" selectionMode="single" :paginator="true" :rows="5" @row-select="onPersonSelect">
+            <p-column field="vorname" header="Vorname" sortable style="min-width: 12rem"></p-column>
+            <p-column field="nachname" header="Nachname" sortable style="min-width: 12rem"></p-column>
+        </p-datatable>
+     </p-overlaypanel>
      
      `
    

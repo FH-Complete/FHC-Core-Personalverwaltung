@@ -76,11 +76,10 @@ const ContractExpiring = {
 
         const capitalize = (s) => {
             return s.charAt(0).toUpperCase() + s.slice(1);
-        }
-        
+        }       
       
         return {
-            data,columns,search,reverse,currentSortKey,filtered,formatDate,
+            data,columns,search,reverse,currentSortKey,filtered,formatDate, 
             capitalize,
 
             sortBy, sorted
