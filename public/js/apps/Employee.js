@@ -239,6 +239,6 @@ const fetchUnternehmen = async () => {
 }
 
 pvApp.use(primevue.config.default);
-//pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.mount('#wrapper');
 
