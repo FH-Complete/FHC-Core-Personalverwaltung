@@ -57,8 +57,10 @@ const pvApp = Vue.createApp({
 		const vertragsbestandteiltypen = Vue.ref([]);
 		const freitexttypen = Vue.ref([]);
 		const gehaltstypen = Vue.ref([]);
+		const hourlyratetypes = Vue.ref([]);
+		const unternehmen = Vue.ref([]);
 
-		const currentDate = Vue.ref('2022-03-04');		
+		const currentDate = Vue.ref('2022-03-04');
 
 		fetchSprache().then((r) => {
 			sprache.value = r;
@@ -116,7 +118,14 @@ const pvApp = Vue.createApp({
 		fetchFreitexttypen().then((r) => {
 			freitexttypen.value = r;
 		})
-				
+
+		fetchHourlyratetypes().then((r) => {
+			hourlyratetypes.value = r;
+		})
+
+		fetchUnternehmen().then((r) => {
+			unternehmen.value = r;
+		})
 
 		Vue.provide("sprache",sprache);
 		Vue.provide("nations",nations);
@@ -132,7 +141,8 @@ const pvApp = Vue.createApp({
 		Vue.provide("vertragsbestandteiltypen",vertragsbestandteiltypen);
 		Vue.provide("gehaltstypen",gehaltstypen);
 		Vue.provide("freitexttypen",freitexttypen);
-
+		Vue.provide("hourlyratetypes",hourlyratetypes);
+		Vue.provide("unternehmen",unternehmen);
 	}
 }).use(router);
 
@@ -216,7 +226,19 @@ const fetchFreitexttypen = async () => {
 	return CoreRESTClient.getData(res.data);
 }
 
+const fetchHourlyratetypes = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getStundensatztypen');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchUnternehmen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getUnternehmen');
+	return CoreRESTClient.getData(res.data);
+}
+
 pvApp.use(primevue.config.default);
-pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+//pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.mount('#wrapper');
 
