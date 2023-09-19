@@ -4,7 +4,7 @@ import dv from './dv.js';
 
 export default {
   template: `
-  <div class="tab-pane fade" :class="(activetab === preset.guioptions.id) ? 'active show' : ''"
+  <div class="tab-pane overflow-scroll fade" :class="(activetab === preset.guioptions.id) ? 'active show' : ''"
        :id="'v-pills-' + preset.guioptions.id"
        role="tabpanel"
        :aria-labelledby="'v-pills-' + preset.guioptions.id + '-tab'"
