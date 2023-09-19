@@ -12,7 +12,7 @@ class GehaltsLib
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsabrechnung_model', 'GehaltsabrechnungModel');
-		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
+		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
 	}
 
 	public function getBestandteile($date = null, $user = null)
@@ -38,7 +38,8 @@ class GehaltsLib
 		else
 			$where .= ' AND dienstverhaeltnis.mitarbeiter_uid =' . $this->_ci->db->escape($user);
 
-		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where);
+		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, 
+			$this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
 
 		if (isError($result)) return $result;
 
@@ -57,7 +58,8 @@ class GehaltsLib
 		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['year']);
 		$where .= " AND betrag = " . $this->_ci->db->escape($bestandteil->betrag_valorisiert);
 
-		$result = $this->_ci->GehaltsabrechnungModel->loadWhere($where);
+		$result = $this->_ci->GehaltsabrechnungModel->loadWhere($where, 
+			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
 
 		if (isError($result)) return $result;
 
@@ -80,7 +82,8 @@ class GehaltsLib
 				'datum' => $date,
 				'betrag' => $bestandteil->betrag_valorisiert,
 				'gehaltsbestandteil_id' => $bestandteil->gehaltsbestandteil_id
-			)
+			), 
+			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns()
 		);
 
 		if (isError($result)) return $result;
