@@ -82,13 +82,13 @@ export const EmployeeContract = {
         }
 
         // dummy data for chart
-        // var dates = ["2013-06-14", "2019-2-1", "2019-06-30", "2019-07-1", "2021-04-13"],
-        // salaries =  [4711,            4800,         4750,        5000,         5000];
         const dates = ref([]);
         const salaries = ref([]);
 
         const chartOptions = reactive({
-
+            lang: {
+                thousandsSep: '.'
+            },
             chart: {
                 type: 'line'
             },
@@ -104,25 +104,41 @@ export const EmployeeContract = {
             ],
             xAxis: {
                 type: 'datetime',
+                currentDateIndicator: {
+                    width: 2,
+                    dashStyle: 'dot',
+                    color: 'red',
+                    label: {
+                      format: '%d.%m.%Y'
+                    }
+                },
                 labels: {
                   // Format the date
                   formatter: function() {
                     return Highcharts.dateFormat('%d.%m.%Y', this.value);
                   },
-                  rotation: 45
+                  rotation: 90
                 },
-                tickPositioner: function() {
+                /*tickPositioner: function() {
                   return dates.value.map(function(date) {
                     return Date.parse(date);
                   });
-                }
+                }*/
             },
-                yAxis: {
+            tooltip: {
+                pointFormat: '<b>€ {point.y:,.2f}</b>',
+                xDateFormat: '%d.%m.%Y'
+            },
+            yAxis: {
                 //min: 0,
                 title: {
                     text: '€'
                 }
             },
+            credits: {
+                enabled: false
+              },
+          
             
 
         })
@@ -197,7 +213,7 @@ export const EmployeeContract = {
                 let tempData = [];
                 // chartOptions.series[0].data.length = 0;
                 Object.keys(res.data).forEach(element => {
-                   tempData.push([element, parseFloat(res.data[element])]);
+                   tempData.push([new Date(element).getTime(), parseFloat(res.data[element])]);
                 });
                 chartOptions.series[0].data = tempData;
             } catch (error) {

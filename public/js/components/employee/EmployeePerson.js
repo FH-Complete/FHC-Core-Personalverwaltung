@@ -3,6 +3,7 @@ import { EmployeeData } from './EmployeeData.js';
 import { BankData } from './BankData.js';
 import { ContactData } from './contact/ContactData.js';
 import { MaterialExpensesData } from './MaterialExpensesData.js';
+import { HourlyRateData } from './HourlyRateData.js';
 
 export const EmployeePerson = {
     components: {
@@ -10,8 +11,9 @@ export const EmployeePerson = {
 		EmployeeData,
 		BankData,
 		ContactData,
-        MaterialExpensesData,
-	},	
+		MaterialExpensesData,
+		HourlyRateData: HourlyRateData,
+	},
     props: {
         // personid: { type: Number, default: 0 }
     },
@@ -20,7 +22,7 @@ export const EmployeePerson = {
         const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(0);
         const currentPersonUID = Vue.ref(null);
-        const items = ["base", "employee", "contact", "bank", "material"];
+        const items = ["base", "employee", "contact", "bank", "material", "hourly"];
         const activeItem = Vue.ref("base");
        // const { personID } = Vue.toRefs(props);
 
@@ -92,6 +94,13 @@ export const EmployeePerson = {
                     @click.prevent="setActive(items[4])"
                     href="#bank"
                     >Sachaufwand</a
+                > 
+				<a
+					class="nav-link"
+					:class="{ active: isActive(items[5]) }"
+					@click.prevent="setActive(items[5])"
+					href="#hourly"
+					>Stundensaetze</a
                 >
             </nav>
             <div class="tab-content col-md-10" id="nav-tabContent">
@@ -130,6 +139,13 @@ export const EmployeePerson = {
                 >
                 <material-expenses-data editMode :personID="currentPersonID"  :personUID="currentPersonUID"></material-expenses-data>
                 </div>
+				<div
+					class="tab-pane"
+					:class="{ active: isActive(items[5]) }"
+					role="tabpanel"
+				>
+				<hourly-rate-data editMode :personID="currentPersonID"  :personUID="currentPersonUID"></hourly-rate-data>
+				</div>
                 
             </div>
         </div>

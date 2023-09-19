@@ -92,6 +92,10 @@ class Api extends Auth_Controller
                 'getVB' => Api::DEFAULT_PERMISSION,
                 'getGB' => Api::DEFAULT_PERMISSION,
                 'dvByID'=> Api::DEFAULT_PERMISSION,
+				'getStundensaetze' => Api::DEFAULT_PERMISSION,
+				'getStundensatztypen' => Api::DEFAULT_PERMISSION,
+				'updateStundensatz' => Api::DEFAULT_PERMISSION,
+				'deleteStundensatz' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -133,6 +137,9 @@ class Api extends Auth_Controller
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+	    $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
+	    $this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+
         // get CI for transaction management
         $this->CI = &get_instance();
     }
@@ -2060,5 +2067,99 @@ EOSQL;
 			$this->outputJsonError('no freitext types found');
 			return;
 		}
+	}
+	
+	public function getStundensaetze($uid = null)
+	{
+		$qry = "SELECT *
+				FROM hr.tbl_stundensatz
+				JOIN hr.tbl_stundensatztyp USING (stundensatztyp)
+				WHERE uid = ?
+				ORDER BY gueltig_bis DESC NULLS LAST, gueltig_von DESC NULLS LAST";
+		
+		$data = $this->StundensatzModel->execReadOnlyQuery($qry, array($uid));
+		$this->_remapData('stundensatz_id',$data);
+		return $this->outputJson($data);
+	}
+	
+	public function getStundensatztypen()
+	{
+		$this->StundensatztypModel->addSelect('stundensatztyp, bezeichnung');
+		$this->StundensatztypModel->addOrder('bezeichnung', 'ASC');
+		$result = $this->StundensatztypModel->load();
+
+		if (isError($result))
+		{
+			return $this->outputJsonError('Keine Stundensatztypen gefunden');
+		}
+
+		if (hasData($result))
+		{
+			return $this->outputJson($result);
+		}
+	}
+	
+	public function updateStundensatz()
+	{
+		
+		$data = json_decode($this->input->raw_input_stream, true);
+		
+		if ($data['stundensatz_id'] === 0)
+		{
+			if (isEmptyString($data['gueltig_bis']))
+				unset($data['gueltig_bis']);
+			unset($data['stundensatz_id']);
+			$data['insertamum'] = 'NOW()';
+			$data['insertvon'] = getAuthUID();
+			
+			$result = $this->StundensatzModel->insert($data);
+		}
+		else
+		{
+			if (isEmptyString($data['gueltig_bis']))
+				$data['gueltig_bis'] = null;
+			unset($data['bezeichnung']);
+			unset($data['aktiv']);
+			
+			
+			$stundensatz_id = $data['stundensatz_id'];
+			unset($data['stundensatz_id']);
+			
+			
+			$data['updateamum'] = 'NOW()';
+			$data['updatevon'] = getAuthUID();
+			$result = $this->StundensatzModel->update(
+				$stundensatz_id,
+				$data
+			);
+		}
+		
+		if (isError($result))
+			return $this->outputJsonError('Fehler beim Speichern des Stundensatzes');
+		
+		$stundensatz = $this->StundensatzModel->load($result->retval);
+		
+		if (hasData($stundensatz))
+			$this->outputJsonSuccess($stundensatz->retval);
+	}
+	
+	public function deleteStundensatz()
+	{
+		$data = json_decode($this->input->raw_input_stream, true);
+		
+		$stundensatz = $this->StundensatzModel->load($data['stundensatz_id']);
+		if (hasData($stundensatz))
+		{
+			$result = $this->StundensatzModel->delete($data['stundensatz_id']);
+			
+			if (isError($result))
+				return $this->outputJsonError('Fehler beim Löschen des Stundensatzes');
+
+			return $this->outputJsonSuccess($result);
+		}
+		
+	
+		
+		
 	}
 }
