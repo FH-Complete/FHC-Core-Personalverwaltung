@@ -9,7 +9,9 @@ export default {
        role="tabpanel"
        :aria-labelledby="'v-pills-' + preset.guioptions.id + '-tab'"
        tabindex="0">
-    <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
+    <div class="overflow-scroll">
+      <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
+    </div>
   </div>
   `,
   props: [

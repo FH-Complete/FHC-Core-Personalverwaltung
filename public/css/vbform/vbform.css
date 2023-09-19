@@ -12,6 +12,7 @@
 
     .vbformModal .modal-lg {
         max-width: 70%;
+        height: calc(100% - 4em);
     }
     
     #vbFormWrapper .modal-content {

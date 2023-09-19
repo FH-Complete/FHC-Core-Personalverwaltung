@@ -10,28 +10,24 @@ import vbgb2gui from '../../../../helpers/vbform/vbgb2gui.js';
 export default {
   template: `
     <Modal :title="getTitle" ref="modalRef" 
-           :class="'vbformModal'" id="vbformModal">
+           :class="'vbformModal'" id="vbformModal" :noscroll="true">
         <template #body>
     
-        <div class="row g-2 py-2">
-          <div class="col-3">
-            <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
-          </div>
-          <div class="col-1 text-center py-2">
-            <em>oder</em>
-          </div>
-          <div class="col-8">
-            <tmpstorehelper ref="tmpstorehelper" @loadedfromtmpstore="handleLoadedFromTmpStore" @savetotmpstore="saveToTmpStore"></tmpstorehelper>
-          </div>
+        <div class="vbformutilities flex-shrink-0 flex-grow-0">
+            <div class="row g-2 py-2">
+              <div class="col-3">
+                <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
+              </div>
+              <div class="col-1 text-center py-2">
+                <em>oder</em>
+              </div>
+              <div class="col-8">
+                <tmpstorehelper ref="tmpstorehelper" @loadedfromtmpstore="handleLoadedFromTmpStore" @savetotmpstore="saveToTmpStore"></tmpstorehelper>
+              </div>
+            </div>
         </div>
         
-        <div class="row g-2 py-2">
-
-          <div class="col-12">
-            <vbformhelper ref="vbformhelperRef" :preset="preset"></vbformhelper>
-          </div>
-
-        </div>
+        <vbformhelper ref="vbformhelperRef" :preset="preset"></vbformhelper>
 
         <div v-if="debug" class="row">
           <div class="col-12">

@@ -9,8 +9,8 @@ import infos from './infos.js';
 
 export default {
   template: `
-    <div class="vbformhelper">
-      <div class="border-bottom py-2 mb-3">
+    <div class="vbformhelper flex-shrink-1 flex-grow-1 d-flex flex-column">
+      <div class="border-bottom py-1 mb-1">
         <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
         <errors :errors="(preset?.guioptions?.errors !== undefined) ? preset?.guioptions?.errors : []" :padright="false"></errors>
       </div>
