@@ -4,12 +4,12 @@ import dv from './dv.js';
 
 export default {
   template: `
-  <div class="tab-pane overflow-scroll fade" :class="(activetab === preset.guioptions.id) ? 'active show' : ''"
+  <div class="tab-pane overflow-hidden position-relative fade" :class="(activetab === preset.guioptions.id) ? 'active show' : ''"
        :id="'v-pills-' + preset.guioptions.id"
        role="tabpanel"
        :aria-labelledby="'v-pills-' + preset.guioptions.id + '-tab'"
        tabindex="0">
-    <div class="overflow-scroll">
+    <div class="container px-1 overflow-auto scrollbar-gutter-stable-both">
       <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
     </div>
   </div>

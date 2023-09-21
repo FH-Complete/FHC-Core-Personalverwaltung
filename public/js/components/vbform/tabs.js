@@ -31,10 +31,12 @@ export default {
       </template>
     </div>
 
-    <div class="tab-content w-100 h-100 d-flex flex-column" id="v-pills-tabContent">
+    <div class="tab-content w-100 h-100 d-flex flex-column position-relative" id="v-pills-tabContent">
       <template v-for="(child, idx) in children">
         <component ref="parts" v-if="child.type === 'tab'" :is="child.type" :key="'tab_' + idx" :preset="child" :activetab="activetab"></component>
-        <component ref="parts" v-else="" :is="child.type" :key="'notab_' + idx" :preset="child"></component>
+        <div v-else="" class="px-3">
+          <component ref="parts" :is="child.type" :key="'notab_' + idx" :preset="child"></component>
+        </div>
       </template>
     </div>
   </div>

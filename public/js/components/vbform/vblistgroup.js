@@ -3,7 +3,7 @@ import vertragsbestandteillist from '../../components/vbform/vertragsbestandteil
 
 export default {
   template: `
-  <div class="scroll-pane" :id="preset.guioptions.id">
+  <div class="overflow-auto px-3 scrollbar-gutter-stable-both" :id="preset.guioptions.id">
     <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
   </div>
   `,
