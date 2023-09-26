@@ -71,6 +71,9 @@ export default {
   emits: [
     "dvsaved"
   ],
+  mixins: [
+    Phrasen
+  ],
   components: {
     'presets_chooser': presets_chooser,
     'debug_viewer': debug_viewer,
