@@ -254,7 +254,7 @@ export const BaseData = {
     <div class="row">
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
-            <template #body><h4>Stammdaten gespeichert.</h4></template>
+            <template #body><h4>{{ t('person', 'stammdatenGespeichert') }}</h4></template>
           </Toast>
         </div>
     </div>
@@ -263,7 +263,7 @@ export const BaseData = {
          <div class="col">
              <div class="card">
                 <div class="card-header">
-                    <div class="h5 mb-0"><h5>Stammdaten</h5></div>        
+                    <div class="h5 mb-0"><h5>{{ t('global', 'stammdaten') }}</h5></div>        
                 </div>
                 <div class="card-body">
                 <div class="d-grid gap-2 d-md-flex justify-content-end ">
@@ -357,12 +357,12 @@ export const BaseData = {
                 </div>
     
                 <div class="col-lg-2 col-md-3">
-                    <label for="svnr" class="form-label">SVNR</label>
+                    <label for="svnr" class="form-label">{{ t('person', 'svnr') }}</label>
                     <input type="text" :readonly="readonly" @blur="frmState.svnrBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validSVNR(currentValue.svnr) && frmState.svnrBlured}" id="svnr" v-model="currentValue.svnr">
                 </div>
     
                 <div class="col-lg-2 col-md-3">
-                        <label for="ersatzkennzeichen" class="form-label">Ersatzkennzeichen</label>
+                        <label for="ersatzkennzeichen" class="form-label">{{ t('person', 'ersatzkennzeichen') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="ersatzkennzeichen" v-model="currentValue.ersatzkennzeichen">
                 </div>
     
@@ -374,7 +374,7 @@ export const BaseData = {
                 
                 <!-- -->
                 <div class="col-lg-6">
-                    <label for="inputAddress" class="form-label">Anmerkung</label>
+                    <label for="inputAddress" class="form-label">{{ t('global', 'anmerkung') }}</label>
                     <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkungen" v-model="currentValue.anmerkung">
                     </textarea>
                 </div>
