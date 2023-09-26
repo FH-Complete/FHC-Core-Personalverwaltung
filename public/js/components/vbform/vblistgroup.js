@@ -1,26 +1,16 @@
 import presetable from '../../mixins/vbform/presetable.js';
 import vertragsbestandteillist from '../../components/vbform/vertragsbestandteillist.js';
-import dv from './dv.js';
 
 export default {
   template: `
-  <div class="tab-pane overflow-hidden position-relative fade" :class="(activetab === preset.guioptions.id) ? 'active show' : ''"
-       :id="'v-pills-' + preset.guioptions.id"
-       role="tabpanel"
-       :aria-labelledby="'v-pills-' + preset.guioptions.id + '-tab'"
-       tabindex="0">
-    <div class="container px-3 overflow-auto scrollbar-gutter-stable-both">
-      <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
-    </div>
+  <div class="overflow-auto px-3 scrollbar-gutter-stable-both" :id="preset.guioptions.id">
+    <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
   </div>
   `,
-  props: [
-    'activetab'
-  ],
   data: function() {
     return {
       payload: {
-        type: 'tab',
+        type: 'vblistgroup',
         guioptions: {
           title: '',
           id: ''
@@ -30,7 +20,6 @@ export default {
     };
   },
   components: {
-    "dv": dv,
     "vertragsbestandteillist": vertragsbestandteillist
   },
   mixins: [
@@ -43,7 +32,7 @@ export default {
         children.push(this.$refs.parts[i].getPayload());
       }
       var payload = {
-        type: 'tab',
+        type: 'vblistgroup',
         guioptions: JSON.parse(JSON.stringify(this.preset.guioptions)),
         children: children
       };
