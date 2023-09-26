@@ -32,6 +32,17 @@ export default {
     <div class="row g-2">
     <template v-if="mode === 'neu'">
       <div class="col">
+        <p-autocomplete 
+            v-model="autocomplete.selectedfunktion" 
+            dropdown
+            dropdownMode="current" 
+            :suggestions="autocomplete.funktionen" 
+            @complete="searchFunktionen"
+            optionLabel="label"
+            optionDisabled="disabled"
+            forceSelection
+        ></p-autocomplete>
+<!--        
         <select v-model="funktion" :disabled="isinputdisabled('funktion')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.funktionen"
@@ -41,8 +52,20 @@ export default {
             {{ f.label }}
           </option>
         </select>
+-->
       </div>
       <div class="col">
+        <p-autocomplete 
+            v-model="autocomplete.selectedorget" 
+            dropdown 
+            dropdownMode="current" 
+            :suggestions="autocomplete.orgets" 
+            @complete="searchOrgets"
+            optionLabel="label"
+            optionDisabled="disabled"
+            forceSelection
+        ></p-autocomplete>
+<!--
         <select v-model="orget" :disabled="isinputdisabled('orget')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="oe in lists.orgets"
@@ -52,6 +75,7 @@ export default {
             {{ oe.label }}
           </option>
         </select>        
+-->
       </div>
     </template>
     <template v-else-if="mode === 'bestehende'">
@@ -81,7 +105,8 @@ export default {
     'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
     'gueltigkeit': gueltigkeit,
     'infos': infos,
-    'errors': errors
+    'errors': errors,
+    'p-autocomplete': primevue.autocomplete
   },
   mixins: [
     configurable
@@ -110,6 +135,12 @@ export default {
             disabled: true
         }]
       },
+      autocomplete: {
+        funktionen: [],
+        orgets: [],
+        selectedfunktion: '',
+        selectedorget: ''
+      },
       store: store
     };
   },
@@ -126,6 +157,16 @@ export default {
       },
       'store.mitarbeiter_uid': function() {
           this.getCurrentFunctions();
+      },
+      'autocomplete.selectedfunktion': function() {
+        if(this.autocomplete.selectedfunktion?.value !== undefined) {
+          this.funktion = this.autocomplete.selectedfunktion.value;
+        }
+      },
+      'autocomplete.selectedorget': function() {
+        if(this.autocomplete.selectedorget?.value !== undefined) {
+          this.orget = this.autocomplete.selectedorget.value;
+        }
       }
   },
   methods: {
@@ -146,10 +187,10 @@ export default {
         this.id = this.config.data.id;
       }
       if( this.config?.data?.funktion !== undefined ) {
-        this.funktion = this.config.data.funktion;
+        this.funktion = this.config.data.funktion;        
       }
       if( this.config?.data?.orget !== undefined ) {
-        this.orget = this.config.data.orget;
+        this.orget = this.config.data.orget;        
       }
       if( this.config?.data?.benutzerfunktionid !== undefined ) {
         this.benutzerfunktionid = this.config.data.benutzerfunktionid;
@@ -170,6 +211,8 @@ export default {
         disabled: true
       });
       this.lists.funktionen = funktionen;
+      this.autocomplete.funktionen = [...this.lists.funktionen];
+      this.setAutocompleteFunktion();
     },
     getOrgetsForCompany: async function() {
       if( this.store.unternehmen === '' ) {
@@ -183,6 +226,8 @@ export default {
         disabled: true
       });
       this.lists.orgets = orgets;
+      this.autocomplete.orgets = [...this.lists.orgets];
+      this.setAutocompleteOrget();
     },
     getCurrentFunctions: async function() {
       if(this.store.unternehmen === '' || this.store.mitarbeiter_uid === '' ) {
@@ -219,6 +264,48 @@ export default {
         },
         gbs: this.getGehaltsbestandteilePayload()
       };
+    },
+    searchFunktionen: function(event) {
+        var that = this;
+        
+        setTimeout(function() {
+            if (!event.query.trim().length) {
+                that.autocomplete.funktionen = [...that.lists.funktionen];
+            } else {
+                that.autocomplete.funktionen = that.lists.funktionen.filter((item) => {
+                    return item.label.toLowerCase().includes(event.query.toLowerCase());
+                });
+            }
+        }, 250);
+    },
+    searchOrgets: function(event) {
+        var that = this;
+        
+        setTimeout(function() {
+            if (!event.query.trim().length) {
+                that.autocomplete.orgets = [...that.lists.orgets];
+            } else {
+                that.autocomplete.orgets = that.lists.orgets.filter((item) => {
+                    return item.label.toLowerCase().includes(event.query.toLowerCase());
+                });
+            }
+        }, 250);
+    },
+    setAutocompleteFunktion: function() {
+        if( this.funktion.length > 0 && this.autocomplete.funktionen.length > 0 ) {
+          var that = this;
+          this.autocomplete.selectedfunktion = this.autocomplete.funktionen.find((item) => {
+              return that.funktion === item.value;
+          });
+        }
+    },
+    setAutocompleteOrget: function() {
+        if( this.orget.length > 0 && this.autocomplete.orgets.length > 0 ) {
+          var that = this;
+          this.autocomplete.selectedorget = this.autocomplete.orgets.find((item) => {
+              return that.orget === item.value;
+          });
+        }
     }
   }
 }
