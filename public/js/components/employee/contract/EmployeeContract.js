@@ -5,6 +5,7 @@ import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 import { Toast } from '../../Toast.js';
+import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeContract = {
     components: {
@@ -26,6 +27,7 @@ export const EmployeeContract = {
         const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
         const router = VueRouter.useRouter();
+        const { t_ref, t } = usePhrasen();
         const dvList = ref([]);
         const vertragList = ref([]);
         const gbtList = ref([]);
@@ -96,11 +98,17 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                name: 'Gesamtgehalt',
-                data: [],
-                color: '#6fcd98',
-                step: 'left' // or 'center' or 'right'
+                    name: 'Gesamtgehalt',
+                    data: [],
+                    color: '#6fcd98',
+                    step: 'left' // or 'center' or 'right'
                 },
+                {
+                    name: 'Abgerechnet',
+                    data: [],
+                    color: '#cd6fca',
+                    step: 'left' // or 'center' or 'right'
+                }, 
             ],
             xAxis: {
                 type: 'datetime',
@@ -210,12 +218,16 @@ export const EmployeeContract = {
             try {
                 const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
                 gbtChartData.value = res.data;
-                let tempData = [];
+                let tempData1 = [], tempData2 = [];
                 // chartOptions.series[0].data.length = 0;
-                Object.keys(res.data).forEach(element => {
-                   tempData.push([new Date(element).getTime(), parseFloat(res.data[element])]);
+                Object.keys(res.data.gesamt).forEach(element => {
+                   tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
                 });
-                chartOptions.series[0].data = tempData;
+                res.data.abgerechnet.forEach(element => {
+                    tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
+                });
+                chartOptions.series[0].data = tempData1;
+                chartOptions.series[1].data = tempData2;
             } catch (error) {
                 console.log(error)                
             } finally {
@@ -526,7 +538,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly,
+            readonly, t_ref, t,
         }
     },
     template: `

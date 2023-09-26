@@ -13,6 +13,8 @@ class GehaltsLib
 
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsabrechnung_model', 'GehaltsabrechnungModel');
 		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
+		// Loads the DB config to encrypt/decrypt data
+		$this->_ci->GehaltsabrechnungModel->config->load('db_crypt');
 	}
 
 	public function getBestandteile($date = null, $user = null)
@@ -46,6 +48,101 @@ class GehaltsLib
 		if (!hasData($result)) return error("Keine Gehaltsbestandteile gefunden!");
 
 		return $result;
+	}
+
+	/**
+	 * fetch sum of Abgerechnet between $from and $to
+	 */
+	public function fetchAbgerechnet($dv_id, $from, $to)
+	{
+		/*
+		$this->_ci->GehaltsabrechnungModel->addSelect('sum(betrag)');
+		$this->_ci->GehaltsabrechnungModel->addJoin('hr.tbl_gehaltsbestandteil', 'gehaltsbestandteil_id');
+
+		$date = $this->getDate($date);
+		$where .= 'hr.tbl_gehaltsbestandteil.dienstverhaeltnis_id =' . $this->_ci->db->escape($dv_id);
+		$where .= "
+				AND (((EXTRACT(MONTH FROM tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['month']) .")
+					AND (EXTRACT(YEAR FROM tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['year']) .")))
+		";
+				
+
+		$result = $this->_ci->GehaltsabrechnungModel->loadWhere($where, 
+			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
+
+		if (isError($result)) return $result;
+
+		if (!hasData($result)) return error("Keine Gehaltsabrechnung gefunden!");
+
+
+ 	 $result = $this->execQuery($qry,
+			array($dv_id, $month, $year),
+			$this->getEncryptedColumns()); */
+		// ---------------------
+
+		$from_date = $this->getDate($from);
+		$to_date = $this->getDate($to);
+
+		$qry = "
+        SELECT
+            sum(betrag),tbl_gehaltsabrechnung.datum
+        FROM hr.tbl_gehaltsabrechnung JOIN hr.tbl_gehaltsbestandteil USING(gehaltsbestandteil_id)
+        WHERE hr.tbl_gehaltsbestandteil.dienstverhaeltnis_id = ?
+		AND (
+			  (
+				 EXTRACT(MONTH FROM tbl_gehaltsabrechnung.datum) >= ?
+			     AND EXTRACT(YEAR FROM tbl_gehaltsabrechnung.datum) >= ?
+			  )  AND
+			  (
+				 EXTRACT(MONTH FROM tbl_gehaltsabrechnung.datum) <= ?
+			     AND EXTRACT(YEAR FROM tbl_gehaltsabrechnung.datum) <= ?
+			  )
+		)
+		GROUP BY tbl_gehaltsabrechnung.datum
+		ORDER BY tbl_gehaltsabrechnung.datum
+        
+        ";
+
+		$encryptedColumns = $this->_ci->GehaltsabrechnungModel->getEncryptedColumns();
+
+		foreach ($encryptedColumns as $encryptedColumn => $definition)
+			{
+				// If the requested encrypted column is well defined
+				if (!isEmptyArray($definition)
+					&& array_key_exists(DB_Model::CRYPT_CAST, $definition)
+					&& array_key_exists(DB_Model::CRYPT_PASSWORD_NAME, $definition))
+				{
+
+					// And if exists the wanted password to decrypt in the configs
+					if (array_key_exists($definition[DB_Model::CRYPT_PASSWORD_NAME], $this->_ci->GehaltsabrechnungModel->config->item(DB_Model::CRYPT_CONF_PASSWORDS)))
+					{
+						// Password to decrypt data
+						$cryptConfPasswords = $this->_ci->GehaltsabrechnungModel->config->item(DB_Model::CRYPT_CONF_PASSWORDS);
+						$decryptionPassword = $cryptConfPasswords[$definition[DB_Model::CRYPT_PASSWORD_NAME]];
+
+						$qry = str_replace(
+							$encryptedColumn,
+							sprintf(
+								DB_Model::CRYPT_WHERE_TEMPLATE,
+								$encryptedColumn,
+								$decryptionPassword,
+								$definition[DB_Model::CRYPT_CAST]
+							),
+							$qry
+						);
+					}
+				}
+			}
+
+		
+
+		$query = $this->_ci->db->query(
+			$qry,
+			array($dv_id, $from_date['month'], $from_date['year'], $to_date['month'], $to_date['year']),
+			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
+		
+
+		return $result = $query->result();
 	}
 
 	public function existsAbrechnung($bestandteil, $date)
