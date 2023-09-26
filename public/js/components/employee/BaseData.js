@@ -1,5 +1,6 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BaseData = {
     components: {
@@ -14,6 +15,7 @@ export const BaseData = {
     },
     setup(props) {
 
+        const { t } = usePhrasen();
         const readonly = Vue.ref(true);
 
         const { personID } = Vue.toRefs(props);
@@ -244,6 +246,7 @@ export const BaseData = {
             validGeburtsdatum,  
             validSVNR,    
             printNation,
+            t,
         }
         
     },
@@ -274,39 +277,39 @@ export const BaseData = {
                 
                 <!-- Anrede -->
                 <div class="col-lg-2 col-md-4">
-                    <label for="anrede" class="form-label">Anrede</label>
+                    <label for="anrede" class="form-label">{{ t('person','anrede') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anrede" v-model="currentValue.anrede">
                 </div>
                 <div class="col-lg-2 col-md-4">
-                    <label for="titelPre" class="form-label">TitelPre</label>
+                    <label for="titelPre" class="form-label">{{ t('person', 'titelpre') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPre" v-model="currentValue.titelpre">
                 </div>
                 <div class="col-lg-2 col-md-4">
-                    <label for="titelPost" class="form-label">TitelPost</label>
+                    <label for="titelPost" class="form-label">{{ t('person', 'titelpost' )}}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
                 </div>
                 <div class="col-lg-6"></div>
                 <!--Name -->
                 <div class="col-lg-3 col-md-4">
-                    <label for="nachname" class="required form-label">Nachname</label>
+                    <label for="nachname" class="required form-label">{{ t('person','nachname') }}</label>
                     <input type="text" required  @blur="frmState.nachnameBlured = true"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}" id="nachname" v-model="currentValue.nachname">
                     <div class="invalid-feedback" v-if="frmState.nachnameBlured && validNachname(currentValue.nachname)">
                       Bitte geben Sie den Nachnamen an.
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-4">
-                    <label for="vorname" class="form-label">Vorname</label>
+                    <label for="vorname" class="form-label">{{ t('person','vorname') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vorname" v-model="currentValue.vorname">
                 </div>
                 <div class="col-lg-2 col-md-4">
-                    <label for="vornamen" class="form-label">Vornamen</label>
+                    <label for="vornamen" class="form-label">{{ t('person','vornamen') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vornamen" v-model="currentValue.vornamen">
                 </div>
                 <div class="col-lg-4"></div>
     
                 <!-- Staatsbürgerschaft, etc. -->
                 <div class="col-lg-2 col-md-3">
-                    <label for="staatsbuergerschaft" class="form-label">Staatsbürgerschaft</label>                
+                    <label for="staatsbuergerschaft" class="form-label">{{ t('person','staatsbuergerschaft') }}</label>                
                     <select v-if="!readonly" id="staatsbuergerschaft" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.staatsbuergerschaft" >
                         <option v-for="(item, index) in nations" :value="item.nation_code">
                             {{ item.nation_text }}
@@ -315,7 +318,7 @@ export const BaseData = {
                     <input v-else type="text"  :readonly="readonly" class="form-control-sm form-control-plaintext" id="staatsbuergerschaft" :value="printNation(currentValue.staatsbuergerschaft)">
                 </div>
                 <div class="col-lg-2 col-md-3">
-                        <label for="geburtsnation" class="form-label">Geburtsnation</label>
+                        <label for="geburtsnation" class="form-label">{{ t('person','geburtsnation') }}</label>
                         <select v-if="!readonly" id="geburtsnation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.geburtsnation" >
                             <option v-for="(item, index) in nations" :value="item.nation_code">
                                 {{ item.nation_text }}
@@ -324,9 +327,9 @@ export const BaseData = {
                         <input v-else type="text" readonly class="form-control-sm form-control-plaintext"  id="geburtsnation" :value="printNation(currentValue.geburtsnation)" >
                 </div>
                 <div class="col-lg-2 col-md-3">
-                    <label for="sprache" class="form-label">Sprache</label><br>
+                    <label for="sprache" class="form-label">{{ t('person','sprache') }}</label><br>
                     <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                        <option value="">-- keine Auswahl --</option>
+                        <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
                         <option v-for="(item, index) in sprache" :value="item.sprache">
                             {{ item.sprache }}
                         </option>         
@@ -338,7 +341,7 @@ export const BaseData = {
                 
                 <!-- Geschlecht -->
                 <div class="col-lg-2 col-md-3">
-                    <label for="geschlecht" class="form-label">Geschlecht</label><br>
+                    <label for="geschlecht" class="form-label">{{ t('person', 'geschlecht') }}</label><br>
                     <select v-if="!readonly" id="geschlecht" v-model="currentValue.geschlecht" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option value="w">weiblich</option>
                         <option value="m">männlich</option>
@@ -349,7 +352,7 @@ export const BaseData = {
                 </div>
     
                 <div class="col-lg-2 col-md-3">
-                    <label for="geburtsdatum" class="required form-label">Geburtsdatum</label>
+                    <label for="geburtsdatum" class="required form-label">{{ t('person', 'geburtsdatum') }}</label>
                     <input type="date" :readonly="readonly" @blur="frmState.geburtsdatumBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured}" id="geburtsdatum" v-model="currentValue.gebdatum">
                 </div>
     

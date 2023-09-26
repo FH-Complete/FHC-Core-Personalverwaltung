@@ -27,7 +27,7 @@ export const EmployeeContract = {
         const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
         const router = VueRouter.useRouter();
-        const { t_ref, t } = usePhrasen();
+        const { t } = usePhrasen();
         const dvList = ref([]);
         const vertragList = ref([]);
         const gbtList = ref([]);
@@ -538,7 +538,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t_ref, t,
+            readonly, t,
         }
     },
     template: `
@@ -622,7 +622,7 @@ export const EmployeeContract = {
                     <div class="col">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Allgemein</h5>
+                                <h5 class="mb-0">Allgemein {{ t('vbform','oder') }}</h5>
                             </div>
                             <div class="card-body" style="text-align:left">
 

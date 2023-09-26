@@ -4,6 +4,7 @@ import { BankData } from './BankData.js';
 import { ContactData } from './contact/ContactData.js';
 import { MaterialExpensesData } from './MaterialExpensesData.js';
 import { HourlyRateData } from './HourlyRateData.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeePerson = {
     components: {
@@ -22,6 +23,7 @@ export const EmployeePerson = {
         const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(0);
         const currentPersonUID = Vue.ref(null);
+        const { t } = usePhrasen();
         const items = ["base", "employee", "contact", "bank", "material", "hourly"];
         const activeItem = Vue.ref("base");
        // const { personID } = Vue.toRefs(props);
@@ -51,7 +53,7 @@ export const EmployeePerson = {
             currentPersonUID.value = route.params.uid;
         })
 */
-        return { items, isActive, setActive, currentPersonID, currentPersonUID }
+        return { items, isActive, setActive, currentPersonID, currentPersonUID, t }
 
     },
     template: `
