@@ -1,7 +1,6 @@
 export default {
 	getStundensaetze: function(uid) {
 		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getStundensaetze/' + uid;
-		console.log("TEEEST" + url);
 
 		return axios.get(url);
 	},

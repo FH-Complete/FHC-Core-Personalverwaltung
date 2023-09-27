@@ -7,7 +7,9 @@ export const HourlyRateData = {
 	components: {
 		Modal,
 		ModalDialog,
-		Toast
+		Toast,
+		"datepicker": VueDatePicker,
+
 	},
 	props: {
 		editMode: { type: Boolean, required: true },
@@ -321,7 +323,7 @@ export const HourlyRateData = {
 	</div>
 
 	<!-- detail modal -->
-	<Modal title="Stundensatz" ref="modalRef">
+	<Modal title="Stundensatz" ref="modalRef" class="stundensatzModal">
 		<template #body>
 			<form class="row g-3" ref="houryrateDataFrm">
 							
@@ -337,11 +339,34 @@ export const HourlyRateData = {
 				<div class="col-md-4"></div>
 				<div class="col-md-4">
 					<label for="beginn" class="required form-label">Von</label>
-					<input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validBeginn(currentValue.gueltig_von) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.gueltig_von">
+					<datepicker 
+						:readonly="readonly"
+						@blur="frmState.beginnBlurred = true"
+						v-bind:enable-time-picker="false"
+						class="startDate"
+						:class="{ 'form-control-plaintext': readonly, 'is-invalid': !validBeginn(currentValue.gueltig_von) && frmState.beginnBlurred}"
+						id="beginn"
+						v-model="currentValue.gueltig_von"
+						locale="de"
+						format="dd.MM.yyyy"
+						auto-apply 
+						model-type="yyyy-MM-dd"
+					></datepicker>
 				</div>
 				<div class="col-md-4">
 					<label for="ende" class="form-label">Bis</label>
-					<input type="date" :readonly="readonly" @blur="frmState.bisBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !checkDates(currentValue.gueltig_von, currentValue.gueltig_bis) && frmState.bisBlurred}" id="ende" v-model="currentValue.gueltig_bis">
+					<datepicker 
+						:readonly="readonly"
+						@blur="frmState.bisBlurred = true"
+						v-bind:enable-time-picker="false"
+						:class="{ 'form-control-plaintext': readonly, 'is-invalid': !checkDates(currentValue.gueltig_von, currentValue.gueltig_bis) && frmState.bisBlurred}"
+						id="ende"
+						v-model="currentValue.gueltig_bis"
+						locale="de"
+						format="dd.MM.yyyy"
+						auto-apply 
+						model-type="yyyy-MM-dd"
+					></datepicker>
 				</div>
 				<div class="col-md-4">
 				</div>
