@@ -305,7 +305,11 @@ export const EmployeeContract = {
             dvSelectedIndex.value = e.target.selectedIndex + 1;
             currentDV.value = dvList.value[e.target.selectedIndex];
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
-            let url = '/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/' + route.params.id + '/' + route.params.uid + '/contract/' + currentDV.value.dienstverhaeltnis_id;
+            let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
+                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+                    + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
+                    + route.params.id + '/' + route.params.uid 
+                    + '/contract/' + currentDV.value.dienstverhaeltnis_id;
             router.push( url );
         }
 

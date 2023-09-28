@@ -5,7 +5,7 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="d-flex align-items-start overflow-hidden">
+  <div class="d-flex align-items-start h-100 overflow-hidden">
     <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
       <template v-for="(child, idx) in children">
         <button
