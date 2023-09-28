@@ -74,3 +74,10 @@
 .scrollbar-gutter-stable-both {
     scrollbar-gutter: stable both-edges;
 }
+.stundensatzModal .modal-content {
+    overflow: initial;
+}
+
+.stundensatzModal .modal-body {
+    overflow-y: inherit;
+}

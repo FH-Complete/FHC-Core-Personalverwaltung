@@ -106,6 +106,8 @@ class Api extends Auth_Controller
 			null, 'VertragsbestandteilLib');
         $this->load->library('vertragsbestandteil/GehaltsbestandteilLib',
 			null, 'GehaltsbestandteilLib');
+        $this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib',
+			null, 'GehaltsabrechnungLib');
 
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
@@ -524,33 +526,22 @@ class Api extends Auth_Controller
         
     }
 
-    function gbtChartDataByDV()
+    private function gbtChartDataAbgerechnet($from_date, $to_date, $dv_id)
     {
-        $dv_id = $this->input->get('dv_id', TRUE);
+        $gbtList = $this->GehaltsabrechnungLib->fetchAbgerechnet($dv_id, $from_date, $to_date, false);
 
-        if (!is_numeric($dv_id))
-        {
-            $this->outputJsonError("dv_id is not numeric!'");
-            return;
-        }
+        return $gbtList;
+    }
 
-        /*$gbtModel = $this->GBTModel;
-        $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);*/
-
-        $data = array();
+    /**
+     * fetch data for Gesamtgehalt (loan without valorisation)
+     */
+    private function gbtChartDataGesamt($now, $dv_id)
+    {
         $gbtList = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dv_id, null, false);
 
         $hasFutureDate = false;
-
-        $now = new DateTime();
-		if( version_compare(phpversion(), '7.1.0', 'lt') ) 
-		{
-			$now->setTime(0,0,0);
-		}
-		else 
-		{
-			$now->setTime(0,0,0,0);
-		}
+        $data = array();
 
         foreach ($gbtList as $value) {
 
@@ -603,8 +594,45 @@ class Api extends Auth_Controller
         }
 
         ksort($data);
+
+        return $data;
+    }
+
+    function gbtChartDataByDV()
+    {
+        $dv_id = $this->input->get('dv_id', TRUE);
+
+        if (!is_numeric($dv_id))
+        {
+            $this->outputJsonError("dv_id is not numeric!'");
+            return;
+        }
+
+        /*$gbtModel = $this->GBTModel;
+        $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);*/
         
-        $this->outputJson($data);       
+        $now = new DateTime();
+		if( version_compare(phpversion(), '7.1.0', 'lt') ) 
+		{
+			$now->setTime(0,0,0);
+		}
+		else 
+		{
+			$now->setTime(0,0,0,0);
+		}
+        
+        // fetch Gesamtgehalt
+        $data = $this->gbtChartDataGesamt($now, $dv_id);
+
+        // loop dates and fetch 
+        $keys = array_keys($data);
+        $from_date = $keys[0];
+        $to_date = end($keys);
+        
+        $abgerechnet_data = $this->gbtChartDataAbgerechnet($from_date, $to_date, $dv_id);
+        
+                
+        $this->outputJson(array('gesamt' => $data, 'abgerechnet' => $abgerechnet_data));
         
     }
     
