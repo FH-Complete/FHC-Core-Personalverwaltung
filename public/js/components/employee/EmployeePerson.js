@@ -67,42 +67,42 @@ export const EmployeePerson = {
                     :class="{ active: isActive(items[0]) }"
                     @click.prevent="setActive(items[0])"
                     href="#base"
-                >Stammdaten</a
+                >{{ t('global', 'stammdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[1]) }"
                     @click.prevent="setActive(items[1])"
                     href="#employee"
-                    >Mitarbeiterdaten</a
+                    >{{ t('person', 'mitarbeiterdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[2]) }"
                     @click.prevent="setActive(items[2])"
                     href="#contact"
-                    >Kontaktdaten</a
+                    >{{ t('person', 'kontaktdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[3]) }"
                     @click.prevent="setActive(items[3])"
                     href="#bank"
-                    >Bankdaten</a
+                    >{{ t('person', 'bankdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[4]) }"
                     @click.prevent="setActive(items[4])"
                     href="#bank"
-                    >Sachaufwand</a
+                    >{{ t('person','sachaufwand') }}</a
                 > 
 				<a
 					class="nav-link"
 					:class="{ active: isActive(items[5]) }"
 					@click.prevent="setActive(items[5])"
 					href="#hourly"
-					>Stundensaetze</a
+					>{{ t('person', 'stundensaetze') }}</a
                 >
             </nav>
             <div class="tab-content col-md-10" id="nav-tabContent">

@@ -393,9 +393,9 @@ export const BaseData = {
         </div>   
     </div>
 
-    <ModalDialog title="Warnung" ref="dialogRef">
+    <ModalDialog :title="t('global', 'warnung')" ref="dialogRef">
       <template #body>
-        Stammdaten schließen? Geänderte Daten gehen verloren!
+        {{ t('person','stammdatenNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 
