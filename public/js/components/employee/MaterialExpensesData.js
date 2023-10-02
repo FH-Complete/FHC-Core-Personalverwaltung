@@ -1,6 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
+import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
 
 export const MaterialExpensesData = {
     components: {
@@ -17,6 +18,8 @@ export const MaterialExpensesData = {
     setup( props ) {
 
         const readonly = Vue.ref(false);
+
+        const { t } = usePhrasen();
 
         const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
@@ -132,6 +135,7 @@ export const MaterialExpensesData = {
         
         const showEditModal = (id) => {
             currentValue.value = { ...materialdataList.value[id] };
+            delete currentValue.value.bezeichnung;
             modalRef.value.show();
         }
 
@@ -241,7 +245,7 @@ export const MaterialExpensesData = {
             toggleMode,  validBeginn, formatDate,
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler,
-            showDeleteModal, showEditModal, confirmDeleteRef,
+            showDeleteModal, showEditModal, confirmDeleteRef, t,
          }
     },
     template: `
@@ -249,13 +253,13 @@ export const MaterialExpensesData = {
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
-            <template #body><h4>Sachaufwand gespeichert.</h4></template>
+            <template #body><h4>{{ t('person','sachaufwandGespeichert') }}</h4></template>
           </Toast>
         </div>
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="deleteToastRef">
-                <template #body><h4>Sachaufwand gelöscht.</h4></template>
+                <template #body><h4>{{ t('person', 'sachaufwandGeloescht') }}</h4></template>
             </Toast>
         </div>
     </div>
@@ -263,7 +267,7 @@ export const MaterialExpensesData = {
          <div class="col">
              <div class="card">
                 <div class="card-header">
-                    <div class="h5"><h5>Sachaufwand</h5></div>        
+                    <div class="h5"><h5>{{ t('person','sachaufwand') }}</h5></div>        
                 </div>
 
                 <div class="card-body">
@@ -276,10 +280,10 @@ export const MaterialExpensesData = {
                         <table class="table table-hover table-sm">
                             <thead>                
                             <tr>
-                                <th scope="col">Typ</th>
-                                <th scope="col">Von</th>
-                                <th scope="col">Bis</th>
-                                <th scope="col">Anmerkung</th>
+                                <th scope="col">{{ t('global','typ') }}</th>
+                                <th scope="col">{{ t('ui','from') }}</th>
+                                <th scope="col">{{ t('global','bis') }}</th>
+                                <th scope="col">{{ t('global','anmerkung') }}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -310,12 +314,12 @@ export const MaterialExpensesData = {
             
 
     <!-- detail modal -->
-    <Modal title="Sachaufwand" ref="modalRef">
+    <Modal :title="t('person','sachaufwand')" ref="modalRef">
         <template #body>
             <form class="row g-3" ref="materialDataFrm">
                             
                 <div class="col-md-8">
-                    <label for="sachaufwandtyp_kurzbz" class="form-label">Typ</label><br>
+                    <label for="sachaufwandtyp_kurzbz" class="form-label">{{ t('global','typ') }}</label><br>
                     <select v-if="!readonly" id="sachaufwandtyp_kurzbz" v-model="currentValue.sachaufwandtyp_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option v-for="(item, index) in types" :value="item.sachaufwandtyp_kurzbz">
                             {{ item.bezeichnung }}
@@ -326,18 +330,18 @@ export const MaterialExpensesData = {
                 <div class="col-md-4"></div>
                 <!--  -->
                 <div class="col-md-4">
-                    <label for="beginn" class="required form-label">Von</label>
+                    <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
                     <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validBeginn(currentValue.beginn) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.beginn">
                 </div>
                 <div class="col-md-4">
-                    <label for="ende" class="form-label">Bis</label>
+                    <label for="ende" class="form-label">{{ t('global','bis') }}</label>
                     <input type="date" :readonly="readonly" @blur="frmState.endeBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.ende">
                 </div>
                 <div class="col-md-4">
                 </div>
                 <!-- -->
                 <div class="col-md-8">
-                    <label for="uid" class="form-label">Anmerkung</label>
+                    <label for="uid" class="form-label">{{ t('global','anmerkung') }}</label>
                     <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.anmerkung">
                 </div>
                 <div class="col-md-4">
@@ -352,24 +356,24 @@ export const MaterialExpensesData = {
         </template>
         <template #footer>
             <button type="button" class="btn btn-secondary" @click="hideModal()">
-                Abbrechen
+                {{ t('ui','abbrechen') }}
             </button>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-                OK
+                {{ t('ui','ok') }}
             </button>
         </template>
 
     </Modal>
 
-    <ModalDialog title="Warnung" ref="dialogRef">
+    <ModalDialog :title="t('global','warnung')" ref="dialogRef">
       <template #body>
-        Sachaufwand schließen? Geänderte Daten gehen verloren!
+        {{ t('person','sachaufwandNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 
-    <ModalDialog title="Warnung" ref="confirmDeleteRef">
+    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
         <template #body>
-            Sachaufwand '{{ currentValue?.sachaufwandtyp_kurzbz }} ({{ currentValue?.beginn }}-{{ currentValue?.ende }})' wirklich löschen?
+            {{ t('person','sachaufwand') }} '{{ currentValue?.sachaufwandtyp_kurzbz }} ({{ currentValue?.beginn }}-{{ currentValue?.ende }})' {{ t('person', 'wirklichLoeschen') }}?
         </template>
     </ModalDialog>
     `
