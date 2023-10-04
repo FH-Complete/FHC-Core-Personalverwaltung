@@ -4,6 +4,7 @@ import { BankData } from './BankData.js';
 import { ContactData } from './contact/ContactData.js';
 import { MaterialExpensesData } from './MaterialExpensesData.js';
 import { HourlyRateData } from './HourlyRateData.js';
+import { JobFunction } from './JobFunction.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeePerson = {
@@ -14,6 +15,7 @@ export const EmployeePerson = {
 		ContactData,
 		MaterialExpensesData,
 		HourlyRateData: HourlyRateData,
+        JobFunction,
 	},
     props: {
         // personid: { type: Number, default: 0 }
@@ -24,7 +26,7 @@ export const EmployeePerson = {
         const currentPersonID = Vue.ref(0);
         const currentPersonUID = Vue.ref(null);
         const { t } = usePhrasen();
-        const items = ["base", "employee", "contact", "bank", "material", "hourly"];
+        const items = ["base", "employee", "contact", "bank", "material", "hourly", "funktion"];
         const activeItem = Vue.ref("base");
        // const { personID } = Vue.toRefs(props);
 
@@ -104,6 +106,13 @@ export const EmployeePerson = {
 					href="#hourly"
 					>{{ t('person', 'stundensaetze') }}</a
                 >
+                <a
+					class="nav-link"
+					:class="{ active: isActive(items[6]) }"
+					@click.prevent="setActive(items[6])"
+					href="#funktion"
+					>{{ t('person', 'funktionen') }}</a
+                >
             </nav>
             <div class="tab-content col-md-10" id="nav-tabContent">
                 <div
@@ -147,6 +156,13 @@ export const EmployeePerson = {
 					role="tabpanel"
 				>
 				<hourly-rate-data editMode :personID="currentPersonID"  :personUID="currentPersonUID"></hourly-rate-data>
+				</div>
+                <div
+					class="tab-pane"
+					:class="{ active: isActive(items[6]) }"
+					role="tabpanel"
+				>
+				<job-function editMode :personID="currentPersonID"  :personUID="currentPersonUID"></job-function>
 				</div>
                 
             </div>
