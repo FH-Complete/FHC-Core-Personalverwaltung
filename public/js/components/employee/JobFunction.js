@@ -35,7 +35,10 @@ export const JobFunction = {
 
         const types = Vue.inject('sachaufwandtyp');
 
+        const aktivChecked = Vue.ref(true);
+
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+        const route = VueRouter.useRoute();
 
         const fetchData = async () => {
             if (currentPersonID.value==null) {    
@@ -219,6 +222,9 @@ export const JobFunction = {
             deleteToastRef.value.show();
         }
 
+        const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+        const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
+
         return { 
             jobfunctionList, jobfunctionListArray,
             currentValue,
@@ -229,6 +235,9 @@ export const JobFunction = {
             materialDataFrm,
             modalRef,
             types, 
+            fullPath,
+            route,
+            aktivChecked,
             
             toggleMode,  validBeginn, formatDate,
             showToast, showDeletedToast,
@@ -260,8 +269,12 @@ export const JobFunction = {
 
                 <div class="card-body">
                     <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                        <div class="form-check form-switch pe-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="aktivChecked" v-model="aktivChecked">
+                            <label class="form-check-label" for="aktivChecked">nur aktive anzeigen</label>
+                        </div>
                         <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-                        <i class="fa fa-plus"></i>
+                            <i class="fa fa-plus"></i>
                         </button>            
                     </div>
                     <div class="table-responsive">
@@ -269,23 +282,20 @@ export const JobFunction = {
                             <thead>                
                             <tr>
                                 <th scope="col">{{ t('core','unternehmen') }}</th>
-                                <th scope="col">{{ t('person','zuordnung') }}</th>
-                                <th scope="col">{{ t('person','abteilung') }}</th>
-                                <th scope="col">{{ t('person','fachbereich') }}</th>
-                                <th scope="col">{{ t('person','hrrelevant') }}</th>
-                                <th scope="col">{{ t('person','vertragsrelevant') }}</th>
+                                <th scope="col">{{ t('person','zuordnung_taetigkeit') }}</th>
+                                <th scope="col">{{ t('lehre','organisationseinheit') }}</th>
+                                <th scope="col">{{ t('person','wochenstunden') }}</th>
                                 <th scope="col">{{ t('ui','from') }}</th>
                                 <th scope="col">{{ t('global','bis') }}</th>                                                                
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="jobfunction in jobfunctionListArray" :key="jobfunction.benutzerfunktion_id">
-                                <td class="align-middle">{{ jobfunction.dienstverhaeltnis_unternehmen }}</td>
+                                <td class="align-middle"><router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + jobfunction.dienstverhaeltnis_id" 
+                                >{{ jobfunction.dienstverhaeltnis_unternehmen }}</router-link></td>
                                 <td class="align-middle">{{ jobfunction.beschreibung }}</td>
                                 <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
-                                <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
-                                <td></td>
-                                <td></td>
+                                <td class="align-middle">{{ jobfunction.wochenstunden }}</td>
                                 <td class="align-middle">{{ formatDate(jobfunction.datum_von) }}</td>
                                 <td class="align-middle">{{ formatDate(jobfunction.datum_bis) }}</td>
 
