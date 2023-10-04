@@ -15,5 +15,11 @@ export default {
             + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/getCurrentFunctions'
             + '/' + mitarbeiter_uid + '/' + unternehmen;
     return axios.get(url);
-  }  
+  }  ,
+  getAllUserFunctions: function(mitarbeiter_uid) {
+    var url = FHC_JS_DATA_STORAGE_OBJECT.app_root 
+            + 'index.ci.php/extensions/FHC-Core-Personalverwaltung/Api/getAllUserFunctions'
+            + '/' + mitarbeiter_uid;
+    return axios.get(url);
+  }
 };

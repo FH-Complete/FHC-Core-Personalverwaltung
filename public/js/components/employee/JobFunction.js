@@ -31,7 +31,7 @@ export const JobFunction = {
 
         const isFetching = Vue.ref(false);
 
-        const materialdataList = Vue.ref([]);
+        const jobfunctionList = Vue.ref([]);
 
         const types = Vue.inject('sachaufwandtyp');
 
@@ -39,7 +39,7 @@ export const JobFunction = {
 
         const fetchData = async () => {
             if (currentPersonID.value==null) {    
-                materialdataList.value = [];            
+                jobfunctionList.value = [];            
                 return;
             }
             isFetching.value = true
@@ -49,8 +49,8 @@ export const JobFunction = {
             
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personMaterialExpenses(currentPersonID.value, currentPersonUID.value);                    
-                materialdataList.value = response.data.retval;
+                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(currentPersonUID.value);                    
+                jobfunctionList.value = response.data.retval;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -103,7 +103,7 @@ export const JobFunction = {
             
         })
 
-        const materialdataListArray = Vue.computed(() => (materialdataList.value ? Object.values(materialdataList.value) : []));
+        const jobfunctionListArray = Vue.computed(() => (jobfunctionList.value ? Object.values(jobfunctionList.value) : []));
 
         // Modal 
         const modalRef = Vue.ref();
@@ -122,13 +122,13 @@ export const JobFunction = {
         }
         
         const showEditModal = (id) => {
-            currentValue.value = { ...materialdataList.value[id] };
+            currentValue.value = { ...jobfunctionList.value[id] };
             delete currentValue.value.bezeichnung;
             modalRef.value.show();
         }
 
         const showDeleteModal = async (id) => {
-            currentValue.value = { ...materialdataList.value[id] };
+            currentValue.value = { ...jobfunctionList.value[id] };
             const ok = await confirmDeleteRef.value.show();
             
             if (ok) {   
@@ -136,7 +136,7 @@ export const JobFunction = {
                 try {
                     const res = await Vue.$fhcapi.Person.deletePersonMaterialExpenses(id);                    
                     if (res.data.error == 0) {
-                        delete materialdataList.value[id];
+                        delete jobfunctionList.value[id];
                         showDeletedToast();
                     }
                 } catch (error) {
@@ -160,7 +160,7 @@ export const JobFunction = {
                 try {
                     const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
                     if (r.data.error == 0) {
-                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
+                        jobfunctionList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
                         console.log('materialdata successfully saved');
                         showToast();
                     }  
@@ -220,7 +220,7 @@ export const JobFunction = {
         }
 
         return { 
-            materialdataList, materialdataListArray,
+            jobfunctionList, jobfunctionListArray,
             currentValue,
             readonly,
             frmState,
@@ -268,28 +268,33 @@ export const JobFunction = {
                         <table class="table table-hover table-sm">
                             <thead>                
                             <tr>
-                                <th scope="col">{{ t('global','beschreibung') }}</th>
-                                <th scope="col">{{ t('ui','from') }}</th>
-                                <th scope="col">{{ t('global','bis') }}</th>
-                                <th scope="col">{{ t('global','aktiv') }}</th>
+                                <th scope="col">{{ t('core','unternehmen') }}</th>
+                                <th scope="col">{{ t('person','zuordnung') }}</th>
+                                <th scope="col">{{ t('person','abteilung') }}</th>
                                 <th scope="col">{{ t('person','fachbereich') }}</th>
-                                <th scope="col">{{ t('lehre','semester') }}</th>
                                 <th scope="col">{{ t('person','hrrelevant') }}</th>
                                 <th scope="col">{{ t('person','vertragsrelevant') }}</th>
+                                <th scope="col">{{ t('ui','from') }}</th>
+                                <th scope="col">{{ t('global','bis') }}</th>                                                                
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="materialdata in materialdataListArray" :key="materialdata.sachaufwand_id">
-                                <td class="align-middle">{{ materialdata.bezeichnung }}</td>
-                                <td class="align-middle">{{ formatDate(materialdata.beginn) }}</td>
-                                <td class="align-middle">{{ formatDate(materialdata.ende) }}</td>
-                                <td class="align-middle">{{ materialdata.anmerkung }}</td>
+                            <tr v-for="jobfunction in jobfunctionListArray" :key="jobfunction.benutzerfunktion_id">
+                                <td class="align-middle">{{ jobfunction.dienstverhaeltnis_unternehmen }}</td>
+                                <td class="align-middle">{{ jobfunction.beschreibung }}</td>
+                                <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
+                                <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
+                                <td></td>
+                                <td></td>
+                                <td class="align-middle">{{ formatDate(jobfunction.datum_von) }}</td>
+                                <td class="align-middle">{{ formatDate(jobfunction.datum_bis) }}</td>
+
                                 <td class="align-middle" width="5%">
                                     <div class="d-grid gap-2 d-md-flex align-middle">
-                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(materialdata.sachaufwand_id)">
+                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(jobfunction.benutzerfunktion_id)">
                                             <i class="fa fa-minus"></i>
                                         </button>
-                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(materialdata.sachaufwand_id)">
+                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(jobfunction.benutzerfunktion_id)">
                                             <i class="fa fa-pen"></i>
                                         </button>
                                     </div>
