@@ -1763,7 +1763,15 @@ EOSQL;
 			SELECT 
 				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen , 
 				oe.bezeichnung AS funktion_oebezeichnung, f.beschreibung, bf.*, 
-				fb.bezeichnung AS fachbereich_bezeichnung
+				fb.bezeichnung AS fachbereich_bezeichnung,
+			    CASE
+					WHEN 
+						bf.datum_bis IS NOT NULL AND bf.datum_bis::date < now()::date
+					THEN
+						false
+					ELSE
+						true
+				END aktiv
 			FROM 
 				public.tbl_benutzerfunktion bf
 			JOIN 
