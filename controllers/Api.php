@@ -1762,7 +1762,9 @@ EOSQL;
 		$sql = <<<EOSQL
 			SELECT 
 				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen , 
-				oe.bezeichnung AS funktion_oebezeichnung, f.beschreibung, bf.*, 
+				oe.bezeichnung AS funktion_oebezeichnung, 
+				f.beschreibung AS funktion_beschreibung, 
+				bf.*, 
 				fb.bezeichnung AS fachbereich_bezeichnung,
 			    CASE
 					WHEN 
