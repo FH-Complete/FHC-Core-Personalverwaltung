@@ -65,6 +65,7 @@ class Api extends Auth_Controller
                 'dvByPerson' => Api::DEFAULT_PERMISSION,
                 'vertragByDV' => Api::DEFAULT_PERMISSION,
 				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
+				'getAllFunctions' => Api::DEFAULT_PERMISSION,
 				'getContractFunctions' => Api::DEFAULT_PERMISSION,
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
 				'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
@@ -1666,6 +1667,35 @@ EOSQL;
 		}
 	}
 
+	/*
+	 * return list of all functions
+	 * as key value list to be used in select or autocomplete
+	 */	
+	public function getAllFunctions() 
+	{
+		$sql = <<<EOSQL
+			SELECT 
+				funktion_kurzbz AS value, beschreibung AS label 
+			FROM 
+				public.tbl_funktion 
+			WHERE 
+				aktiv = true 
+			ORDER BY beschreibung ASC
+EOSQL;
+		
+		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
+		if( hasData($fkts) ) 
+		{
+			$this->outputJson($fkts);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no contract relevant funktionen found');
+			return;
+		}		
+	}
+	
 	/*
 	 * return list of contract relevant functions
 	 * as key value list to be used in select or autocomplete
