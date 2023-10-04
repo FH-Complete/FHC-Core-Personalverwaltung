@@ -281,7 +281,7 @@ export const JobFunction = {
                         <table class="table table-hover table-sm">
                             <thead>                
                             <tr>
-                                <th scope="col">{{ t('core','unternehmen') }}</th>
+                                <th scope="col">{{ t('person','dv_unternehmen') }}</th>
                                 <th scope="col">{{ t('person','zuordnung_taetigkeit') }}</th>
                                 <th scope="col">{{ t('lehre','organisationseinheit') }}</th>
                                 <th scope="col">{{ t('person','wochenstunden') }}</th>
@@ -290,26 +290,28 @@ export const JobFunction = {
                             </tr>
                             </thead>
                             <tbody>
-                            <tr v-for="jobfunction in jobfunctionListArray" :key="jobfunction.benutzerfunktion_id">
-                                <td class="align-middle"><router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + jobfunction.dienstverhaeltnis_id" 
-                                >{{ jobfunction.dienstverhaeltnis_unternehmen }}</router-link></td>
-                                <td class="align-middle">{{ jobfunction.beschreibung }}</td>
-                                <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
-                                <td class="align-middle">{{ jobfunction.wochenstunden }}</td>
-                                <td class="align-middle">{{ formatDate(jobfunction.datum_von) }}</td>
-                                <td class="align-middle">{{ formatDate(jobfunction.datum_bis) }}</td>
+                            <template v-for="jobfunction in jobfunctionListArray" :key="jobfunction.benutzerfunktion_id">
+                                <tr v-if="!aktivChecked || (aktivChecked && jobfunction.aktiv)" >
+                                    <td class="align-middle"><router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + jobfunction.dienstverhaeltnis_id" 
+                                    >{{ jobfunction.dienstverhaeltnis_unternehmen }}</router-link></td>
+                                    <td class="align-middle">{{ jobfunction.beschreibung }}</td>
+                                    <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
+                                    <td class="align-middle">{{ jobfunction.wochenstunden }}</td>
+                                    <td class="align-middle">{{ formatDate(jobfunction.datum_von) }}</td>
+                                    <td class="align-middle">{{ formatDate(jobfunction.datum_bis) }}</td>
 
-                                <td class="align-middle" width="5%">
-                                    <div class="d-grid gap-2 d-md-flex align-middle">
-                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(jobfunction.benutzerfunktion_id)">
-                                            <i class="fa fa-minus"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(jobfunction.benutzerfunktion_id)">
-                                            <i class="fa fa-pen"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                                    <td class="align-middle" width="5%">
+                                        <div class="d-grid gap-2 d-md-flex align-middle">
+                                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(jobfunction.benutzerfunktion_id)">
+                                                <i class="fa fa-minus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(jobfunction.benutzerfunktion_id)">
+                                                <i class="fa fa-pen"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>    
+                            </template>
                 
                             </tbody>
                         </table>            
@@ -326,7 +328,7 @@ export const JobFunction = {
             <form class="row g-3" ref="materialDataFrm">
                             
                 <div class="col-md-8">
-                    <label for="sachaufwandtyp_kurzbz" class="form-label">{{ t('global','typ') }}</label><br>
+                    <label for="sachaufwandtyp_kurzbz" class="form-label">{{ t('person','funktion') }}</label><br>
                     <select v-if="!readonly" id="sachaufwandtyp_kurzbz" v-model="currentValue.sachaufwandtyp_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option v-for="(item, index) in types" :value="item.sachaufwandtyp_kurzbz">
                             {{ item.bezeichnung }}
