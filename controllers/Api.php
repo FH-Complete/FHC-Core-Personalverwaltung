@@ -67,6 +67,7 @@ class Api extends Auth_Controller
 				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
 				'getContractFunctions' => Api::DEFAULT_PERMISSION,
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
+				'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
 				'saveVertrag' => Api::DEFAULT_PERMISSION,
 				'getCurrentVBs' => Api::DEFAULT_PERMISSION,
 				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
@@ -1746,6 +1747,55 @@ EOSQL;
 			return;
 		}		
 	}
+
+	/*
+	 * return list of functions for a uid 
+	 * as objects to be used in as datasource
+	 */
+	public function getAllUserFunctions($uid) 
+	{
+		if( empty($uid) )
+		{
+			$this->outputJsonError('Missing Parameter <uid>');
+		}
+				
+		$sql = <<<EOSQL
+			SELECT 
+				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen , 
+				oe.bezeichnung AS funktion_oebezeichnung, f.beschreibung, bf.* 
+			FROM 
+				public.tbl_benutzerfunktion bf
+			JOIN 
+				public.tbl_organisationseinheit oe ON oe.oe_kurzbz = bf.oe_kurzbz 
+            JOIN 
+				public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
+			LEFT JOIN 
+				hr.tbl_vertragsbestandteil_funktion vf ON vf.benutzerfunktion_id = bf.benutzerfunktion_id 
+			LEFT JOIN 
+				hr.tbl_vertragsbestandteil v ON vf.vertragsbestandteil_id = v.vertragsbestandteil_id
+			LEFT JOIN 
+				hr.tbl_dienstverhaeltnis dv ON v.dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
+			LEFT JOIN 
+				public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
+            WHERE 
+				bf.uid = ? 
+            ORDER BY 
+				f.beschreibung, bf.datum_von ASC
+		
+EOSQL;
+			
+		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($uid));
+		if( hasData($benutzerfunktionen) ) 
+		{
+			$this->outputJson($benutzerfunktionen);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid);
+			return;
+		}		
+	}	
 	
 	public function saveVertrag($mitarbeiter_uid, $dryrun=null) 
 	{
