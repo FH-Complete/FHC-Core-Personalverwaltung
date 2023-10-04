@@ -1762,11 +1762,12 @@ EOSQL;
 		$sql = <<<EOSQL
 			SELECT 
 				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen , 
-				oe.bezeichnung AS funktion_oebezeichnung, f.beschreibung, bf.* 
+				oe.bezeichnung AS funktion_oebezeichnung, f.beschreibung, bf.*, 
+				fb.bezeichnung AS fachbereich_bezeichnung
 			FROM 
 				public.tbl_benutzerfunktion bf
 			JOIN 
-				public.tbl_organisationseinheit oe ON oe.oe_kurzbz = bf.oe_kurzbz 
+				public.tbl_organisationseinheit oe ON oe.oe_kurzbz = bf.oe_kurzbz
             JOIN 
 				public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
 			LEFT JOIN 
@@ -1777,6 +1778,8 @@ EOSQL;
 				hr.tbl_dienstverhaeltnis dv ON v.dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
 			LEFT JOIN 
 				public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
+			LEFT JOIN
+				public.tbl_fachbereich fb ON fb.fachbereich_kurzbz = bf.fachbereich_kurzbz
             WHERE 
 				bf.uid = ? 
             ORDER BY 
