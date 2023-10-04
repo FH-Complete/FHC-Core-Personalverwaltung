@@ -103,6 +103,7 @@ body {
     border: 1px solid #FFF;
     border-radius: 0;
     background-color: #EFEFEF;
+    text-transform: capitalize!important;
   }
 
 
@@ -136,6 +137,7 @@ div#collapseTable.minimized {
 
 .form-label {
   font-size: 0.75em;
+  text-transform: capitalize!important;
 }  
   
 
