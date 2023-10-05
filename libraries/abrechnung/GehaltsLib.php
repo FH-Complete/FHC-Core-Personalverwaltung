@@ -101,48 +101,15 @@ class GehaltsLib
 		GROUP BY tbl_gehaltsabrechnung.datum
 		ORDER BY tbl_gehaltsabrechnung.datum
         
-        ";
+        ";		
 
-		$encryptedColumns = $this->_ci->GehaltsabrechnungModel->getEncryptedColumns();
-
-		foreach ($encryptedColumns as $encryptedColumn => $definition)
-			{
-				// If the requested encrypted column is well defined
-				if (!isEmptyArray($definition)
-					&& array_key_exists(DB_Model::CRYPT_CAST, $definition)
-					&& array_key_exists(DB_Model::CRYPT_PASSWORD_NAME, $definition))
-				{
-
-					// And if exists the wanted password to decrypt in the configs
-					if (array_key_exists($definition[DB_Model::CRYPT_PASSWORD_NAME], $this->_ci->GehaltsabrechnungModel->config->item(DB_Model::CRYPT_CONF_PASSWORDS)))
-					{
-						// Password to decrypt data
-						$cryptConfPasswords = $this->_ci->GehaltsabrechnungModel->config->item(DB_Model::CRYPT_CONF_PASSWORDS);
-						$decryptionPassword = $cryptConfPasswords[$definition[DB_Model::CRYPT_PASSWORD_NAME]];
-
-						$qry = str_replace(
-							$encryptedColumn,
-							sprintf(
-								DB_Model::CRYPT_WHERE_TEMPLATE,
-								$encryptedColumn,
-								$decryptionPassword,
-								$definition[DB_Model::CRYPT_CAST]
-							),
-							$qry
-						);
-					}
-				}
-			}
-
-		
-
-		$query = $this->_ci->db->query(
+		$result = $this->_ci->GehaltsabrechnungModel->execReadOnlyQuery(
 			$qry,
 			array($dv_id, $from_date['month'], $from_date['year'], $to_date['month'], $to_date['year']),
 			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
 		
 
-		return $result = $query->result();
+		return $result;
 	}
 
 	public function existsAbrechnung($bestandteil, $date)

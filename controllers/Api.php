@@ -633,8 +633,13 @@ class Api extends Auth_Controller
         
         $abgerechnet_data = $this->gbtChartDataAbgerechnet($from_date, $to_date, $dv_id);
         
+        if(isError($abgerechnet_data)) 
+		{
+			$this->outputJsonError("error getting chart data");
+            return;
+		}
                 
-        $this->outputJson(array('gesamt' => $data, 'abgerechnet' => $abgerechnet_data));
+        $this->outputJson(array('gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
         
     }
     
