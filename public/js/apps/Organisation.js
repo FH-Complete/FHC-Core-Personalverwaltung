@@ -47,7 +47,7 @@ const pvApp = Vue.createApp(	{
 	},
 });
 
-pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+//pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(primevue.config.default);
 pvApp.use(primevue.toastservice);
 
