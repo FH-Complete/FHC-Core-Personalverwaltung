@@ -1765,36 +1765,7 @@ EOSQL;
 			$this->outputJsonError('no orgets found for parent oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
 		}
-	}
-
-    /*
-	 * return list of all active functions
-	 * as key value list to be used in select or autocomplete
-	 */	
-	public function getAllFunctions() 
-	{
-		$sql = <<<EOSQL
-			SELECT 
-				funktion_kurzbz AS value, beschreibung AS label 
-			FROM 
-				public.tbl_funktion 
-			WHERE 
-				aktiv = true  
-			ORDER BY beschreibung ASC
-EOSQL;
-		
-		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) ) 
-		{
-			$this->outputJson($fkts);
-			return;
-		}
-		else
-		{
-			$this->outputJsonError('no funktionen found');
-			return;
-		}		
-	}
+	}    
 
 	/*
 	 * return list of all functions
