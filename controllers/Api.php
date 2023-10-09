@@ -48,6 +48,8 @@ class Api extends Auth_Controller
                 'personBankData' => Api::DEFAULT_PERMISSION,
                 'upsertPersonBankData' => Api::DEFAULT_PERMISSION,
                 'deletePersonBankData' => Api::DEFAULT_PERMISSION,
+                'upsertPersonJobFunction'  => Api::DEFAULT_PERMISSION,
+                'deletePersonJobFunction'  => Api::DEFAULT_PERMISSION,
                 'personBaseData' => Api::DEFAULT_PERMISSION,
                 'updatePersonBaseData' => Api::DEFAULT_PERMISSION,
                 'personEmployeeData' => Api::DEFAULT_PERMISSION,
@@ -64,11 +66,13 @@ class Api extends Auth_Controller
                 'getAdressentyp' => Api::DEFAULT_PERMISSION,
                 'dvByPerson' => Api::DEFAULT_PERMISSION,
                 'vertragByDV' => Api::DEFAULT_PERMISSION,
+                'getCompanyByOrget'  => Api::DEFAULT_PERMISSION,
 				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
 				'getAllFunctions' => Api::DEFAULT_PERMISSION,
 				'getContractFunctions' => Api::DEFAULT_PERMISSION,
 				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
 				'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
+                'getAllFunctions' => Api::DEFAULT_PERMISSION,
 				'saveVertrag' => Api::DEFAULT_PERMISSION,
 				'getCurrentVBs' => Api::DEFAULT_PERMISSION,
 				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
@@ -311,6 +315,67 @@ class Api extends Auth_Controller
                 show_error('sachaufwand_id is not numeric!');
 
             $result = $this->SachaufwandModel->deletePersonSachaufwand($payload['sachaufwand_id']);
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when deleting bank data');
+
+        } else {
+            $this->output->set_status_header('405');
+        }        
+
+    }
+
+
+    // ---------------------------------------
+    // job function (=Benutzerfunktion)
+    // ---------------------------------------
+
+    function upsertPersonJobFunction()
+    {
+        if($this->input->method() === 'post'){
+
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['benutzerfunktion_id']) && !is_numeric($payload['benutzerfunktion_id']))
+                show_error('benutzerfunktion_id is not numeric!');
+
+            if (!isset($payload['oe_kurzbz']) || (isset($payload['oe_kurzbz']) && $payload['oe_kurzbz'] == ''))
+                show_error('oe_kurzbz is empty!');   
+            
+            if (!isset($payload['funktion_kurzbz']) || (isset($payload['funktion_kurzbz']) && $payload['funktion_kurzbz'] == ''))
+                show_error('funktion_kurzbz is empty!');
+
+            if (!isset($payload['uid']) || (isset($payload['uid']) && $payload['uid'] == ''))
+                show_error('uid is empty!');    
+
+            if ($payload['benutzerfunktion_id'] == 0)
+            {
+                $result = $this->BenutzerfunktionModel->insertBenutzerfunktion($payload);
+            } else {
+                $result = $this->BenutzerfunktionModel->updateBenutzerfunktion($payload);
+            }
+            
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when updating job function');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+    function deletePersonJobFunction()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['benutzerfunktion_id']) && !is_numeric($payload['benutzerfunktion_id']))
+                show_error('benutzerfunktion_id is not numeric!');
+
+            $result = $this->BenutzerfunktionModel->deleteBenutzerfunktion($payload['benutzerfunktion_id']);
 
             if (isSuccess($result))
 			    $this->outputJsonSuccess($result->retval);
@@ -1625,6 +1690,36 @@ class Api extends Auth_Controller
             $this->output->set_status_header('405'); 
         }
     }
+
+    public function getCompanyByOrget($oe_kurzbz)
+    {
+
+        $sql = <<<EOSQL
+        WITH RECURSIVE unternehmen as
+        (
+                SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
+                WHERE oe_kurzbz=?
+                UNION ALL
+                SELECT o.oe_kurzbz, o.oe_parent_kurzbz 
+                FROM   public.tbl_organisationseinheit AS o
+                       INNER JOIN unternehmen u  ON u.oe_parent_kurzbz=o.oe_kurzbz
+        )
+        SELECT *
+        FROM unternehmen
+        WHERE oe_parent_kurzbz is null;
+EOSQL;
+        $childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($oe_kurzbz));
+        if( hasData($childorgets) ) 
+        {
+            $this->outputJson($childorgets);
+            return;
+        }
+        else
+        {
+            $this->outputJsonError('no orgets found for parent oe_kurzbz ' . $oe_kurzbz );
+            return;
+        }
+    }
    
 	/*
 	 * return list of child orgets for a given company orget_kurzbz
@@ -1670,6 +1765,35 @@ EOSQL;
 			$this->outputJsonError('no orgets found for parent oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
 		}
+	}
+
+    /*
+	 * return list of all active functions
+	 * as key value list to be used in select or autocomplete
+	 */	
+	public function getAllFunctions() 
+	{
+		$sql = <<<EOSQL
+			SELECT 
+				funktion_kurzbz AS value, beschreibung AS label 
+			FROM 
+				public.tbl_funktion 
+			WHERE 
+				aktiv = true  
+			ORDER BY beschreibung ASC
+EOSQL;
+		
+		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
+		if( hasData($fkts) ) 
+		{
+			$this->outputJson($fkts);
+			return;
+		}
+		else
+		{
+			$this->outputJsonError('no funktionen found');
+			return;
+		}		
 	}
 
 	/*

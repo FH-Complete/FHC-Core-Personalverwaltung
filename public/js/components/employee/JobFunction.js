@@ -1,6 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
+import {OrgChooser} from "../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
 
 export const JobFunction = {
@@ -8,6 +9,7 @@ export const JobFunction = {
         Modal,
         ModalDialog,
         Toast,
+        OrgChooser,
     },
     props: {
         editMode: { type: Boolean, required: true },
@@ -23,22 +25,29 @@ export const JobFunction = {
 
         const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
-        const uid = Vue.ref("");
-
         const dialogRef = Vue.ref();
-
-        const url = Vue.ref("");
 
         const isFetching = Vue.ref(false);
 
+        const unternehmen = Vue.ref();
         const jobfunctionList = Vue.ref([]);
-
-        const types = Vue.inject('sachaufwandtyp');
+        const jobfunctionDefList = Vue.ref([]);
+        const orgUnitList = Vue.ref([{value: '', label: '-'}]);
 
         const aktivChecked = Vue.ref(true);
 
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const route = VueRouter.useRoute();
+
+        const convertArrayToObject = (array, key) => {
+            const initialValue = {};
+            return array.reduce((obj, item) => {
+              return {
+                ...obj,
+                [item[key]]: item,
+              };
+            }, initialValue);
+          };
 
         const fetchData = async () => {
             if (currentPersonID.value==null) {    
@@ -47,13 +56,11 @@ export const JobFunction = {
             }
             isFetching.value = true
  
-            const urlMaterial = `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
-            const urlUID = `${full}/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
-            
-            // submit
+            // fetch data and map them for easier access
             try {
-                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(currentPersonUID.value);                    
-                jobfunctionList.value = response.data.retval;
+                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(currentPersonUID.value);
+                let rawList = response.data.retval;
+                jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -64,12 +71,14 @@ export const JobFunction = {
 
         const createShape = () => {
             return {
-                sachaufwand_id: 0,
-                mitarbeiter_uid: currentPersonUID.value,
-                sachaufwandtyp_kurzbz: "",
-                beginn: "",
-                ende: "",  
-                anmerkung: "",     
+                benutzerfunktion_id: 0,
+                uid: currentPersonUID.value,
+                oe_kurzbz: "",
+                funktion_kurzbz: "",
+                datum_von: "",
+                datum_bis: "",  
+                bezeichnung: "",
+                wochenstunden: 0,     
             } 
         }
 
@@ -78,6 +87,11 @@ export const JobFunction = {
 
         Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
             fetchData();                     
+        });
+
+        Vue.watch(unternehmen, (unternehmen_kurzbz) => {
+            fetchOrgUnits(unternehmen_kurzbz);   
+            fetchFunctions();             
         });
 
         const toggleMode = async () => {
@@ -115,6 +129,8 @@ export const JobFunction = {
         const showAddModal = () => {
             currentValue.value = createShape();
             // reset form state
+            frmState.orgetBlurred=false;
+            frmState.funktionBlurred=false;            
             frmState.beginnBlurred=false;
             // call bootstrap show function
             modalRef.value.show();
@@ -124,9 +140,24 @@ export const JobFunction = {
             modalRef.value.hide();
         }
         
-        const showEditModal = (id) => {
+        const showEditModal = async (id) => {
             currentValue.value = { ...jobfunctionList.value[id] };
-            delete currentValue.value.bezeichnung;
+            // fetch company
+            isFetching.value = true;
+            try {
+                const res = await Vue.$fhcapi.Funktion.getCompanyByOrget(currentValue.value.oe_kurzbz);                    
+                if (res.data.error == 0) {
+                    unternehmen.value = res.data.retval[0].oe_kurzbz;
+                } else {
+                    console.log('company not found for orget!');
+                }
+
+            } catch (error) {
+                console.log(error)              
+            } finally {
+                  isFetching.value = false
+            }   
+            //delete currentValue.value.bezeichnung;
             modalRef.value.show();
         }
 
@@ -137,7 +168,7 @@ export const JobFunction = {
             if (ok) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonMaterialExpenses(id);                    
+                    const res = await Vue.$fhcapi.Person.deletePersonJobFunction(id);                    
                     if (res.data.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
@@ -161,10 +192,20 @@ export const JobFunction = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
+                    let payload = {...currentValue.value};
+                    delete payload.dienstverhaeltnis_id;
+                    delete payload.dienstverhaeltnis_unternehmen;
+                    delete payload.fachbereich_bezeichnung;
+                    delete payload.funktion_oebezeichnung;
+                    delete payload.aktiv;
+                    delete payload.funktion_beschreibung;
+                    const r = await Vue.$fhcapi.Person.upsertPersonJobFunction(payload);                    
                     if (r.data.error == 0) {
-                        jobfunctionList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
-                        console.log('materialdata successfully saved');
+                        //jobfunctionList.value[r.data.retval[0].benutzerfunktion_id] = 
+                        //    {r.data.retval[0]};
+                        // fetch all data because of all the references in the changed record
+                        await fetchData();
+                        console.log('job function successfully saved');
                         showToast();
                     }  
                 } catch (error) {
@@ -181,20 +222,21 @@ export const JobFunction = {
         // form handling
         // -------------
 
-        const materialDataFrm = Vue.ref();
+        const jobFunctionFrm = Vue.ref();
 
-        const frmState = Vue.reactive({ beginnBlurred: false, wasValidated: false });
+        const frmState = Vue.reactive({ beginnBlurred: false, orgetBlurred: false, funktionBlurred: false, wasValidated: false });       
 
-        const validBeginn = (n) => {
+        const notEmpty = (n) => {
             return !!n && n.trim() != "";
         }
 
         const validate = () => {
+            frmState.orgetBlurred = true;
+            frmState.funktionBlurred = true;
             frmState.beginnBlurred = true;
-            if (validBeginn(currentValue.value.beginn)) {
-                return true;
-            }
-            return false;
+            return notEmpty(currentValue.value.datum_von) && 
+                notEmpty(currentValue.value.oe_kurzbz) && 
+                notEmpty(currentValue.value.funktion_kurzbz);
         }
         
 
@@ -222,27 +264,59 @@ export const JobFunction = {
             deleteToastRef.value.show();
         }
 
+        const fetchOrgUnits = async (unternehmen_kurzbz) => {
+            if( unternehmen_kurzbz === '' ) {
+                return;
+            }
+            const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(unternehmen_kurzbz);
+            const orgets = response.data.retval;
+            orgets.unshift({
+              value: '',
+              label: t('ui','bitteWaehlen'),
+            });
+            orgUnitList.value = await  orgets;
+        }
+
+        const fetchFunctions = async (uid, unternehmen_kurzbz) => {
+            if(unternehmen_kurzbz === '' || uid === '' ) { 
+              return;  
+            }
+            const response = await Vue.$fhcapi.Funktion.getAllFunctions();
+            const benutzerfunktionen = response.data.retval;
+            benutzerfunktionen.unshift({
+              value: '',
+              label: t('ui','bitteWaehlen'),
+            });
+            jobfunctionDefList.value = benutzerfunktionen;
+          }
+
+        const unternehmenSelectedHandler = (e) => {
+            console.log('unternhemen selected: ',e);
+            unternehmen.value = e;
+        }
+ 
         const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
 
         return { 
-            jobfunctionList, jobfunctionListArray,
+            jobfunctionList, orgUnitList, jobfunctionListArray,
+            jobfunctionDefList,
             currentValue,
             readonly,
             frmState,
             dialogRef,
             toastRef, deleteToastRef,
-            materialDataFrm,
+            jobFunctionFrm,
             modalRef,
-            types, 
             fullPath,
             route,
             aktivChecked,
+            unternehmen,
             
-            toggleMode,  validBeginn, formatDate,
+            toggleMode, formatDate, notEmpty,
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler,
-            showDeleteModal, showEditModal, confirmDeleteRef, t,
+            showDeleteModal, showEditModal, confirmDeleteRef, t, unternehmenSelectedHandler,
          }
     },
     template: `
@@ -250,13 +324,13 @@ export const JobFunction = {
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','sachaufwandGespeichert') }}</h4></template>
+            <template #body><h4>{{ t('person','funktionGespeichert') }}</h4></template>
           </Toast>
         </div>
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person', 'sachaufwandGeloescht') }}</h4></template>
+                <template #body><h4>{{ t('person', 'funktionGeloescht') }}</h4></template>
             </Toast>
         </div>
     </div>
@@ -286,7 +360,8 @@ export const JobFunction = {
                                 <th scope="col">{{ t('lehre','organisationseinheit') }}</th>
                                 <th scope="col">{{ t('person','wochenstunden') }}</th>
                                 <th scope="col">{{ t('ui','from') }}</th>
-                                <th scope="col">{{ t('global','bis') }}</th>                                                                
+                                <th scope="col">{{ t('global','bis') }}</th>  
+                                <th scope="col">{{ t('ui','bezeichnung') }}</th>                                                                
                             </tr>
                             </thead>
                             <tbody>
@@ -294,11 +369,12 @@ export const JobFunction = {
                                 <tr v-if="!aktivChecked || (aktivChecked && jobfunction.aktiv)" >
                                     <td class="align-middle"><router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + jobfunction.dienstverhaeltnis_id" 
                                     >{{ jobfunction.dienstverhaeltnis_unternehmen }}</router-link></td>
-                                    <td class="align-middle">{{ jobfunction.beschreibung }}</td>
+                                    <td class="align-middle">{{ jobfunction.funktion_beschreibung }}</td>
                                     <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
                                     <td class="align-middle">{{ jobfunction.wochenstunden }}</td>
                                     <td class="align-middle">{{ formatDate(jobfunction.datum_von) }}</td>
                                     <td class="align-middle">{{ formatDate(jobfunction.datum_bis) }}</td>
+                                    <td class="align-middle">{{ jobfunction.bezeichnung }}</td>
 
                                     <td class="align-middle" width="5%">
                                         <div class="d-grid gap-2 d-md-flex align-middle">
@@ -325,40 +401,73 @@ export const JobFunction = {
     <!-- detail modal -->
     <Modal :title="t('person','funktion')" ref="modalRef">
         <template #body>
-            <form class="row g-3" ref="materialDataFrm">
+            <form class="row g-3" ref="jobFunctionFrm">
                             
                 <div class="col-md-8">
-                    <label for="sachaufwandtyp_kurzbz" class="form-label">{{ t('person','funktion') }}</label><br>
-                    <select v-if="!readonly" id="sachaufwandtyp_kurzbz" v-model="currentValue.sachaufwandtyp_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                        <option v-for="(item, index) in types" :value="item.sachaufwandtyp_kurzbz">
-                            {{ item.bezeichnung }}
+                    <label class="form-label">{{ t('core','unternehmen') }}</label><br>
+                    <org-chooser  @org-selected="unternehmenSelectedHandler" :oe="unternehmen" class="form-select form-select-sm"></org-chooser>
+                </div>
+                <div class="col-md-4">
+                </div>
+                <!--  -->
+                <div class="col-md-8">
+                    <label class="required form-label">{{ t('lehre','organisationseinheit') }}</label><br>
+                    <select id="oe_kurzbz" v-model="currentValue.oe_kurzbz" 
+                        @blur="frmState.orgetBlurred = true"
+                        class="form-select form-select-sm" aria-label=".form-select-sm " 
+                        :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !notEmpty(currentValue.oe_kurzbz) && frmState.orgetBlurred}"
+                        >
+                        <option v-for="(item, index) in orgUnitList" :value="item.value">
+                            {{ item.label }}
                         </option>                       
                     </select>
-                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sachaufwandtyp_kurzbz" :value="currentValue.sachaufwandtyp_kurzbz">
+                </div>
+                <div class="col-md-4">
+                </div>
+                <!--  -->
+                <div class="col-md-8">
+                    <label for="funktion_kurzbz" class="required form-label">{{ t('person','funktion') }}</label><br>
+                    <select id="_kurzbz" v-model="currentValue.funktion_kurzbz" 
+                        @blur="frmState.funktionBlurred = true"
+                        class="form-select form-select-sm" aria-label=".form-select-sm " 
+                        :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !notEmpty(currentValue.funktion_kurzbz) && frmState.funktionBlurred}"
+                        >
+                        <option v-for="(item, index) in jobfunctionDefList" :value="item.value">
+                            {{ item.label }}
+                        </option>                       
+                    </select>
                 </div>
                 <div class="col-md-4"></div>
+                <!-- -->
+                <div class="col-md-8">
+                    <label for="uid" class="form-label">{{ t('person','wochenstunden') }}</label>
+                    <input type="number"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.wochenstunden">
+                </div>
+                <div class="col-md-4">
+                </div>
                 <!--  -->
                 <div class="col-md-4">
                     <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validBeginn(currentValue.beginn) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.beginn">
+                    <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !notEmpty(currentValue.datum_von) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.datum_von">
                 </div>
                 <div class="col-md-4">
                     <label for="ende" class="form-label">{{ t('global','bis') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.endeBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.ende">
+                    <input type="date" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.datum_bis">                    
                 </div>
                 <div class="col-md-4">
                 </div>
                 <!-- -->
                 <div class="col-md-8">
-                    <label for="uid" class="form-label">{{ t('global','anmerkung') }}</label>
-                    <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.anmerkung">
+                    <label for="bezeichnung" class="form-label">{{ t('ui','bezeichnung') }}</label>
+                    <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bezeichnung" v-model="currentValue.bezeichnung">
                 </div>
                 <div class="col-md-4">
                 </div>
                 
+                
                 <!-- changes -->
                 <div class="col-8">
-                    <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
+                    <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }} [id={{ currentValue.benutzerfunktion_id }}]</div>
                 </div>
                 
             </form>
@@ -376,13 +485,13 @@ export const JobFunction = {
 
     <ModalDialog :title="t('global','warnung')" ref="dialogRef">
       <template #body>
-        {{ t('person','sachaufwandNochNichtGespeichert') }}
+        {{ t('person','funktionNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 
     <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
         <template #body>
-            {{ t('person','sachaufwand') }} '{{ currentValue?.sachaufwandtyp_kurzbz }} ({{ currentValue?.beginn }}-{{ currentValue?.ende }})' {{ t('person', 'wirklichLoeschen') }}?
+            {{ t('person','funktion') }} '{{ currentValue?.funktion_kurzbz }} ({{ currentValue?.datum_von }}-{{ currentValue?.datum_bis }})' {{ t('person', 'wirklichLoeschen') }}?
         </template>
     </ModalDialog>
     `
