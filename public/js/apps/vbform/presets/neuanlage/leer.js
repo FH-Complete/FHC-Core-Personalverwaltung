@@ -9,16 +9,16 @@ export default {
   },
   children: [
     {
+      type: 'dv',
+	    guioptions: {
+      },
+      children: []
+    },
+    {
       type: 'vblistgroup',
       guioptions: {
       },
       children: [
-        {
-          type: 'dv',
-          guioptions: {
-          },
-          children: []
-        },
         {
           type: 'vertragsbestandteillist',
           guioptions: {
