@@ -22,7 +22,7 @@ export const OrgChooser = {
           orgList.value = CoreRESTClient.getData(res.data);
           if (orgList.value.length > 0)  {
             //orgList.value.reverse();
-            if (props.oe == null && props.oe == '') {
+            if (props.oe == undefined || (props.oe != null && props.oe == '')) {
               selected.value = orgList.value[0].oe_kurzbz;
             }
             emit("orgSelected", selected.value);
