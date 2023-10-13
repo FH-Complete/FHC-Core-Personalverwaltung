@@ -1,5 +1,6 @@
 import { AddressData } from "./AddressData.js";
 import { EmailTelData } from "./EmailTelData.js";
+import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const ContactData = {
     components: {
@@ -13,6 +14,8 @@ export const ContactData = {
         writePermission: { type: Boolean, required: false },
     },
     setup() {
+
+        const { t } = usePhrasen();
 
         // tabs
         const items = ["address", "contact"];
@@ -31,6 +34,7 @@ export const ContactData = {
             items,
             isActive,
             setActive,
+            t,
         }
     },
     template: `
@@ -38,7 +42,7 @@ export const ContactData = {
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        <div class="h5"><h5>Kontaktdaten</h5></div>        
+                        <div class="h5"><h5>{{ t('person', 'kontaktdaten') }}</h5></div>        
                     </div>
                     <div class="card-body">
                         <div class="col-md-12 d-flex flex-column align-items-start pt-3 pb-2 mb-3">
@@ -49,7 +53,7 @@ export const ContactData = {
                                     :class="{ active: isActive(items[0]) }"
                                     @click.prevent="setActive(items[0])"
                                     href="#"
-                                    >Adressen</a
+                                    >{{ t('person','adressen') }}</a
                                     >
                                 </li>
                                 <li class="nav-item">
@@ -58,7 +62,7 @@ export const ContactData = {
                                     :class="{ active: isActive(items[1]) }"
                                     @click.prevent="setActive(items[1])"
                                     href="#"
-                                    >Kontakt</a
+                                    >{{ t('global','kontakt') }}</a
                                     >
                                 </li>
                             </ul>

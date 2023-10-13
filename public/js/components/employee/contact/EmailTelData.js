@@ -1,6 +1,7 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
+import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmailTelData = {
     components: {
@@ -16,6 +17,8 @@ export const EmailTelData = {
     setup(props) {
 
         const { personID } = Vue.toRefs(props);
+
+        const { t } = usePhrasen();
 
         const urlContactData = Vue.ref("");
 
@@ -184,7 +187,7 @@ export const EmailTelData = {
         return {
             contactList, contactListArray, 
             currentContact, showEditModal, showAddModal, showDeleteModal, hideModal, modalRef,
-            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef,
+            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef, t,
             // form handling
             validKontakt, frmState, contactDataFrm, readonly
         }
@@ -194,13 +197,13 @@ export const EmailTelData = {
 
                 <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                     <Toast ref="toastRef">
-                        <template #body><h4>Kontaktdaten gespeichert.</h4></template>
+                        <template #body><h4>{{ t('person','kontaktdatenGespeichert') }}</h4></template>
                     </Toast>
                 </div>
 
                 <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                     <Toast ref="deleteToastRef">
-                        <template #body><h4>Kontaktdaten gelöscht.</h4></template>
+                        <template #body><h4>{{ t('person','kontaktdatenGeloescht') }}</h4></template>
                     </Toast>
                 </div>
 
@@ -228,11 +231,11 @@ export const EmailTelData = {
                     </th>
                 </tr>
                 <tr>
-                    <th scope="col">Typ</th>
-                    <th scope="col">Kontakt</th>
-                    <th scope="col">Zustellung</th>
-                    <th scope="col">Anmerkung</th>
-                    <th scope="col">Aktion</th>
+                    <th scope="col">{{ t('global','typ') }}</th>
+                    <th scope="col">{{ t('global','kontakt') }}</th>
+                    <th scope="col">{{ t('person', 'zustellung') }}</th>
+                    <th scope="col">{{ t('global', 'anmerkung') }}</th>
+                    <th scope="col">{{ t('ui','aktion') }}</th>
                 </tr>
                 </thead>
                 <tbody>               
@@ -259,12 +262,12 @@ export const EmailTelData = {
         </div>
 
         <!-- Detail Modal -->
-        <Modal title="Kontakt" ref="modalRef">
+        <Modal :title="t('global','kontakt')" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentContact != null"  ref="contactDataFrm" >
                                 
                     <div class="col-md-4">
-                        <label for="kontakttyp" class="form-label">Typ</label>
+                        <label for="kontakttyp" class="form-label">{{ t('global','typ') }}</label>
                         <select  id="kontakttyp" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentContact.kontakttyp" >
                             <option v-for="(item, index) in kontakttyp" :value="item.kontakttyp">
                                 {{ item.beschreibung }}
@@ -272,19 +275,19 @@ export const EmailTelData = {
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label for="kontakt" class="required form-label">Kontakt</label>
+                        <label for="kontakt" class="required form-label">{{ t('global','kontakt') }}</label>
                         <input type="text" @blur="frmState.kontaktBlured = true" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validKontakt(currentContact.kontakt) && frmState.kontaktBlured}" id="kontakt" maxlength="128" v-model="currentContact.kontakt">
                     </div>
                     
                     <div class="col-md-2">                                             
-                        <label for="zustellung" class="form-label">Zustellung</label>
+                        <label for="zustellung" class="form-label">{{ t('person','zustellung') }}</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="zustellung" v-model="currentContact.zustellung">
                         </div>
                     </div>      
                     
                     <div class="col-md-8">
-                        <label for="anmerkung" class="form-label">Anmerkung</label>
+                        <label for="anmerkung" class="form-label">{{ t('global','anmerkung') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkung" maxlength="64" v-model="currentContact.anmerkung">
                     </div>                                                            
 
@@ -293,17 +296,17 @@ export const EmailTelData = {
             </template>
             <template #footer>
                 <button type="button" class="btn btn-secondary" @click="hideModal()">
-                    Abbrechen
+                {{ t('ui','abbrechen') }}
                 </button>
                 <button type="button" class="btn btn-primary" @click="okHandler()" >
-                    OK
+                {{ t('ui','ok') }}
                 </button>
             </template>
         </Modal>
 
-        <ModalDialog title="Warnung" ref="confirmDeleteRef">
+        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
             <template #body>
-                Kontaktinformation '{{ currentContact?.kontakt }}' wirklich löschen?
+                {{ t('person','kontaktinformation') }} '{{ currentContact?.kontakt }}' {{ t('person','wirklichLoeschen') }}?
             </template>
         </ModalDialog>
     `

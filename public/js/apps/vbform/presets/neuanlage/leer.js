@@ -10,57 +10,64 @@ export default {
   children: [
     {
       type: 'dv',
-      guioptions: {
+	    guioptions: {
       },
       children: []
     },
     {
-      type: 'vertragsbestandteillist',
+      type: 'vblistgroup',
       guioptions: {
-        title: 'Arbeitszeit',
-        vertragsbestandteiltyp: 'vertragsbestandteilstunden'
       },
-      children: []
-    },
-    {
-      type: 'vertragsbestandteillist',
-      guioptions: {
-        title: 'Zeitaufzeichnung',
-        vertragsbestandteiltyp: 'vertragsbestandteilzeitaufzeichnung'
-      },
-      children: []
-    },
-    {
-      type: 'vertragsbestandteillist',
-      guioptions: {
-        title: 'Kündigungsfrist',
-        vertragsbestandteiltyp: 'vertragsbestandteilkuendigungsfrist'
-      },
-      children: []
-    },
-    {
-      type: 'vertragsbestandteillist',
-      guioptions: {
-        title: 'Urlaubsanspruch',
-        vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
-      },
-      children: []
-    },
-    {
-      type: 'vertragsbestandteillist',
-      guioptions: {
-        title: 'Funktionen',
-        vertragsbestandteiltyp: 'vertragsbestandteilfunktion'
-      },
-      children: []
-    },
-    {
-      type: 'vertragsbestandteillist',
-      guioptions: {
-        title: 'Sonstiges',
-        vertragsbestandteiltyp: 'vertragsbestandteilfreitext'
-      },
-      children: []
+      children: [
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Arbeitszeit',
+            vertragsbestandteiltyp: 'vertragsbestandteilstunden'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Zeitaufzeichnung',
+            vertragsbestandteiltyp: 'vertragsbestandteilzeitaufzeichnung'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Kündigungsfrist',
+            vertragsbestandteiltyp: 'vertragsbestandteilkuendigungsfrist'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Urlaubsanspruch',
+            vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Funktionen',
+            vertragsbestandteiltyp: 'vertragsbestandteilfunktion'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Sonstiges',
+            vertragsbestandteiltyp: 'vertragsbestandteilfreitext'
+          },
+          children: []
+        }
+      ]
     }
   ],
   dv: {

@@ -123,4 +123,21 @@ export default {
           }
         });
     },
+
+    deletePersonJobFunction: function(benutzerfunktion_id) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/deletePersonJobFunction';
+      return axios.post(url, {benutzerfunktion_id: benutzerfunktion_id}, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },
+    upsertPersonJobFunction: function(payload) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/extensions/FHC-Core-Personalverwaltung/api/upsertPersonJobFunction';
+      return axios.post(url, payload, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  },
 }

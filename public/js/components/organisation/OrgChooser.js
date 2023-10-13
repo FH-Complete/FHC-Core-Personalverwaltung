@@ -4,12 +4,14 @@ export const OrgChooser = {
     props: {
       placeholder: String,
       customClass: String,
+      oe: String,
     },
     emits: ["orgSelected"],
-    setup(_, { emit }) {   
+    setup(props, { emit }) {   
 
       const orgList = Vue.ref([]);
       const isFetching = Vue.ref(false);
+      const oeRef = Vue.toRefs(props).oe
       const selected = Vue.ref();
 
       const fetchHead = async () => {
@@ -20,7 +22,9 @@ export const OrgChooser = {
           orgList.value = CoreRESTClient.getData(res.data);
           if (orgList.value.length > 0)  {
             //orgList.value.reverse();
-            selected.value = orgList.value[0].oe_kurzbz;
+            if (props.oe == undefined || (props.oe != null && props.oe == '')) {
+              selected.value = orgList.value[0].oe_kurzbz;
+            }
             emit("orgSelected", selected.value);
           }
           isFetching.value = false          
@@ -38,6 +42,14 @@ export const OrgChooser = {
         emit("orgSelected", e.target.value);
       }
 
+      Vue.watch(
+        oeRef,
+        (val, old) => {
+          console.log('prop value changed', val);
+          selected.value = val;
+        }
+      )
+
       return   {
         orgList, selected,
 
@@ -47,7 +59,7 @@ export const OrgChooser = {
 
     },
     template: `
-    <select  id="orgHeadChooser"  v-model="selected" @change="orgSelected" class="" aria-label=".form-select-sm " >
+    <select  id="orgHeadChooser" v-model="selected" @change="orgSelected" class="" aria-label=".form-select-sm " >
         <option v-for="(item, index) in orgList" :value="item.oe_kurzbz"  :key="item.oe_kurzbz">
             {{ item.bezeichnung }}
         </option>         

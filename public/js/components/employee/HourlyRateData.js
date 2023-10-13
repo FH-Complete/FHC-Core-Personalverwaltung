@@ -1,7 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-
+import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
 
 export const HourlyRateData = {
 	components: {
@@ -19,6 +19,8 @@ export const HourlyRateData = {
 	},
 	setup (props) {
 		const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+
+		const { t } = usePhrasen();
 
 		const readonly = Vue.ref(false);
 		const isFetching = Vue.ref(false);
@@ -254,7 +256,7 @@ export const HourlyRateData = {
 			validBeginn, validInput, checkDates, formatDate,
 			showToast, showDeletedToast,
 			showAddModal, hideModal, okHandler,
-			showDeleteModal, showEditModal, confirmDeleteRef,
+			showDeleteModal, showEditModal, confirmDeleteRef, t,
 		}
 	},
 	template: `
@@ -262,13 +264,13 @@ export const HourlyRateData = {
 
 		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 		  <Toast ref="toastRef">
-			<template #body><h4>Stundensätze gespeichert.</h4></template>
+			<template #body><h4>{{ t('person','stundensatzGespeichert') }}</h4></template>
 		  </Toast>
 		</div>
 
 		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 			<Toast ref="deleteToastRef">
-				<template #body><h4>Stundensätze gelöscht.</h4></template>
+				<template #body><h4>{ t('person','stundensatzGeloescht') }}</h4></template>
 			</Toast>
 		</div>
 	</div>
@@ -276,7 +278,7 @@ export const HourlyRateData = {
 		 <div class="col">
 			 <div class="card">
 				<div class="card-header">
-					<div class="h5"><h5>Stundensätze</h5></div>        
+					<div class="h5"><h5>{{ t('person','stundensaetze') }}</h5></div>        
 				</div>
 
 				<div class="card-body">
@@ -289,11 +291,11 @@ export const HourlyRateData = {
 						<table class="table table-hover table-sm">
 							<thead>                
 							<tr>
-								<th scope="col">Typ</th>
-								<th scope="col">Gültig von</th>
-								<th scope="col">Gültig bis</th>
-								<th scope="col">Unternehmen</th>
-								<th scope="col">Stundensatz</th>
+								<th scope="col">{{ t('global','typ') }}</th>
+								<th scope="col">{{ t('ui','from') }}</th>
+								<th scope="col">{{ t('global','bis') }}</th>
+								<th scope="col">{{ t('core','unternehmen') }}</th>
+								<th scope="col">{{ t('ui','stundensatz') }}</th>
 							</tr>
 							</thead>
 							<tbody>
@@ -323,12 +325,12 @@ export const HourlyRateData = {
 	</div>
 
 	<!-- detail modal -->
-	<Modal title="Stundensatz" ref="modalRef" class="stundensatzModal">
+	<Modal :title="t('ui','stundensatz')" ref="modalRef" class="stundensatzModal">
 		<template #body>
 			<form class="row g-3" ref="houryrateDataFrm">
 							
 				<div class="col-md-8">
-					<label for="stundensatztyp" class="required form-label">Typ</label><br>
+					<label for="stundensatztyp" class="required form-label">{{ t('global','typ') }}</label><br>
 					<select v-if="!readonly" id="stundensatztyp" @blur="frmState.typBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.stundensatztyp) && frmState.typBlurred}" v-model="currentValue.stundensatztyp" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option v-for="(item, index) in types" :value="item.stundensatztyp">
 							{{ item.bezeichnung }}
@@ -338,7 +340,7 @@ export const HourlyRateData = {
 				</div>
 				<div class="col-md-4"></div>
 				<div class="col-md-4">
-					<label for="beginn" class="required form-label">Von</label>
+					<label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
 					<datepicker 
 						:readonly="readonly"
 						@blur="frmState.beginnBlurred = true"
@@ -354,7 +356,7 @@ export const HourlyRateData = {
 					></datepicker>
 				</div>
 				<div class="col-md-4">
-					<label for="ende" class="form-label">Bis</label>
+					<label for="ende" class="form-label">{{ t('global','bis') }}</label>
 					<datepicker 
 						:readonly="readonly"
 						@blur="frmState.bisBlurred = true"
@@ -372,12 +374,12 @@ export const HourlyRateData = {
 				</div>
 				<!-- -->
 			   <div class="col-md-4">
-					<label for="stundensatz" class="required form-label">Stundensatz</label>
+					<label for="stundensatz" class="required form-label">{{ t('ui','stundensatz') }}</label>
 					<input type="number" :readonly="readonly" @blur="frmState.satzBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.stundensatz) && frmState.satzBlurred}" id="stundensatz" v-model="currentValue.stundensatz">
 				</div>
 			  
 			   <div class="col-md-4">
-					<label for="unternehmen" class="required form-label">Unternehmen</label><br>
+					<label for="unternehmen" class="required form-label">{{ t('core','unternehmen') }}</label><br>
 					<select v-if="!readonly" id="unternehmen" @blur="frmState.unternehmenBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.oe_kurzbz) && frmState.unternehmenBlurred}" v-model="currentValue.oe_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option v-for="(item, index) in unternehmen" :value="item.value">
 							{{ item.label }}
@@ -396,24 +398,24 @@ export const HourlyRateData = {
 		</template>
 		<template #footer>
 			<button type="button" class="btn btn-secondary" @click="hideModal()">
-				Abbrechen
+				{{ t('ui','abbrechen') }}
 			</button>
 			<button type="button" class="btn btn-primary" @click="okHandler()" >
-				OK
+				{{ t('ui','ok') }}
 			</button>
 		</template>
 
 	</Modal>
 
-	<ModalDialog title="Warnung" ref="dialogRef">
+	<ModalDialog :title="t('global','warnung')" ref="dialogRef">
 	  <template #body>
-		Stundensätze schließen? Geänderte Daten gehen verloren!
+	  	{{ t('person','stundensatzNochNichtGespeichert') }}
 	  </template>
 	</ModalDialog>
 
-	<ModalDialog title="Warnung" ref="confirmDeleteRef">
+	<ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
 		<template #body>
-			Stundensatz mit dem Typ '{{ currentValue?.stundensatztyp }}' ({{ currentValue?.gueltig_von }}<span v-if="currentValue?.gueltig_bis"> - {{ currentValue?.gueltig_bis }}</span>) wirklich löschen?
+		{{ t('person','stundensatzWirklichLoeschen') }} '{{ currentValue?.stundensatztyp }}' ({{ currentValue?.gueltig_von }}<span v-if="currentValue?.gueltig_bis"> - {{ currentValue?.gueltig_bis }}</span>) {{ t('person','wirklichLoeschen') }}
 		</template>
 	</ModalDialog>
 	`

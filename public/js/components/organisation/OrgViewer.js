@@ -158,7 +158,7 @@ export const OrgViewer = {
             <template #body  v-if="isFetching">
                 <p-skeleton style="display: inline-block; width:80%"></p-skeleton>
             </template>
-            <template #body="slotProps" v-if"!isFetching">          
+            <template #body="slotProps" v-if="!isFetching">          
                 <a href="#" @click="filterOrg(slotProps.node.data.oe_kurzbz)">{{ slotProps.node.data.bezeichnung }}</a>
             </template>
         </p-column>
@@ -174,7 +174,7 @@ export const OrgViewer = {
             <template #filter>
                 <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter" placeholder="Filter Leitung"></p-inputtext>
             </template>
-            <template #body="slotProps" v-if"!isFetching">
+            <template #body="slotProps" v-if="!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.leitung_array.data">
                     <span v-if="index!=0"> | </span>
                     <a :href="getLink(item.person_id, item.uid)">{{ item.name }}</a>
@@ -191,7 +191,7 @@ export const OrgViewer = {
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
             </template>
-            <template #body="slotProps" v-if"!isFetching">
+            <template #body="slotProps" v-if="!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.assistenz_array.data">
                     <span v-if="index!=0"> | </span>
                     <a :href="getLink(item.person_id,item.uid)">{{ item.name }}</a>
