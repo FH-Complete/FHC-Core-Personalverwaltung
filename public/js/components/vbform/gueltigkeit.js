@@ -11,6 +11,7 @@ export default {
         v-bind:placeholder="'gültig ab'"
         six-weeks
         auto-apply 
+        text-input 
         locale="de"
         format="dd.MM.yyyy"
         model-type="yyyy-MM-dd"></datepicker>
@@ -21,6 +22,7 @@ export default {
         v-bind:placeholder="'gültig bis'"
         six-weeks
         auto-apply 
+        text-input
         locale="de"
         format="dd.MM.yyyy"
         model-type="yyyy-MM-dd"></datepicker>
