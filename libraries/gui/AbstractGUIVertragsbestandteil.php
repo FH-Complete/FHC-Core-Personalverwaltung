@@ -118,6 +118,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
 	
     public function jsonSerialize() {
 		$this->syncInstanceId();
+		$this->updateGuiOptions();
         $json = [
             "type" => $this->type,
             "guioptions" => $this->guioptions,
