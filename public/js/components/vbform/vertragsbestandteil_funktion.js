@@ -32,16 +32,18 @@ export default {
     <div class="row g-2">
     <template v-if="mode === 'neu'">
       <div class="col">
-        <p-autocomplete 
-            v-model="autocomplete.selectedfunktion" 
-            dropdown
-            dropdownMode="current" 
-            :suggestions="autocomplete.funktionen" 
-            @complete="searchFunktionen"
-            optionLabel="label"
-            optionDisabled="disabled"
-            forceSelection
-        ></p-autocomplete>
+        <div class="fhc_autocomplete_wrapper">
+            <p-autocomplete 
+                v-model="autocomplete.selectedfunktion" 
+                dropdown
+                dropdownMode="current" 
+                :suggestions="autocomplete.funktionen" 
+                @complete="searchFunktionen"
+                optionLabel="label"
+                optionDisabled="disabled"
+                forceSelection
+            ></p-autocomplete>
+        </div>
 <!--        
         <select v-model="funktion" :disabled="isinputdisabled('funktion')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
@@ -55,16 +57,18 @@ export default {
 -->
       </div>
       <div class="col">
-        <p-autocomplete 
-            v-model="autocomplete.selectedorget" 
-            dropdown 
-            dropdownMode="current" 
-            :suggestions="autocomplete.orgets" 
-            @complete="searchOrgets"
-            optionLabel="label"
-            optionDisabled="disabled"
-            forceSelection
-        ></p-autocomplete>
+        <div class="fhc_autocomplete_wrapper">
+            <p-autocomplete 
+                v-model="autocomplete.selectedorget" 
+                dropdown 
+                dropdownMode="current" 
+                :suggestions="autocomplete.orgets" 
+                @complete="searchOrgets"
+                optionLabel="label"
+                optionDisabled="disabled"
+                forceSelection
+            ></p-autocomplete>
+        </div>
 <!--
         <select v-model="orget" :disabled="isinputdisabled('orget')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option

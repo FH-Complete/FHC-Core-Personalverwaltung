@@ -7,7 +7,6 @@ import vertragsbestandteilurlaubsanspruch from './vertragsbestandteil_urlaubsans
 import vertragsbestandteilkarenz from './vertragsbestandteil_karenz.js';
 import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
-import store from './vbsharedstate.js';
 import errors from './errors.js';
 import infos from './infos.js';
 
@@ -38,7 +37,6 @@ export default {
     return {
       title: '',
       vertragsbestandteiltyp: '',
-      store: store,
       payload: {
         type: 'vertragsbestandteillist',
         guioptions: {
@@ -90,7 +88,7 @@ export default {
         guioptions: guioptions,
         data: data
       });
-      this.children.push(vbid);
+      this.children.unshift(vbid);
     },
     removeVB: function(payload) {
       this.store.removeVB(payload.id);

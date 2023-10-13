@@ -4,8 +4,6 @@ import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
   template: `
-  <gehaltsbestandteil ref="parts" v-for="config in children"
-    v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
   <div class="row py-2 pb-1">
     <div class="col-12 ps-5">
       <div class="position-relative">
@@ -15,6 +13,8 @@ export default {
       </div>
     </div>
   </div>
+  <gehaltsbestandteil ref="parts" v-for="config in children"
+    v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
   `,
   data: function() {
     return {
@@ -32,7 +32,7 @@ export default {
       e.preventDefault();
       e.stopPropagation();
 
-      this.children.push({
+      this.children.unshift({
         type: 'gehaltsbestandteil',
         guioptions: {
           id: uuid.get_uuid(),

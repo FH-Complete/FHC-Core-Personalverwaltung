@@ -81,3 +81,23 @@
 .stundensatzModal .modal-body {
     overflow-y: inherit;
 }
+
+.fhc_autocomplete_wrapper {
+    line-height: 1;
+}
+
+.fhc_autocomplete_wrapper {
+    line-height: 1;
+}
+
+.fhc_autocomplete_wrapper .p-autocomplete input {
+    padding-top: .25em;
+    padding-bottom: .25em;
+}
+
+.fhc_autocomplete_wrapper .p-autocomplete .p-button, 
+.fhc_autocomplete_wrapper .p-autocomplete .p-button:enabled:hover {
+	background: #e9ecef;
+	color: #212529;
+	border: 1px solid #ced4da;
+}
