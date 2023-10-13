@@ -29,6 +29,8 @@ abstract class AbstractBestandteil implements JsonSerializable {
     }
 	
 	public function jsonSerialize() {
+		$this->updateGuiOptions();
+	 
         return [
             "type" => $this->type,
             "guioptions" => $this->guioptions,
@@ -176,5 +178,13 @@ abstract class AbstractBestandteil implements JsonSerializable {
 	public function hasToBeDeleted() {
 		$toBeDeleted = (isset($this->data['db_delete'])) ? $this->data['db_delete'] :false;
 		return $toBeDeleted;
+	}
+	
+	protected function updateGuiOptions() 
+	{
+		if( $this->data['id'] !== null && isset($this->guioptions['removeable']) )
+		{
+			unset($this->guioptions['removeable']);
+		}
 	}
 }
