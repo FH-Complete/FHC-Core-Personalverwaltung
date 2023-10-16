@@ -17,7 +17,7 @@ class GehaltsLib
 		$this->_ci->GehaltsabrechnungModel->config->load('db_crypt');
 	}
 
-	public function getBestandteile($date = null, $user = null)
+	public function getBestandteile($date = null, $user = null, $oe_kurzbz = null)
 	{
 		$this->_ci->GehaltsbestandteilModel->addSelect('tbl_gehaltsbestandteil.*');
 		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_dienstverhaeltnis dienstverhaeltnis', 'dienstverhaeltnis_id');
@@ -35,12 +35,15 @@ class GehaltsLib
 					OR tbl_gehaltsbestandteil.von IS NULL)
 		";
 
-		if (is_null($user))
+		if (is_null($user) || $user === "null")
 			$where .= ' AND benutzer.aktiv';
 		else
 			$where .= ' AND dienstverhaeltnis.mitarbeiter_uid =' . $this->_ci->db->escape($user);
 
-		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, 
+		if (!is_null($oe_kurzbz) && $oe_kurzbz !== "null")
+			$where .= ' AND dienstverhaeltnis.oe_kurzbz =' . $this->_ci->db->escape($oe_kurzbz);
+
+		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where,
 			$this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
 
 		if (isError($result)) return $result;
@@ -157,7 +160,7 @@ class GehaltsLib
 	
 	private function getDate($date)
 	{
-		if (is_null($date))
+		if (is_null($date) || $date === 'null')
 		{
 			$month = date('n');
 			$year = date('Y');

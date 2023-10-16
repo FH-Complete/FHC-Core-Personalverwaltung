@@ -17,12 +17,11 @@ class GehaltsAbrechnungJob extends JOB_Controller
 	}
 
 
-	public function addGehaltsabrechnung($date = null, $user = null)
+	public function addGehaltsabrechnung($date = null, $user = null, $oe_kurzbz = null)
 	{
 		$this->logInfo('Start GehaltsAbrechnung Job');
 		
-		$result = $this->_ci->gehaltslib->getBestandteile($date, $user);
-		
+		$result = $this->_ci->gehaltslib->getBestandteile($date, $user, $oe_kurzbz);
 		if (isError($result))
 		{
 			$this->logError(getError($result));
