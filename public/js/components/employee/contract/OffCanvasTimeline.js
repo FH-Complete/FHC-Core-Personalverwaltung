@@ -193,6 +193,9 @@ export const OffCanvasTimeline = {
      <div class="offcanvas offcanvas-end vertragshistorie"
         ref="offCanvasEle"
         tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+
+        <button v-if="!readonly" type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="show()">Vertragshistorie</button>
+
         <div class="offcanvas-header">
             <h5 id="offcanvasRightLabel">Vertragshistorie</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>

@@ -546,7 +546,11 @@ export const EmployeeContract = {
         }
     },
     template: `
-    <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
+
+
+
+    <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">    
+
       <div class="container-fluid px-1">
 
             <div class="row">
@@ -573,7 +577,7 @@ export const EmployeeContract = {
                             <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
                             </DropDownButton>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="showOffCanvas()">Vertragshistorie</button>
+                            <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
                         </div>
 
                         <div class="d-flex align-items-end flex-column">  
@@ -626,7 +630,7 @@ export const EmployeeContract = {
                     <div class="col">
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Allgemein {{ t('vbform','oder') }}</h5>
+                                <h5 class="mb-0">Allgemein</h5>
                             </div>
                             <div class="card-body" style="text-align:left">
 
