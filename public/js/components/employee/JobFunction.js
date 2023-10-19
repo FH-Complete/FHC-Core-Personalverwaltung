@@ -36,6 +36,11 @@ export const JobFunction = {
 
         const aktivChecked = Vue.ref(true);
 
+        const table = Vue.ref(null); // reference to your table element
+        const tabulator = Vue.ref(null); // variable to hold your table
+        const tableData = Vue.reactive([]); // data for table to display
+
+
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const route = VueRouter.useRoute();
 
@@ -60,6 +65,7 @@ export const JobFunction = {
             try {
                 const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(currentPersonUID.value);
                 let rawList = response.data.retval;
+                tableData.value = response.data.retval;
                 jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
             } catch (error) {
                 console.log(error)              
@@ -113,14 +119,95 @@ export const JobFunction = {
               readonly.value = !readonly.value;
         }
 
-        Vue.onMounted(() => {
+        Vue.onMounted(async () => {
             console.log('Job function mounted', props.personID);
             currentValue.value = createShape();
-            fetchData();
+            await fetchData();
+
+            const dateFormatter = (cell) => {
+                return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
+            }
+
+            const dvFormatter = (cell) => {
+                const url = fullPath + route.params.id + '/' + route.params.uid + '/contract/' + cell.getRow().getData().dienstverhaeltnis_id;
+                return cell.getValue() != null ? `<a href="${url}">` + cell.getValue() + '</a>' : '';
+            }
+
+            // helper
+            const createDomButton = (classValue, clickHandler) => {
+                const nodeBtn = document.createElement("button");
+                const classAttrBtn = document.createAttribute("class");
+                classAttrBtn.value = "btn btn-outline-dark btn-sm";
+                nodeBtn.setAttributeNode(classAttrBtn);
+                nodeBtn.addEventListener("click", clickHandler);
+                const nodeI = document.createElement("i");
+                const classAttrI = document.createAttribute("class");
+                classAttrI.value = classValue;
+                nodeI.setAttributeNode(classAttrI);
+                nodeBtn.appendChild(nodeI);
+                return nodeBtn;
+            }
+
+            const btnFormatter = (cell) => {
+
+                const nodeDiv = document.createElement("div");  
+                const classAttrDiv = document.createAttribute("class");
+                classAttrDiv.value = "d-grid gap-2 d-md-flex justify-content-end align-middle";
+                nodeDiv.setAttributeNode(classAttrDiv);
+                // delete button              
+                const nodeBtnDel = createDomButton("fa fa-minus",() => { showDeleteModal(cell.getValue()) })
+                // edit button
+                const nodeBtnEdit = createDomButton("fa fa-pen",() => { showEditModal(cell.getValue()) })
+
+                nodeDiv.appendChild(nodeBtnDel);
+                nodeDiv.appendChild(nodeBtnEdit);
+                return nodeDiv;
+            }
+            
+
+            const columnsDef = [
+                { title: t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter},
+                { title: t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left" },
+                { title: t('lehre','organisationseinheit'), field: "funktion_oebezeichnung" },
+                { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140  },
+                { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140 },
+                { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140  },
+                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left" },
+                { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false }
+              ];
+
+            let tabulatorOptions = {
+				height: "100%",
+				layout: "fitColumns",
+				movableColumns: true,
+				reactiveData: true,
+                columns: columnsDef,
+                //data: tableData.value,
+                data: jobfunctionListArray.value,
+			};
+
+            tabulator.value = new Tabulator(
+				table.value,
+				tabulatorOptions
+			);
+
+            tabulator.value.on('tableBuilt', () => {
+                //tabulator.value.setData(tableData.value);
+            })
             
         })
 
-        const jobfunctionListArray = Vue.computed(() => (jobfunctionList.value ? Object.values(jobfunctionList.value) : []));
+        const jobfunctionListArray = Vue.computed(() => {
+            let temp = (jobfunctionList.value ? Object.values(jobfunctionList.value) : []);
+            let filtered = temp.filter((e) => ( !aktivChecked.value || (aktivChecked.value && e.aktiv) ));
+            return filtered;
+        });
+
+        // Workaround to update tabulator
+        Vue.watch(jobfunctionListArray, (newVal, oldVal) => {
+            console.log('jobfunctionList changed');
+            tabulator.value?.setData(jobfunctionListArray.value);
+        }, {deep: true})
 
         // Modal 
         const modalRef = Vue.ref();
@@ -312,6 +399,8 @@ export const JobFunction = {
             route,
             aktivChecked,
             unternehmen,
+            tabulator,
+            table,
             
             toggleMode, formatDate, notEmpty,
             showToast, showDeletedToast,
@@ -342,56 +431,19 @@ export const JobFunction = {
                 </div>
 
                 <div class="card-body">
-                    <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                    <div class="d-grid gap-2 d-md-flex justify-content-end mb-1">
                         <div class="form-check form-switch pe-2">
                             <input class="form-check-input" type="checkbox" role="switch" id="aktivChecked" v-model="aktivChecked">
                             <label class="form-check-label" for="aktivChecked">nur aktive anzeigen</label>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-3" @click="showAddModal()">
                             <i class="fa fa-plus"></i>
                         </button>            
                     </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-sm">
-                            <thead>                
-                            <tr>
-                                <th scope="col">{{ t('person','dv_unternehmen') }}</th>
-                                <th scope="col">{{ t('person','zuordnung_taetigkeit') }}</th>
-                                <th scope="col">{{ t('lehre','organisationseinheit') }}</th>
-                                <th scope="col">{{ t('person','wochenstunden') }}</th>
-                                <th scope="col">{{ t('ui','from') }}</th>
-                                <th scope="col">{{ t('global','bis') }}</th>  
-                                <th scope="col">{{ t('ui','bezeichnung') }}</th>                                                                
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <template v-for="jobfunction in jobfunctionListArray" :key="jobfunction.benutzerfunktion_id">
-                                <tr v-if="!aktivChecked || (aktivChecked && jobfunction.aktiv)" >
-                                    <td class="align-middle"><router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + jobfunction.dienstverhaeltnis_id" 
-                                    >{{ jobfunction.dienstverhaeltnis_unternehmen }}</router-link></td>
-                                    <td class="align-middle">{{ jobfunction.funktion_beschreibung }}</td>
-                                    <td class="align-middle">{{ jobfunction.funktion_oebezeichnung }}</td>
-                                    <td class="align-middle">{{ jobfunction.wochenstunden }}</td>
-                                    <td class="align-middle">{{ formatDate(jobfunction.datum_von) }}</td>
-                                    <td class="align-middle">{{ formatDate(jobfunction.datum_bis) }}</td>
-                                    <td class="align-middle">{{ jobfunction.bezeichnung }}</td>
 
-                                    <td class="align-middle" width="5%">
-                                        <div class="d-grid gap-2 d-md-flex align-middle">
-                                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(jobfunction.benutzerfunktion_id)">
-                                                <i class="fa fa-minus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(jobfunction.benutzerfunktion_id)">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>    
-                            </template>
+                    <!-- TABULATOR -->
+                    <div ref="table"></div>
                 
-                            </tbody>
-                        </table>            
-                    </div>
                 </div>
              </div>
          </div>
