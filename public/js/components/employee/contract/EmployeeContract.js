@@ -1041,12 +1041,12 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
                                         </div>
 
-                                        <div class="col-md-4">
-                                            <label class="form-label" v-if="index == 0">Abteilung</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.oe_bezeichnung">
+                                        <div class="col-md-6">
+                                            <label class="form-label" v-if="index == 0">Organisationseinheit</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
                                         </div>
 
-                                        <div class="col-md-4">
+                                        <div class="col-md-2">
                                             <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
                                         </div>
@@ -1062,12 +1062,12 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
                                         </div>
 
-                                        <div class="col-md-4">
-                                            <label class="form-label" v-if="index == 0">Abteilung</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.oe_bezeichnung">
+                                        <div class="col-md-6">
+                                            <label class="form-label" v-if="index == 0">Organisationseinheit</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
                                         </div>
 
-                                        <div class="col-md-4">                                            
+                                        <div class="col-md-2">                                            
                                         </div>
 
 
