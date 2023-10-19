@@ -4,6 +4,9 @@ import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
 import {EmployeeSummary } from "../components/employee/summary/EmployeeSummary.js";
+import {EmployeeTime} from "../components/employee/time/EmployeeTime.js";
+import { EmployeeLifeCycle } from "../components/employee/lifecycle/EmployeeLifeCycle.js";
+import { EmployeeDocument } from "../components/employee/document/EmployeeDocument.js";
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
@@ -23,7 +26,9 @@ const router = VueRouter.createRouter(
 					{ path: '', component: EmployeePerson, name: 'person' },
 					{ path: 'contract', component: EmployeeContract },
 					{ path: 'contract/:dienstverhaeltnis_id', component: EmployeeContract },
-					{ path: 'salary', component: EmployeeContract, name: 'salary' },
+					{ path: 'time', component: EmployeeTime, name: 'time' },
+					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
+					{ path: 'document', component: EmployeeDocument, name: 'document' },
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },

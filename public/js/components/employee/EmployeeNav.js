@@ -51,20 +51,20 @@ export const EmployeeNav = {
             :class="[{'router-link-active active': route.path.indexOf('contract') > -1 }]" >
             Dienstverhältnis
         </router-link>        
-        <a
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/time' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + route.params.id + -'/' + route.params.uid + '/time' + maybeAddDate()"
-        >Zeiten</a
+        :class="[{'router-link-active active': route?.name === 'time'}]"
+        >Zeiten</router-link
         >
-        <a
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/lifecycle' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + route.params.id + '/' + route.params.uid + '/lifecycle' + maybeAddDate()"
-        >Life Cycle</a
+        :class="[{'router-link-active active': route?.name === 'lifecycle'}]"
+        >Life Cycle</router-link
         >
-        <a
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/document' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + route.params.id + '/' + route.params.uid + '/documents'  + maybeAddDate() "
-        >Dokumente</a
+        :class="[{'router-link-active active': route?.name === 'document'}]"
+        >Dokumente</router-link
         >
     </nav>
     
