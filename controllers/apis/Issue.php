@@ -107,7 +107,7 @@ EOSQL;
 		}
 		else
 		{
-			$this->outputJsonError('no persons with open issues found');
+			$this->outputJsonSuccess(array());
 			return;
 		}
 	}
