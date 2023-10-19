@@ -1892,7 +1892,7 @@ EOSQL;
 		$sql = <<<EOSQL
 			SELECT 
 				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen , 
-				oe.bezeichnung AS funktion_oebezeichnung, 
+				'[' || oet.bezeichnung || '] ' || oe.bezeichnung AS funktion_oebezeichnung, 
 				f.beschreibung AS funktion_beschreibung, 
 				bf.*, 
 				fb.bezeichnung AS fachbereich_bezeichnung,
@@ -1908,6 +1908,8 @@ EOSQL;
 				public.tbl_benutzerfunktion bf
 			JOIN 
 				public.tbl_organisationseinheit oe ON oe.oe_kurzbz = bf.oe_kurzbz
+			JOIN 
+				public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
             JOIN 
 				public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
 			LEFT JOIN 

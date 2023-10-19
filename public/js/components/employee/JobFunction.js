@@ -159,21 +159,23 @@ export const JobFunction = {
                 // edit button
                 const nodeBtnEdit = createDomButton("fa fa-pen",() => { showEditModal(cell.getValue()) })
 
-                nodeDiv.appendChild(nodeBtnDel);
+                if( cell.getRow().getData().dienstverhaeltnis_unternehmen === null ) {
+                    nodeDiv.appendChild(nodeBtnDel);
+                }
                 nodeDiv.appendChild(nodeBtnEdit);
                 return nodeDiv;
             }
             
 
             const columnsDef = [
-                { title: t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter},
-                { title: t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left" },
-                { title: t('lehre','organisationseinheit'), field: "funktion_oebezeichnung" },
-                { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140  },
-                { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140 },
-                { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140  },
-                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left" },
-                { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false }
+                { title: t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: t('lehre','organisationseinheit'), field: "funktion_oebezeichnung", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
+                { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:false },
+                { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:false },
+                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true }
               ];
 
             let tabulatorOptions = {
@@ -442,7 +444,7 @@ export const JobFunction = {
                     </div>
 
                     <!-- TABULATOR -->
-                    <div ref="table"></div>
+                    <div ref="table" class="fhc-tabulator"></div>
                 
                 </div>
              </div>

@@ -101,3 +101,31 @@ label.required.form-label:after {
   .dp-custom-input {
     font-size: 0.875rem !important;
   }
+  
+.fhc-tabulator.tabulator {
+    border-left: 1px solid #dee2e6;
+}
+.fhc-container.tabulator .tabulator-row {
+    border-bottom: none;
+}
+.fhc-tabulator.tabulator .tabulator-row .tabulator-frozen,
+.fhc-tabulator.tabulator .tabulator-row .tabulator-cell {
+    border-bottom: 1px solid #dee2e6;
+}
+.fhc-tabulator.tabulator .tabulator-row.tabulator-row-even {
+    background-color: transparent;
+}
+.fhc-tabulator.tabulator .tabulator-headers .tabulator-frozen,
+.fhc-tabulator.tabulator .tabulator-row.tabulator-row-odd .tabulator-frozen,
+.fhc-tabulator.tabulator .tabulator-row.tabulator-row-odd .tabulator-cell {
+    background-color: #fff;
+}
+.fhc-tabulator.tabulator .tabulator-row.tabulator-row-even .tabulator-frozen,
+.fhc-tabulator.tabulator .tabulator-row.tabulator-row-even .tabulator-cell {
+    background-color: #f2f2f2;
+}
+
+.fhc-tabulator.tabulator .tabulator-col,
+.fhc-tabulator.tabulator .tabulator-cell {
+    border-right: 1px solid #dee2e6;
+}
