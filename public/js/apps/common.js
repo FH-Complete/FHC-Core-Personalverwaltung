@@ -72,27 +72,28 @@ export const searchbaroptions = {
         employee: {
             defaultaction: {
                 type: "link",
-                action: (data) =>  { 
-                    return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}`;
+                action: (data) => {
+                    return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}/summary`;
                 }
             },
             childactions: [
                 {
-                    label: "testchildaction1",
+                    label: "Dienstverhältnis",
                     icon: "fas fa-address-book",
-                    type: "function",
-                    action: function(data) { 
-                        alert('employee testchildaction 01 ' + JSON.stringify(data)); 
+                    type: "link",
+                    action: function(data) {
+                        return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}/contract`;
                     }
                 },
                 {
-                    label: "testchildaction2",
+                    label: "Stammdaten",
                     icon: "fas fa-user-slash",
-                    type: "function",
-                    action: function(data) { 
-                        alert('employee testchildaction 02 ' + JSON.stringify(data)); 
+                    type: "link",
+                    action: function(data) {
+                        return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}`;
                     }
                 },
+/*
                 {
                     label: "testchildaction3",
                     icon: "fas fa-bell",
@@ -109,6 +110,7 @@ export const searchbaroptions = {
                         alert('employee testchildaction 04 ' + JSON.stringify(data)); 
                     }
                 }
+ */
             ]
         },
         organisationunit: {
