@@ -3,6 +3,7 @@ require_once __DIR__ . '/GUIHandlerFactory.php';
 //require_once __DIR__ . '/../../../models/vertragsbestandteil/Dienstverhaeltnis_model.php';
 //require_once __DIR__ . '/../../libraries/vertragsbestandteil/VertragsbestandteilLib.php';
 require_once __DIR__ . '/util.php';
+require_once __DIR__ . '/GUIValidationHelper.php';
 
 /**
  * GUIHandler takes JSON from GUI and manages the process of
@@ -84,6 +85,8 @@ class GUIHandler
 		$decoded = json_decode($guidata, true);
 		$this->DataMapper = GUIHandlerFactory::getGUIHandler($decoded['type']);
 		$this->DataMapper->mapJSON($decoded);
+		$validationhelper = new GUIValidationHelper();
+		$validationhelper->checkDVwithVBsAnbGBs($this->DataMapper);
 		
 		if( $this->DataMapper->isValid() )
 		{

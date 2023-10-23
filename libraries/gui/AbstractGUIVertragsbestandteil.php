@@ -111,7 +111,7 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
             $guiGBS = new GUIGehaltsbestandteil();
             $guiGBS->mapJSON($decodedGbs);
 			$guiGBS->generateGehaltsbestandteil();
-			$guiGBS->validate();
+			//$guiGBS->validate(); 2023-10-23 validate in Helper
             $this->gbs[] = $guiGBS;
         }
     }

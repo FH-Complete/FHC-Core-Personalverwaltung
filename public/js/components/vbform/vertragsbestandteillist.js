@@ -13,7 +13,7 @@ import infos from './infos.js';
 export default {
   template: `
       <div>
-        <div class="row g-2 py-2 border-bottom mb-3">
+        <div class="row g-2 py-2 mb-3">
           <div class="col">
             <div class="position-relative">
               <a class="btn btn-sm btn-light fs-6 fw-light" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus"></i>

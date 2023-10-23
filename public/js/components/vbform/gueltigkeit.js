@@ -20,6 +20,8 @@ export default {
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
         v-bind:placeholder="'gültig bis'"
+        v-bind:min-date="minDateBis"
+        v-bind:start-date="minDateBis"
         six-weeks
         auto-apply 
         text-input
@@ -160,6 +162,9 @@ export default {
   computed: {
     isdisabled: function() {
       return (this.sharedstatemode === 'reflect');
+    },
+    minDateBis: function() {
+      return (this.gueltig_ab !== '') ? this.gueltig_ab : new Date(); 
     }
   }
 }

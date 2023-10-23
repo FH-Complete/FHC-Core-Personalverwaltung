@@ -62,23 +62,31 @@ class FormData extends AbstractBestandteil {
         $this->dv = new GUIDienstverhaeltnis();
 		$this->dv->mapJSON($decodedData);		
 		$this->dv->generateVBLibInstance();
-		$this->dv->validate();
+		//$this->dv->validate(); TODO validate in Helper 2023-10-23
     }
 
     private function mapVbs(&$decoded)
-    {
+    {		
 		$decodedData = array();
         if (!$this->getJSONData($decodedData, $decoded, 'vbs'))
         {
             throw new \Exception('missing vbs');
         }
-        
+     
+		$dvid = intval($this->getDv()->getDienstverhaeltnis()->getDienstverhaeltnis_id());
+		
 		foreach ($decodedData as $vbid => $vbs)
 		{
 		    $vbsMapper = GUIHandlerFactory::getGUIHandler($vbs['type']);
 			$vbsMapper->mapJSON($vbs);
 			$vbsMapper->generateVBLibInstance();
-			$vbsMapper->validate();
+			
+			$vbdvid = intval($vbsMapper->getVbsinstance()->getDienstverhaeltnis_id());
+			if( $dvid > 0 && $vbdvid === 0 ) {
+				$vbsMapper->getVbsinstance()->setDienstverhaeltnis_id($dvid);
+			}
+			
+			//$vbsMapper->validate(); TODO validate in Helper 2023-10-23
 			$this->vbs[$vbid] = $vbsMapper;
 		}
     }
