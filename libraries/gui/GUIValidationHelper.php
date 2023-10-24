@@ -43,8 +43,11 @@ class GUIValidationHelper
 		$this->checkSievedList($this->vbfreitextbytype);
 		
 		$formdata->getDv()->validate();
+		$dv = $formdata->getDv()->getDienstverhaeltnis();
 		foreach( $vbs as $vbmapper )
 		{
+			$vb = $vbmapper->getVbsinstance();
+			$this->checkIfContains($dv, $vb);
 			$vbmapper->validate();
 			if( $vbmapper->getHasGBS() )
 			{
@@ -53,12 +56,34 @@ class GUIValidationHelper
 				$this->checkSievedList($this->gbsbytype);
 				foreach($gbs as $gbmapper) 
 				{
+					$gb = $gbmapper->getGbsInstance();
+					$this->checkIfContains($vb, $gb);
 					$gbmapper->validate();
 				}
 			}
 		}
 	}
 	
+	protected function checkIfContains($a, $b)
+	{
+		if( (!$a->getVon() && !$a->getBis())
+			|| (!$b->getVon() && !$b->getBis()) )
+		{
+			return;
+		}
+
+		$a_von = new DateTime(($a->getVon() ?? '1970-01-01'));
+		$b_von = new DateTime(($b->getVon() ?? '1970-01-01'));
+
+		$a_bis = new DateTime(($a->getBis() ?? '2170-01-01'));
+		$b_bis = new DateTime(($b->getBis() ?? '2170-01-01'));
+
+		if( ($b_von < $a_von) || ($b_bis > $a_bis ) )
+		{
+			$b->addValidationError('Bestandteil liegt ausserhalb der Gültigkeit des übergeordneten Bestandteils');
+		}
+	}
+
 	protected function checkForOverlap($a, $b)
 	{
 		if( (!$a->getVon() && !$a->getBis()) 
