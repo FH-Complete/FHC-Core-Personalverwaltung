@@ -32,7 +32,7 @@ export default {
       </div>
     </div>
     <div class="row g-2 py2">
-      <div class="col-6">
+      <div class="col-3">
         <div class="input-group input-group-sm">
             <datepicker v-model="geplanter_geburtstermin" 
               :disabled="isinputdisabled('geplanter_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
@@ -43,7 +43,11 @@ export default {
               format="dd.MM.yyyy"
               model-type="yyyy-MM-dd" 
               auto-apply 
-              class="me-2"></datepicker>      
+              class="me-2"></datepicker>
+        </div>
+      </div>
+      <div class="col-3">
+          <div class="input-group input-group-sm">
             <datepicker v-model="tatsaechlicher_geburtstermin" 
               :disabled="isinputdisabled('tatsaechlicher_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
               v-bind:enable-time-picker="false"
@@ -53,7 +57,7 @@ export default {
               format="dd.MM.yyyy"
               auto-apply 
               model-type="yyyy-MM-dd"></datepicker>
-        </div>
+          </div>
       </div>
       <div class="col-6">
         &nbsp;
