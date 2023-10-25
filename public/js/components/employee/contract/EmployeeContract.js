@@ -378,11 +378,11 @@ export const EmployeeContract = {
         }
 
         const linkToLehrtaetigkeitsbestaetigungODT = () => {
-            window.location.href = '/content/mitarbeiter/lehrtaetigkeit.pdf.php?output=odt&uid=' + currentDV.value.uid;
+            window.location.href = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/mitarbeiter/lehrtaetigkeit.pdf.php?output=odt&uid=' + currentDV.value.uid;
         }
 
         const linkToLehrtaetigkeitsbestaetigungPDF = () => {
-            window.location.href = '/content/mitarbeiter/lehrtaetigkeit.pdf.php?output=pdf&uid=' + currentDV.value.uid;
+            window.location.href = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/mitarbeiter/lehrtaetigkeit.pdf.php?output=pdf&uid=' + currentDV.value.uid;
         }
         
         const karenzDialog = () => {
