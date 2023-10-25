@@ -377,6 +377,14 @@ export const EmployeeContract = {
             enddvmodalRef.value.showModal();            
         }
 
+        const linkToLehrtaetigkeitsbestaetigungODT = () => {
+            window.location.href = '/content/mitarbeiter/lehrtaetigkeit.pdf.php?output=odt&uid=' + currentDV.value.uid;
+        }
+
+        const linkToLehrtaetigkeitsbestaetigungPDF = () => {
+            window.location.href = '/content/mitarbeiter/lehrtaetigkeit.pdf.php?output=pdf&uid=' + currentDV.value.uid;
+        }
+        
         const karenzDialog = () => {
             curKarenz.value = {
                     type: 'vertragsbestandteilkarenz',
@@ -542,7 +550,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t,
+            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, 
         }
     },
     template: `
@@ -572,7 +580,9 @@ export const EmployeeContract = {
                         <div class="me-auto">
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2">Bestätigung drucken</button>
+                            <DropDownButton class="me-2" :links="[{action:linkToLehrtaetigkeitsbestaetigungODT,text:'Lehrtätigkeitsbestätigung (odt)'},{action:linkToLehrtaetigkeitsbestaetigungPDF,text:'Lehrtätigkeitsbestätigung (pdf)'}]">
+                                Bestätigung drucken
+                            </DropDownButton>
                             <!-- Drop Down Button -->
                             <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
                                 weitere Aktionen
