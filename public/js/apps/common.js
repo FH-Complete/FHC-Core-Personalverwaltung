@@ -1,4 +1,5 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import { CoreFilterAPIs } from '../../../../js/components/filter/API.js';
 
 Vue.$fhcapi = fhcapifactory;
 
@@ -117,7 +118,17 @@ export const searchbaroptions = {
             defaultaction: {
                 type: "function",
                 action: function(data) { 
-                    alert('organisationunit defaultaction ' + JSON.stringify(data)); 
+                    //alert('organisationunit defaultaction ' + JSON.stringify(data));
+                    const filterFields = {
+                        "filterUniqueId":"extensions/FHC-Core-Personalverwaltung/Employees/index",
+                        "filterType":"EmployeeViewer",
+                        "filterFields":[{"name":"OE Key","operation":"equal","condition":data.oe_kurzbz}]
+                    };
+                    CoreFilterAPIs.applyFilterFields(filterFields).then(function() {
+                        // redirect
+                        let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+                        window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;
+                    });
                 }
             },
             childactions: []
