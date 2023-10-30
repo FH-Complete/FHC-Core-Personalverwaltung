@@ -17,6 +17,7 @@ export const OffCanvasTimeline = {
         const title = Vue.ref("Timeline");
         const currentUID = Vue.toRefs(props).uid
         const events =Vue.ref([])
+        const isHidden = Vue.ref(true);
         let offCanvasEle = Vue.ref(null);
         let thisOffCanvasObj;
         const numberFormat = new Intl.NumberFormat();
@@ -48,6 +49,12 @@ export const OffCanvasTimeline = {
 
         Vue.onMounted(() => {
             thisOffCanvasObj = new bootstrap.Offcanvas(offCanvasEle.value);
+            offCanvasEle.value.addEventListener('hidden.bs.offcanvas', event => {
+                isHidden.value = true;
+            });
+            offCanvasEle.value.addEventListener('shown.bs.offcanvas', event => {
+                isHidden.value = false;
+            });
         })
 
         function show() {
@@ -186,7 +193,7 @@ export const OffCanvasTimeline = {
         expose({show, hide, toggle});
 
         return {
-            courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, title, currentUID, events, offCanvasEle, show, hide, toggle,
+            courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden,
         }
      },
      template: `
@@ -194,7 +201,7 @@ export const OffCanvasTimeline = {
         ref="offCanvasEle"
         tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
 
-        <button v-if="!readonly" type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="show()">Vertragshistorie</button>
+        <button v-if="!readonly" type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="isHidden ? show() : hide()">Vertragshistorie</button>
 
         <div class="offcanvas-header">
             <h5 id="offcanvasRightLabel">Vertragshistorie</h5>
