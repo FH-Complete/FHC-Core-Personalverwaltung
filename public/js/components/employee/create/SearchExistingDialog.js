@@ -85,9 +85,7 @@ export const SearchExistingDialog = {
         }
 
         Vue.onMounted(() => {
-            console.log('SearchExistingDialog mounted');
-            surnameRef.value.focus();
-            
+            surnameRef.value.focus();            
         })
 
 
