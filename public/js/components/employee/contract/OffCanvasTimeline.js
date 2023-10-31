@@ -1,8 +1,10 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
+
 export const OffCanvasTimeline = {
      components: {
         "p-timeline": primevue.timeline,
+        "p-multiselect": primevue.multiselect,
      },
      props: {
         uid: String,
@@ -16,11 +18,16 @@ export const OffCanvasTimeline = {
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Timeline");
         const currentUID = Vue.toRefs(props).uid
-        const events =Vue.ref([])
+        const vbsData = Vue.ref();
+        const events =Vue.ref([]);
         const isHidden = Vue.ref(true);
         let offCanvasEle = Vue.ref(null);
         let thisOffCanvasObj;
         const numberFormat = new Intl.NumberFormat();
+        const selectedVBSTypen = Vue.ref([]);
+        const selectedGBSTypen = Vue.ref([]);
+        const vertragsbestandteiltypen = Vue.inject('vertragsbestandteiltypen');
+        const gehaltstypen = Vue.inject('gehaltstypen');        
 
         const formatDate = (ds) => {
             var d = new Date(ds);
@@ -47,21 +54,60 @@ export const OffCanvasTimeline = {
             hide();
         }
 
+        const hiddenCanvasHandler = () => {
+            isHidden.value = true;
+        }
+
+
+        const shownCanvasHandler = () => {
+            isHidden.value = false;
+        }
+
         Vue.onMounted(() => {
             thisOffCanvasObj = new bootstrap.Offcanvas(offCanvasEle.value);
-            offCanvasEle.value.addEventListener('hidden.bs.offcanvas', event => {
-                isHidden.value = true;
-            });
-            offCanvasEle.value.addEventListener('shown.bs.offcanvas', event => {
-                isHidden.value = false;
-            });
+            offCanvasEle.value.addEventListener('hidden.bs.offcanvas', hiddenCanvasHandler);
+            offCanvasEle.value.addEventListener('shown.bs.offcanvas', shownCanvasHandler);
         })
+
+        Vue.onBeforeUnmount(() => {
+            offCanvasEle.value.removeEventListener('hidden.bs.offcanvas', hiddenCanvasHandler);
+            offCanvasEle.value.removeEventListener('shown.bs.offcanvas', shownCanvasHandler);
+        })
+
+        /*
+        const eventsFiltered = Vue.computed(() => {            
+
+            return events.value.filter((e) => {
+                
+                let filterActive = false;
+
+                e.bestandteile = e.bestandteile.filter((b) => {
+                    
+                    
+                    if (b.typ == 'vbs' && selectedVBSTypen.value.length > 0) {
+                        filterActive = true;
+                        return selectedVBSTypen.value.find(kt => kt.value == b.kurzbz)
+                    }
+
+                    if (b.typ == 'gbs' && selectedGBSTypen.value.length > 0) {
+                        filterActive = true;
+                        return selectedGBSTypen.value.find(kt => kt.value == b.kurzbz)                    
+                    }
+
+                    return !filterActive;
+                })
+                
+                return e.bestandteile.length > 0;
+            })
+        })
+*/
 
         function show() {
             Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
                     .then((response) => {
                         console.log(response);
-                        events.value = generateTimeline(response.data.data);
+                        vbsData.value = response.data.data;
+                        events.value = generateTimeline(vbsData.value);
                     });
 
             thisOffCanvasObj.show();
@@ -136,37 +182,53 @@ export const OffCanvasTimeline = {
             return gbstypMap[gbsTyp] !== undefined ? gbstypMap[gbsTyp] : gbsTyp;
         }
 
+        Vue.watch([selectedVBSTypen, selectedGBSTypen], ([id,uid]) => {
+            events.value = generateTimeline(vbsData.value);                     
+        });
+
         function generateTimeline(data) {
             let timeline = {};
+            let filterActive = selectedVBSTypen.value.length > 0 || selectedGBSTypen.value.length > 0
+            let isVBSFiltered = (vbs) => selectedVBSTypen.value.find(vbsType => vbsType.value == vbs.vertragsbestandteiltyp_kurzbz)
+            let isGBSFiltered = (gbs) => selectedGBSTypen.value.find(gbsType => gbsType.value == gbs.gehaltstyp_kurzbz)
 
             data.forEach(vbs => {
 
-                if (!timeline[vbs.von]) {
-                    timeline[vbs.von] = { date: vbs.von, bestandteile: []}
-                }
-                timeline[vbs.von].bestandteile.push({ typ: 'vbs', start: true, status: getBestandteilLabel(vbs), vbs})
+                if (!filterActive || (filterActive && isVBSFiltered(vbs))) {
 
-                if (vbs.bis != null) {
-                    if (!timeline[vbs.bis]) {
-                        timeline[vbs.bis] = { date: vbs.bis, bestandteile: []}
+                    if (!timeline[vbs.von]) {
+                        timeline[vbs.von] = { date: vbs.von, bestandteile: []}
                     }
-                    timeline[vbs.bis].bestandteile.push({ typ: 'vbs', start: false, status: getBestandteilLabel(vbs), vbs})
-                }
 
-                vbs.gehaltsbestandteile.forEach( gbs => {
-                    if (!timeline[gbs.von]) {
-                        timeline[gbs.von] = { date: gbs.von, bestandteile: []}
-                    }
-                    timeline[gbs.von].bestandteile.push({ typ: 'gbs', start: true,status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), gbs})
+                    timeline[vbs.von].bestandteile.push({ typ: 'vbs', start: true, status: getBestandteilLabel(vbs), vbs, kurzbz: vbs.vertragsbestandteiltyp_kurzbz})
 
-                    if (gbs.bis != null) {
-                        if (!timeline[gbs.bis]) {
-                            timeline[gbs.bis] = { date: gbs.bis, bestandteile: []}
+                    if (vbs.bis != null) {
+                        if (!timeline[vbs.bis]) {
+                            timeline[vbs.bis] = { date: vbs.bis, bestandteile: []}
                         }
-                        timeline[gbs.bis].bestandteile.push({ typ: 'gbs', start: false, status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), gbs})
+                        timeline[vbs.bis].bestandteile.push({ typ: 'vbs', start: false, status: getBestandteilLabel(vbs), vbs, kurzbz: vbs.vertragsbestandteiltyp_kurzbz})
+                    }
+                }
+                
+                vbs.gehaltsbestandteile.forEach( gbs => {
+
+                    if (!filterActive || (filterActive && isGBSFiltered(gbs))) {
+
+                        if (!timeline[gbs.von]) {
+                            timeline[gbs.von] = { date: gbs.von, bestandteile: []}
+                        }
+                        timeline[gbs.von].bestandteile.push({ typ: 'gbs', start: true,status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), gbs, kurzbz: gbs.gehaltstyp_kurzbz})
+                    
+                        if (gbs.bis != null) {
+                            if (!timeline[gbs.bis]) {
+                                timeline[gbs.bis] = { date: gbs.bis, bestandteile: []}
+                            }
+                            timeline[gbs.bis].bestandteile.push({ typ: 'gbs', start: false, status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), gbs, kurzbz: gbs.gehaltstyp_kurzbz})
+                        }
                     }
                 })
-            });
+                
+            })
 
             return Object.values(timeline).sort((a, b) => {
                 const date1 = new Date(a.date);
@@ -193,7 +255,9 @@ export const OffCanvasTimeline = {
         expose({show, hide, toggle});
 
         return {
-            courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden,
+            courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, 
+            title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden,
+            selectedVBSTypen, vertragsbestandteiltypen, selectedGBSTypen, gehaltstypen, events,
         }
      },
      template: `
@@ -201,13 +265,40 @@ export const OffCanvasTimeline = {
         ref="offCanvasEle"
         tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
 
-        <button v-if="!readonly" type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="isHidden ? show() : hide()">Vertragshistorie</button>
+        <button type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="isHidden ? show() : hide()">Vertragshistorie</button>
 
         <div class="offcanvas-header">
             <h5 id="offcanvasRightLabel">Vertragshistorie</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
+
+                <div class="card flex justify-content-center" style="border:0">
+                    <p-multiselect v-model="selectedVBSTypen" 
+                        :options="vertragsbestandteiltypen" optionLabel="label"                         
+                        display="chip" placeholder="Filter Vertragsbestandteile" 
+                        appendTo="self" 
+                        class="mb-1">
+                        <template #optiongroup="slotProps">
+                            <div class="flex align-items-center">                            
+                                <div>{{ slotProps.option.label }}</div>
+                            </div>
+                        </template>
+                    </p-multiselect>   
+                    <p-multiselect v-model="selectedGBSTypen" 
+                        :options="gehaltstypen" optionLabel="label"                         
+                        display="chip" placeholder="Filter Gehaltsbestandteile" 
+                        appendTo="self" 
+                        class="mb-5">
+                        <template #optiongroup="slotProps">
+                            <div class="flex align-items-center">                            
+                                <div>{{ slotProps.option.label }}</div>
+                            </div>
+                        </template>
+                    </p-multiselect>   
+                
+                </div>             
+
                 <p-timeline :value="events">
                     <template #content="slotProps">
                         <div style="font-weight:bold; cursor: pointer" @click="dateSelected(slotProps.item.date)">{{formatDate(slotProps.item.date)}}
