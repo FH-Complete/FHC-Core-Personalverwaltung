@@ -247,12 +247,12 @@ export const EmailTelData = {
                         <td class="align-middle">{{ contact.zustellung == true ? "X" : "" }}</td>
                         <td class="align-middle">{{ contact.anmerkung }}</td>
                         <td class="align-middle" width="5%">
-                            <div class="d-grid gap-2 d-md-flex align-middle">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(contact.kontakt_id)">
-                                    <i class="fa fa-xmark"></i>
-                                </button>
+                            <div class="d-grid gap-2 d-md-flex align-middle">           
                                 <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(contact.kontakt_id)">
                                     <i class="fa fa-pen"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(contact.kontakt_id)">
+                                    <i class="fa fa-xmark"></i>
                                 </button>
                             </div>
                         </td>

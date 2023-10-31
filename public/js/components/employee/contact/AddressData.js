@@ -301,12 +301,12 @@ export const AddressData = {
                     <td class="align-middle">{{ address.zustelladresse == true ? "X" : "" }}</td>
                     <td class="align-middle">{{ address.co_name }}</td>
                     <td class="align-middle" width="5%">
-                        <div class="d-grid gap-2 d-md-flex align-middle">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(address.adresse_id)">
-                                <i class="fa fa-xmark"></i>
-                            </button>
+                        <div class="d-grid gap-2 d-md-flex align-middle">                
                             <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(address.adresse_id)">
                                 <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(address.adresse_id)">
+                                <i class="fa fa-xmark"></i>
                             </button>
                         </div>
                     </td>

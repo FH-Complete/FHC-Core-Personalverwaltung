@@ -256,7 +256,7 @@ export const EmployeeHeader = {
                     <div v-if="employee?.foto" class="fotobutton">
                         <div class="d-grid gap-2 d-md-flex ">
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
-                                    <i class="fa fa-minus"></i>
+                                    <i class="fa fa-xmark"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal">
                                     <i class="fa fa-pen"></i>

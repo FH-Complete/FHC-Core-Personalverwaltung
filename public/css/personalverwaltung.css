@@ -156,3 +156,7 @@ label.required.form-label:after {
 .offcanvas.show .offcanvas-btn span:last-child {
   display: inline;
 }
+
+i.fa.fa-xmark {
+    padding: 0.15em;
+}

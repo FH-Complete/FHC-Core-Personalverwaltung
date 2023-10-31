@@ -137,7 +137,7 @@ export const JobFunction = {
             const createDomButton = (classValue, clickHandler) => {
                 const nodeBtn = document.createElement("button");
                 const classAttrBtn = document.createAttribute("class");
-                classAttrBtn.value = "btn btn-outline-dark btn-sm";
+                classAttrBtn.value = "btn btn-outline-secondary btn-sm";
                 nodeBtn.setAttributeNode(classAttrBtn);
                 nodeBtn.addEventListener("click", clickHandler);
                 const nodeI = document.createElement("i");
@@ -154,15 +154,15 @@ export const JobFunction = {
                 const classAttrDiv = document.createAttribute("class");
                 classAttrDiv.value = "d-grid gap-2 d-md-flex justify-content-end align-middle";
                 nodeDiv.setAttributeNode(classAttrDiv);
-                // delete button              
-                const nodeBtnDel = createDomButton("fa fa-minus",() => { showDeleteModal(cell.getValue()) })
+                // delete button
+                const nodeBtnDel = createDomButton("fa fa-xmark",() => { showDeleteModal(cell.getValue()) })
                 // edit button
                 const nodeBtnEdit = createDomButton("fa fa-pen",() => { showEditModal(cell.getValue()) })
 
                 if( cell.getRow().getData().dienstverhaeltnis_unternehmen === null ) {
-                    nodeDiv.appendChild(nodeBtnDel);
+                    nodeDiv.appendChild(nodeBtnEdit);
                 }
-                nodeDiv.appendChild(nodeBtnEdit);
+                nodeDiv.appendChild(nodeBtnDel);
                 return nodeDiv;
             }
             
@@ -434,9 +434,9 @@ export const JobFunction = {
 
                 <div class="card-body">
                     <div class="d-grid gap-2 d-md-flex justify-content-end mb-1">
-                        <div class="form-check form-switch pe-2">
+                        <div class="form-check pe-2">
                             <input class="form-check-input" type="checkbox" role="switch" id="aktivChecked" v-model="aktivChecked">
-                            <label class="form-check-label" for="aktivChecked">nur aktive anzeigen</label>
+                            <label class="form-check-label" for="aktivChecked">Nur aktive anzeigen</label>
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-secondary me-3" @click="showAddModal()">
                             <i class="fa fa-plus"></i>

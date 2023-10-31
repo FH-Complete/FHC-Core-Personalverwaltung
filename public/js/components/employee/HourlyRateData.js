@@ -307,11 +307,11 @@ export const HourlyRateData = {
 								<td class="align-middle">{{ hourlyratedata.stundensatz }}</td>
 								<td class="align-middle" width="5%">
 									<div class="d-grid gap-2 d-md-flex align-middle">
-										<button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(hourlyratedata.stundensatz_id)">
-											<i class="fa fa-minus"></i>
-										</button>
-										<button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(hourlyratedata.stundensatz_id)">
+										<button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(hourlyratedata.stundensatz_id)">
 											<i class="fa fa-pen"></i>
+										</button>
+										<button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(hourlyratedata.stundensatz_id)">
+											<i class="fa fa-xmark"></i>
 										</button>
 									</div>
 								</td>
