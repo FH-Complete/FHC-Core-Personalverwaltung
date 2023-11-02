@@ -76,7 +76,7 @@ export const EmployeeContract = {
         const vertragsarten = inject('vertragsarten');
         const freitexttypen = inject('freitexttypen');
 
-        const readonly = ref(false);
+        const readonly = ref(false);        
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -550,7 +550,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, 
+            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,             
         }
     },
     template: `
@@ -584,7 +584,7 @@ export const EmployeeContract = {
                                 Bestätigung drucken
                             </DropDownButton>
                             <!-- Drop Down Button -->
-                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
+                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'},{action:'extensions/',text:'Testlink'}]">
                                 weitere Aktionen
                             </DropDownButton>
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
