@@ -131,6 +131,10 @@ class GUIValidationHelper
 	{
 		foreach($vbs as $vbmapper) 
 		{
+			if( $vbmapper->hasToBeDeleted() )
+			{
+				continue;
+			}
 			$vb = $vbmapper->getVbsinstance();
 			$vb instanceof vertragsbestandteil\Vertragsbestandteil;
 			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'freitext' )
@@ -156,6 +160,10 @@ class GUIValidationHelper
 		$this->gbsbytype = array();
 		foreach($gbs as $gbmapper) 
 		{
+			if( $gbmapper->hasToBeDeleted() )
+			{
+				continue;
+			}
 			$gb = $gbmapper->getGbsInstance();
 			$gb instanceof vertragsbestandteil\Gehaltsbestandteil;
 			if( !isset($this->gbsbytype[$gb->getGehaltstyp_kurzbz()]) )

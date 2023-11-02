@@ -77,7 +77,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         }
         $this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['gehaltstyp'], $decodedData, 'gehaltstyp');
-        $this->getJSONDataInt($this->data['betrag'], $decodedData, 'betrag');
+        $this->getJSONDataFloat($this->data['betrag'], $decodedData, 'betrag');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;

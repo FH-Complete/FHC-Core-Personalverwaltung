@@ -68,7 +68,7 @@ export default {
       betrag: '',
       gueltig_ab: '',
       gueltig_bis: '',
-      valorisierung: '',
+      valorisierung: true,
       valorisierungssperre: null,
       auszahlungen: 14,
       db_delete: false
@@ -98,7 +98,10 @@ export default {
         this.gehaltstyp = this.config.data.gehaltstyp;
       }
       if( this.config?.data?.betrag !== undefined ) {
-        this.betrag = this.config.data.betrag;
+        if(!isNaN(this.config.data.betrag)) {
+            this.config.data.betrag = this.config.data.betrag.toString();
+        }
+        this.betrag = this.config.data.betrag.replace('.', ',');
       }
       if( this.config?.data?.valorisierung !== undefined ) {
         this.valorisierung = this.config.data.valorisierung;
@@ -123,7 +126,7 @@ export default {
         data: {
           id: this.id,
           gehaltstyp: this.gehaltstyp,
-          betrag: this.betrag,
+          betrag: this.betrag.replace(',', '.'),
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
           valorisierung: Boolean(this.valorisierung),

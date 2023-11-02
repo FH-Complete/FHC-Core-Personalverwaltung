@@ -124,12 +124,12 @@ export default {
     },
     presetselected: function(preset) {
       if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
-        preset.dv.data.dienstverhaeltnisid = this.curdv.dienstverhaeltnis_id;
-        preset.dv.data.unternehmen = this.curdv.oe_kurzbz;
-        preset.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+        preset.dv.data.dienstverhaeltnisid = preset.dv.data.dienstverhaeltnisid ?? this.curdv.dienstverhaeltnis_id;
+        preset.dv.data.unternehmen = (preset.dv.data.unternehmen !== '') ? preset.dv.data.unternehmen : this.curdv.oe_kurzbz;
+        preset.dv.data.vertragsart_kurzbz = preset.dv.data.vertragsart_kurzbz ?? this.curdv.vertragsart_kurzbz;
         preset.dv.data.gueltigkeit.data = {
-            gueltig_ab: this.curdv.von,
-            gueltig_bis: this.curdv.bis
+            gueltig_ab: preset.dv.data.gueltigkeit?.data?.gueltig_ab ?? this.curdv.von,
+            gueltig_bis: preset.dv.data.gueltigkeit?.data?.gueltig_bis ?? this.curdv.bis
         };
         preset.dv.data.gueltigkeit.guioptions.sharedstatemode = 'ignore';
         if( this.mode === 'aenderung' ) {
