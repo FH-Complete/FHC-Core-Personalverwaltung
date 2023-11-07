@@ -54,8 +54,8 @@ export default {
         };
         
         if( (typeof tmpchildren[0] === 'object')
-                && tmpchildren[0]?.type !== undefined ) {
-            console.log(JSON.stringify(tmpchildren[0]));
+                && tmpchildren[0]?.type === undefined ) {
+            console.log('Child Type undefined: ' + JSON.stringify(tmpchildren[0]));
         }
         
         if( (typeof tmpchildren[0] === 'object')

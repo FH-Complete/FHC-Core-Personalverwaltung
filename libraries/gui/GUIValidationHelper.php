@@ -47,7 +47,10 @@ class GUIValidationHelper
 		foreach( $vbs as $vbmapper )
 		{
 			$vb = $vbmapper->getVbsinstance();
-			$this->checkIfContains($dv, $vb);
+			if( !$vbmapper->hasToBeDeleted() )
+			{
+				$this->checkIfContains($dv, $vb);
+			}			
 			$vbmapper->validate();
 			if( $vbmapper->getHasGBS() )
 			{
@@ -57,7 +60,10 @@ class GUIValidationHelper
 				foreach($gbs as $gbmapper) 
 				{
 					$gb = $gbmapper->getGbsInstance();
-					$this->checkIfContains($vb, $gb);
+					if( !$gbmapper->hasToBeDeleted() )
+					{
+						$this->checkIfContains($vb, $gb);
+					}
 					$gbmapper->validate();
 				}
 			}

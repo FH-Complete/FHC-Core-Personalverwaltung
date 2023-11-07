@@ -28,11 +28,20 @@ export default {
   </div>
   <div class="col-1">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
-  <div class="col-1">&nbsp;</div>
+  <div class="col-1">
+    <div v-if="this.store.mode === 'korrektur'" class="form-check">
+      <input v-model="checkoverlap" class="form-check-input" type="checkbox" id="dvcheckoverlap">
+      <label class="form-check-label" for="dvcheckoverlap">
+        parallele DVs prüfen
+      </label>
+    </div>
+    <span v-else>&nbsp;</span>
+  </div>
   `,
   data: function() {
     return {
       'vertragsart_kurzbz': '',
+      'checkoverlap': true,
       'lists': {
           'unternehmen': [],
           'vertragsarten': []
@@ -93,13 +102,17 @@ export default {
       if( this.config?.vertragsart_kurzbz !== undefined ) {
         this.vertragsart_kurzbz = this.config.vertragsart_kurzbz;
       }
+      if( this.config?.checkoverlap !== undefined ) {
+        this.checkoverlap = this.config.checkoverlap;
+      }
     },
     getPayload: function() {
       return {
         dienstverhaeltnisid: this.config.dienstverhaeltnisid,
         unternehmen: this.store.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
-        gueltigkeit: this.$refs.gueltigkeit.getPayload()
+        gueltigkeit: this.$refs.gueltigkeit.getPayload(),
+        checkoverlap: this.checkoverlap
       }
     }
   },

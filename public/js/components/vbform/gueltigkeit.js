@@ -5,10 +5,10 @@ export default {
   template: `
   <div class="col-4 vbform_gueltigkeit">
     <div class="input-group input-group-sm">
-      <datepicker v-model="gueltig_ab" :disabled="isdisabled || isinputdisabled('gueltig_ab')"
+      <datepicker ref="dpvon" v-model="gueltig_ab" :disabled="isdisabled || isinputdisabled('gueltig_ab')"
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
-        v-bind:placeholder="'gültig ab'"
+        v-bind:placeholder="'gültig ab'"        
         six-weeks
         auto-apply 
         text-input 
@@ -16,7 +16,7 @@ export default {
         format="dd.MM.yyyy"
         model-type="yyyy-MM-dd"></datepicker>
       <span class="input-group-text">&dash;</span>
-      <datepicker v-model="gueltig_bis" :disabled="isdisabled || isinputdisabled('gueltig_bis')"
+      <datepicker ref="dpbis" v-model="gueltig_bis" :disabled="isdisabled || isinputdisabled('gueltig_bis')"
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
         v-bind:placeholder="'gültig bis'"
@@ -67,7 +67,8 @@ export default {
     configurable
   ],
   emits: [
-    "markended"
+    "markended",
+    "gueltigkeitchanged"
   ],
   created: function() {
     this.sharedstatemode = this.initialsharedstatemode;
@@ -132,6 +133,10 @@ export default {
         this.sharedstate.gueltigkeit.gueltig_ab = this.gueltig_ab;
         this.sharedstate.gueltigkeit.gueltig_bis = this.gueltig_bis;
       }
+      this.$emit('gueltigkeitchanged', {
+          'gueltig_ab': this.gueltig_ab,
+          'gueltig_bis': this.gueltig_bis
+      });
     },
     changesharedstatemode: function(mode) {
       this.sharedstatemode = mode;
