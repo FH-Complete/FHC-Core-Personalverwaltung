@@ -418,6 +418,13 @@ export const EmployeeContract = {
         const handleDvSaved = async (dvid) => {
             console.log(dvid);
             fetchData(route.params.uid);
+
+            // data might have changed -> fetch updated data
+            if (currentDVID != null && currentDVID.value > 0) {
+                fetchVertrag(currentDVID.value, currentDate.value);
+                fetchGBT(currentDVID.value, currentDate.value);
+                fetchGBTChartData(currentDVID.value);
+            }
         }
 
         const handleDvEnded = async () => {
@@ -1218,6 +1225,7 @@ export const EmployeeContract = {
         ref="offCanvasRef"
         @dateSelected="dateSelectedHandler"
         :curdv="currentDV">
+        :alldv="dvList"
     </OffCanvasTimeline>
     
     <karenzmodal 
