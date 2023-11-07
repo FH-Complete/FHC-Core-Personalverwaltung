@@ -415,7 +415,8 @@ export const EmployeeContract = {
             offCanvasRef.value.show();
         }
         
-        const handleDvSaved = async () => {
+        const handleDvSaved = async (dvid) => {
+            console.log(dvid);
             fetchData(route.params.uid);
         }
 

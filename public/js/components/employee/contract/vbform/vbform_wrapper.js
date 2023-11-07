@@ -237,7 +237,8 @@ export default {
         .then(() => {
         this.$refs['tmpstorehelper'].fetchTmpStoreList();
         this.presetselected(payload);
-        this.$emit('dvsaved');
+        const dvid = payload.dv.data.dienstverhaeltnisid;
+        this.$emit('dvsaved', dvid);
       });
     },
     handleLoadedFromTmpStore: function(payload) {

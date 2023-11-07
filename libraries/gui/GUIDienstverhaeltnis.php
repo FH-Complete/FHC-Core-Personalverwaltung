@@ -156,7 +156,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 		
 		if( intval($this->dv->getDienstverhaeltnis_id()) > 0 ) 
 		{
-			$this->data['dienstverhaeltnis_id'] = $this->dv->getDienstverhaeltnis_id();
+			$this->data['dienstverhaeltnisid'] = $this->dv->getDienstverhaeltnis_id();
 		}
 	}
 }
