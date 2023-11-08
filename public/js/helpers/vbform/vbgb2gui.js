@@ -104,7 +104,7 @@ export default {
       var endable = (bt.vertragsbestandteiltyp_kurzbz !== 'karenz') 
                   ? this.isEndable(bt) 
                   : false;
-      if( endable || (mode === 'aenderung' && !this.isFuture(bt)) ) {
+      if( endable && !(mode === 'aenderung' && this.isFuture(bt)) ) {
           disabled = [
             'gueltig_ab'
           ];
