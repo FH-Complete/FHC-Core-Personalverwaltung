@@ -240,7 +240,6 @@ export const EmployeeContract = {
             isFetching.value = true            
             try {
                 const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
-                employee.value = res.data.retval[0];
             } catch (error) {
                 console.log(error);
             } finally {
@@ -277,6 +276,7 @@ export const EmployeeContract = {
         watch(
             currentDVID,
             (newVal) => {
+                if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
@@ -415,16 +415,15 @@ export const EmployeeContract = {
             offCanvasRef.value.show();
         }
         
-        const handleDvSaved = async (dvid) => {
-            console.log(dvid);
-            fetchData(route.params.uid);
-
-            // data might have changed -> fetch updated data
-            if (currentDVID != null && currentDVID.value > 0) {
-                fetchVertrag(currentDVID.value, currentDate.value);
-                fetchGBT(currentDVID.value, currentDate.value);
-                fetchGBTChartData(currentDVID.value);
-            }
+        const handleDvSaved = async () => {
+            fetchData(route.params.uid).then(() => {
+                // data might have changed but currentDVID is still the same -> fetch updated data
+                if (currentDVID != null && currentDVID.value > 0) {
+                    fetchVertrag(currentDVID.value, currentDate.value);
+                    fetchGBT(currentDVID.value, currentDate.value);
+                    fetchGBTChartData(currentDVID.value);
+                }
+            })
         }
 
         const handleDvEnded = async () => {
@@ -517,7 +516,15 @@ export const EmployeeContract = {
 
         const dvDeleteHandler = () => {
             console.log('dvDeleteHandler link clicked', currentDVID);
-            deleteDV(currentDVID.value).then(() => fetchData(route.params.uid));            
+            deleteDV(currentDVID.value).then(async () => {                
+                fetchData(route.params.uid)
+                let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
+                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+                    + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
+                    + route.params.id + '/' + route.params.uid 
+                    + '/contract';
+                await router.push( url )
+            });
         }
 
         const capitalize = (s) => {
@@ -627,14 +634,14 @@ export const EmployeeContract = {
                 <div class="row justify-content-center pt-md-2" v-if="!isCurrentDVActive && dvList?.length">
                         <div class="alert alert-warning mt-3" role="alert">
                             Dienstverhältnis ist zum ausgewählten Datum inaktiv.
-                            <span v-if="currentDV.bis != null">
+                            <span v-if="currentDV?.bis != null">
                                 Anzeigedatum auf letztgültiges Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
                                     <i class="fa fa-pen"></i> Datum setzen
                                 </button>
                                 
                             </span>
-                            <span v-else-if="currentDV.von != null">
+                            <span v-else-if="currentDV?.von != null">
                                 Anzeigedatum auf Von-Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2VonDatum">
                                     <i class="fa fa-pen"></i> Datum setzen
@@ -679,7 +686,7 @@ export const EmployeeContract = {
 
                                     <div class="col-md-4">
                                         <label for="zeitraum_bis" class="form-label" >Bis</label>
-                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.bis)" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV?.bis)" >
                                     </div>
 
                                     <div class="col-md-4">
