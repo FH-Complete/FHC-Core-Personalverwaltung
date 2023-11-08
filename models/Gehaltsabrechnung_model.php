@@ -20,4 +20,12 @@ class Gehaltsabrechnung_model extends DB_Model
 			)
 		);
     }
+
+	public function deleteByGehaltsbestandteilID($gehaltsbestandteil_id)
+    {
+        $qry = "DELETE FROM " . $this->dbTable ." ".
+               "WHERE gehaltsbestandteil_id = ?";
+
+        return $this->execQuery($qry, array($gehaltsbestandteil_id));
+    }
 }    

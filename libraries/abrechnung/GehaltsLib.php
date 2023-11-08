@@ -157,6 +157,19 @@ class GehaltsLib
 
 		return $result;
 	}
+
+	public function deleteAbrechnung($bestandteil)
+	{
+		$ret = $this->_ci->GehaltsabrechnungModel->deleteByGehaltsbestandteilID(
+			$bestandteil->getGehaltsbestandteil_id());
+
+		if (isError($ret))
+		{
+			throw new Exception('error deleting Gehaltsabrechnung');
+		}
+
+		return	$ret;
+	}
 	
 	private function getDate($date)
 	{
