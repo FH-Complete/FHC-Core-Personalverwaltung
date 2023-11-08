@@ -9,6 +9,7 @@ export const OffCanvasTimeline = {
      props: {
         uid: String,
         curdv: Object,
+        alldv: Array,
      },
      //expose: ['show', 'hide', 'toggle'],
      emits: [ 'dateSelected' ],
@@ -74,33 +75,6 @@ export const OffCanvasTimeline = {
             offCanvasEle.value.removeEventListener('shown.bs.offcanvas', shownCanvasHandler);
         })
 
-        /*
-        const eventsFiltered = Vue.computed(() => {            
-
-            return events.value.filter((e) => {
-                
-                let filterActive = false;
-
-                e.bestandteile = e.bestandteile.filter((b) => {
-                    
-                    
-                    if (b.typ == 'vbs' && selectedVBSTypen.value.length > 0) {
-                        filterActive = true;
-                        return selectedVBSTypen.value.find(kt => kt.value == b.kurzbz)
-                    }
-
-                    if (b.typ == 'gbs' && selectedGBSTypen.value.length > 0) {
-                        filterActive = true;
-                        return selectedGBSTypen.value.find(kt => kt.value == b.kurzbz)                    
-                    }
-
-                    return !filterActive;
-                })
-                
-                return e.bestandteile.length > 0;
-            })
-        })
-*/
 
         function show() {
             Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
@@ -244,14 +218,7 @@ export const OffCanvasTimeline = {
             return numberFormat.format(parseFloat(num));
         }
 
-        // dummy events
-        /*const events = [
-            {status: 'Funktionsänderung', date: '1/2/2023', icon: 'pi pi-shopping-cart', color: '#9C27B0', image: 'game-controller.jpg'},
-            {status: 'Valorisierung (2,5%), Gehalt: € 3121,13', date: '1/9/2022', icon: 'pi pi-cog', color: '#673AB7'},
-            {status: 'Valorisierung (1,5%), Gehalt: € 3150', date: '1/9/2021', icon: 'pi pi-shopping-cart', color: '#FF9800'},
-            {status: 'Eintritt, Gehalt: € 3045', date: '16/10/2020', icon: 'pi pi-check', color: '#607D8B'}
-        ]*/
-
+        // expose functions
         expose({show, hide, toggle});
 
         return {
@@ -309,13 +276,13 @@ export const OffCanvasTimeline = {
                             <div class="card mb-1">
                                 <div class="row g-0">
                                     <div class="col-md-4" style="background-color:#eee">
-                                        <div class="card-body rounded-start">
+                                        <div class="card-body rounded-start pt-1 pb-1">
                                         {{bestandteil.status}}<br/>
                                         <span v-if="!bestandteil.start">(beendet)</span>
                                         </div>
                                     </div>
                                     <div class="col-md-8">
-                                        <div class="card-body ">
+                                        <div class="card-body pt-1 pb-1">
                                             <div v-if="bestandteil.typ == 'vbs'">
                                                 <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='stunden'">
                                                     {{ formatNumber(bestandteil.vbs.wochenstunden) }}h
