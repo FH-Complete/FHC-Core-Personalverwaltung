@@ -296,6 +296,7 @@ export const HourlyRateData = {
 								<th scope="col">{{ t('global','bis') }}</th>
 								<th scope="col">{{ t('core','unternehmen') }}</th>
 								<th scope="col">{{ t('ui','stundensatz') }}</th>
+								<th scope="col"></th>
 							</tr>
 							</thead>
 							<tbody>
