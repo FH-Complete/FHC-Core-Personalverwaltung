@@ -433,14 +433,14 @@ export const JobFunction = {
                 </div>
 
                 <div class="card-body">
-                    <div class="d-grid gap-2 d-md-flex justify-content-end mb-1">
-                        <div class="form-check pe-2">
+                    <div class="d-grid d-md-flex justify-content-between pt-2 pb-3">
+                        <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
+                            <i class="fa fa-plus"></i> {{ t('person','funktion') }}
+                        </button>
+                        <div class="form-check">
                             <input class="form-check-input" type="checkbox" role="switch" id="aktivChecked" v-model="aktivChecked">
                             <label class="form-check-label" for="aktivChecked">Nur aktive anzeigen</label>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-3" @click="showAddModal()">
-                            <i class="fa fa-plus"></i>
-                        </button>            
                     </div>
 
                     <!-- TABULATOR -->

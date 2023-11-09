@@ -265,10 +265,9 @@ export const AddressData = {
             </div>
 
             <div class="d-flex bd-highlight">
-                <div class="flex-grow-1 bd-highlight"></div>        
-                <div class="p-2 bd-highlight">                   
-                    <button type="button" class="btn btn-outline-secondary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
-                        <i class="fa fa-plus"></i>
+                <div class="py-2 bd-highlight">                   
+                    <button type="button" class="btn btn-primary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
+                        <i class="fa fa-plus"></i> {{ t('person','adresse') }}
                     </button>
                 </div>
             </div>

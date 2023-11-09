@@ -234,10 +234,6 @@ export default {
                             <div class="flex-fill align-self-center">
                             <h1 class="h2" style="margin-bottom:0" > Mitarbeiter </h1>
                             </div>
-                            <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
-                                <button type="button" class="btn btn-outline-secondary" @click="openCreateWizard()"><i class="fa fa-plus"></i></button>
-                            </div>
-
 							<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 								<Toast ref="toastEmployeeCreatedRef">
 									<template #body><h4>Mitarbeiter erstellt.</h4></template>
@@ -250,7 +246,10 @@ export default {
                             :sideMenu="false"
                             :tabulator-options="employeesTabulatorOptions"
                             :tabulator-events="employeesTabulatorEvents"
-                            @nw-new-entry="newSideMenuEntryHandler">
+							new-btn-label="Mitarbeiter"
+							new-btn-show="true"
+                            @nw-new-entry="newSideMenuEntryHandler"
+							@click:new="openCreateWizard()">
                             </core-filter-cmpt>
                         </div>
                     </template>

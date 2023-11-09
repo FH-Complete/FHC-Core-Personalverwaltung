@@ -282,9 +282,9 @@ export const HourlyRateData = {
 				</div>
 
 				<div class="card-body">
-					<div class="d-grid gap-2 d-md-flex justify-content-end ">
-						<button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-						<i class="fa fa-plus"></i>
+					<div class="d-grid d-md-flex justify-content-start py-2">
+						<button type="button" class="btn btn-sm btn-primary" @click="showAddModal()">
+						<i class="fa fa-plus"></i> {{ t('ui','stundensatz') }}
 						</button>
 					</div>
 					<div class="table-responsive">

@@ -218,18 +218,12 @@ export const EmailTelData = {
             </div>
          
              
-        
+        <button type="button" class="btn btn-primary btn-sm my-2"  @click="showAddModal()">
+                <i class="fa fa-plus"></i> {{ t('global','kontakt') }}
+        </button>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead>
-                <tr>
-                    <th colspan="4"></th>                    
-                    <th scope="col">
-                        <button type="button" class="btn btn-outline-secondary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
-                            <i class="fa fa-plus"></i>
-                        </button>
-                    </th>
-                </tr>
                 <tr>
                     <th scope="col">{{ t('global','typ') }}</th>
                     <th scope="col">{{ t('global','kontakt') }}</th>

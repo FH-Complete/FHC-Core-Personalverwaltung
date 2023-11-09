@@ -578,7 +578,7 @@ export const EmployeeContract = {
                     </div>
                     <div class="d-flex">
                         <div class="me-auto">
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <DropDownButton class="me-2" :links="[{action:linkToLehrtaetigkeitsbestaetigungODT,text:'Lehrtätigkeitsbestätigung (odt)'},{action:linkToLehrtaetigkeitsbestaetigungPDF,text:'Lehrtätigkeitsbestätigung (pdf)'}]">
                                 Bestätigung drucken
