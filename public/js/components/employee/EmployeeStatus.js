@@ -125,9 +125,9 @@ export const EmployeeStatus = {
         return {statusList};
     },
     template: `
-    <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2" >
+    <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2 mt-auto" >
       <template v-for="item in statusList">
-        <span class="badge me-2" :class="(item?.css != undefined) ? item.css : 'bg-secondary'" >{{ item.text }}</span>
+        <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary'" >{{ item.text }}</span>
       </template>
     </div>   
    `
