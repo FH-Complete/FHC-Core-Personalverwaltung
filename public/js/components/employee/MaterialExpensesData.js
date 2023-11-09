@@ -318,7 +318,7 @@ export const MaterialExpensesData = {
         <template #body>
             <form class="row g-3" ref="materialDataFrm">
                             
-                <div class="col-md-8">
+                <div class="col-md-4">
                     <label for="sachaufwandtyp_kurzbz" class="form-label">{{ t('global','typ') }}</label><br>
                     <select v-if="!readonly" id="sachaufwandtyp_kurzbz" v-model="currentValue.sachaufwandtyp_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option v-for="(item, index) in types" :value="item.sachaufwandtyp_kurzbz">
@@ -327,24 +327,23 @@ export const MaterialExpensesData = {
                     </select>
                     <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sachaufwandtyp_kurzbz" :value="currentValue.sachaufwandtyp_kurzbz">
                 </div>
-                <div class="col-md-4"></div>
                 <!--  -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
                     <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validBeginn(currentValue.beginn) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.beginn">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="ende" class="form-label">{{ t('global','bis') }}</label>
                     <input type="date" :readonly="readonly" @blur="frmState.endeBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.ende">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                 </div>
                 <!-- -->
-                <div class="col-md-8">
+                <div class="col-md-10">
                     <label for="uid" class="form-label">{{ t('global','anmerkung') }}</label>
                     <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.anmerkung">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                 </div>
                 
                 <!-- changes -->
@@ -355,11 +354,8 @@ export const MaterialExpensesData = {
             </form>
         </template>
         <template #footer>
-            <button type="button" class="btn btn-secondary" @click="hideModal()">
-                {{ t('ui','abbrechen') }}
-            </button>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-                {{ t('ui','ok') }}
+                {{ t('ui','speichern') }}
             </button>
         </template>
 

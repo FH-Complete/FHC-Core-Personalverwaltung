@@ -493,22 +493,20 @@ export const JobFunction = {
                 </div>
                 <div class="col-md-4"></div>
                 <!-- -->
-                <div class="col-md-8">
+                <div class="col-md-2">
                     <label for="uid" class="form-label">{{ t('person','wochenstunden') }}</label>
                     <input type="number"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.wochenstunden">
                 </div>
-                <div class="col-md-4">
-                </div>
                 <!--  -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
                     <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !notEmpty(currentValue.datum_von) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.datum_von">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="ende" class="form-label">{{ t('global','bis') }}</label>
                     <input type="date" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.datum_bis">                    
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                 </div>
                 <!-- -->
                 <div class="col-md-8">
@@ -527,11 +525,8 @@ export const JobFunction = {
             </form>
         </template>
         <template #footer>
-            <button type="button" class="btn btn-secondary" @click="hideModal()">
-                {{ t('ui','abbrechen') }}
-            </button>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-                {{ t('ui','ok') }}
+                {{ t('ui','speichern') }}
             </button>
         </template>
 

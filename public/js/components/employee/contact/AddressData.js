@@ -394,11 +394,8 @@ export const AddressData = {
 
             </template>
             <template #footer>
-                <button type="button" class="btn btn-secondary" @click="hideModal()">
-                    {{ t('ui','abbrechen') }}
-                </button>
                 <button type="button" class="btn btn-primary" @click="okHandler()" >
-                    {{ t('ui','ok') }}
+                    {{ t('ui','speichern') }}
                 </button>
             </template>
         </Modal>

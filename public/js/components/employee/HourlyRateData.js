@@ -330,7 +330,7 @@ export const HourlyRateData = {
 		<template #body>
 			<form class="row g-3" ref="houryrateDataFrm">
 							
-				<div class="col-md-8">
+				<div class="col-md-4">
 					<label for="stundensatztyp" class="required form-label">{{ t('global','typ') }}</label><br>
 					<select v-if="!readonly" id="stundensatztyp" @blur="frmState.typBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.stundensatztyp) && frmState.typBlurred}" v-model="currentValue.stundensatztyp" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option v-for="(item, index) in types" :value="item.stundensatztyp">
@@ -339,8 +339,7 @@ export const HourlyRateData = {
 					</select>
 					<input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="stundensatztyp" :value="currentValue.stundensatztyp">
 				</div>
-				<div class="col-md-4"></div>
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
 					<datepicker 
 						:readonly="readonly"
@@ -356,7 +355,7 @@ export const HourlyRateData = {
 						model-type="yyyy-MM-dd"
 					></datepicker>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<label for="ende" class="form-label">{{ t('global','bis') }}</label>
 					<datepicker 
 						:readonly="readonly"
@@ -371,7 +370,7 @@ export const HourlyRateData = {
 						model-type="yyyy-MM-dd"
 					></datepicker>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-2">
 				</div>
 				<!-- -->
 			   <div class="col-md-4">
@@ -398,11 +397,8 @@ export const HourlyRateData = {
 			</form>
 		</template>
 		<template #footer>
-			<button type="button" class="btn btn-secondary" @click="hideModal()">
-				{{ t('ui','abbrechen') }}
-			</button>
 			<button type="button" class="btn btn-primary" @click="okHandler()" >
-				{{ t('ui','ok') }}
+				{{ t('ui','speichern') }}
 			</button>
 		</template>
 
