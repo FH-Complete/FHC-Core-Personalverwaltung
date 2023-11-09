@@ -573,7 +573,7 @@ export const EmployeeContract = {
                     <div class="d-flex justify-content-end mb-2">
                         <div class="me-2"><span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></div>
                         <div v-if="!isCurrentDate"><span class="badge badge-sm bg-warning me-1">Anzeigedatum ist nicht aktueller Tag</span></div> 
-                        <div><span class="badge badge-sm me-1 border border-secondary text-black-50" v-if="!isFetching"><i class="fa fa-solid fa-circle" :class="{'text-success': activeDV.length > 0, 'text-danger': activeDV.length == 0}"></i>&nbsp;{{ activeDV.length }} aktiv zu gewähltem Datum</span></div> 
+                        <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum</span></div> 
                         <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
                     </div>
                     <div class="d-flex">
