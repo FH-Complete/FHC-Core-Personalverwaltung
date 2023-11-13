@@ -1,14 +1,14 @@
 <?php
 
 
-class Gehaltsabrechnung_model extends DB_Model
+class Gehaltshistorie_model extends DB_Model
 {
 
     public function __construct()
 	{
 		parent::__construct();
-		$this->dbTable = 'hr.tbl_gehaltsabrechnung';
-		$this->pk = 'gehaltsabrechnung_id';
+		$this->dbTable = 'hr.tbl_gehaltshistorie';
+		$this->pk = 'gehaltshistorie_id';
 	}
 	
     public function getEncryptedColumns(): array
