@@ -115,9 +115,8 @@ export default {
 		};
 
 		const employeesTabulatorOptions = {
-			maxHeight: "100%",
-			minHeight: 50,
-			layout: 'fitDataFill',
+			height: "100%",
+			layout: 'fitColumns',
                         footerElement: '<div><span id="search_count"></span> von <span id="total_count"></span></div>',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
