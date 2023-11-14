@@ -43,7 +43,7 @@ class GehaltsLib
 		if (!is_null($oe_kurzbz) && strtolower($oe_kurzbz) !== "null")
 			$where .= ' AND dienstverhaeltnis.oe_kurzbz =' . $this->_ci->db->escape($oe_kurzbz);
 
-		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where);
+		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, $this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
 
 		if (isError($result)) return $result;
 
@@ -123,8 +123,9 @@ class GehaltsLib
 		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
 		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);
 		$where .= " AND betrag = " . $this->_ci->db->escape($bestandteil->betrag_valorisiert);
+		$where .= " AND gehaltsbestandteil_id = " . $this->_ci->db->escape($bestandteil->gehaltsbestandteil_id);
 
-		$result = $this->_ci->GehaltshistorieModel->loadWhere($where);
+		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, $this->_ci->GehaltshistorieModel->getEncryptedColumns());
 
 		if (isError($result)) return $result;
 
@@ -149,7 +150,8 @@ class GehaltsLib
 				'betrag' => $bestandteil->betrag_valorisiert,
 				'gehaltsbestandteil_id' => $bestandteil->gehaltsbestandteil_id,
 				'mitarbeiter_uid' => $bestandteil->mitarbeiter_uid
-			)
+			),
+			$this->_ci->GehaltshistorieModel->getEncryptedColumns()
 		);
 
 		if (isError($result)) return $result;
