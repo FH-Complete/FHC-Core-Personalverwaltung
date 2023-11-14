@@ -48,9 +48,7 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oestdkst'),
-                uuid.get_uuidbyname('oediszpl'),
-                uuid.get_uuidbyname('oefachl')
+                uuid.get_uuidbyname('oediszpl')
               ]
             }
           ]
@@ -94,22 +92,6 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('oestdkst')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oestdkst'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'kstzuordnung'
-      }
-    },
     [uuid.get_uuidbyname('oediszpl')]: {
       type: 'vertragsbestandteilfunktion',
       guioptions: {
@@ -124,20 +106,6 @@ export default {
       },
       data: {
         funktion: 'oezuordnung'
-      }
-    },
-    [uuid.get_uuidbyname('oefachl')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oefachl'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'fachzuordnung'
       }
     }
   }

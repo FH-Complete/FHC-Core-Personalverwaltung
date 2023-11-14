@@ -48,9 +48,8 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oestdkst'),
-                uuid.get_uuidbyname('oediszpl'),
-                uuid.get_uuidbyname('oefachl')
+                uuid.get_uuidbyname('oestdkst'),  
+                uuid.get_uuidbyname('oediszpl')
               ]
             }
           ]
@@ -124,20 +123,6 @@ export default {
       },
       data: {
         funktion: 'oezuordnung'
-      }
-    },
-    [uuid.get_uuidbyname('oefachl')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oefachl'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'fachzuordnung'
       }
     }
   }
