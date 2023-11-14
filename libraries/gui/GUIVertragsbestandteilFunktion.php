@@ -145,6 +145,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 		if( intval($this->vbsinstance->getVertragsbestandteil_id()) > 0 ) 
 		{
 			$this->data['benutzerfunktionid'] = $this->vbsinstance->getBenutzerfunktion_id();
+			$this->data['mode'] = 'bestehende';
 		}
 	}
 }
