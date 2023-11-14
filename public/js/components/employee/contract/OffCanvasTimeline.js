@@ -29,11 +29,13 @@ export const OffCanvasTimeline = {
         const numberFormat = new Intl.NumberFormat();
         const selectedVBSTypen = Vue.ref([]);
         const selectedGBSTypen = Vue.ref([]);
+        const vertragsarten = Vue.inject('vertragsarten');
         const vertragsbestandteiltypen = Vue.inject('vertragsbestandteiltypen');
         const gehaltstypen = Vue.inject('gehaltstypen');        
 
         const formatDate = (ds) => {
-            var d = new Date(ds);
+            if (!ds) return ""
+            var d = new Date(ds)
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
@@ -264,6 +266,11 @@ export const OffCanvasTimeline = {
             })
         }
 
+        const formatVertragsart = (item) => {
+            let va = vertragsarten.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
@@ -275,7 +282,7 @@ export const OffCanvasTimeline = {
             courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, 
             title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden, 
             selectedVBSTypen, vertragsbestandteiltypen, selectedGBSTypen, gehaltstypen,              
-            showAllDVChecked, colorPalette,
+            showAllDVChecked, colorPalette, formatVertragsart,
         }
      },
      template: `
@@ -291,7 +298,19 @@ export const OffCanvasTimeline = {
         </div>
         <div class="offcanvas-body">
 
-                <div class="card flex justify-content-center" style="border:0">
+                <ul class="list-group mb-1">
+                    <li class="list-group-item py-1" v-for="(dv, index) in alldv"  :style="{ 'border-left': '5px solid ' + colorPalette[index] }" >
+                        {{ formatVertragsart(dv.vertragsart_kurzbz) }}/{{dv.oe_bezeichnung}}, {{ formatDate(dv.von) }} - {{ formatDate(dv.bis) }}
+                        <span v-if="dv.dienstverhaeltnis_id==curdv.dienstverhaeltnis_id"> (ausgewähltes DV)</span>
+                    </li>
+                </ul>
+
+                <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="showAllDVChecked" v-model="showAllDVChecked">
+                            <label class="form-check-label" for="showAllDVChecked">alle DV anzeigen</label>
+                </div>
+                
+                <div class="card flex justify-content-center mb-5" style="border:0">
                     <p-multiselect v-model="selectedVBSTypen" 
                         :options="vertragsbestandteiltypen" optionLabel="label"                         
                         display="chip" placeholder="Filter Vertragsbestandteile" 
@@ -315,11 +334,9 @@ export const OffCanvasTimeline = {
                         </template>
                     </p-multiselect>   
 
-                    <div class="form-check form-switch mb-4">
-                            <input class="form-check-input" type="checkbox" role="switch" id="showAllDVChecked" v-model="showAllDVChecked">
-                            <label class="form-check-label" for="showAllDVChecked">alle DV anzeigen</label>
-                    </div>
+                    
                 
+
                 </div>             
 
                 <p-timeline :value="events">
