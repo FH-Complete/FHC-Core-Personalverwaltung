@@ -1500,9 +1500,10 @@ class Api extends Auth_Controller
             $stichtag = time();
         }
 
-        $date = DateTime::createFromFormat( 'U', $stichtag );
+        $date = DateTime::createFromFormat( 'U', $stichtag); 
+		$date->setTimezone(new DateTimeZone('Europe/Vienna'));
         $datestring = $date->format("Y-m-d");
-
+		
         $data = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
 			intval($dv_id), $datestring);
 
