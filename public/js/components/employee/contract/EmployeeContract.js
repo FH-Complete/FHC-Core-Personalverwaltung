@@ -648,7 +648,7 @@ export const EmployeeContract = {
                                 </button>
                                 
                             </span>
-                        </div>
+                        </div>                        
                 </div>
                 <div class="row pt-md-2" v-if="isCurrentDVActive && dvList?.length">
 
@@ -658,7 +658,7 @@ export const EmployeeContract = {
                                 <h5 class="mb-0">Allgemein</h5>
                             </div>
                             <div class="card-body" style="text-align:left">
-
+     
                                 <form  ref="baseDataFrm" class="row g-3" v-if="currentDV != null">
 
 
@@ -1231,8 +1231,8 @@ export const EmployeeContract = {
     <OffCanvasTimeline
         ref="offCanvasRef"
         @dateSelected="dateSelectedHandler"
-        :curdv="currentDV">
-        :alldv="dvList"
+        :curdv="currentDV"
+        :alldv="dvList">
     </OffCanvasTimeline>
     
     <karenzmodal 

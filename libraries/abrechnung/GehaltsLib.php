@@ -11,15 +11,15 @@ class GehaltsLib
 	{
 		$this->_ci =& get_instance();
 
-		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsabrechnung_model', 'GehaltsabrechnungModel');
+		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltshistorie_model', 'GehaltshistorieModel');
 		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
 		// Loads the DB config to encrypt/decrypt data
-		$this->_ci->GehaltsabrechnungModel->config->load('db_crypt');
+		$this->_ci->GehaltshistorieModel->config->load('db_crypt');
 	}
 
 	public function getBestandteile($date = null, $user = null, $oe_kurzbz = null)
 	{
-		$this->_ci->GehaltsbestandteilModel->addSelect('tbl_gehaltsbestandteil.*');
+		$this->_ci->GehaltsbestandteilModel->addSelect('tbl_gehaltsbestandteil.*, dienstverhaeltnis.mitarbeiter_uid');
 		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_dienstverhaeltnis dienstverhaeltnis', 'dienstverhaeltnis_id');
 		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_mitarbeiter mitarbeiter', 'mitarbeiter_uid');
 		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_benutzer benutzer', 'mitarbeiter.mitarbeiter_uid = benutzer.uid');
@@ -35,16 +35,15 @@ class GehaltsLib
 					OR tbl_gehaltsbestandteil.von IS NULL)
 		";
 
-		if (is_null($user) || $user === "null")
+		if (is_null($user) || strtolower($user) === "null")
 			$where .= ' AND benutzer.aktiv';
 		else
 			$where .= ' AND dienstverhaeltnis.mitarbeiter_uid =' . $this->_ci->db->escape($user);
 
-		if (!is_null($oe_kurzbz) && $oe_kurzbz !== "null")
+		if (!is_null($oe_kurzbz) && strtolower($oe_kurzbz) !== "null")
 			$where .= ' AND dienstverhaeltnis.oe_kurzbz =' . $this->_ci->db->escape($oe_kurzbz);
 
-		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where,
-			$this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
+		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where);
 
 		if (isError($result)) return $result;
 
@@ -59,23 +58,23 @@ class GehaltsLib
 	public function fetchAbgerechnet($dv_id, $from, $to)
 	{
 		/*
-		$this->_ci->GehaltsabrechnungModel->addSelect('sum(betrag)');
-		$this->_ci->GehaltsabrechnungModel->addJoin('hr.tbl_gehaltsbestandteil', 'gehaltsbestandteil_id');
+		$this->_ci->GehaltshistorieModel->addSelect('sum(betrag)');
+		$this->_ci->GehaltshistorieModel->addJoin('hr.tbl_gehaltsbestandteil', 'gehaltsbestandteil_id');
 
 		$date = $this->getDate($date);
 		$where .= 'hr.tbl_gehaltsbestandteil.dienstverhaeltnis_id =' . $this->_ci->db->escape($dv_id);
 		$where .= "
-				AND (((EXTRACT(MONTH FROM tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['month']) .")
-					AND (EXTRACT(YEAR FROM tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['year']) .")))
+				AND (((EXTRACT(MONTH FROM tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']) .")
+					AND (EXTRACT(YEAR FROM tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']) .")))
 		";
 				
 
-		$result = $this->_ci->GehaltsabrechnungModel->loadWhere($where, 
-			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
+		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, 
+			$this->_ci->GehaltshistorieModel->getEncryptedColumns());
 
 		if (isError($result)) return $result;
 
-		if (!hasData($result)) return error("Keine Gehaltsabrechnung gefunden!");
+		if (!hasData($result)) return error("Keine Gehaltshistorie gefunden!");
 
 
  	 $result = $this->execQuery($qry,
@@ -88,54 +87,54 @@ class GehaltsLib
 
 		$qry = "
         SELECT
-            sum(betrag),tbl_gehaltsabrechnung.datum
-        FROM hr.tbl_gehaltsabrechnung JOIN hr.tbl_gehaltsbestandteil USING(gehaltsbestandteil_id)
+            sum(betrag),tbl_gehaltshistorie.datum
+        FROM hr.tbl_gehaltshistorie JOIN hr.tbl_gehaltsbestandteil USING(gehaltsbestandteil_id)
         WHERE hr.tbl_gehaltsbestandteil.dienstverhaeltnis_id = ?
 		AND (
 			  (
-				 EXTRACT(MONTH FROM tbl_gehaltsabrechnung.datum) >= ?
-			     AND EXTRACT(YEAR FROM tbl_gehaltsabrechnung.datum) >= ?
+				 EXTRACT(MONTH FROM tbl_gehaltshistorie.datum) >= ?
+			     AND EXTRACT(YEAR FROM tbl_gehaltshistorie.datum) >= ?
 			  )  AND
 			  (
-				 EXTRACT(MONTH FROM tbl_gehaltsabrechnung.datum) <= ?
-			     AND EXTRACT(YEAR FROM tbl_gehaltsabrechnung.datum) <= ?
+				 EXTRACT(MONTH FROM tbl_gehaltshistorie.datum) <= ?
+			     AND EXTRACT(YEAR FROM tbl_gehaltshistorie.datum) <= ?
 			  )
 		)
-		GROUP BY tbl_gehaltsabrechnung.datum
-		ORDER BY tbl_gehaltsabrechnung.datum
+		GROUP BY tbl_gehaltshistorie.datum
+		ORDER BY tbl_gehaltshistorie.datum
         
         ";		
 
-		$result = $this->_ci->GehaltsabrechnungModel->execReadOnlyQuery(
+		$result = $this->_ci->GehaltshistorieModel->execReadOnlyQuery(
 			$qry,
 			array($dv_id, $from_date['month'], $from_date['year'], $to_date['month'], $to_date['year']),
-			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
+			$this->_ci->GehaltshistorieModel->getEncryptedColumns());
 		
 
 		return $result;
 	}
 
-	public function existsAbrechnung($bestandteil, $date)
+	public function existsGehaltshistorie($bestandteil, $date)
 	{
-		$this->_ci->GehaltsabrechnungModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltsabrechnung.datum) as month');
+		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
 
 		$date = $this->getDate($date);
 
-		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['month']);
-		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltsabrechnung.datum) = ". $this->_ci->db->escape($date['year']);
+		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
+		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);
 		$where .= " AND betrag = " . $this->_ci->db->escape($bestandteil->betrag_valorisiert);
 
-		$result = $this->_ci->GehaltsabrechnungModel->loadWhere($where, 
-			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns());
+		$result = $this->_ci->GehaltshistorieModel->loadWhere($where);
 
 		if (isError($result)) return $result;
 
 		return $result;
 	}
 	
-	public function addAbrechnung($bestandteil, $date)
+	public function addHistorie($bestandteil, $date)
 	{
-		if (is_null($date))
+		
+		if (is_null($date) || strtolower($date) === 'null')
 		{
 			$date = date("Y-m-t");
 		}
@@ -143,14 +142,14 @@ class GehaltsLib
 		{
 			$date = date("Y-m-t", strtotime($date));
 		}
-
-		$result = $this->_ci->GehaltsabrechnungModel->insert(
+		
+		$result = $this->_ci->GehaltshistorieModel->insert(
 			array(
 				'datum' => $date,
 				'betrag' => $bestandteil->betrag_valorisiert,
-				'gehaltsbestandteil_id' => $bestandteil->gehaltsbestandteil_id
-			), 
-			$this->_ci->GehaltsabrechnungModel->getEncryptedColumns()
+				'gehaltsbestandteil_id' => $bestandteil->gehaltsbestandteil_id,
+				'mitarbeiter_uid' => $bestandteil->mitarbeiter_uid
+			)
 		);
 
 		if (isError($result)) return $result;
@@ -160,12 +159,12 @@ class GehaltsLib
 
 	public function deleteAbrechnung($bestandteil)
 	{
-		$ret = $this->_ci->GehaltsabrechnungModel->deleteByGehaltsbestandteilID(
+		$ret = $this->_ci->GehaltshistorieModel->deleteByGehaltsbestandteilID(
 			$bestandteil->getGehaltsbestandteil_id());
 
 		if (isError($ret))
 		{
-			throw new Exception('error deleting Gehaltsabrechnung');
+			throw new Exception('error deleting Gehaltshistorie');
 		}
 
 		return	$ret;
@@ -173,7 +172,7 @@ class GehaltsLib
 	
 	private function getDate($date)
 	{
-		if (is_null($date) || $date === 'null')
+		if (is_null($date) || strtolower($date) === 'null')
 		{
 			$month = date('n');
 			$year = date('Y');
