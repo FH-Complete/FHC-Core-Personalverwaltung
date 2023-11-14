@@ -10,10 +10,19 @@ export default {
   <div class="row g-2 mb-1">
     <div class="col-3 ps-5">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<!--        
         <option value="" selected disabled>Gehaltstyp wählen</option>
         <option value="basisgehalt">Basisgehalt</option>
         <option value="grundgehalt">Grundgehalt</option>
         <option value="zulage">Zulage</option>
+-->        
+        <option
+          v-for="gt in gehaltstypen"
+          :value="gt.value"
+          :selected="isselected(gt.value, this.gehaltstyp)"
+          :disabled="gt.disabled">
+          {{ gt.label }}
+        </option>
       </select>
     </div>
     <div class="col-2">
@@ -74,6 +83,9 @@ export default {
       db_delete: false
     };
   },
+  inject: [
+      'gehaltstypen'
+  ],
   components: {
     'gueltigkeit': gueltigkeit,
     'infos': infos,
@@ -90,6 +102,9 @@ export default {
     this.setDataFromConfig();
   },
   methods: {
+    isselected: function(optvalue, selvalue) {
+      return (optvalue === selvalue);
+    },
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;

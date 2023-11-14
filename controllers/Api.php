@@ -2139,7 +2139,8 @@ EOSQL;
     public function getGehaltstypen()
 	{		
 		$this->GehaltstypModel->resetQuery();
-		$this->GehaltstypModel->addSelect('gehaltstyp_kurzbz AS value, bezeichnung AS label');
+		$this->GehaltstypModel->addSelect('gehaltstyp_kurzbz AS value, '
+			. 'bezeichnung AS label, NOT(aktiv) AS disabled, valorisierung');
 		$this->GehaltstypModel->addOrder('sort', 'ASC');
 		$gehaltstypen = $this->GehaltstypModel->load();
 		if( hasData($gehaltstypen) ) 

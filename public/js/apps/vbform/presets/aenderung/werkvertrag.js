@@ -3,14 +3,14 @@ import uuid from '../../../../helpers/vbform/uuid.js';
 export default {
   type: 'preset',
   guioptions: {
-    id: 'freierdv',
-    label: 'Freier DV',
-    description: 'freier Dienstvertrag',
+    id: 'werkvertrag',
+    label: 'Werkvertrag / Überlassungsvertrag',
+    description: 'Werkvertrag / Überlassungsvertrag',
     for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+        'werkvertrag', 'ueberlassungsvertrag'
     ],
     default_for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+        'werkvertrag', 'ueberlassungsvertrag'
     ]
   },
   children: [

@@ -167,7 +167,7 @@ export default {
           children: []
         }
       ]
-    }
+    },    
   ],
   dv: {
     type: 'dienstverhaeltnis',

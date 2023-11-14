@@ -15,17 +15,43 @@ export default {
       },
       children: [
         {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        },
+        {
           type: 'tab',
           guioptions: {
-            title: 'Allgemein',
-            id: 'allgemein'
+            title: 'Funktionen',
+            id: 'funktionen'
           },
           children: [
             {
-              type: 'dv',
+              type: 'vertragsbestandteillist',
               guioptions: {
+                title: 'Zuordnung',
+                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                errors: [],
+                infos: [],
+                childdefaults: {
+                  guioptions: {
+                    canhavegehaltsbestandteile: false,
+                    disabled: [
+                      'funktion'
+                    ],
+                    hidden: []
+                  },
+                  data: {
+                    funktion: "fachzuordnung"
+                  }
+                }
               },
-              children: []
+              children: [
+                uuid.get_uuidbyname('oestdkst'),
+                uuid.get_uuidbyname('oediszpl'),
+                uuid.get_uuidbyname('oefachl')
+              ]
             }
           ]
         },
@@ -68,5 +94,51 @@ export default {
     }
   },
   vbs: {
+    [uuid.get_uuidbyname('oestdkst')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oestdkst'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'kstzuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oediszpl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oediszpl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'oezuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oefachl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oefachl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'fachzuordnung'
+      }
+    }
   }
 }

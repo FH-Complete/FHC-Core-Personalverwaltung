@@ -3,18 +3,12 @@ import uuid from '../../../../helpers/vbform/uuid.js';
 export default {
   type: 'preset',
   guioptions: {
-    id: 'freierdv',
-    label: 'Freier DV',
-    description: 'freier Dienstvertrag',
-    for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
-    ],
-    default_for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
-    ]
+    id: 'externerlehrender',
+    label: 'externe Lehrende',
+    description: 'freier Dienstvertrag fuer externe Lehrende'
   },
   children: [
-{
+    {
       type: 'tabs',
       guioptions: {
 
@@ -90,7 +84,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: null,
+      vertragsart_kurzbz: 'externerlehrender',
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",
@@ -100,5 +94,51 @@ export default {
     }
   },
   vbs: {
+    [uuid.get_uuidbyname('oestdkst')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oestdkst'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'kstzuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oediszpl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oediszpl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'oezuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oefachl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oefachl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'fachzuordnung'
+      }
+    }
   }
 }

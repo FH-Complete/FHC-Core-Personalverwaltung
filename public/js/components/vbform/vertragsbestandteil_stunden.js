@@ -27,7 +27,7 @@ export default {
           </option>
         </select>
       </div>
-      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
+      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded" @gueltigkeitchanged="gueltigkeitchanged"></gueltigkeit>
       <div class="col-1">
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
@@ -65,6 +65,9 @@ export default {
     this.setDataFromConfig();
   },
   methods: {
+    gueltigkeitchanged: function(payload) {
+      console.log(JSON.stringify(payload));  
+    },
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
     },

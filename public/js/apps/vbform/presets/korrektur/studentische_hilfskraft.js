@@ -3,18 +3,18 @@ import uuid from '../../../../helpers/vbform/uuid.js';
 export default {
   type: 'preset',
   guioptions: {
-    id: 'freierdv',
-    label: 'Freier DV',
-    description: 'freier Dienstvertrag',
+    id: 'studhilfskraft',
+    label: 'Studentische Hilfskraft',
+    description: 'Echter DV für Studentische Hilfskräfte',
     for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+        'studentischehilfskr'
     ],
     default_for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+        'studentischehilfskr'
     ]
   },
   children: [
-{
+    {
       type: 'tabs',
       guioptions: {
 
@@ -53,11 +53,7 @@ export default {
                   }
                 }
               },
-              children: [
-                uuid.get_uuidbyname('oestdkst'),
-                uuid.get_uuidbyname('oediszpl'),
-                uuid.get_uuidbyname('oefachl')
-              ]
+              children: []
             }
           ]
         },
@@ -90,7 +86,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: null,
+      vertragsart_kurzbz: 'studentischehilfskr',
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",
