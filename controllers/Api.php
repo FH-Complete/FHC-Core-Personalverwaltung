@@ -595,7 +595,7 @@ class Api extends Auth_Controller
 
     private function gbtChartDataAbgerechnet($from_date, $to_date, $dv_id)
     {
-        $gbtList = $this->GehaltsabrechnungLib->fetchAbgerechnet($dv_id, $from_date, $to_date, false);
+        $gbtList = $this->GehaltsabrechnungLib->fetchAbgerechnet($dv_id, $from_date, $to_date);
 
         return $gbtList;
     }

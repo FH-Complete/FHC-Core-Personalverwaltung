@@ -90,16 +90,7 @@ class GehaltsLib
             sum(betrag),tbl_gehaltshistorie.datum
         FROM hr.tbl_gehaltshistorie JOIN hr.tbl_gehaltsbestandteil USING(gehaltsbestandteil_id)
         WHERE hr.tbl_gehaltsbestandteil.dienstverhaeltnis_id = ?
-		AND (
-			  (
-				 EXTRACT(MONTH FROM tbl_gehaltshistorie.datum) >= ?
-			     AND EXTRACT(YEAR FROM tbl_gehaltshistorie.datum) >= ?
-			  )  AND
-			  (
-				 EXTRACT(MONTH FROM tbl_gehaltshistorie.datum) <= ?
-			     AND EXTRACT(YEAR FROM tbl_gehaltshistorie.datum) <= ?
-			  )
-		)
+		AND tbl_gehaltshistorie.datum BETWEEN ? AND ?
 		GROUP BY tbl_gehaltshistorie.datum
 		ORDER BY tbl_gehaltshistorie.datum
         
@@ -107,10 +98,9 @@ class GehaltsLib
 
 		$result = $this->_ci->GehaltshistorieModel->execReadOnlyQuery(
 			$qry,
-			array($dv_id, $from_date['month'], $from_date['year'], $to_date['month'], $to_date['year']),
+			array($dv_id, $from, $to),
 			$this->_ci->GehaltshistorieModel->getEncryptedColumns());
 		
-
 		return $result;
 	}
 
