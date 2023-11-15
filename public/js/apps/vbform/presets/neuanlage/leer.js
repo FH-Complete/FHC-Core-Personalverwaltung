@@ -10,7 +10,7 @@ export default {
   children: [
     {
       type: 'dv',
-	    guioptions: {
+      guioptions: {
       },
       children: []
     },
@@ -19,6 +19,60 @@ export default {
       guioptions: {
       },
       children: [
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Kündigungsfrist',
+            vertragsbestandteiltyp: 'vertragsbestandteilkuendigungsfrist'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Befristung',
+            vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+            filter: {
+              freitexttyp: [
+                "befristung"
+              ]
+            },
+            childdefaults: {
+              guioptions: {
+                canhavegehaltsbestandteile: false,
+                disabled: [
+                  'freitexttyp'
+                ],
+                hidden: [
+                  'titel',
+                  'freitext'
+                ]
+              },
+              data: {
+                freitexttyp: "befristung",
+                titel: "Befristung",
+                freitext: "befristeter Dienstvertrag"
+              }
+            }
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Urlaubsanspruch',
+            vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
+          },
+          children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Karenz',
+            vertragsbestandteiltyp: 'vertragsbestandteilkarenz'
+          },
+          children: []
+        },
         {
           type: 'vertragsbestandteillist',
           guioptions: {
@@ -38,37 +92,81 @@ export default {
         {
           type: 'vertragsbestandteillist',
           guioptions: {
-            title: 'Kündigungsfrist',
-            vertragsbestandteiltyp: 'vertragsbestandteilkuendigungsfrist'
+            title: 'All-In',
+            vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+            filter: {
+              freitexttyp: [
+                'allin'
+              ]
+            },
+            childdefaults: {
+              guioptions: {
+                canhavegehaltsbestandteile: true,
+                disabled: [
+                  'freitexttyp'
+                ],
+                hidden: [
+                  'titel',
+                  'freitext'
+                ]
+              },
+              data: {
+                freitexttyp: "allin",
+                titel: "All-In",
+                freitext: "All-In Vertrag"
+              }
+            }
           },
           children: []
         },
         {
           type: 'vertragsbestandteillist',
           guioptions: {
-            title: 'Urlaubsanspruch',
-            vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
+            title: 'Zuordnung',
+            vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+            filter: 'zuordnung',
+            errors: [],
+            infos: [],
+            childdefaults: {
+              guioptions: {
+                canhavegehaltsbestandteile: false,
+                disabled: [],
+                hidden: []
+              },
+              data: {}
+            }
           },
           children: []
         },
         {
           type: 'vertragsbestandteillist',
           guioptions: {
-            title: 'Funktionen',
-            vertragsbestandteiltyp: 'vertragsbestandteilfunktion'
+            title: 'Funktion',
+            vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+            filter: 'funktion',
+            errors: [],
+            infos: []
           },
           children: []
         },
         {
           type: 'vertragsbestandteillist',
           guioptions: {
-            title: 'Sonstiges',
-            vertragsbestandteiltyp: 'vertragsbestandteilfreitext'
+            title: 'Zusatzvereinbarungen',
+            vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+            filter: {
+              freitexttyp: [
+                "zusatzvereinbarung", 
+                "sonstiges"
+              ]
+            },
+            errors: [],
+            infos: []
           },
           children: []
         }
       ]
-    }
+    },    
   ],
   dv: {
     type: 'dienstverhaeltnis',

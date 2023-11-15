@@ -9,7 +9,9 @@ export default {
     for_vertragsart_kurzbz: [
         'echterdv'
     ],
-    default_for_vertragsart_kurzbz: 'echterdv'
+    default_for_vertragsart_kurzbz: [
+        'echterdv'
+    ]
   },
   children: [
     {

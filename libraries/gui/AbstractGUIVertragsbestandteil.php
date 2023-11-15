@@ -197,11 +197,17 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
     }
 
 	public function removeDeletedGbs() {
+		$reindex = false;
 		foreach( $this->gbs as $idx => $gb ) {
 			if( $gb->hastoBeDeleted() ) {
 				unset($this->gbs[$idx]);
+				$reindex = true;
 			}
-		}		
+		}
+		if($reindex)
+		{
+			$this->gbs = array_values($this->gbs);
+		}
 	}
 	
 	public function validate()

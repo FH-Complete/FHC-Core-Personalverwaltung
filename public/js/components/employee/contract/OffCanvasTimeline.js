@@ -1,28 +1,41 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
+
 export const OffCanvasTimeline = {
      components: {
         "p-timeline": primevue.timeline,
+        "p-multiselect": primevue.multiselect,
      },
      props: {
         uid: String,
         curdv: Object,
+        alldv: Array,
      },
      //expose: ['show', 'hide', 'toggle'],
      emits: [ 'dateSelected' ],
      setup( props, { expose, emit } ) {
 
+        const colorPalette = ["#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"];
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Timeline");
+        const showAllDVChecked = Vue.ref(false);
         const currentUID = Vue.toRefs(props).uid
-        const events =Vue.ref([])
+        const vbsData = Vue.ref();
+        const events =Vue.ref([]);
+        const isHidden = Vue.ref(true);
         let offCanvasEle = Vue.ref(null);
         let thisOffCanvasObj;
         const numberFormat = new Intl.NumberFormat();
+        const selectedVBSTypen = Vue.ref([]);
+        const selectedGBSTypen = Vue.ref([]);
+        const vertragsarten = Vue.inject('vertragsarten');
+        const vertragsbestandteiltypen = Vue.inject('vertragsbestandteiltypen');
+        const gehaltstypen = Vue.inject('gehaltstypen');        
 
         const formatDate = (ds) => {
-            var d = new Date(ds);
+            if (!ds) return ""
+            var d = new Date(ds)
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
@@ -46,19 +59,42 @@ export const OffCanvasTimeline = {
             hide();
         }
 
+        const hiddenCanvasHandler = () => {
+            isHidden.value = true;
+        }
+
+
+        const shownCanvasHandler = () => {
+            isHidden.value = false;
+        }
+
         Vue.onMounted(() => {
             thisOffCanvasObj = new bootstrap.Offcanvas(offCanvasEle.value);
+            offCanvasEle.value.addEventListener('hidden.bs.offcanvas', hiddenCanvasHandler);
+            offCanvasEle.value.addEventListener('shown.bs.offcanvas', shownCanvasHandler);
         })
 
-        function show() {
-            Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
-                    .then((response) => {
-                        console.log(response);
-                        events.value = generateTimeline(response.data.data);
-                    });
+        Vue.onBeforeUnmount(() => {
+            offCanvasEle.value.removeEventListener('hidden.bs.offcanvas', hiddenCanvasHandler);
+            offCanvasEle.value.removeEventListener('shown.bs.offcanvas', shownCanvasHandler);
+        })
 
-            thisOffCanvasObj.show();
+
+        async function show() {
+            //let response = await Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
+            //console.log('curdv: ',response.data)
+            vbsData.value = []
+                        
+            for (const dv of props.alldv){
+                let response = await Vue.$fhcapi.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
+                console.log('alldv: ',response.data)
+                vbsData.value.push(response.data.data)
+            }            
+
+            events.value = generateTimeline(vbsData.value)
+            thisOffCanvasObj.show()
         }
+
         function hide() {
             thisOffCanvasObj.hide();
         }
@@ -129,37 +165,14 @@ export const OffCanvasTimeline = {
             return gbstypMap[gbsTyp] !== undefined ? gbstypMap[gbsTyp] : gbsTyp;
         }
 
+        Vue.watch([selectedVBSTypen, selectedGBSTypen, showAllDVChecked], ([id,uid]) => {
+            events.value = generateTimeline(vbsData.value);                     
+        });
+
         function generateTimeline(data) {
             let timeline = {};
-
-            data.forEach(vbs => {
-
-                if (!timeline[vbs.von]) {
-                    timeline[vbs.von] = { date: vbs.von, bestandteile: []}
-                }
-                timeline[vbs.von].bestandteile.push({ typ: 'vbs', start: true, status: getBestandteilLabel(vbs), vbs})
-
-                if (vbs.bis != null) {
-                    if (!timeline[vbs.bis]) {
-                        timeline[vbs.bis] = { date: vbs.bis, bestandteile: []}
-                    }
-                    timeline[vbs.bis].bestandteile.push({ typ: 'vbs', start: false, status: getBestandteilLabel(vbs), vbs})
-                }
-
-                vbs.gehaltsbestandteile.forEach( gbs => {
-                    if (!timeline[gbs.von]) {
-                        timeline[gbs.von] = { date: gbs.von, bestandteile: []}
-                    }
-                    timeline[gbs.von].bestandteile.push({ typ: 'gbs', start: true,status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), gbs})
-
-                    if (gbs.bis != null) {
-                        if (!timeline[gbs.bis]) {
-                            timeline[gbs.bis] = { date: gbs.bis, bestandteile: []}
-                        }
-                        timeline[gbs.bis].bestandteile.push({ typ: 'gbs', start: false, status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), gbs})
-                    }
-                })
-            });
+            
+            data.forEach( (item, index) => mergeTimelineData(item, timeline, index))
 
             return Object.values(timeline).sort((a, b) => {
                 const date1 = new Date(a.date);
@@ -171,22 +184,105 @@ export const OffCanvasTimeline = {
 
         }
 
+        function mergeTimelineData(data, timeline, index) {
+            let filterActive = selectedVBSTypen.value.length > 0 || selectedGBSTypen.value.length > 0  || !showAllDVChecked
+            let isVBSFiltered = (vbs) => selectedVBSTypen.value.find(vbsType => vbsType.value == vbs.vertragsbestandteiltyp_kurzbz)
+            let isGBSFiltered = (gbs) => selectedGBSTypen.value.find(gbsType => gbsType.value == gbs.gehaltstyp_kurzbz)
+
+            data.forEach(vbs => {
+
+                if (!filterActive || (filterActive && isVBSFiltered(vbs))) {
+
+                    if (showAllDVChecked.value || (!showAllDVChecked.value && vbs.dienstverhaeltnis_id == props.curdv.dienstverhaeltnis_id)) {
+
+                        if (!timeline[vbs.von]) {
+                            timeline[vbs.von] = { date: vbs.von, bestandteile: []}
+                        }
+                        
+                        timeline[vbs.von].bestandteile.push({ 
+                            dienstverhaeltnis_id: vbs.dienstverhaeltnis_id, 
+                            index: index,
+                            typ: 'vbs', 
+                            start: true, 
+                            status: getBestandteilLabel(vbs), 
+                            vbs, kurzbz: vbs.vertragsbestandteiltyp_kurzbz
+                        })
+
+
+                        if (vbs.bis != null) {
+                            if (!timeline[vbs.bis]) {
+                                timeline[vbs.bis] = { date: vbs.bis, bestandteile: []}
+                            }
+                            timeline[vbs.bis].bestandteile.push({ 
+                                dienstverhaeltnis_id: vbs.dienstverhaeltnis_id, 
+                                index: index,
+                                typ: 'vbs', 
+                                start: false, 
+                                status: getBestandteilLabel(vbs), 
+                                vbs, kurzbz: vbs.vertragsbestandteiltyp_kurzbz
+                            })
+                        }
+                    }
+                }
+                
+                vbs.gehaltsbestandteile.forEach( gbs => {
+
+                    if (!filterActive || (filterActive && isGBSFiltered(gbs))) {
+
+                        if (showAllDVChecked.value || (!showAllDVChecked.value && vbs.dienstverhaeltnis_id == props.curdv.dienstverhaeltnis_id)) {
+
+                            if (!timeline[gbs.von]) {
+                                timeline[gbs.von] = { date: gbs.von, bestandteile: []}
+                            }
+                            timeline[gbs.von].bestandteile.push({ 
+                                dienstverhaeltnis_id: gbs.dienstverhaeltnis_id, 
+                                index: index,
+                                typ: 'gbs', 
+                                start: true,
+                                status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), 
+                                gbs, 
+                                kurzbz: gbs.gehaltstyp_kurzbz
+                            })
+                        
+                            if (gbs.bis != null) {
+                                if (!timeline[gbs.bis]) {
+                                    timeline[gbs.bis] = { date: gbs.bis, bestandteile: []}
+                                }
+                                timeline[gbs.bis].bestandteile.push({ 
+                                    dienstverhaeltnis_id: gbs.dienstverhaeltnis_id, 
+                                    index: index,
+                                    typ: 'gbs', 
+                                    start: false, 
+                                    status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), 
+                                    gbs, 
+                                    kurzbz: gbs.gehaltstyp_kurzbz
+                                })
+                            }
+
+                        }
+                    }
+                })
+                
+            })
+        }
+
+        const formatVertragsart = (item) => {
+            let va = vertragsarten.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
 
-        // dummy events
-        /*const events = [
-            {status: 'Funktionsänderung', date: '1/2/2023', icon: 'pi pi-shopping-cart', color: '#9C27B0', image: 'game-controller.jpg'},
-            {status: 'Valorisierung (2,5%), Gehalt: € 3121,13', date: '1/9/2022', icon: 'pi pi-cog', color: '#673AB7'},
-            {status: 'Valorisierung (1,5%), Gehalt: € 3150', date: '1/9/2021', icon: 'pi pi-shopping-cart', color: '#FF9800'},
-            {status: 'Eintritt, Gehalt: € 3045', date: '16/10/2020', icon: 'pi pi-check', color: '#607D8B'}
-        ]*/
-
+        // expose functions
         expose({show, hide, toggle});
 
         return {
-            courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, title, currentUID, events, offCanvasEle, show, hide, toggle,
+            courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, 
+            title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden, 
+            selectedVBSTypen, vertragsbestandteiltypen, selectedGBSTypen, gehaltstypen,              
+            showAllDVChecked, colorPalette, formatVertragsart,
         }
      },
      template: `
@@ -194,13 +290,55 @@ export const OffCanvasTimeline = {
         ref="offCanvasEle"
         tabindex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
 
-        <button v-if="!readonly" type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="show()">Vertragshistorie</button>
+        <button type="button" id="btnContractHistory" class="offcanvas-btn btn btn-sm btn-secondary" @click="isHidden ? show() : hide()">Vertragshistorie</button>
 
         <div class="offcanvas-header">
             <h5 id="offcanvasRightLabel">Vertragshistorie</h5>
             <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
+
+                <ul class="list-group mb-1">
+                    <li class="list-group-item py-1" v-for="(dv, index) in alldv"  :style="{ 'border-left': '5px solid ' + colorPalette[index] }" >
+                        {{ formatVertragsart(dv.vertragsart_kurzbz) }}/{{dv.oe_bezeichnung}}, {{ formatDate(dv.von) }} - {{ formatDate(dv.bis) }}
+                        <span v-if="dv.dienstverhaeltnis_id==curdv.dienstverhaeltnis_id"> (ausgewähltes DV)</span>
+                    </li>
+                </ul>
+
+                <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" role="switch" id="showAllDVChecked" v-model="showAllDVChecked">
+                            <label class="form-check-label" for="showAllDVChecked">alle DV anzeigen</label>
+                </div>
+                
+                <div class="card flex justify-content-center mb-5" style="border:0">
+                    <p-multiselect v-model="selectedVBSTypen" 
+                        :options="vertragsbestandteiltypen" optionLabel="label"                         
+                        display="chip" placeholder="Filter Vertragsbestandteile" 
+                        appendTo="self" 
+                        class="mb-1">
+                        <template #optiongroup="slotProps">
+                            <div class="flex align-items-center">                            
+                                <div>{{ slotProps.option.label }}</div>
+                            </div>
+                        </template>
+                    </p-multiselect>   
+                    <p-multiselect v-model="selectedGBSTypen" 
+                        :options="gehaltstypen" optionLabel="label"                         
+                        display="chip" placeholder="Filter Gehaltsbestandteile" 
+                        appendTo="self" 
+                        class="mb-1">
+                        <template #optiongroup="slotProps">
+                            <div class="flex align-items-center">                            
+                                <div>{{ slotProps.option.label }}</div>
+                            </div>
+                        </template>
+                    </p-multiselect>   
+
+                    
+                
+
+                </div>             
+
                 <p-timeline :value="events">
                     <template #content="slotProps">
                         <div style="font-weight:bold; cursor: pointer" @click="dateSelected(slotProps.item.date)">{{formatDate(slotProps.item.date)}}
@@ -208,16 +346,16 @@ export const OffCanvasTimeline = {
                         </div>
 
                         <template v-for="bestandteil in slotProps.item.bestandteile">
-                            <div class="card mb-1">
+                            <div class="card mb-1" :style="{ 'border-left': '5px solid ' + colorPalette[bestandteil.index] }" >
                                 <div class="row g-0">
                                     <div class="col-md-4" style="background-color:#eee">
-                                        <div class="card-body rounded-start">
+                                        <div class="card-body rounded-start pt-1 pb-1">
                                         {{bestandteil.status}}<br/>
                                         <span v-if="!bestandteil.start">(beendet)</span>
                                         </div>
                                     </div>
                                     <div class="col-md-8">
-                                        <div class="card-body ">
+                                        <div class="card-body pt-1 pb-1">
                                             <div v-if="bestandteil.typ == 'vbs'">
                                                 <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='stunden'">
                                                     {{ formatNumber(bestandteil.vbs.wochenstunden) }}h

@@ -47,7 +47,10 @@ class GUIValidationHelper
 		foreach( $vbs as $vbmapper )
 		{
 			$vb = $vbmapper->getVbsinstance();
-			$this->checkIfContains($dv, $vb);
+			if( !$vbmapper->hasToBeDeleted() )
+			{
+				$this->checkIfContains($dv, $vb);
+			}			
 			$vbmapper->validate();
 			if( $vbmapper->getHasGBS() )
 			{
@@ -57,7 +60,10 @@ class GUIValidationHelper
 				foreach($gbs as $gbmapper) 
 				{
 					$gb = $gbmapper->getGbsInstance();
-					$this->checkIfContains($vb, $gb);
+					if( !$gbmapper->hasToBeDeleted() )
+					{
+						$this->checkIfContains($vb, $gb);
+					}
 					$gbmapper->validate();
 				}
 			}
@@ -131,6 +137,10 @@ class GUIValidationHelper
 	{
 		foreach($vbs as $vbmapper) 
 		{
+			if( $vbmapper->hasToBeDeleted() )
+			{
+				continue;
+			}
 			$vb = $vbmapper->getVbsinstance();
 			$vb instanceof vertragsbestandteil\Vertragsbestandteil;
 			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'freitext' )
@@ -156,6 +166,10 @@ class GUIValidationHelper
 		$this->gbsbytype = array();
 		foreach($gbs as $gbmapper) 
 		{
+			if( $gbmapper->hasToBeDeleted() )
+			{
+				continue;
+			}
 			$gb = $gbmapper->getGbsInstance();
 			$gb instanceof vertragsbestandteil\Gehaltsbestandteil;
 			if( !isset($this->gbsbytype[$gb->getGehaltstyp_kurzbz()]) )

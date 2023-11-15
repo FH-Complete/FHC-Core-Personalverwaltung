@@ -238,7 +238,7 @@ export default {
         return;  
       }
       const response = await Vue.$fhcapi.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
-      const benutzerfunktionen = response.data.retval;
+      const benutzerfunktionen = (response.error === 1) ? [] : response.data.retval;
       benutzerfunktionen.unshift({
         value: '',
         label: 'Benutzerfunktion wählen',

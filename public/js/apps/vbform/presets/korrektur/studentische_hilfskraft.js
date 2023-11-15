@@ -5,7 +5,13 @@ export default {
   guioptions: {
     id: 'studhilfskraft',
     label: 'Studentische Hilfskraft',
-    description: 'Echter DV für Studentische Hilfskräfte'
+    description: 'Echter DV für Studentische Hilfskräfte',
+    for_vertragsart_kurzbz: [
+        'studentischehilfskr'
+    ],
+    default_for_vertragsart_kurzbz: [
+        'studentischehilfskr'
+    ]
   },
   children: [
     {
@@ -47,10 +53,7 @@ export default {
                   }
                 }
               },
-              children: [
-                uuid.get_uuidbyname('oestdkst'),  
-                uuid.get_uuidbyname('oediszpl')
-              ]
+              children: []
             }
           ]
         },
@@ -93,37 +96,5 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('oestdkst')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oestdkst'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'kstzuordnung'
-      }
-    },
-    [uuid.get_uuidbyname('oediszpl')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oediszpl'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'oezuordnung'
-      }
-    }
   }
 }

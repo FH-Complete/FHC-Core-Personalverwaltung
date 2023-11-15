@@ -43,6 +43,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 						"dienstverhaeltnisid" => "",
 						"unternehmen" => "",
 						"vertragsart_kurzbz" => "",
+						"checkoverlap"=> "",
 						"gueltigkeit" => [
 							"guioptions" => ["sharedstatemode" => "set"],
 							"data" =>       ["gueltig_ab"      => "", "gueltig_bis" => ""]
@@ -74,6 +75,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
         $this->getJSONDataInt($this->data['dienstverhaeltnisid'], $decodedData, 'dienstverhaeltnisid');
         $this->getJSONData($this->data['unternehmen'], $decodedData, 'unternehmen');
         $this->getJSONData($this->data['vertragsart_kurzbz'], $decodedData, 'vertragsart_kurzbz');
+		$this->getJSONDataBool($this->data['checkoverlap'], $decodedData, 'checkoverlap');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
@@ -97,6 +99,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$this->dv->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
 			$this->dv->setOe_kurzbz($this->data['unternehmen']);
 			$this->dv->setVertragsart_kurzbz($this->data['vertragsart_kurzbz']);
+			$this->dv->setCheckoverlap($this->data['checkoverlap']);
 			$this->dv->setUpdatevon($editorUID);
 		}
 		else 
@@ -108,6 +111,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
 			$data->oe_kurzbz = $this->data['unternehmen'];
 			$data->vertragsart_kurzbz = $this->data['vertragsart_kurzbz'];
+			$data->checkoverlap = $this->data['checkoverlap'];
 			$data->insertvon = $editorUID;
 			$data->insertamum = $now->format(DateTime::ATOM);
 			
@@ -152,7 +156,7 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 		
 		if( intval($this->dv->getDienstverhaeltnis_id()) > 0 ) 
 		{
-			$this->data['dienstverhaeltnis_id'] = $this->dv->getDienstverhaeltnis_id();
+			$this->data['dienstverhaeltnisid'] = $this->dv->getDienstverhaeltnis_id();
 		}
 	}
 }

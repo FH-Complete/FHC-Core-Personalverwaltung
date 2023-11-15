@@ -172,8 +172,8 @@ export const JobFunction = {
                 { title: t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: t('lehre','organisationseinheit'), field: "funktion_oebezeichnung", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
-                { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:false },
-                { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:false },
+                { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
+                { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
                 { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true }
               ];
@@ -192,9 +192,29 @@ export const JobFunction = {
 				table.value,
 				tabulatorOptions
 			);
+            
+            function customHeaderFilter(headerValue, rowValue, rowData, filterParams){
+                //headerValue - the value of the header filter element
+                //rowValue - the value of the column in this row
+                //rowData - the data for the row being filtered
+                //filterParams - params object passed to the headerFilterFuncParams property
+            
+                const validDate = function(d){
+                    return d instanceof Date && isFinite(d);
+                }
+
+                const date1 = new Date(rowValue);
+                date1.setHours(0,0,0,0);
+                let [day, month, year] = headerValue.split('.')
+                if (year < 1000) return true;  // prevents dates like 17.5.2
+                const date2 = new Date(+year, +month - 1, +day);
+                
+                return  !(validDate(date2)) || ((date2 - date1) == 0); //must return a boolean, true if it passes the filter.
+            }
 
             tabulator.value.on('tableBuilt', () => {
                 //tabulator.value.setData(tableData.value);
+                
             })
             
         })

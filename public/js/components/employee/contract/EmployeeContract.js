@@ -240,7 +240,6 @@ export const EmployeeContract = {
             isFetching.value = true            
             try {
                 const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
-                employee.value = res.data.retval[0];
             } catch (error) {
                 console.log(error);
             } finally {
@@ -277,6 +276,7 @@ export const EmployeeContract = {
         watch(
             currentDVID,
             (newVal) => {
+                if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
@@ -416,7 +416,14 @@ export const EmployeeContract = {
         }
         
         const handleDvSaved = async () => {
-            fetchData(route.params.uid);
+            fetchData(route.params.uid).then(() => {
+                // data might have changed but currentDVID is still the same -> fetch updated data
+                if (currentDVID != null && currentDVID.value > 0) {
+                    fetchVertrag(currentDVID.value, currentDate.value);
+                    fetchGBT(currentDVID.value, currentDate.value);
+                    fetchGBTChartData(currentDVID.value);
+                }
+            })
         }
 
         const handleDvEnded = async () => {
@@ -509,7 +516,15 @@ export const EmployeeContract = {
 
         const dvDeleteHandler = () => {
             console.log('dvDeleteHandler link clicked', currentDVID);
-            deleteDV(currentDVID.value).then(() => fetchData(route.params.uid));            
+            deleteDV(currentDVID.value).then(async () => {
+                fetchData(route.params.uid)
+                let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
+                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+                    + '/extensions/FHC-Core-Personalverwaltung/Employees/'
+                    + route.params.id + '/' + route.params.uid
+                    + '/contract';
+                await router.push( url )
+            });
         }
 
         const capitalize = (s) => {
@@ -550,7 +565,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, 
+            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
         }
     },
     template: `
@@ -584,7 +599,7 @@ export const EmployeeContract = {
                                 Bestätigung drucken
                             </DropDownButton>
                             <!-- Drop Down Button -->
-                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'}]">
+                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'},{action:'extensions/',text:'Testlink'}]">
                                 Weitere Aktionen
                             </DropDownButton>
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
@@ -619,21 +634,21 @@ export const EmployeeContract = {
                 <div class="row justify-content-center pt-md-2" v-if="!isCurrentDVActive && dvList?.length">
                         <div class="alert alert-warning mt-3" role="alert">
                             Dienstverhältnis ist zum ausgewählten Datum inaktiv.
-                            <span v-if="currentDV.bis != null">
+                            <span v-if="currentDV?.bis != null">
                                 Anzeigedatum auf letztgültiges Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
                                     <i class="fa fa-pen"></i> Datum setzen
                                 </button>
                                 
                             </span>
-                            <span v-else-if="currentDV.von != null">
+                            <span v-else-if="currentDV?.von != null">
                                 Anzeigedatum auf Von-Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2VonDatum">
                                     <i class="fa fa-pen"></i> Datum setzen
                                 </button>
                                 
                             </span>
-                        </div>
+                        </div>                        
                 </div>
                 <div class="row pt-md-2" v-if="isCurrentDVActive && dvList?.length">
 
@@ -643,7 +658,7 @@ export const EmployeeContract = {
                                 <h5 class="mb-0">Allgemein</h5>
                             </div>
                             <div class="card-body" style="text-align:left">
-
+     
                                 <form  ref="baseDataFrm" class="row g-3" v-if="currentDV != null">
 
 
@@ -671,7 +686,7 @@ export const EmployeeContract = {
 
                                     <div class="col-md-4">
                                         <label for="zeitraum_bis" class="form-label" >Bis</label>
-                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.bis)" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV?.bis)" >
                                     </div>
 
                                     <div class="col-md-4">
@@ -1216,7 +1231,8 @@ export const EmployeeContract = {
     <OffCanvasTimeline
         ref="offCanvasRef"
         @dateSelected="dateSelectedHandler"
-        :curdv="currentDV">
+        :curdv="currentDV"
+        :alldv="dvList">
     </OffCanvasTimeline>
     
     <karenzmodal 

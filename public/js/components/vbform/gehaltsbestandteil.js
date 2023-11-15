@@ -10,10 +10,19 @@ export default {
   <div class="row g-2 mb-1">
     <div class="col-3 ps-5">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+<!--        
         <option value="" selected disabled>Gehaltstyp wählen</option>
         <option value="basisgehalt">Basisgehalt</option>
         <option value="grundgehalt">Grundgehalt</option>
         <option value="zulage">Zulage</option>
+-->        
+        <option
+          v-for="gt in gehaltstypen"
+          :value="gt.value"
+          :selected="isselected(gt.value, this.gehaltstyp)"
+          :disabled="gt.disabled">
+          {{ gt.label }}
+        </option>
       </select>
     </div>
     <div class="col-2">
@@ -68,12 +77,15 @@ export default {
       betrag: '',
       gueltig_ab: '',
       gueltig_bis: '',
-      valorisierung: '',
+      valorisierung: true,
       valorisierungssperre: null,
       auszahlungen: 14,
       db_delete: false
     };
   },
+  inject: [
+      'gehaltstypen'
+  ],
   components: {
     'gueltigkeit': gueltigkeit,
     'infos': infos,
@@ -90,6 +102,9 @@ export default {
     this.setDataFromConfig();
   },
   methods: {
+    isselected: function(optvalue, selvalue) {
+      return (optvalue === selvalue);
+    },
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;
@@ -98,7 +113,10 @@ export default {
         this.gehaltstyp = this.config.data.gehaltstyp;
       }
       if( this.config?.data?.betrag !== undefined ) {
-        this.betrag = this.config.data.betrag;
+        if(!isNaN(this.config.data.betrag)) {
+            this.config.data.betrag = this.config.data.betrag.toString();
+        }
+        this.betrag = this.config.data.betrag.replace('.', ',');
       }
       if( this.config?.data?.valorisierung !== undefined ) {
         this.valorisierung = this.config.data.valorisierung;
@@ -123,7 +141,7 @@ export default {
         data: {
           id: this.id,
           gehaltstyp: this.gehaltstyp,
-          betrag: this.betrag,
+          betrag: this.betrag.replace(',', '.'),
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
           valorisierung: Boolean(this.valorisierung),

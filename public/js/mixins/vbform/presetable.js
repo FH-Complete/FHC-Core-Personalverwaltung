@@ -24,6 +24,14 @@ export default {
   methods: {
     getSortedChildrenFromPreset: function() {
         var tmpchildren = JSON.parse(JSON.stringify(this.preset.children));
+        var store = this.store;
+        
+        if( tmpchildren.length > 0 && typeof tmpchildren[0] === 'string' ) {            
+            tmpchildren = tmpchildren.filter(function(child) {
+                return (store.getVB(child) !== null);
+            });
+        }
+        
         if( tmpchildren.length < 2 ) {
             return tmpchildren;
         }
@@ -45,7 +53,13 @@ export default {
             return avd - bvd;        
         };
         
-        if( (typeof tmpchildren[0] === 'object') 
+        if( (typeof tmpchildren[0] === 'object')
+                && tmpchildren[0]?.type === undefined ) {
+            console.log('Child Type undefined: ' + JSON.stringify(tmpchildren[0]));
+        }
+        
+        if( (typeof tmpchildren[0] === 'object')
+                && tmpchildren[0]?.type !== undefined 
                 && (tmpchildren[0].type === 'gehaltsbestandteil') ) {
             tmpchildren.sort((a,b) => {
               return compareVBorGBgueltigvon(a, b);

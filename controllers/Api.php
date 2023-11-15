@@ -595,7 +595,7 @@ class Api extends Auth_Controller
 
     private function gbtChartDataAbgerechnet($from_date, $to_date, $dv_id)
     {
-        $gbtList = $this->GehaltsabrechnungLib->fetchAbgerechnet($dv_id, $from_date, $to_date, false);
+        $gbtList = $this->GehaltsabrechnungLib->fetchAbgerechnet($dv_id, $from_date, $to_date);
 
         return $gbtList;
     }
@@ -1500,9 +1500,10 @@ class Api extends Auth_Controller
             $stichtag = time();
         }
 
-        $date = DateTime::createFromFormat( 'U', $stichtag );
+        $date = DateTime::createFromFormat( 'U', $stichtag); 
+		$date->setTimezone(new DateTimeZone('Europe/Vienna'));
         $datestring = $date->format("Y-m-d");
-
+		
         $data = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
 			intval($dv_id), $datestring);
 
@@ -2139,7 +2140,8 @@ EOSQL;
     public function getGehaltstypen()
 	{		
 		$this->GehaltstypModel->resetQuery();
-		$this->GehaltstypModel->addSelect('gehaltstyp_kurzbz AS value, bezeichnung AS label');
+		$this->GehaltstypModel->addSelect('gehaltstyp_kurzbz AS value, '
+			. 'bezeichnung AS label, NOT(aktiv) AS disabled, valorisierung');
 		$this->GehaltstypModel->addOrder('sort', 'ASC');
 		$gehaltstypen = $this->GehaltstypModel->load();
 		if( hasData($gehaltstypen) ) 

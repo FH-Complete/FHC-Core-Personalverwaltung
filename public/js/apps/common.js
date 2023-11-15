@@ -88,7 +88,7 @@ export const searchbaroptions = {
                 },
                 {
                     label: "Stammdaten",
-                    icon: "fas fa-user-slash",
+                    icon: "fas fa-address-card",
                     type: "link",
                     action: function(data) {
                         return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}`;

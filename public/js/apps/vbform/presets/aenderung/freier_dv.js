@@ -7,28 +7,57 @@ export default {
     label: 'Freier DV',
     description: 'freier Dienstvertrag',
     for_vertragsart_kurzbz: [
-        'freierdv'
+        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+    ],
+    default_for_vertragsart_kurzbz: [
+        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
     ]
   },
   children: [
-    {
+{
       type: 'tabs',
       guioptions: {
 
       },
       children: [
         {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        },
+        {
           type: 'tab',
           guioptions: {
-            title: 'Allgemein',
-            id: 'allgemein'
+            title: 'Funktionen',
+            id: 'funktionen'
           },
           children: [
             {
-              type: 'dv',
+              type: 'vertragsbestandteillist',
               guioptions: {
+                title: 'Zuordnung',
+                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                errors: [],
+                infos: [],
+                childdefaults: {
+                  guioptions: {
+                    canhavegehaltsbestandteile: false,
+                    disabled: [
+                      'funktion'
+                    ],
+                    hidden: []
+                  },
+                  data: {
+                    funktion: "fachzuordnung"
+                  }
+                }
               },
-              children: []
+              children: [
+                uuid.get_uuidbyname('oestdkst'),
+                uuid.get_uuidbyname('oediszpl'),
+                uuid.get_uuidbyname('oefachl')
+              ]
             }
           ]
         },
@@ -61,7 +90,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'freierdv',
+      vertragsart_kurzbz: null,
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",

@@ -26,6 +26,7 @@ export const SearchExistingDialog = {
         const surnameRef = Vue.ref(null);
 
         const formatDate = (ds) => {
+            if (ds == null || ds == '') return '';
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
@@ -62,13 +63,14 @@ export const SearchExistingDialog = {
 		}
 
         // create new employee based on student
-        const take = async (person_id, uid) => {
-                                
+        const take = async (person_id, uid) => {                        
+
             try {
                 isFetching.value = true
                 const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid}});             
                 isFetching.value = false;                
                 personSelectedHandler(person_id, res.data.retval.uid);
+                filterPerson();
 
             } catch (error) {
                 console.log(error);
@@ -85,13 +87,11 @@ export const SearchExistingDialog = {
         }
 
         Vue.onMounted(() => {
-            console.log('SearchExistingDialog mounted');
-            surnameRef.value.focus();
-            
+            surnameRef.value.focus();            
         })
 
 
-        return {  currentValue, filterPerson, personSelectedHandler, personList, surnameRef, take, reset  };
+        return {  currentValue, filterPerson, personSelectedHandler, personList, surnameRef, take, reset, formatDate, isFetching  };
     },
     template: `
     <form class="row g-3" ref="searchExistingFrm" id="searchExistingFrm" >
@@ -127,7 +127,7 @@ export const SearchExistingDialog = {
                         <td>{{ person.uid }}</td>
                         <td>{{ person.nachname }}</td>
                         <td>{{ person.vorname }}</td>
-                        <td>{{ person.gebdatum }}</td>
+                        <td>{{ formatDate(person.gebdatum) }}</td>
                         <td>{{ person.svnr }}</td>
                         <td>{{ person.status }}</td>
                         <td @click.stop>
@@ -135,6 +135,7 @@ export const SearchExistingDialog = {
                                 <button type="button" class="btn btn-outline-dark btn-sm" 
                                     @click="take(person.person_id, person.uid)"
                                     style="white-space: nowrap"
+                                    :disabled="isFetching"
                                     v-if="person.status=='Student' && !person.taken">
                                     Als MA übernehmen
                                 </button>

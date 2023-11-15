@@ -3,12 +3,18 @@ import uuid from '../../../../helpers/vbform/uuid.js';
 export default {
   type: 'preset',
   guioptions: {
-    id: 'studhilfskraft',
-    label: 'Studentische Hilfskraft',
-    description: 'Echter DV für Studentische Hilfskräfte'
+    id: 'werkvertrag',
+    label: 'Werkvertrag / Überlassungsvertrag',
+    description: 'Werkvertrag / Überlassungsvertrag',
+    for_vertragsart_kurzbz: [
+        'werkvertrag', 'ueberlassungsvertrag'
+    ],
+    default_for_vertragsart_kurzbz: [
+        'werkvertrag', 'ueberlassungsvertrag'
+    ]
   },
   children: [
-    {
+{
       type: 'tabs',
       guioptions: {
 
@@ -48,8 +54,9 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oestdkst'),  
-                uuid.get_uuidbyname('oediszpl')
+                uuid.get_uuidbyname('oestdkst'),
+                uuid.get_uuidbyname('oediszpl'),
+                uuid.get_uuidbyname('oefachl')
               ]
             }
           ]
@@ -83,7 +90,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'studentischehilfskr',
+      vertragsart_kurzbz: null,
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",
@@ -93,37 +100,5 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('oestdkst')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oestdkst'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'kstzuordnung'
-      }
-    },
-    [uuid.get_uuidbyname('oediszpl')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oediszpl'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'oezuordnung'
-      }
-    }
   }
 }

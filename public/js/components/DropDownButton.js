@@ -33,7 +33,10 @@ export const DropDownButton = {
                 <slot></slot>
             </button>
             <ul class="dropdown-menu" >
-                <li v-for="link in links"><a class="dropdown-item" href="#" @click="link.action">{{ link.text }}</a></li>
+                <li v-for="link in links">
+                    <a v-if="typeof(link?.action) === 'function'"  class="dropdown-item" href="#" @click="link?.action">{{ link?.text }}</a>
+                    <a v-else-if="typeof(link?.action) === 'string'"  class="dropdown-item" :href="link?.action" >{{ link?.text }}</a>                   
+                </li>
             </ul>
         </div>`
 }

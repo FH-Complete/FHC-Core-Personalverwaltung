@@ -2,7 +2,7 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class GehaltsAbrechnungJob extends JOB_Controller
+class GehaltshistorieJob extends JOB_Controller
 {
 	
 	private $_ci; // Code igniter instance
@@ -17,11 +17,12 @@ class GehaltsAbrechnungJob extends JOB_Controller
 	}
 
 
-	public function addGehaltsabrechnung($date = null, $user = null, $oe_kurzbz = null)
+	public function addGehaltshistorie($date = null, $user = null, $oe_kurzbz = null)
 	{
-		$this->logInfo('Start GehaltsAbrechnung Job');
+		$this->logInfo('Start Gehaltshistorie Job');
 		
 		$result = $this->_ci->gehaltslib->getBestandteile($date, $user, $oe_kurzbz);
+		
 		if (isError($result))
 		{
 			$this->logError(getError($result));
@@ -38,10 +39,10 @@ class GehaltsAbrechnungJob extends JOB_Controller
 			$bestandteile = getData($result);
 			foreach ($bestandteile as $bestandteil)
 			{
-				$abrechnung = $this->_ci->gehaltslib->existsAbrechnung($bestandteil, $date);
+				$abrechnung = $this->_ci->gehaltslib->existsGehaltshistorie($bestandteil, $date);
 				if (!hasData($abrechnung))
 				{
-					$result = $this->_ci->gehaltslib->addAbrechnung($bestandteil, $date);
+					$result = $this->_ci->gehaltslib->addHistorie($bestandteil, $date);
 					
 					if (isError($result))
 					{
@@ -54,7 +55,7 @@ class GehaltsAbrechnungJob extends JOB_Controller
 			}
 		}
 		
-		$this->logInfo('End GehaltsAbrechnung Job', array('Number of Abrechnungen added ' => $count));
+		$this->logInfo('End Gehaltshistorie Job', array('Number of Abrechnungen added ' => $count));
 	}
 	
 	

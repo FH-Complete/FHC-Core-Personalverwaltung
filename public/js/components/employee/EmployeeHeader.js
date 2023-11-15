@@ -109,9 +109,7 @@ export const EmployeeHeader = {
         )
 
         onMounted(() => {
-            console.log("EmployeeHeader mounted ");
             currentDate.value = route.query.d || new Date();
-           // headerUrl.value = generateEndpointURL(props.personID, props.personUID);
             fetchHeaderData(props.personID, props.personUID);
             fetchOpenIssuesCount(props.personID);
         })

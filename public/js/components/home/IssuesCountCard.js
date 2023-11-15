@@ -58,10 +58,11 @@ const IssuesCountCard = {
      </div>
 
      <p-overlaypanel ref="issuesOverlay">
-         <p-datatable v-model:selection="selectedPerson" :value="issues" selectionMode="single" :paginator="true" :rows="5" @row-select="onPersonSelect">
+         <p-datatable v-model:selection="selectedPerson" :value="issues" selectionMode="single" sortMode="multiple" :paginator="true" :rows="5" @row-select="onPersonSelect">
             <p-column field="vorname" header="Vorname" sortable style="min-width: 12rem"></p-column>
             <p-column field="nachname" header="Nachname" sortable style="min-width: 12rem"></p-column>
-            <p-column field="openissues" header="Issues" sortable style="min-width: 12rem"></p-column>          
+            <p-column field="openissues" header="Issues" sortable style="min-width: 8rem"></p-column>
+            <p-column field="aktiv" header="Aktive DV" sortable style="min-width: 5rem"></p-column>          
         </p-datatable>
      </p-overlaypanel>
      

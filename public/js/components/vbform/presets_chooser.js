@@ -60,7 +60,7 @@ export default {
              || preset.guioptions.for_vertragsart_kurzbz.indexOf(vertragsart_kurzbz) > -1  ) {
                 this.usedpresets.push(preset);
                 if( preset.guioptions?.default_for_vertragsart_kurzbz !== undefined 
-                        && preset.guioptions.default_for_vertragsart_kurzbz === vertragsart_kurzbz ) {
+                        && preset.guioptions.default_for_vertragsart_kurzbz.indexOf(vertragsart_kurzbz) > -1 ) {
                     this.selectedpresetidx = (this.usedpresets.length - 1);
                 }
             }
