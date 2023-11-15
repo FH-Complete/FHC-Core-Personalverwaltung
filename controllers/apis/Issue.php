@@ -77,26 +77,33 @@ class Issue extends Auth_Controller
 	public function PersonenMitOffenenIssues()
 	{
 		$sql = <<<EOSQL
-			SELECT 
-				person_id, uid, vorname, nachname, count(*) AS openissues 
-			FROM 
-				system.tbl_issue 
-			JOIN 
-				system.tbl_fehler USING (fehlercode) 
-			JOIN 
-				public.tbl_person USING (person_id) 
-			JOIN 
-				public.tbl_benutzer USING (person_id) 
-			JOIN 
-				public.tbl_mitarbeiter ON uid = mitarbeiter_uid 
-			WHERE 
-				app = 'personalverwaltung' AND verarbeitetamum IS NULL 
-			GROUP BY 
-				person_id, uid, vorname, nachname 
-			HAVING 
-				count(*) > 0 
-			ORDER BY 
-				count(*) DESC;
+SELECT
+
+		person_id, uid, vorname, nachname, count(*) AS openissues ,
+		(select count(*) anz_aktiv 
+		 from hr.tbl_dienstverhaeltnis dv 
+		 where dv.mitarbeiter_uid=uid and dv.von<=now() and 
+		       (dv.bis is null OR dv.bis>=now())
+		) aktiv
+FROM 
+		system.tbl_issue 
+JOIN 
+		system.tbl_fehler USING (fehlercode) 
+JOIN 
+		public.tbl_person USING (person_id) 
+JOIN 
+		public.tbl_benutzer USING (person_id) 
+JOIN 
+		public.tbl_mitarbeiter ON uid = mitarbeiter_uid                         
+WHERE 
+		app = 'personalverwaltung' AND verarbeitetamum IS NULL 
+GROUP BY 
+		person_id, uid, vorname, nachname 
+HAVING 
+		count(*) > 0 
+ORDER BY 
+		count(*) DESC;
+			
 EOSQL;
 		
 		$personenmitissues = $this->IssueModel->execReadOnlyQuery($sql);
