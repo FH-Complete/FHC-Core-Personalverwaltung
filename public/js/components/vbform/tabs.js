@@ -6,7 +6,7 @@ import store from './vbsharedstate.js';
 export default {
   template: `
   <div class="d-flex align-items-start h-100 overflow-hidden">
-    <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+    <div class="nav flex-column nav-pills col-2" id="v-pills-tab" role="tablist" aria-orientation="vertical">
       <template v-for="(child, idx) in children">
         <button
               v-if="child.type === 'tab'"
@@ -31,7 +31,7 @@ export default {
       </template>
     </div>
 
-    <div class="tab-content w-100 h-100 d-flex flex-column position-relative" id="v-pills-tabContent">
+    <div class="tab-content col-10 h-100 d-flex flex-column position-relative" id="v-pills-tabContent">
       <template v-for="(child, idx) in children">
         <component ref="parts" v-if="child.type === 'tab'" :is="child.type" :key="'tab_' + idx" :preset="child" :activetab="activetab"></component>
         <div v-else="" class="px-3">

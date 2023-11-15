@@ -56,9 +56,6 @@ export default {
           locale="de"
           format="dd.MM.yyyy"
           model-type="yyyy-MM-dd"></datepicker>
-        <span class="input-group-text bg-white border-0">
-            <i class="fas fa-square text-white"></i>
-        </span>
       </div>
     </div>
     <div class="col-2 form-check form-control-sm">

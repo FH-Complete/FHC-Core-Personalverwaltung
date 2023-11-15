@@ -15,7 +15,7 @@ export default {
   },
   children: [
     {
-      type: 'tabs',
+      type: 'tabsspacer',
       guioptions: {},
       children: [
         {
@@ -23,7 +23,13 @@ export default {
           guioptions: {
           },
           children: []
-        },
+        }
+      ]
+    },
+    {
+      type: 'tabs',
+      guioptions: {},
+      children: [
         {
           type: 'tab',
           guioptions: {
