@@ -4,7 +4,7 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="col-3">
+  <div class="col-2">
     <select v-model="store.unternehmen" :disabled="isaenderung && isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
         v-for="u in lists.unternehmen"
@@ -15,7 +15,7 @@ export default {
       </option>
     </select>
   </div>
-  <div class="col-3">
+  <div class="col-5">
     <select v-model="vertragsart_kurzbz" :disabled="isaenderung && isconfigured('vertragsart_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
         v-for="v in lists.vertragsarten"
@@ -26,7 +26,6 @@ export default {
       </option>
     </select>
   </div>
-  <div class="col-1">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
   <div class="col-1">
     <div v-if="this.store.mode === 'korrektur'" class="form-check">

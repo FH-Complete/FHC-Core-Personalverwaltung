@@ -14,7 +14,7 @@ export default {
     }
   },
   template: `
-  <div class="row g-2 py-2">
+  <div class="row g-2 mb-1">
     <div class="col-3">
       <select v-model="gehaltstyp" class="form-select form-select-sm" aria-label=".form-select-sm example">
         <option value="" selected>Gehaltstyp wählen</option>

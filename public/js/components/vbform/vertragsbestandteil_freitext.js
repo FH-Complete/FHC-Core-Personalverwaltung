@@ -6,7 +6,7 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <div class="border-bottom py-2 mb-3">
+  <div class="my-2" :class="canhavegehaltsbestandteile ? 'card card-body my-2' : ''">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2 py-2">

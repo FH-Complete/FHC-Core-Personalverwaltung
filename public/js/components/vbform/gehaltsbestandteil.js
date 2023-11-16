@@ -5,10 +5,11 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []" :padleft="true"></infos>
-  <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []" :padleft="true"></errors>
-  <div class="row g-2 mb-1">
-    <div class="col-3 ps-5">
+  <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
+  <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
+  <div class="card card-body border-0 bg-primary my-2" style="--bs-bg-opacity: .03;">
+    <div class="row g-2 mb-1">
+      <div class="col-3">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
 <!--        
         <option value="" selected disabled>Gehaltstyp wählen</option>
@@ -44,8 +45,7 @@ export default {
       <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
     </div>
   </div>
-  <div class="row g-2 mb-3">
-    <div class="col-2 ps-5">&nbsp;</div>
+    <div class="row g-2">
     <div class="col-3">
       <div class="input-group input-group-sm">
         <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
@@ -68,6 +68,7 @@ export default {
       </label>
     </div>
     <div class="col-5">&nbsp;</div>    
+  </div>
   </div>
   `,
   data: function() {

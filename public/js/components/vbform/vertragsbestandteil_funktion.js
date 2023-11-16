@@ -7,20 +7,18 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="py-2" :class="vbcssclasses">
+  <div class="my-2" :class="canhavegehaltsbestandteile ? 'card card-body my-2' : ''">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config.guioptions.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config.guioptions.errors : []"></errors>
     <div class="row g-2 py-2">
-      <div class="col-2">
-        <div class="form-check">
+      <div class="col-5">
+        <div class="form-check form-check-inline">
           <input v-model="mode" :disabled="isinputdisabled('mode')" class="form-check-input form-check-input-sm" type="radio"
             @change="resetDropdowns"
             :name="'vbfunktionmode_' + config.guioptions.id" :id="'vbfunktionmode1_' + config.guioptions.id" value="neu">
           <label class="form-check-label" :for="'vbfunktionmode1_' + config.guioptions.id">Neue Funktion</label>
         </div>
-      </div>
-      <div class="col-3">
-        <div class="form-check">
+        <div class="form-check form-check-inline">
           <input v-model="mode" class="form-check-input form-check-input-sm" type="radio"
             @change="resetDropdowns"
             :name="'vbfunktionmode_' + config.guioptions.id" :id="'vbfunktionmode2_' + config.guioptions.id" value="bestehende">
@@ -31,7 +29,7 @@ export default {
     </div>
     <div class="row g-2">
     <template v-if="mode === 'neu'">
-      <div class="col">
+      <div class="col-3">
         <div class="fhc_autocomplete_wrapper">
             <p-autocomplete 
                 v-model="autocomplete.selectedfunktion" 
@@ -56,7 +54,7 @@ export default {
         </select>
 -->
       </div>
-      <div class="col">
+      <div class="col-4">
         <div class="fhc_autocomplete_wrapper">
             <p-autocomplete 
                 v-model="autocomplete.selectedorget" 
@@ -83,7 +81,7 @@ export default {
       </div>
     </template>
     <template v-else-if="mode === 'bestehende'">
-      <div class="col">
+      <div class="col-7">
         <select v-model="benutzerfunktionid" :disabled="isinputdisabled('benutzerfunktionid')" class="form-select form-select-sm">
           <option
             v-for="bf in lists.benutzerfunktionen"

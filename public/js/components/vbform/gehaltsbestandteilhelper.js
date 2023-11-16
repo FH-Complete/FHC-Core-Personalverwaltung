@@ -4,8 +4,8 @@ import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
   template: `
-  <div class="row py-2 pb-1">
-    <div class="col-12 ps-5">
+  <div class="row pt-3 pb-1">
+    <div class="col-12">
       <div class="position-relative">
         <a class="btn btn-sm btn-primary" href="javascript:void(0);" @click="addGB">
           <i class="fas fa-plus"></i>&nbsp;Gehaltsbestandteil
