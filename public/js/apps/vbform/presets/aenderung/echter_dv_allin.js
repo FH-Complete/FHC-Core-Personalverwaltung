@@ -12,15 +12,15 @@ export default {
   },
   children: [
     {
+      type: 'dv',
+      guioptions: {
+      },
+      children: []
+    },
+    {
       type: 'tabs',
       guioptions: {},
       children: [
-        {
-          type: 'dv',
-          guioptions: {
-          },
-          children: []
-        },
         {
           type: 'tab',
           guioptions: {
