@@ -15,7 +15,7 @@ export default {
         <template #body>
     
         <div class="vbformutilities flex-shrink-0 flex-grow-0">
-            <div class="row g-2 py-2">
+            <div class="row p-2 bg-light">
               <div class="col-3">
                 <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
               </div>
