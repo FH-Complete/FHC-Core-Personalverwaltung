@@ -637,14 +637,14 @@ export const EmployeeContract = {
                             <span v-if="currentDV?.bis != null">
                                 Anzeigedatum auf letztgültiges Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
-                                    <i class="fa fa-pen"></i> Datum setzen
+                                    Datum setzen
                                 </button>
                                 
                             </span>
                             <span v-else-if="currentDV?.von != null">
                                 Anzeigedatum auf Von-Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2VonDatum">
-                                    <i class="fa fa-pen"></i> Datum setzen
+                                    Datum setzen
                                 </button>
                                 
                             </span>

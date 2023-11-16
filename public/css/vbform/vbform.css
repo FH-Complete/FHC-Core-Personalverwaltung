@@ -93,6 +93,7 @@
 .fhc_autocomplete_wrapper .p-autocomplete input {
     padding-top: .25em;
     padding-bottom: .25em;
+    font-size: 0.9rem;
 }
 
 .fhc_autocomplete_wrapper .p-autocomplete .p-button, 
