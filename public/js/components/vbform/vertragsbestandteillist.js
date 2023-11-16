@@ -16,7 +16,7 @@ export default {
         <div class="row g-2 py-2 mb-3">
           <div class="col">
             <div class="position-relative">
-              <a class="btn btn-sm btn-light fs-6 fw-light" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus"></i>
+              <a class="btn btn-sm btn-primary mb-1" href="javascript:void(0);" @click="addVB"><i class="fas fa-plus"></i>
                 &nbsp;
                 {{ title }}{{ childcount }}
                 &nbsp;
