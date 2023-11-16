@@ -16,7 +16,7 @@ export default {
     </select>
   </div>
   <div class="col-3">
-    <select v-model="vertragsart_kurzbz" :disabled="isaenderung && isconfigured('vertragsart_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+    <select v-model="vertragsart_kurzbz" :disabled="isaenderung || isconfigured('vertragsart_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
         v-for="v in lists.vertragsarten"
         :value="v.value"
@@ -90,6 +90,9 @@ export default {
       return this.lists.vertragsarten = vertragsarten;
     },
     isconfigured: function(field) {
+      if( this.config === null ) {
+          return false;
+      }
       if( typeof this.config[field] !== 'undefined' ) {
         return this.config[field] !== '';
       }
