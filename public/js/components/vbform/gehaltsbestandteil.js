@@ -8,7 +8,7 @@ export default {
   <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []" :padleft="true"></infos>
   <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []" :padleft="true"></errors>
   <div class="row g-2 mb-1">
-    <div class="col-3 ps-5">
+    <div class="col-2 ps-5">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
 <!--        
         <option value="" selected disabled>Gehaltstyp wählen</option>
@@ -37,6 +37,7 @@ export default {
         <option value="12">12 Auszahlungen</option>
       </select>
     </div>
+    <div class="col-1">&nbsp;</div>
     <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
     <div class="col-1">
       <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>        
@@ -45,26 +46,28 @@ export default {
     </div>
   </div>
   <div class="row g-2 mb-3">
-    <div class="col-2 ps-5">&nbsp;</div>
-    <div class="col-3">
+    <div class="col-1 ps-5">&nbsp;</div>
+    <div class="col-2">
       <div class="input-group input-group-sm">
         <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
           v-bind:enable-time-picker="false"
           v-bind:placeholder="'Valorisierungssperre bis'"
           six-weeks
           auto-apply 
+          text-input 
           locale="de"
           format="dd.MM.yyyy"
           model-type="yyyy-MM-dd"></datepicker>
       </div>
     </div>
+    <div class="col-1">&nbsp;</div>
     <div class="col-2 form-check form-control-sm">
       <input v-model="valorisierung" :disabled="isinputdisabled('valorisierung')" class="form-check-input" type="checkbox" value="" :id="'valorisierung_' + config.guioptions.id">
       <label class="form-check-label" :for="'valorisierung_' + config.guioptions.id">
         Valorisierung
       </label>
     </div>
-    <div class="col-5">&nbsp;</div>    
+    <div class="col-6">&nbsp;</div>    
   </div>
   `,
   data: function() {

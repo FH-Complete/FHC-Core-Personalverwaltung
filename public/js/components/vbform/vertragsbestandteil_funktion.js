@@ -31,7 +31,7 @@ export default {
     </div>
     <div class="row g-2">
     <template v-if="mode === 'neu'">
-      <div class="col">
+      <div class="col-3">
         <div class="fhc_autocomplete_wrapper">
             <p-autocomplete 
                 v-model="autocomplete.selectedfunktion" 
@@ -56,7 +56,7 @@ export default {
         </select>
 -->
       </div>
-      <div class="col">
+      <div class="col-3">
         <div class="fhc_autocomplete_wrapper">
             <p-autocomplete 
                 v-model="autocomplete.selectedorget" 
@@ -81,9 +81,10 @@ export default {
         </select>        
 -->
       </div>
+      <div class="col-1">&nbsp;</div>
     </template>
     <template v-else-if="mode === 'bestehende'">
-      <div class="col">
+      <div class="col-6">
         <select v-model="benutzerfunktionid" :disabled="isinputdisabled('benutzerfunktionid')" class="form-select form-select-sm">
           <option
             v-for="bf in lists.benutzerfunktionen"
@@ -94,6 +95,7 @@ export default {
           </option>
         </select>
       </div>
+      <div class="col-1">&nbsp;</div>
     </template>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
       <div class="col-1">

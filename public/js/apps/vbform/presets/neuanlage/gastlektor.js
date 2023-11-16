@@ -9,17 +9,23 @@ export default {
   },
   children: [
     {
-      type: 'tabs',
-      guioptions: {
-
-      },
+      type: 'tabsspacer',
+      guioptions: {},
       children: [
         {
           type: 'dv',
           guioptions: {
           },
           children: []
-        },
+        }
+      ]
+    },
+    {
+      type: 'tabs',
+      guioptions: {
+
+      },
+      children: [
         {
           type: 'tab',
           guioptions: {
