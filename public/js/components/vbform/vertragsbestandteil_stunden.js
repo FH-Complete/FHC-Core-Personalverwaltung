@@ -16,7 +16,7 @@ export default {
           <span class="input-group-text">Std/Woche</span>
         </div>
       </div>
-      <div class="col-4">
+      <div class="col-3">
         <select v-model="teilzeittyp_kurzbz" :disabled="isinputdisabled('teilzeittyp_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.teilzeittypen"
@@ -27,6 +27,7 @@ export default {
           </option>
         </select>
       </div>
+      <div class="col-1">&nbsp;</div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded" @gueltigkeitchanged="gueltigkeitchanged"></gueltigkeit>
       <div class="col-1">
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>

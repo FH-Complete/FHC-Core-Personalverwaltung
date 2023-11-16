@@ -6,6 +6,7 @@ import dv from './dv.js';
 import store from './vbsharedstate.js';
 import errors from './errors.js';
 import infos from './infos.js';
+import tabsspacer from './tabsspacer.js';
 
 export default {
   template: `
@@ -23,7 +24,8 @@ export default {
     "dv": dv,
     "vertragsbestandteillist": vertragsbestandteillist,
     "infos": infos,
-    "errors": errors
+    "errors": errors,
+    "tabsspacer": tabsspacer
   },
   mixins: [
     presetable

@@ -10,7 +10,7 @@ export default {
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2 py-2">
-      <div class="col-7">
+      <div class="col-6">
         <select v-model="freitexttyp" :disabled="isinputdisabled('freitexttyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option value="" selected>Freitexttyp wählen</option>
           <option value="allin">AllIn</option>
@@ -20,6 +20,7 @@ export default {
           <option value="sonstiges">Sonstiges</option>
         </select>
       </div>
+      <div class="col-1">&nbsp;</div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
       <div class="col-1">
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
@@ -28,15 +29,17 @@ export default {
       </div>
     </div>
     <div class="row g-2 py-2" v-show="showinput('titel')">
-      <div class="col-11">
+      <div class="col-6">
         <input v-model="titel" type="text" class="form-control form-control-sm" placeholder="Titel" aria-label="Titel">
       </div>
+      <div class="col-5">&nbsp;</div>
       <div class="col-1">&nbsp;</div>
     </div>
     <div class="row g-2 py-2" v-show="showinput('freitext')">
-      <div class="col-11">
+      <div class="col-6">
         <textarea v-model="freitext" rows="5" class="form-control form-control-sm" placeholder="Freitext" aria-label="Freitext"></textarea>
       </div>
+      <div class="col-5">&nbsp;</div>
       <div class="col-1">&nbsp;</div>
     </div>
     <gehaltsbestandteilhelper ref="gbh" v-if="canhavegehaltsbestandteile" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>

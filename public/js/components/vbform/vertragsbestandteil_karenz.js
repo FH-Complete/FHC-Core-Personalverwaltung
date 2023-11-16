@@ -39,10 +39,11 @@ export default {
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'geplanter Geburtstermin'"
               six-weeks
+              auto-apply 
+              text-input 
               locale="de"
               format="dd.MM.yyyy"
-              model-type="yyyy-MM-dd" 
-              auto-apply 
+              model-type="yyyy-MM-dd"
               class="me-2"></datepicker>
         </div>
       </div>
@@ -53,9 +54,10 @@ export default {
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'tatsaechlicher Geburtstermin'"
               six-weeks
+              auto-apply 
+              text-input 
               locale="de"
               format="dd.MM.yyyy"
-              auto-apply 
               model-type="yyyy-MM-dd"></datepicker>
           </div>
       </div>

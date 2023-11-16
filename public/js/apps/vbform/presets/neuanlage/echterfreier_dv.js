@@ -4,15 +4,21 @@ export default {
   type: 'preset',
   guioptions: {
     id: 'freierdv',
-    label: 'Freier DV',
+    label: 'Echter Freier DV',
     description: 'freier Dienstvertrag'
   },
   children: [
     {
-      type: 'dv',
-      guioptions: {
-      },
-      children: []
+      type: 'tabsspacer',
+      guioptions: {},
+      children: [
+        {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        }
+      ]
     },
     {
       type: 'tabs',

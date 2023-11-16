@@ -9,10 +9,16 @@ export default {
   },
   children: [
     {
-      type: 'dv',
-      guioptions: {
-      },
-      children: []
+      type: 'tabsspacer',
+      guioptions: {},
+      children: [
+        {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        }
+      ]
     },
     {
       type: 'tabs',
