@@ -5,7 +5,7 @@ use phpDocumentor\Reflection\Types\Boolean;
 defined('BASEPATH') || exit('No direct script access allowed');
 
 require_once dirname(__DIR__) . '/libraries/gui/GUIHandler.php';
-require_once DOCROOT . '/include/' . EXT_FKT_PATH . '/generateuid.inc.php';
+require_once DOC_ROOT . '/include/' . EXT_FKT_PATH . '/generateuid.inc.php';
 
 class Api extends Auth_Controller
 {
