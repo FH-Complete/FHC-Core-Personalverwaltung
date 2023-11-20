@@ -7,6 +7,7 @@ import store from './vbsharedstate.js';
 import errors from './errors.js';
 import infos from './infos.js';
 import tabsspacer from './tabsspacer.js';
+import vblistgroupspacer from './vblistgroupspacer.js';
 
 export default {
   template: `
@@ -25,7 +26,8 @@ export default {
     "vertragsbestandteillist": vertragsbestandteillist,
     "infos": infos,
     "errors": errors,
-    "tabsspacer": tabsspacer
+    "tabsspacer": tabsspacer,
+    "vblistgroupspacer": vblistgroupspacer
   },
   mixins: [
     presetable

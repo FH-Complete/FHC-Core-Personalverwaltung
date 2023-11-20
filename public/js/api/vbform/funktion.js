@@ -1,7 +1,10 @@
 export default {
-  getContractFunctions: function() {
+  getContractFunctions: function(filter) {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
             + '/extensions/FHC-Core-Personalverwaltung/Api/getContractFunctions';
+    if( typeof filter !== 'undefined' && filter !== null ) {
+        url = url + '/' + filter;
+    }
     return axios.get(url);
   },
   getOrgetsForCompany: function(unternehmen) {

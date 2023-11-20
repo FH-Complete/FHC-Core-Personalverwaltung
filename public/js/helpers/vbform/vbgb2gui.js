@@ -173,6 +173,9 @@ export default {
       }
       if( vb.benutzerfunktiondata.funktion_kurzbz.match('zuordnung') ) {
           this.vbout.guioptions.canhavegehaltsbestandteile = false;
+          this.vbout.guioptions.filter = 'zuordnung';
+      } else {
+          this.vbout.guioptions.filter = 'funktion';
       }
   },
   karenz2gui: function(vb, mode) {

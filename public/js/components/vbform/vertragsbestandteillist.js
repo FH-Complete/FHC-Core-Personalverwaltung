@@ -78,6 +78,9 @@ export default {
       var guioptions = (this.preset.guioptions?.childdefaults?.guioptions !== undefined)
                      ? JSON.parse(JSON.stringify(this.preset.guioptions.childdefaults.guioptions))
                      : {};
+      if( this.preset.guioptions?.filter !== undefined ) {
+          guioptions.filter = this.preset.guioptions.filter;
+      }
       guioptions.id = vbid;
       guioptions.removeable = true;
       var data = (this.preset.guioptions?.childdefaults?.data !== undefined)

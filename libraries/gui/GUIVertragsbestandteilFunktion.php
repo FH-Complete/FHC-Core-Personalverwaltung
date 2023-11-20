@@ -114,9 +114,26 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 			/**
 			 * @todo refactor update
 			 */
-            $vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
-            $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
-            $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+			if( intval($this->data['benutzerfunktionid']) > 0 )
+			{
+				$vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);			
+				$vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
+				$vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
+			}
+			else 
+			{
+				$data = new stdClass();
+				$data->von = string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']);
+				$data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
+
+				$data->funktion = $this->data['funktion'];
+				$data->orget = $this->data['orget'];
+				$data->mitarbeiter_uid = $this->data['mitarbeiter_uid'];
+				$data->benutzerfunktionid = $this->data['benutzerfunktionid'];
+			
+				$vbs->hydrateByStdClass($data, false);
+			}
+
         } else {
 
             $data = new stdClass();

@@ -121,6 +121,7 @@ export default {
               guioptions: {
                 title: 'Zuordnung',
                 vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'zuordnung',
                 errors: [],
                 infos: [],
                 childdefaults: {
@@ -147,6 +148,7 @@ export default {
               guioptions: {
                 title: 'Funktion',
                 vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'funktion',
                 errors: [],
                 infos: []
               },

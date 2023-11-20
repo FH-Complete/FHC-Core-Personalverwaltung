@@ -1801,8 +1801,23 @@ EOSQL;
 	 * return list of contract relevant functions
 	 * as key value list to be used in select or autocomplete
 	 */	
-	public function getContractFunctions() 
+	public function getContractFunctions($mode='all') 
 	{
+		$addwhere = '';
+		switch ($mode)
+		{
+			case 'zuordnung':
+				$addwhere = ' AND funktion_kurzbz LIKE \'%zuordnung%\'';
+				break;
+			case 'funktion':
+				$addwhere = ' AND funktion_kurzbz NOT LIKE \'%zuordnung%\'';
+				break;
+			case 'all':
+			default:
+				$addwhere = '';
+				break;
+		}
+		
 		$sql = <<<EOSQL
 			SELECT 
 				funktion_kurzbz AS value, beschreibung AS label 
@@ -1810,6 +1825,7 @@ EOSQL;
 				public.tbl_funktion 
 			WHERE 
 				aktiv = true AND vertragsrelevant = true 
+				{$addwhere}
 			ORDER BY beschreibung ASC
 EOSQL;
 		
@@ -1843,7 +1859,12 @@ EOSQL;
 		}
 		
 		$sql = <<<EOSQL
-			SELECT bf.benutzerfunktion_id AS value, f.beschreibung || ', ' || oe.bezeichnung || ' [' || oet.bezeichnung || '], ' || COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a') || ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a') AS label 
+			SELECT 
+				bf.benutzerfunktion_id AS value, f.beschreibung || ', ' 
+					|| oe.bezeichnung || ' [' || oet.bezeichnung || '], ' 
+					|| COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a') 
+					|| ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a') 
+					|| COALESCE(dvu.attachedtovb, '') AS label 
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(
@@ -1860,9 +1881,17 @@ EOSQL;
 			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz 
 			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz 
 			JOIN public.tbl_benutzerfunktion bf ON bf.oe_kurzbz = oe.oe_kurzbz
-                        JOIN public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
-                        WHERE bf.uid = ? 
-                        ORDER BY f.beschreibung ASC
+			JOIN public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
+			LEFT JOIN (
+				SELECT 
+					benutzerfunktion_id, ' [DV]' AS attachedtovb 
+				FROM 
+					"hr"."tbl_vertragsbestandteil_funktion" 
+				GROUP BY
+					benutzerfunktion_id
+			) dvu ON dvu.benutzerfunktion_id = bf.benutzerfunktion_id 
+			WHERE bf.uid = ? 
+			ORDER BY f.beschreibung ASC
 		
 EOSQL;
 			

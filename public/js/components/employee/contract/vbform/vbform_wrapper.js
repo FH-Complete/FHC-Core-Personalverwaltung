@@ -39,6 +39,9 @@ export default {
     </template>
         <template #footer>
          <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
+              <div v-if="mode === 'aenderung' || mode === 'korrektur'" class="btn-group me-2" role="group" aria-label="Second group">
+                  <button class="btn btn-secondary btn-sm float-end" @click="reload">zurücksetzen</button>
+              </div>
               <div class="btn-group me-2" role="group" aria-label="Second group">
                   <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
               </div>
@@ -267,6 +270,9 @@ export default {
         this.$refs['presetchooserRef'].resetSelectedPreset();
         console.log('storeToTmpStore executed.');
       });
+    },
+    reload: function() {
+        this.$refs['presetchooserRef'].selectpreset();
     }
   },
   expose: ['showModal'],

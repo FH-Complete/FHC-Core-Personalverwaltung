@@ -44,6 +44,7 @@ export default {
               guioptions: {
                 title: 'Zuordnung',
                 vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'zuordnung',
                 errors: [],
                 infos: [],
                 childdefaults: {

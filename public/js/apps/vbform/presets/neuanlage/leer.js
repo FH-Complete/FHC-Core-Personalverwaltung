@@ -9,10 +9,17 @@ export default {
   },
   children: [
     {
-      type: 'dv',
+      type: 'vblistgroupspacer',
       guioptions: {
       },
-      children: []
+      children: [
+        {
+          type: 'dv',
+          guioptions: {
+          },
+          children: []
+        }
+      ]
     },
     {
       type: 'vblistgroup',

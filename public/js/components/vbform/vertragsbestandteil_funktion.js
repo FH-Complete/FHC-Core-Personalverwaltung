@@ -42,6 +42,7 @@ export default {
                 optionLabel="label"
                 optionDisabled="disabled"
                 forceSelection
+                :disabled="isinputdisabled('funktion')"
             ></p-autocomplete>
         </div>
 <!--        
@@ -67,6 +68,7 @@ export default {
                 optionLabel="label"
                 optionDisabled="disabled"
                 forceSelection
+                :disabled="isinputdisabled('orget')"
             ></p-autocomplete>
         </div>
 <!--
@@ -209,7 +211,8 @@ export default {
       }
     },
     getFunktionen: async function() {
-      const response = await Vue.$fhcapi.Funktion.getContractFunctions();
+      const filter = (this.config.guioptions?.filter) ? this.config.guioptions?.filter : 'all';
+      const response = await Vue.$fhcapi.Funktion.getContractFunctions(filter);
       const funktionen = response.data.retval;
       funktionen.unshift({
         value: '',
