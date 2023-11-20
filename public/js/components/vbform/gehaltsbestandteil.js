@@ -9,7 +9,7 @@ export default {
   <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
   <div class="card card-body border-0 bg-primary my-2" style="--bs-bg-opacity: .03;">
     <div class="row g-2 mb-1">
-      <div class="col-3">
+      <div class="col-2">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
 <!--        
         <option value="" selected disabled>Gehaltstyp wählen</option>
@@ -47,7 +47,6 @@ export default {
     </div>
   </div>
   <div class="row g-2 mb-3">
-    <div class="col-1 ps-5">&nbsp;</div>
     <div class="col-2">
       <div class="input-group input-group-sm">
         <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
@@ -59,19 +58,15 @@ export default {
           locale="de"
           format="dd.MM.yyyy"
           model-type="yyyy-MM-dd"></datepicker>
-        <span class="input-group-text bg-white border-0">
-            <i class="fas fa-square text-white"></i>
-        </span>
       </div>
     </div>
-    <div class="col-1">&nbsp;</div>
-    <div class="col-2 form-check form-control-sm">
+    <div class="col-2 form-check form-control-sm ms-2">
       <input v-model="valorisierung" :disabled="isinputdisabled('valorisierung')" class="form-check-input" type="checkbox" value="" :id="'valorisierung_' + config.guioptions.id">
       <label class="form-check-label" :for="'valorisierung_' + config.guioptions.id">
         Valorisierung
       </label>
     </div>
-    <div class="col-6">&nbsp;</div>    
+    <div class="col-8">&nbsp;</div>    
   </div>
   `,
   data: function() {
