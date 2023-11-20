@@ -143,11 +143,11 @@ export const CreateEmployeeFrm = {
             frmState.wasValidated  = true;  
         }
 
-        const take = async (person_id, uid) => {
+        const take = async (person_id, uid, vorname, nachname) => {
                                 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid}});             
+                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
                 isFetching.value = false;                
                 personSelectedHandler(person_id, res.data.retval.uid);
 
