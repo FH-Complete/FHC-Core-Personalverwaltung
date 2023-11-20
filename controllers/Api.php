@@ -1595,6 +1595,13 @@ class Api extends Auth_Controller
                 //$uid = sprintf('ma%05d',  $personalnummer - 10000);
 				$uid = generateMitarbeiterUID($payload['vorname'], $payload['nachname'], 
 					false, true, $personalnummer);
+
+                if ($uid === false)
+                {
+                    $this->CI->db->trans_rollback();
+                    $this->outputJsonError('error generating UID for person');
+                    return;
+                }
 				
                 // create benutzer
                 $result = $this->ApiModel->insertUser([ 'uid' => $uid, 'person_id' => $person_id ]);
