@@ -131,7 +131,7 @@ export default {
           freitext: vb.freitext,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'freitexttyp',
             'titel',
@@ -163,7 +163,7 @@ export default {
           mode: 'bestehende',
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'funktion',
             'orget',
@@ -187,7 +187,7 @@ export default {
           tatsaechlicher_geburtstermin: vb.tatsaechlicher_geburtstermin,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'karenztyp_kurzbz'
         ];
@@ -201,7 +201,7 @@ export default {
           arbeitnehmer_frist: vb.arbeitnehmer_frist,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'arbeitgeber_frist',
             'arbeitnehmer_frist'
@@ -216,7 +216,7 @@ export default {
           teilzeittyp_kurzbz: vb.teilzeittyp_kurzbz,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'stunden',
             'teilzeittyp_kurzbz'
@@ -230,7 +230,7 @@ export default {
           tage: vb.tage,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'tage'
         ];
@@ -245,7 +245,7 @@ export default {
           homeoffice: vb.homeoffice,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
-      if( this.isEndable(vb) ) {
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'zeitaufzeichnung',
             'azgrelevant',
@@ -255,7 +255,7 @@ export default {
   },
   gehaltsbestandteil2gui: function(gb, mode) {
       var disabled = [];
-      if( this.isEndable(gb) ) {
+      if( this.isEndable(gb) && !this.isFuture(gb) ) {
           disabled = [
             'gehaltstyp',
             'anmerkung',

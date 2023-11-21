@@ -4,8 +4,8 @@ import dv from './dv.js';
 export default {
   template: `
     <div class="px-3">
-      <template v-for="(child, idx) in children">
-        <component ref="parts" :is="child.type" :key="idx" :preset="child"></component>
+      <template v-for="(child, idx) in children" :key="idx">
+        <component ref="parts" :is="child.type" :preset="child"></component>
       </template>
     </div>
   `,

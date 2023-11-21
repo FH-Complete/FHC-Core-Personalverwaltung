@@ -7,6 +7,7 @@ import {Modal} from '../../../Modal.js';
 import tmpstorehelper from '../../../vbform/tmpstorehelper.js';
 import vbgb2gui from '../../../../helpers/vbform/vbgb2gui.js';
 import Phrasen from '../../../../../../../js/mixins/Phrasen.js';
+import savedpayloadchecker from '../../../../helpers/vbform/savedpayloadchecker.js';
 
 export default {
   template: `
@@ -101,8 +102,8 @@ export default {
     resetStoreDV: function() {
       if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
         // TODO cleanup and remove again
-        store.dv.data = {};
-        store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
+        this.store.dv.data = {};
+        this.store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
       }  
     },
     resetpreset: function() {
@@ -239,6 +240,7 @@ export default {
       this.$refs['tmpstorehelper'].deleteFromTmpStorePromise()
         .then(() => {
         this.$refs['tmpstorehelper'].fetchTmpStoreList();
+        savedpayloadchecker.checkpayload(payload);
         this.presetselected(payload);
         const dvid = payload.dv.data.dienstverhaeltnisid;
         this.$emit('dvsaved', dvid);

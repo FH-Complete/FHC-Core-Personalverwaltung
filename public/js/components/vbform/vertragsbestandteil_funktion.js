@@ -43,6 +43,7 @@ export default {
                 optionDisabled="disabled"
                 forceSelection
                 :disabled="isinputdisabled('funktion')"
+                :placeholder="getFunktionDropdownPlaceholder"
             ></p-autocomplete>
         </div>
 <!--        
@@ -69,6 +70,7 @@ export default {
                 optionDisabled="disabled"
                 forceSelection
                 :disabled="isinputdisabled('orget')"
+                :placeholder="getOrgetDropdownPlaceholder"
             ></p-autocomplete>
         </div>
 <!--
@@ -169,11 +171,15 @@ export default {
       'autocomplete.selectedfunktion': function() {
         if(this.autocomplete.selectedfunktion?.value !== undefined) {
           this.funktion = this.autocomplete.selectedfunktion.value;
+        } else {
+          this.funktion = '';
         }
       },
       'autocomplete.selectedorget': function() {
         if(this.autocomplete.selectedorget?.value !== undefined) {
           this.orget = this.autocomplete.selectedorget.value;
+        } else {
+          this.orget = '';
         }
       }
   },
@@ -316,5 +322,19 @@ export default {
           });
         }
     }
+  },
+  computed: {
+      getFunktionDropdownPlaceholder: function() {
+          if( this.store.unternehmen === '' ) {
+            return 'Bitte zuerst ein Unternehmen auswählen';
+          }
+          return 'Funktion wählen';
+      },
+      getOrgetDropdownPlaceholder: function() {
+          if( this.store.unternehmen === '' ) {
+            return 'Bitte zuerst ein Unternehmen auswählen';
+          }
+          return 'OrgEinheit wählen';
+      }
   }
 }
