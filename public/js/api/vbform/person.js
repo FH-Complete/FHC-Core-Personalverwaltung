@@ -38,6 +38,11 @@ export default {
           }
         });
     },
+    personEmployeeKurzbzExists: function(uid, kurzbz) {
+      var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+              + '/extensions/FHC-Core-Personalverwaltung/api/personEmployeeKurzbzExists';
+      return axios.get(url, { params: { uid, kurzbz} });
+    },
 
     deletePersonBankData: function(bankverbindung_id) {
       var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 

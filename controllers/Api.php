@@ -52,6 +52,7 @@ class Api extends Auth_Controller
                 'deletePersonJobFunction'  => Api::DEFAULT_PERMISSION,
                 'personBaseData' => Api::DEFAULT_PERMISSION,
                 'updatePersonBaseData' => Api::DEFAULT_PERMISSION,
+                'personEmployeeKurzbzExists' => Api::DEFAULT_PERMISSION,
                 'personEmployeeData' => Api::DEFAULT_PERMISSION,
                 'updatePersonEmployeeData' => Api::DEFAULT_PERMISSION,
                 'personAddressData' => Api::DEFAULT_PERMISSION,
@@ -1072,6 +1073,31 @@ class Api extends Auth_Controller
 			    $this->outputJsonSuccess($result->retval);
 		    else
 			    $this->outputJsonError('Error when updating person base data');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+    function personEmployeeKurzbzExists()
+    {
+        if($this->input->get()){
+            $uid = $this->input->get('uid', '');
+            $kurzbz = $this->input->get('kurzbz', '');
+
+            if ($uid == '') 
+                show_error('parameter uid missing');
+
+            $kurzbzexists = $this->EmployeeModel->kurzbzExists($kurzbz, $uid);
+
+            if (isError($kurzbzexists))
+            {
+                $this->outputJsonError($kurzbzexists->msg, EXIT_ERROR);
+            }
+
+            if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
+                $this->outputJsonSuccess(true);
+            else
+                $this->outputJsonSuccess(false);
         } else {
             $this->output->set_status_header('405');
         }

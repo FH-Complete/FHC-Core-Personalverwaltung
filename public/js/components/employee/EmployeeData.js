@@ -30,6 +30,7 @@ export const EmployeeData= {
         const ausbildung = Vue.inject('ausbildung');
         const standorte = Vue.inject('standorte');
         const orte = Vue.inject('orte');
+        const validKurzbz = Vue.ref(true);
 
         const fetchData = async () => {
             if (personID.value==null) {                
@@ -128,15 +129,37 @@ export const EmployeeData= {
 
         const employeeDataFrm = Vue.ref();
 
-        const frmState = Vue.reactive({ nachnameBlured: false, geburtsdatumBlured: false, wasValidated: false });
+        const frmState = Vue.reactive({ nachnameBlured: false, kurzbzBlured: false, wasValidated: false });
 
         const validNachname = (n) => {
             return !!n && n.trim() != "";
         }
 
-        const validGeburtsdatum = (n) => {
-            return !!n && n.trim() != "";
+        const validateKurzbz = () => {
+
+                if (!!currentValue.value.kurzbz && currentValue.value.kurzbz.trim() != "") {
+
+                    console.log('validateKurzbz: ', currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz)
+                    isFetching.value = true;
+
+                    try {
+                        Vue.$fhcapi.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
+                            if (res.data.error == 1) {
+                                console.error("error checking kurzbz", res.data.msg)
+                            } else {                                
+                                validKurzbz.value = !res.data.retval
+                            }
+                        })
+                        
+                    } catch (error) {
+                        console.log(error)              
+                    } finally {
+                        isFetching.value = false
+                    }   
+                }
+                
         }
+        
 
         const readonlyBlocker = (e) => {
             if (readonly.value) e.preventDefault();
@@ -197,10 +220,12 @@ export const EmployeeData= {
             ausbildung,
             standorte,
             orte,
+            validKurzbz,
 
             save,
             toggleMode,  
-            validNachname,    
+            validNachname, 
+            validateKurzbz,   
             getAusbildungbez,
             getStandortbez,
             readonlyBlocker,
@@ -238,7 +263,10 @@ export const EmployeeData= {
                             </div>            
                             <div class="col-md-2">
                                 <label for="kurzbezeichnung" class="form-label">{{ t('gruppenmanagement','kurzbezeichnung') }}</label>
-                                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
+                                <input type="text" :readonly="readonly" @blur="frmState.kurzbzBlured = true" @input="validateKurzbz()" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validKurzbz && frmState.kurzbzBlured }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
+                                <div class="invalid-feedback" v-if="!validKurzbz">
+                                    Kurzbezeichnung existiert bereits. 
+                                </div>
                             </div>
                             <div class="col-md-4">
                                 <label for="alias" class="form-label">{{ t('person','alias') }}</label>
