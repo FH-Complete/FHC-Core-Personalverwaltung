@@ -55,22 +55,28 @@ export const SearchExistingDialog = {
         };
         
 
-        const personSelectedHandler = (id, uid) => {
+        const personSelectedHandler = (id, uid, event) => {
 			console.log('personSelected: ', id);			
 			let url = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/${id}/${uid}/summary`;
 			router.push(url);
-            emit('select', uid );
+            emit(event, uid );
 		}
+        
 
         // create new employee based on student
-        const take = async (person_id, uid) => {                        
+        const take = async (person_id, uid, vorname, nachname) => {                        
 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid}});             
-                isFetching.value = false;                
-                personSelectedHandler(person_id, res.data.retval.uid);
-                filterPerson();
+                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                isFetching.value = false;    
+
+                if (!res.data.error) {            
+                    personSelectedHandler(person_id, res.data.retval.uid, 'take');
+                    filterPerson();
+                } else {
+                    console.log("Fehler beim Anlegen: ", res.data.retval);
+                }
 
             } catch (error) {
                 console.log(error);
@@ -123,7 +129,7 @@ export const SearchExistingDialog = {
                     <tr><th>UID</th><th>Nachname</th><th>Vorname</th><th>Geb.Dat.</th><th>SVNr</th><th>Status</th><th>Aktion</th></tr>
                 </thead>
                 <tbody>
-                    <tr v-for="person in personList"  @click="personSelectedHandler(person.person_id, person.uid)">
+                    <tr v-for="person in personList"  @click="personSelectedHandler(person.person_id, person.uid, 'select')">
                         <td>{{ person.uid }}</td>
                         <td>{{ person.nachname }}</td>
                         <td>{{ person.vorname }}</td>
@@ -133,7 +139,7 @@ export const SearchExistingDialog = {
                         <td @click.stop>
                             <div class="d-grid gap-2 d-md-flex align-middle">
                                 <button type="button" class="btn btn-outline-dark btn-sm" 
-                                    @click="take(person.person_id, person.uid)"
+                                    @click="take(person.person_id, person.uid, person.vorname, person.nachname)"
                                     style="white-space: nowrap"
                                     :disabled="isFetching"
                                     v-if="person.status=='Student' && !person.taken">

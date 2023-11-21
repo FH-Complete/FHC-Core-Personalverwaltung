@@ -1595,6 +1595,13 @@ class Api extends Auth_Controller
                 //$uid = sprintf('ma%05d',  $personalnummer - 10000);
 				$uid = generateMitarbeiterUID($payload['vorname'], $payload['nachname'], 
 					false, true, $personalnummer);
+
+                if ($uid === false)
+                {
+                    $this->CI->db->trans_rollback();
+                    $this->outputJsonError('error generating UID for person');
+                    return;
+                }
 				
                 // create benutzer
                 $result = $this->ApiModel->insertUser([ 'uid' => $uid, 'person_id' => $person_id ]);
@@ -1606,8 +1613,25 @@ class Api extends Auth_Controller
                 }
                 $uid = $result->retval;
 
-                // create employee
+                
                 $employeeJson = [ 'mitarbeiter_uid' => $uid, 'personalnummer' => $personalnummer];
+
+                // generate abbreviated designation
+                $kurzbzRes = $this->EmployeeModel->generateKurzbzHelper($payload['vorname'], $payload['nachname']);
+                if (!isError($kurzbzRes))
+                {
+                    $genKurzbz = getData($kurzbzRes);
+                    if (!isEmptyString($genKurzbz))
+                    {
+                        $employeeJson['kurzbz'] = $genKurzbz;
+                    }
+                } else {
+                    $this->CI->db->trans_rollback();
+                    $this->outputJsonError('error creating employee: duplicate kurzbz');
+                    return;
+                }
+
+                // create employee
                 $result = $this->ApiModel->insertEmployee($employeeJson);
                 if (isError($result)) 
                 {

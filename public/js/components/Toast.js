@@ -3,10 +3,14 @@ export const Toast = {
         title: {
             text: String,
             default: "<<Text goes here>>",
+        },
+        type: {
+            text: String,
+            default: "success",
         }
     },
     expose: ['show', 'hide'],
-    setup() {
+    setup(props) {
 
         let toastEle = Vue.ref(null);
         let thisToastObj;
@@ -23,11 +27,15 @@ export const Toast = {
             thisToastObj.hide();
         }
 
-        return { show, hide, toastEle };
+        const backgroundColor = Vue.computed(() => {
+            return props.type == "success" ? "bg-primary"  : "bg-danger"
+        })
+
+        return { show, hide, toastEle, backgroundColor };
 
     },
     template: `
-    <div class="toast align-items-center text-white bg-primary border-0 " role="alert" aria-live="assertive" aria-atomic="true" ref="toastEle">
+    <div class="toast align-items-center text-white border-0 " :class="backgroundColor" role="alert" aria-live="assertive" aria-atomic="true" ref="toastEle">
         <div class="d-flex">
             <div class="toast-body">
             <slot name="body"></slot>

@@ -27,8 +27,7 @@ export default {
 
 		const { watch, ref } = Vue;
 		const router = VueRouter.useRouter();
-                const route = VueRouter.useRoute();
-
+		const route = VueRouter.useRoute();
 		const isEditorOpen = ref(false);
 		const currentPersonID = ref(null);
 		const currentPersonUID = ref(null);
@@ -36,6 +35,7 @@ export default {
 		const verticalsplitRef = ref(null);
 		const createWizardRef = ref();
 		const toastEmployeeCreatedRef = ref();
+		const toastEmployeeCreateFailedRef = ref();
 		const currentDate = ref(null);
 
 		watch(
@@ -63,9 +63,11 @@ export default {
 
 		const openCreateWizard = () => {
 			createWizardRef.value.showModal().then((action) => {
-				console.log('create wizard closed. action: ', action);
-				if (action !== false) {
-					showEmployeeCreatedToast();
+
+				if (action !== false && action.type != "CANCELED") {
+					showEmployeeCreatedToast()
+				} else if (action === false) {
+					showEmployeeCreateFailedToast()
 				}
 			})
 		}
@@ -144,6 +146,10 @@ export default {
             toastEmployeeCreatedRef.value.show();
         }
 
+		const showEmployeeCreateFailedToast = () => {
+			toastEmployeeCreateFailedRef.value.show();
+		}
+
 		Vue.onMounted(() => {
 			let person_id = route.params.id;
 			let person_uid = route.params.uid;
@@ -192,6 +198,7 @@ export default {
 			employeesTabulatorOptions,
 			verticalsplitRef,
 			toastEmployeeCreatedRef,
+			toastEmployeeCreateFailedRef,
 			route,
 		}
 
@@ -240,6 +247,9 @@ export default {
 							<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 								<Toast ref="toastEmployeeCreatedRef">
 									<template #body><h4>Mitarbeiter erstellt.</h4></template>
+								</Toast>
+								<Toast ref="toastEmployeeCreateFailedRef" type="error">
+									<template #body><h4>Mitarbeiter anlegen fehlgeschlagen!</h4></template>
 								</Toast>
 							</div>
                         </div>

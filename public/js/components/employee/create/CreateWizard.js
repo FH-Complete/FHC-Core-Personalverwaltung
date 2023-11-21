@@ -65,23 +65,26 @@ export const CreateWizard = {
                 currentValue.value = { surname: '', birthdate: null} 
                 searchExistingRef.value.reset()  
                 schnellanlageRef.value.reset()             
-                hideModal()
-                
-                
+                hideModal()                            
                 _resolve({type: 'CREATED', payload: { uid: 'dummy' }})
             })
             .catch((error) => {
                 console.log(error.message);
+                _reject(false);
             });
 
             
             
         }
-
         
         const cancelHandler = () =>  {
             hideModal();
-            _resolve(false);
+            _resolve({type: 'CANCELED', payload: { uid: 'dummy' }});
+        }
+
+        const takeHandler = () =>  {
+            hideModal();
+            _resolve({type: 'CREATED', payload: { uid: 'dummy' }});
         }
 
         const showCreateHandler = () => {
@@ -100,7 +103,7 @@ export const CreateWizard = {
 
         return { modalRef, stepsRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
             okHandler,cancelHandler, currentValue, showCreateHandler, getSelectedTitle,
-            searchCriteriaHandler };
+            searchCriteriaHandler, takeHandler };
     },
     template: `
         <Modal :title="'Mitarbeiter anlegen'" ref="modalRef" id="createWizardModal">
@@ -108,7 +111,7 @@ export const CreateWizard = {
             
                 <Steps  ref="stepsRef">
                     <Step title="Suche">
-                        <search-existing-dialog ref="searchExistingRef" @change="searchCriteriaHandler" @select="cancelHandler" />
+                        <search-existing-dialog ref="searchExistingRef" @change="searchCriteriaHandler" @take="takeHandler" @select="cancelHandler" />
                     </Step>
                     <Step title="Schnellanlage" >
                         <create-employee-frm ref="schnellanlageRef" :defaultval="currentValue" />
