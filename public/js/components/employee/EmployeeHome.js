@@ -131,7 +131,13 @@ export default {
 				{title: "TitelPost", field: "TitelPost", headerFilter: true},
 				{title: "Alias", field: "Alias", headerFilter: true},
 				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
-				{title: "Aktiv", field: "Aktiv", formatter:"tickCross",  headerFilter:"tickCross", hozAlign: "center", headerFilterParams:{"tristate":true,elementAttributes:{"value":"true"}}, headerFilterEmptyCheck:function(value){return value === null}},
+				{title: "Aktiv", field: "Aktiv", hozAlign: "center", formatter:"tickCross", formatterParams: {
+						tickElement: '<i class="fas fa-check text-success"></i>',
+						crossElement: '<i class="fas fa-times text-danger"></i>'
+					},
+					headerFilter:"tickCross", headerFilterParams: {
+						"tristate":true,elementAttributes:{"value":"true"}
+					}, headerFilterEmptyCheck:function(value){return value === null}},
 				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
 				{title: "SVNR", field: "SVNR", headerFilter: true},
 				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
