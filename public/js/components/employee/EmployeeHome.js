@@ -44,6 +44,9 @@ export default {
 				currentPersonID.value = parseInt(params.id);
 				currentPersonUID.value = params.uid;	
 				console.log('*** EmployeeHome params changed', currentPersonID.value);
+				if (verticalsplitRef.value.isCollapsed() == 'bottom') {
+					verticalsplitRef.value.showBoth();
+				}
 			}
 		)
 
