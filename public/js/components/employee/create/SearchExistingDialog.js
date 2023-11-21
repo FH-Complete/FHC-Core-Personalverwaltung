@@ -104,7 +104,7 @@ export const SearchExistingDialog = {
                 @keyup="filterPerson"
                 type="text" 
                 class="form-control form-control-sm" 
-                placeholder="Nachname" aria-label="nachname"
+                aria-label="nachname"
                 autofocus >
         </div>
         <div class="col-md-3">
