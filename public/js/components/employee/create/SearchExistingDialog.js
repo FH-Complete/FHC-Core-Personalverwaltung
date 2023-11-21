@@ -135,20 +135,19 @@ export const SearchExistingDialog = {
                         <td>{{ person.svnr }}</td>
                         <td>{{ person.status }}</td>
                         <td @click.stop>
-                            <div class="d-grid gap-2 d-md-flex align-middle">
-                                <button type="button" class="btn btn-outline-dark btn-sm" 
+                            <div class="d-grid gap-2 d-md-flex justify-content-start">
+                                <button type="button" class="btn btn-secondary btn-sm" 
                                     @click="take(person.person_id, person.uid)"
                                     style="white-space: nowrap"
                                     :disabled="isFetching"
                                     v-if="person.status=='Student' && !person.taken">
-                                    Als MA übernehmen
+                                    Person als MA anlegen
                                 </button>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </div>
 
     </form>
