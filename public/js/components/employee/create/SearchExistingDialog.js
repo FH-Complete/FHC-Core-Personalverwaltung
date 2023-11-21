@@ -3,7 +3,7 @@ const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*
 
 export const SearchExistingDialog = {
     components: {
- 
+        "datepicker": VueDatePicker,
     },
     props: {
        
@@ -109,11 +109,16 @@ export const SearchExistingDialog = {
         </div>
         <div class="col-md-3">
             <label for="birthdate" class="form-label">Geburtsdatum</label>
-            <input id="birthdate"
-                type="date"  
-                class="form-control form-control-sm"   
-                v-model="currentValue.birthdate" 
-                @change="filterPerson" >
+            <datepicker id="birthdate" 
+                :teleport="true"
+                v-model="currentValue.birthdate"
+                v-bind:enable-time-picker="false"
+                text-input 
+                locale="de"
+                format="dd.MM.yyyy"
+                auto-apply 
+                model-type="yyyy-MM-dd" 
+                @change="filterPerson" ></datepicker>
         </div>
         <div class="col-md-12 pt-5">
             <h6>Prüfung ob Person bereits existiert</h6>

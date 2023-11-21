@@ -6,7 +6,7 @@ const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*
 
 export const CreateEmployeeFrm = {
     components: {
- 
+        "datepicker": VueDatePicker
     },
     props: {
         defaultval: { type: Object, required: false },
@@ -251,12 +251,17 @@ export const CreateEmployeeFrm = {
         </div>
         <div class="col-md-2">
             <label for="birthdate" class="required form-label">Geburtsdatum</label>
-            <input id="birthdate"
-                type="date"  
-                class="form-control form-control-sm"  
+            <datepicker id="birthdate"
+                :teleport="true"
                 :class="{ 'is-invalid': !validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured}"
-                @blur="frmState.geburtsdatumBlured = true"
-                v-model="currentValue.gebdatum" >
+                @blur="frmState.geburtsdatumBlured = true"             
+                v-model="currentValue.gebdatum"
+                v-bind:enable-time-picker="false"
+                text-input 
+                locale="de"
+                format="dd.MM.yyyy"
+                auto-apply 
+                model-type="yyyy-MM-dd"></datepicker>
                 <div class="invalid-feedback" v-if="frmState.geburtsdatumBlured && !validGeburtsdatum(currentValue.gebdatum)">
                 Bitte geben Sie das Geburtsdatum an.
                 </div>
