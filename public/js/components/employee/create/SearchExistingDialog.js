@@ -94,7 +94,7 @@ export const SearchExistingDialog = {
         return {  currentValue, filterPerson, personSelectedHandler, personList, surnameRef, take, reset, formatDate, isFetching  };
     },
     template: `
-    <form class="row g-3" ref="searchExistingFrm" id="searchExistingFrm" >
+    <form class="row g-3 pb-4" ref="searchExistingFrm" id="searchExistingFrm" >
 
         <div class="col-md-3">
             <label for="surname" class="required form-label">Nachname</label>
@@ -120,10 +120,9 @@ export const SearchExistingDialog = {
                 model-type="yyyy-MM-dd" 
                 @change="filterPerson" ></datepicker>
         </div>
-        <div class="col-md-12 pt-5">
-            <h6>Prüfung ob Person bereits existiert</h6>
-<!--            <p>{{ personList.length }} Übereinstimmungen</p>-->
-            <table class="table table-sm table-striped table-hover">
+        <div v-if="personList.length !== 0" class="col-md-12 py-3">
+            <span class="text-primary fw-semibold"><i class="fa fa-circle-info text-primary"></i>&nbsp;{{ personList.length }} Personen gefunden</span>
+            <table class="table table-sm table-striped table-hover mt-2">
                 <thead>
                     <tr><th>UID</th><th>Nachname</th><th>Vorname</th><th>Geb.Dat.</th><th>SVNr</th><th>Status</th><th>Aktion</th></tr>
                 </thead>
