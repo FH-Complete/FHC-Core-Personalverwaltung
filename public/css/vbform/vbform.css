@@ -102,3 +102,8 @@
 	color: #212529;
 	border: 1px solid #ced4da;
 }
+ /* TODO --hainberg Move to core Tabulator5.css? */
+.tabulator .tabulator-footer .tabulator-footer-contents{
+    font-size: small;
+    background-color: white;
+}

@@ -120,7 +120,7 @@ export default {
 		const employeesTabulatorOptions = {
 			height: "100%",
 			layout: 'fitColumns',
-                        footerElement: '<div><span id="search_count"></span> von <span id="total_count"></span></div>',
+            footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
 				{title: "Person ID", field: "PersonId", headerFilter: true},
