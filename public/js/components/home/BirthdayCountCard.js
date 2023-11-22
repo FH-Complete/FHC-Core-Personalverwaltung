@@ -61,9 +61,9 @@ const BirthdayCountCard = {
      },
      template: `
      <div class="card" @click="toggle">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-baseline">
             <h5 class="mb-0">Geburtstage</h5>
-                {{formatDate(currentDate)}}
+                <span class="text-muted">{{formatDate(currentDate)}}</span>
             </div>
             <div class="card-body" style="text-align:center">
             <div v-if="isFetching" class="spinner-border" role="status">
