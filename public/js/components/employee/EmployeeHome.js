@@ -45,7 +45,8 @@ export default {
 				currentPersonUID.value = params.uid;	
 				console.log('*** EmployeeHome params changed', currentPersonID.value);
 				if (verticalsplitRef.value.isCollapsed() == 'bottom') {
-					verticalsplitRef.value.showBoth();
+					isEditorOpen.value = true; // TODO check notwendig? was macht isEditorOpen?
+					verticalsplitRef.value.collapseTop();
 				}
 			}
 		)
@@ -207,7 +208,7 @@ export default {
 	},
     template: `
 
-        <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 border-bottom">
             <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="${FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router}">FHComplete [PV21]</a>
             <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -237,7 +238,7 @@ export default {
                 <verticalsplit id="macombined" ref="verticalsplitRef" >
                     <template #top>
                         <div class="d-flex  flex-column" style="height:100%"  >
-                        <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                                     
                             <div class="flex-fill align-self-center">
                             <h1 class="h2" style="margin-bottom:0" > Mitarbeiter </h1>
