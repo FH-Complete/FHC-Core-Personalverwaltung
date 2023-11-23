@@ -8,6 +8,7 @@ export const MaterialExpensesData = {
         Modal,
         ModalDialog,
         Toast,
+        "datepicker": VueDatePicker
     },
     props: {
         editMode: { type: Boolean, required: true },
@@ -330,11 +331,29 @@ export const MaterialExpensesData = {
                 <!--  -->
                 <div class="col-md-3">
                     <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validBeginn(currentValue.beginn) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.beginn">
+                    <datepicker id="beginn" 
+                        :teleport="true" 
+                        @blur="frmState.beginnBlurred = true" 
+                        :input-class-name="(!validBeginn(currentValue.beginn) && frmState.beginnBlurred) ? 'dp-invalid-input' : ''"  
+                        v-model="currentValue.beginn"
+                        v-bind:enable-time-picker="false"
+                        text-input 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        auto-apply 
+                        model-type="yyyy-MM-dd"></datepicker>
                 </div>
                 <div class="col-md-3">
                     <label for="ende" class="form-label">{{ t('global','bis') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.endeBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.ende">
+                    <datepicker id="ende" 
+                        :teleport="true" 
+                        v-model="currentValue.ende"
+                        v-bind:enable-time-picker="false"
+                        text-input 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        auto-apply 
+                        model-type="yyyy-MM-dd"></datepicker>
                 </div>
                 <div class="col-md-2">
                 </div>

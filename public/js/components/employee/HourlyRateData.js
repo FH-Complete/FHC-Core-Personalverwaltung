@@ -341,14 +341,12 @@ export const HourlyRateData = {
 				</div>
 				<div class="col-md-3">
 					<label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
-					<datepicker 
-						:readonly="readonly"
+					<datepicker id="beginn"
 						@blur="frmState.beginnBlurred = true"
 						v-bind:enable-time-picker="false"
-						class="startDate"
-						:class="{ 'form-control-plaintext': readonly, 'is-invalid': !validBeginn(currentValue.gueltig_von) && frmState.beginnBlurred}"
-						id="beginn"
+						:input-class-name="(!validBeginn(currentValue.gueltig_von) && frmState.beginnBlurred) ? 'dp-invalid-input' : ''"						
 						v-model="currentValue.gueltig_von"
+						text-input 
 						locale="de"
 						format="dd.MM.yyyy"
 						auto-apply 
@@ -357,13 +355,11 @@ export const HourlyRateData = {
 				</div>
 				<div class="col-md-3">
 					<label for="ende" class="form-label">{{ t('global','bis') }}</label>
-					<datepicker 
-						:readonly="readonly"
+					<datepicker id="ende"
 						@blur="frmState.bisBlurred = true"
 						v-bind:enable-time-picker="false"
-						:class="{ 'form-control-plaintext': readonly, 'is-invalid': !checkDates(currentValue.gueltig_von, currentValue.gueltig_bis) && frmState.bisBlurred}"
-						id="ende"
 						v-model="currentValue.gueltig_bis"
+						text-input 
 						locale="de"
 						format="dd.MM.yyyy"
 						auto-apply 

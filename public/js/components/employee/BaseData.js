@@ -6,6 +6,7 @@ export const BaseData = {
     components: {
         ModalDialog,
         Toast,
+        "datepicker": VueDatePicker
     },
     props: {
         editMode: { type: Boolean, required: true },
@@ -353,7 +354,21 @@ export const BaseData = {
     
                 <div class="col-lg-2 col-md-3">
                     <label for="geburtsdatum" class="required form-label">{{ t('person', 'geburtsdatum') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.geburtsdatumBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured}" id="geburtsdatum" v-model="currentValue.gebdatum">
+                    <template v-if="readonly">
+                        <input type="date" readonly class="form-control-sm form-control-plaintext" v-model="currentValue.gebdatum" id="geburtsdatum" >
+                    </template>
+                    <template v-else>
+                        <datepicker id="geburtsdatum"
+                            @blur="frmState.geburtsdatumBlured = true" 
+                            :input-class-name="(!validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured) ? 'dp-invalid-input' : ''" 
+                            v-model="currentValue.gebdatum"
+                            v-bind:enable-time-picker="false"
+                            text-input 
+                            locale="de"
+                            format="dd.MM.yyyy"
+                            auto-apply 
+                            model-type="yyyy-MM-dd"></datepicker>
+                    </template>
                 </div>
     
                 <div class="col-lg-2 col-md-3">
