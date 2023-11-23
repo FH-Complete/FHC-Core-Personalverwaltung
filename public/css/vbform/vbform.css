@@ -107,3 +107,7 @@
     font-size: small;
     background-color: white;
 }
+
+.dp-invalid-input{
+    border-color: #dc3545;
+}
