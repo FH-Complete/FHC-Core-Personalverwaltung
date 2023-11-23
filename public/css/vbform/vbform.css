@@ -90,6 +90,10 @@
     line-height: 1;
 }
 
+.fhc_autocomplete_wrapper .p-autocomplete {
+    width: 100%
+}
+
 .fhc_autocomplete_wrapper .p-autocomplete input {
     padding-top: .25em;
     padding-bottom: .25em;
