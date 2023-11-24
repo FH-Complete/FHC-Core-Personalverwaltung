@@ -13,6 +13,7 @@ const IssuesCountCard = {
         const issues = Vue.ref([]);
         const issuesOverlay = Vue.ref();
         const selectedPerson = Vue.ref();
+        const filterActiveDV = Vue.ref(false);
 
         const toggle = (event) => {
             issuesOverlay.value.toggle(event);
@@ -38,9 +39,17 @@ const IssuesCountCard = {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
             window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${event.data.person_id}/${event.data.uid}/summary`;
         }
+
+        const issuesFiltered = Vue.computed(() => {
+            if (filterActiveDV.value) {
+                return  issues.value.filter(issue => issue.aktiv > 0)
+            }
+            return issues.value
+        })
       
         return {
-           issues, isFetching, title, toggle, issuesOverlay, onPersonSelect, selectedPerson,
+           issues, isFetching, title, toggle, issuesOverlay, onPersonSelect, selectedPerson, 
+           filterActiveDV, issuesFiltered,
         }
      },
      template: `
@@ -58,7 +67,11 @@ const IssuesCountCard = {
      </div>
 
      <p-overlaypanel ref="issuesOverlay">
-         <p-datatable v-model:selection="selectedPerson" :value="issues" selectionMode="single" sortMode="multiple" :paginator="true" :rows="5" @row-select="onPersonSelect">
+         <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" role="switch" id="filterActiveDV" v-model="filterActiveDV">
+            <label class="form-check-label" for="filterActiveDV">aktive DV anzeigen</label>
+         </div>
+         <p-datatable v-model:selection="selectedPerson" :value="issuesFiltered" selectionMode="single" sortMode="multiple" :paginator="true" :rows="5" @row-select="onPersonSelect">
             <p-column field="vorname" header="Vorname" sortable style="min-width: 12rem"></p-column>
             <p-column field="nachname" header="Nachname" sortable style="min-width: 12rem"></p-column>
             <p-column field="openissues" header="Issues" sortable style="min-width: 8rem"></p-column>
