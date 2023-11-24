@@ -247,14 +247,14 @@ export const EmployeeHeader = {
         </div>
 
         <div class="d-flex justify-content-between ms-sm-auto col-lg-12 p-md-2" >
-            <div class="d-flex align-items-center flex-fill" >
+            <div class="d-flex align-items-top flex-fill" >
             
                 <div class="fotocontainer" v-if="!isFetchingName">
                     <img v-if="employee?.foto" class="rounded" style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
                     <div v-if="employee?.foto" class="fotobutton">
                         <div class="d-grid gap-2 d-md-flex ">
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
-                                    <i class="fa fa-minus"></i>
+                                    <i class="fa fa-xmark"></i>
                                 </button>
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal">
                                     <i class="fa fa-pen"></i>
@@ -274,28 +274,28 @@ export const EmployeeHeader = {
                     </div>
                 </div>                             
                 
-                <div class="ms-3 flex-fill" >
+                <div class="ms-3 flex-fill d-flex flex-column" >
                     <div class="align-items-top">
                         <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}</h2>
                         <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
     
-                        <div v-if="employee?.abteilung && !isFetching" class="mb-1 text-muted">
+                        <div v-if="employee?.abteilung && !isFetching" class="mb-1">
                             <template v-for="(item, index) in employee?.abteilung">
-                                <strong>{{ item?.organisationseinheittyp_kurzbz }}</strong> {{ item?.bezeichnung }},
-                                <strong>Vorgesetzte(r) </strong> <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
+                                <strong class="text-muted">{{ item?.organisationseinheittyp_kurzbz }}</strong> {{ item?.bezeichnung }} |
+                                <strong class="text-muted">Vorgesetzte*r </strong> <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
                                 <br v-if="index < employee?.abteilung?.length - 1" />
                             </template>    
                             </div>  
                         <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>                
-                        <div v-if="!isFetchingName" class="mb-1 text-muted">
-                            <strong>Email</strong>&nbsp; 
+                        <div v-if="!isFetchingName" class="mb-1">
+                            <strong class="text-muted">Email</strong>&nbsp; 
                             <span v-if="!employee?.alias">,  
                                 <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
                             </span>
                             <span v-if="employee?.alias">
                                 <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
                             </span>
-                            <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <strong>DW</strong> {{  employee?.telefonklappe }}</span>  
+                            <span v-if="employee?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW</strong> {{  employee?.telefonklappe }}</span>  
                         </div>  
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
                     </div>

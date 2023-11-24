@@ -1,7 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BankData = {
     components: {
@@ -260,9 +260,9 @@ export const BankData = {
                 </div>
         
                 <div class="card-body">
-                    <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-                            <i class="fa fa-plus"></i>
+                    <div class="d-grid gap-2 d-md-flex justify-content-start py-2">
+                        <button type="button" class="btn btn-sm btn-primary" @click="showAddModal()">
+                            <i class="fa fa-plus"></i> {{ t('person','bankdaten') }}
                         </button>            
                     </div>
                     <div class="table-responsive">
@@ -288,11 +288,11 @@ export const BankData = {
                         <td class="align-middle">{{ bankdata.verrechnung == true ? "X" : "" }}</td>
                         <td class="align-middle" width="5%">
                             <div class="d-grid gap-2 d-md-flex align-middle">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(bankdata.bankverbindung_id)">
-                                    <i class="fa fa-xmark"></i>
-                                </button>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(bankdata.bankverbindung_id)">
                                     <i class="fa fa-pen"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(bankdata.bankverbindung_id)">
+                                    <i class="fa fa-xmark"></i>
                                 </button>
                             </div>
                         </td>
@@ -358,11 +358,8 @@ export const BankData = {
             </form>
         </template>
         <template #footer>
-            <button type="button" class="btn btn-secondary" @click="hideModal()">
-            {{ t('ui','abbrechen') }}
-            </button>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-            {{ t('ui','ok') }}
+            {{ t('ui','speichern') }}
             </button>
         </template>
 

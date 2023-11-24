@@ -6,7 +6,7 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="py-2" :class="vbcssclasses">
+  <div class="pt-2">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config.guioptions.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config.guioptions.errors : []"></errors>
     <div class="row g-2 py-2">

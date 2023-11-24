@@ -90,9 +90,14 @@
     line-height: 1;
 }
 
+.fhc_autocomplete_wrapper .p-autocomplete {
+    width: 100%
+}
+
 .fhc_autocomplete_wrapper .p-autocomplete input {
     padding-top: .25em;
     padding-bottom: .25em;
+    font-size: 0.9rem;
 }
 
 .fhc_autocomplete_wrapper .p-autocomplete .p-button, 
@@ -100,4 +105,13 @@
 	background: #e9ecef;
 	color: #212529;
 	border: 1px solid #ced4da;
+}
+ /* TODO --hainberg Move to core Tabulator5.css? */
+.tabulator .tabulator-footer .tabulator-footer-contents{
+    font-size: small;
+    background-color: white;
+}
+
+.dp-invalid-input{
+    border-color: #dc3545;
 }

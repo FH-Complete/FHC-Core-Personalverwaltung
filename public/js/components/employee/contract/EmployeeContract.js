@@ -76,7 +76,7 @@ export const EmployeeContract = {
         const vertragsarten = inject('vertragsarten');
         const freitexttypen = inject('freitexttypen');
 
-        const readonly = ref(false);        
+        const readonly = ref(false);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -516,12 +516,12 @@ export const EmployeeContract = {
 
         const dvDeleteHandler = () => {
             console.log('dvDeleteHandler link clicked', currentDVID);
-            deleteDV(currentDVID.value).then(async () => {                
+            deleteDV(currentDVID.value).then(async () => {
                 fetchData(route.params.uid)
-                let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
-                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                    + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
-                    + route.params.id + '/' + route.params.uid 
+                let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
+                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+                    + '/extensions/FHC-Core-Personalverwaltung/Employees/'
+                    + route.params.id + '/' + route.params.uid
                     + '/contract';
                 await router.push( url )
             });
@@ -565,7 +565,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,             
+            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
         }
     },
     template: `
@@ -593,14 +593,14 @@ export const EmployeeContract = {
                     </div>
                     <div class="d-flex">
                         <div class="me-auto">
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <DropDownButton class="me-2" :links="[{action:linkToLehrtaetigkeitsbestaetigungODT,text:'Lehrtätigkeitsbestätigung (odt)'},{action:linkToLehrtaetigkeitsbestaetigungPDF,text:'Lehrtätigkeitsbestätigung (pdf)'}]">
                                 Bestätigung drucken
                             </DropDownButton>
                             <!-- Drop Down Button -->
-                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'Korrektur'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'},{action:'extensions/',text:'Testlink'}]">
-                                weitere Aktionen
+                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'},{action:'extensions/',text:'Testlink'}]">
+                                Weitere Aktionen
                             </DropDownButton>
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
                         </div>
@@ -637,14 +637,14 @@ export const EmployeeContract = {
                             <span v-if="currentDV?.bis != null">
                                 Anzeigedatum auf letztgültiges Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
-                                    <i class="fa fa-pen"></i> Datum setzen
+                                    Datum setzen
                                 </button>
                                 
                             </span>
                             <span v-else-if="currentDV?.von != null">
                                 Anzeigedatum auf Von-Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2VonDatum">
-                                    <i class="fa fa-pen"></i> Datum setzen
+                                    Datum setzen
                                 </button>
                                 
                             </span>

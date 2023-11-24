@@ -2,7 +2,7 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const JobFunction = {
     components: {
@@ -10,6 +10,7 @@ export const JobFunction = {
         ModalDialog,
         Toast,
         OrgChooser,
+        "datepicker": VueDatePicker
     },
     props: {
         editMode: { type: Boolean, required: true },
@@ -137,7 +138,7 @@ export const JobFunction = {
             const createDomButton = (classValue, clickHandler) => {
                 const nodeBtn = document.createElement("button");
                 const classAttrBtn = document.createAttribute("class");
-                classAttrBtn.value = "btn btn-outline-dark btn-sm";
+                classAttrBtn.value = "btn btn-outline-secondary btn-sm";
                 nodeBtn.setAttributeNode(classAttrBtn);
                 nodeBtn.addEventListener("click", clickHandler);
                 const nodeI = document.createElement("i");
@@ -154,15 +155,15 @@ export const JobFunction = {
                 const classAttrDiv = document.createAttribute("class");
                 classAttrDiv.value = "d-grid gap-2 d-md-flex justify-content-end align-middle";
                 nodeDiv.setAttributeNode(classAttrDiv);
-                // delete button              
-                const nodeBtnDel = createDomButton("fa fa-minus",() => { showDeleteModal(cell.getValue()) })
+                // delete button
+                const nodeBtnDel = createDomButton("fa fa-xmark",() => { showDeleteModal(cell.getValue()) })
                 // edit button
                 const nodeBtnEdit = createDomButton("fa fa-pen",() => { showEditModal(cell.getValue()) })
 
                 if( cell.getRow().getData().dienstverhaeltnis_unternehmen === null ) {
-                    nodeDiv.appendChild(nodeBtnDel);
+                    nodeDiv.appendChild(nodeBtnEdit);
                 }
-                nodeDiv.appendChild(nodeBtnEdit);
+                nodeDiv.appendChild(nodeBtnDel);
                 return nodeDiv;
             }
             
@@ -453,14 +454,14 @@ export const JobFunction = {
                 </div>
 
                 <div class="card-body">
-                    <div class="d-grid gap-2 d-md-flex justify-content-end mb-1">
-                        <div class="form-check form-switch pe-2">
+                    <div class="d-grid d-md-flex justify-content-between pt-2 pb-3">
+                        <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
+                            <i class="fa fa-plus"></i> {{ t('person','funktion') }}
+                        </button>
+                        <div class="form-check">
                             <input class="form-check-input" type="checkbox" role="switch" id="aktivChecked" v-model="aktivChecked">
-                            <label class="form-check-label" for="aktivChecked">nur aktive anzeigen</label>
+                            <label class="form-check-label" for="aktivChecked">Nur aktive anzeigen</label>
                         </div>
-                        <button type="button" class="btn btn-sm btn-outline-secondary me-3" @click="showAddModal()">
-                            <i class="fa fa-plus"></i>
-                        </button>            
                     </div>
 
                     <!-- TABULATOR -->
@@ -513,22 +514,38 @@ export const JobFunction = {
                 </div>
                 <div class="col-md-4"></div>
                 <!-- -->
-                <div class="col-md-8">
+                <div class="col-md-2">
                     <label for="uid" class="form-label">{{ t('person','wochenstunden') }}</label>
                     <input type="number"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.wochenstunden">
                 </div>
-                <div class="col-md-4">
-                </div>
                 <!--  -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !notEmpty(currentValue.datum_von) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.datum_von">
+                    <datepicker id="beginn"
+                        :teleport="true" 
+                        @blur="frmState.beginnBlurred = true" 
+                        :input-class-name="(!notEmpty(currentValue.datum_von) && frmState.beginnBlurred) ? 'dp-invalid-input' : ''" 
+                        v-model="currentValue.datum_von"
+                        v-bind:enable-time-picker="false"
+                        text-input 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        auto-apply 
+                        model-type="yyyy-MM-dd"></datepicker>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="ende" class="form-label">{{ t('global','bis') }}</label>
-                    <input type="date" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.datum_bis">                    
+                    <datepicker id="ende"
+                        :teleport="true" 
+                        v-model="currentValue.datum_bis"
+                        v-bind:enable-time-picker="false"
+                        text-input 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        auto-apply 
+                        model-type="yyyy-MM-dd"></datepicker>                   
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                 </div>
                 <!-- -->
                 <div class="col-md-8">
@@ -547,11 +564,8 @@ export const JobFunction = {
             </form>
         </template>
         <template #footer>
-            <button type="button" class="btn btn-secondary" @click="hideModal()">
-                {{ t('ui','abbrechen') }}
-            </button>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-                {{ t('ui','ok') }}
+                {{ t('ui','speichern') }}
             </button>
         </template>
 

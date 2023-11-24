@@ -54,7 +54,7 @@ const IssuesCountCard = {
      },
      template: `
      <div class="card" @click="toggle">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-baseline">
             <h5 class="mb-0">{{ title }}</h5>
                 &nbsp;
             </div>

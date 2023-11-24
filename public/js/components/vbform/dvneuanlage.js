@@ -3,14 +3,14 @@ import configurable from '../../mixins/vbform/configurable.js';
 
 export default {
   template: `
-  <div class="col-3">
+  <div class="col-2">
     <select v-model="unternehmen" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option value="" selected disabled>Unternehmen wählen</option>
       <option value="fhtw">FH Technikum Wien</option>
       <option value="twacademy">Technikum Wien GmbH</option>
     </select>
   </div>
-  <div class="col-3">
+  <div class="col-4">
     <select v-model="vertragsart_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option value="" selected disabled>Vertragsart wählen</option>
       <option value="echterDV">Echter DV</option>
@@ -20,9 +20,8 @@ export default {
       <option value="StudHilfskraft">Stud. Hilfskraft</option>
     </select>
   </div>
-  <div class="col-1">&nbsp;</div>
+  <div class="col-2">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
-  <div class="col-1">&nbsp;</div>
   `,
   data: function() {
     return {
