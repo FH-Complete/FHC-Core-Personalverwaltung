@@ -6,7 +6,8 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <div class="my-2" :class="canhavegehaltsbestandteile ? 'card card-body my-2' : ''">
+  <div class="card card-body my-2" :class="canhavegehaltsbestandteile ? '' : 'border-white py-0'">
+    <div class="card card-body border-white py-0">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2 py-2">
@@ -41,6 +42,7 @@ export default {
       </div>
       <div class="col-5">&nbsp;</div>
       <div class="col-1">&nbsp;</div>
+    </div>
     </div>
     <gehaltsbestandteilhelper ref="gbh" v-if="canhavegehaltsbestandteile" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>

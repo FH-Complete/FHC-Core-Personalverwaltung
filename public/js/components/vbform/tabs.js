@@ -5,37 +5,41 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="d-flex align-items-start h-100 overflow-hidden pt-2 border-top">
-      <ul class="nav flex-column subsubnav col-2" id="v-menubar" role="menubar" aria-orientation="vertical">
-        <li class="nav-item" v-for="(child, idx) in children" :key="idx">    
-            <a
-              v-if="child.type === 'tab'"
-              class="nav-link"
-              :class="(this.activetab === child.guioptions.id) ? 'active' : ''"
-              :id="'v-menuitem-' + child.guioptions.id + 'tab'"
-              :href="'#v-menuitem-' + child.guioptions.id"
-              role="menuitem"
-              :aria-controls="'v-menuitem-' + child.guioptions.id"
-              :aria-selected="(this.activetab === child.guioptions.id) ? 'true' : 'false'"
-              @click="activetab = child.guioptions.id">
-              {{ child.guioptions.title }}
-              <span
-                  v-if="(getErrorsCount(child) > 0)" 
-                  class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger">
-                {{ getErrorsCount(child) }}
-              </span>
-            </a>
-        </li>
-      </ul>
-    <div class="tab-content w-100 h-100 d-flex flex-column position-relative" id="v-menuitem-tabContent">
-      <template v-for="(child, idx) in children">
-        <component ref="parts" v-if="child.type === 'tab'" :is="child.type" :key="'tab_' + idx" :preset="child" :activetab="activetab"></component>
-        <div v-else="" class="px-3">
-          <component ref="parts" :is="child.type" :key="'notab_' + idx" :preset="child"></component>
+    <div class="row h-100 overflow-hidden">
+      <div class="col-2 h-100">  
+        <ul class="nav w-100 position-relative flex-column subsubnav col-2" id="v-menubar" role="menubar" aria-orientation="vertical">
+          <li class="nav-item position-relative" v-for="(child, idx) in children" :key="idx">    
+              <a
+                v-if="child.type === 'tab'"
+                class="nav-link"
+                :class="(this.activetab === child.guioptions.id) ? 'active' : ''"
+                :id="'v-menuitem-' + child.guioptions.id + 'tab'"
+                :href="'#v-menuitem-' + child.guioptions.id"
+                role="menuitem"
+                :aria-controls="'v-menuitem-' + child.guioptions.id"
+                :aria-selected="(this.activetab === child.guioptions.id) ? 'true' : 'false'"
+                @click="activetab = child.guioptions.id">
+                {{ child.guioptions.title }}
+                <span
+                    v-if="(getErrorsCount(child) > 0)" 
+                    class="position-absolute top-50 end-0 translate-middle badge rounded-pill bg-danger">
+                  {{ getErrorsCount(child) }}
+                </span>
+              </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-10 h-100">
+        <div class="tab-content w-100 h-100 d-flex flex-column position-relative" id="v-menuitem-tabContent">
+          <template v-for="(child, idx) in children">
+            <component ref="parts" v-if="child.type === 'tab'" :is="child.type" :key="'tab_' + idx" :preset="child" :activetab="activetab"></component>
+            <div v-else="" class="px-3">
+              <component ref="parts" :is="child.type" :key="'notab_' + idx" :preset="child"></component>
+            </div>
+          </template>
         </div>
-      </template>
+      </div>
     </div>
-  </div>
   `,
   components: {
     "dv": dv,

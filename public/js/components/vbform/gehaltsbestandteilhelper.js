@@ -8,7 +8,7 @@ export default {
     <div class="col-12">
       <div class="position-relative">
         <a class="btn btn-sm btn-primary" href="javascript:void(0);" @click="addGB">
-          <i class="fas fa-plus"></i>&nbsp;Gehaltsbestandteil
+          <i class="fas fa-plus"></i>&nbsp;Gehaltsbestandteil{{ childcount }}
         </a>
       </div>
     </div>
@@ -64,6 +64,11 @@ export default {
       for( var i in this.$refs.parts ) {
         this.$refs.parts[i].setDelete(hastobedeleted);
       }
+    }
+  },
+  computed: {
+    childcount: function() {
+      return (this.children.length > 0) ? ' (' + this.children.length + ')' : '';
     }
   }
 }

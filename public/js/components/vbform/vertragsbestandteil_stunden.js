@@ -7,32 +7,34 @@ import infos from './infos.js';
 export default {
   template: `
   <div class="card card-body my-2">
-    <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
-    <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
-    <div class="row g-2">
-      <div class="col-3">
-        <div class="input-group input-group-sm mb-3">
-          <input v-model="stunden" :disabled="isinputdisabled('stunden')" type="text" class="form-control form-control-sm" placeholder="Stunden" aria-label="stunden">
-          <span class="input-group-text">Std/Woche</span>
+    <div class="card card-body border-white py-0">
+      <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
+      <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
+      <div class="row g-2">
+        <div class="col-3">
+          <div class="input-group input-group-sm mb-3">
+            <input v-model="stunden" :disabled="isinputdisabled('stunden')" type="text" class="form-control form-control-sm" placeholder="Stunden" aria-label="stunden">
+            <span class="input-group-text">Std/Woche</span>
+          </div>
         </div>
-      </div>
-      <div class="col-3">
-        <select v-model="teilzeittyp_kurzbz" :disabled="isinputdisabled('teilzeittyp_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option
-            v-for="f in lists.teilzeittypen"
-            :value="f.value"
-            :selected="isselected(f.value, this.teilzeittyp_kurzbz)"
-            :disabled="f.disabled">
-            {{ f.label }}
-          </option>
-        </select>
-      </div>
-      <div class="col-1">&nbsp;</div>
-      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded" @gueltigkeitchanged="gueltigkeitchanged"></gueltigkeit>
-      <div class="col-1">
-        <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
-        <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
-        <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
+        <div class="col-3">
+          <select v-model="teilzeittyp_kurzbz" :disabled="isinputdisabled('teilzeittyp_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+            <option
+              v-for="f in lists.teilzeittypen"
+              :value="f.value"
+              :selected="isselected(f.value, this.teilzeittyp_kurzbz)"
+              :disabled="f.disabled">
+              {{ f.label }}
+            </option>
+          </select>
+        </div>
+        <div class="col-1">&nbsp;</div>
+        <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded" @gueltigkeitchanged="gueltigkeitchanged"></gueltigkeit>
+        <div class="col-1">
+          <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
+          <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
+          <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
+        </div>
       </div>
     </div>
     <gehaltsbestandteilhelper ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>

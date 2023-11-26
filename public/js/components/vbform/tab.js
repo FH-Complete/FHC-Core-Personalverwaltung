@@ -9,7 +9,7 @@ export default {
        role="tabpanel"
        :aria-labelledby="'v-pills-' + preset.guioptions.id + '-tab'"
        tabindex="0">
-    <div class="container overflow-auto ps-0 ms-n2">
+    <div class="container-fluid p-0 overflow-auto pe-3">
       <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
     </div>
   </div>

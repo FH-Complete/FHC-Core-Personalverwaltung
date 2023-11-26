@@ -5,9 +5,9 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
-  <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
-  <div class="card card-body border-0 bg-primary my-2" style="--bs-bg-opacity: .03;">
+  <div class="card card-body border-0 bg-primary my-2" style="--bs-bg-opacity: .2;">
+    <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
+    <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2 mb-1">
       <div class="col-2">
       <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
@@ -60,11 +60,13 @@ export default {
           model-type="yyyy-MM-dd"></datepicker>
       </div>
     </div>
-    <div class="col-2 form-check form-control-sm ms-2">
-      <input v-model="valorisierung" :disabled="isinputdisabled('valorisierung')" class="form-check-input" type="checkbox" value="" :id="'valorisierung_' + config.guioptions.id">
-      <label class="form-check-label" :for="'valorisierung_' + config.guioptions.id">
-        Valorisierung
-      </label>
+    <div class="col-2">
+      <div class="form-check form-control-sm">
+        <input v-model="valorisierung" :disabled="isinputdisabled('valorisierung')" class="form-check-input" type="checkbox" value="" :id="'valorisierung_' + config.guioptions.id">
+        <label class="form-check-label" :for="'valorisierung_' + config.guioptions.id">
+          Valorisierung
+        </label>
+      </div>
     </div>
     <div class="col-8">&nbsp;</div>    
   </div>
