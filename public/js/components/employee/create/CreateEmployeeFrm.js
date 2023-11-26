@@ -54,7 +54,7 @@ export const CreateEmployeeFrm = {
         }
 
         Vue.watch(props, () => {
-            currentValue.value.nachname = props.defaultval.surname
+            currentValue.value.nachname = props.defaultval.surname.charAt(0).toUpperCase() + props.defaultval.surname.slice(1)
             currentValue.value.gebdatum = props.defaultval.birthdate
           })
 
@@ -199,7 +199,6 @@ export const CreateEmployeeFrm = {
             <input id="surname" 
                 @blur="frmState.nachnameBlured = true"
                 v-model="currentValue.nachname"
-                :value="currentValue.nachname.charAt(0).toUpperCase() + currentValue.nachname.slice(1)" 
                 type="text" 
                 class="form-control form-control-sm" 
                 :class="{ 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}"

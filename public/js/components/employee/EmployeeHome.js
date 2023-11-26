@@ -265,8 +265,8 @@ export default {
                             :sideMenu="false"
                             :tabulator-options="employeesTabulatorOptions"
                             :tabulator-events="employeesTabulatorEvents"
-							new-btn-label="Mitarbeiter"
-							new-btn-show="true"
+                            :new-btn-label="'Mitarbeiter'"
+                            :new-btn-show="true"
                             @nw-new-entry="newSideMenuEntryHandler"
 							@click:new="openCreateWizard()">
                             </core-filter-cmpt>
