@@ -71,9 +71,14 @@
     display: flex !important;
 }
 
+.scrollbar-gutter-stable {
+    scrollbar-gutter: stable;
+}
+
 .scrollbar-gutter-stable-both {
     scrollbar-gutter: stable both-edges;
 }
+
 .stundensatzModal .modal-content {
     overflow: initial;
 }
