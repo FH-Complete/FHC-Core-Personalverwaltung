@@ -93,14 +93,13 @@
             <h1 class="h2">Organisation</h1>
           </div>
         <div class="d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pb-2">
-            <org-chooser @org-selected="orgSelectedHandler" ></org-chooser>
+          <org-chooser @org-selected="orgSelectedHandler" ></org-chooser>
           <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group ms-2">
               <button v-show="isCollapsed" type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler"><i class="fa-solid fa-maximize"></i></button>
               <button v-show="!isCollapsed" type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler"><i class="fa-solid fa-minimize"></i></button>
             </div>
           </div>
-
         </div>                
 
         <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >         
