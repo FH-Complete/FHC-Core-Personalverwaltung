@@ -154,7 +154,7 @@ export const OrgViewer = {
     <p-treetable :value="nodes" :filters="filters"  :expandedKeys="expandedKeys" class="p-treetable-sm" filterMode="strict" >
         <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:450px" filterMatchMode="contains" >
             <template #filter>
-                <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter"></p-inputtext>
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton style="display: inline-block; width:80%"></p-skeleton>
@@ -165,7 +165,7 @@ export const OrgViewer = {
         </p-column>
         <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:150px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ" style="width:150px"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" style="width:150px"></p-inputtext>
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
@@ -173,7 +173,7 @@ export const OrgViewer = {
         </p-column>
         <p-column field="leitung" header="Leitung" style="width:300px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter" placeholder="Filter Leitung"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter"></p-inputtext>
             </template>
             <template #body="slotProps" v-if="!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.leitung_array.data">
@@ -187,7 +187,7 @@ export const OrgViewer = {
         </p-column>
         <p-column field="assistenz" header="Assistenz" style="width:250px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters['assistenz']" class="p-column-filter" placeholder="Filter Assistenz"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['assistenz']" class="p-column-filter"></p-inputtext>
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
@@ -203,7 +203,7 @@ export const OrgViewer = {
                 <template #header>                    
                 </template>
                 <template #body="slotProps">  
-                    <button type="button" class="btn btn-outline-dark "  @click="showModal(slotProps.node.data)">
+                    <button type="button" class="btn btn-outline-secondary"  @click="showModal(slotProps.node.data)">
                             <i class="fa fa-info"></i>
                     </button>
                 </template>

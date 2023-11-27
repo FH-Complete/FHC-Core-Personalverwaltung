@@ -161,6 +161,10 @@ i.fa.fa-xmark {
     padding: 0.15em;
 }
 
+i.fa.fa-info {
+    padding: 0.15em;
+}
+
 :root {
     --bs-body-font-size: 14px;
 }
@@ -171,4 +175,23 @@ html {
 
 .tabulator {
     font-size: var(--bs-body-font-size);
+}
+
+.p-treetable table {
+    border-top: 1px solid #dee2e6
+}
+
+.p-treetable.p-treetable-sm .p-treetable-thead > tr > th {
+    border: none;
+    padding: 0.3rem;
+    color: black;
+}
+
+.p-treetable.p-treetable-sm .p-treetable-tbody > tr > td {
+    padding: 0.3rem 0.3rem;
+}
+
+.p-treetable input.p-inputtext.p-component.p-column-filter{
+    padding: 0.2rem;
+    width: 100%;
 }
