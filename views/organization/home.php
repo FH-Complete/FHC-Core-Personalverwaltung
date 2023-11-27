@@ -89,17 +89,21 @@
       <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>      
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-          <h1 class="h2">Organisation</h1>
+          <div class="d-flex justify-content-start flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+            <h1 class="h2">Organisation</h1>
+          </div>
+        <div class="d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pb-2">
+
           <div class="btn-toolbar mb-2 mb-md-0">        
                       
             <div class="btn-group me-2">
-              <button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler">Expand</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler">Collapse</button>
+              <button v-show="isCollapsed" type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler"><i class="fa-solid fa-maximize"></i></button>
+              <button v-show="!isCollapsed" type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler"><i class="fa-solid fa-minimize"></i></button>
             </div>
 
-            <org-chooser  @org-selected="orgSelectedHandler" ></org-chooser>
+
           </div>
+            <org-chooser @org-selected="orgSelectedHandler" ></org-chooser>
         </div>                
 
         <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >         
