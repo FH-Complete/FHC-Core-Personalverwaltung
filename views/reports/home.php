@@ -10,7 +10,8 @@
       'primevue3' => true,
       'navigationcomponent' => true,
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
-                       'public/css/components/searchbar.css'],       
+                       'public/css/components/searchbar.css',
+					   'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css'],
       'customJSs' => ['public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/report/PivotReport.js'],
       'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Report.js')

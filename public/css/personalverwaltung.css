@@ -160,3 +160,15 @@ label.required.form-label:after {
 i.fa.fa-xmark {
     padding: 0.15em;
 }
+
+:root {
+    --bs-body-font-size: 14px;
+}
+
+html {
+    font-size: var(--bs-body-font-size);
+}
+
+.tabulator {
+    font-size: var(--bs-body-font-size);
+}
