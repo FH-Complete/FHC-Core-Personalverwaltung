@@ -20,7 +20,7 @@
         return { redirect }
       },
     template: `
-      <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+      <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                           
         <div class="flex-fill align-self-center">
           <h1 class="h2">Termine & Fristen</h1>

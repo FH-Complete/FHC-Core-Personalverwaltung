@@ -9,8 +9,8 @@ export default {
     </div>
 
     <div class="col-10">
-      <div class="overflow-auto scrollbar-gutter-stable pe-3">
-        <div class="card card-body border-white py-0">
+      <div class="overflow-y-auto scrollbar-gutter-stable pe-3">
+        <div class="card card-body py-0">
           <template v-for="(child, idx) in children" :key="idx">
             <component ref="parts" :is="child.type" :preset="child"></component>
           </template>
