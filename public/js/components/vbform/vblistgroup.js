@@ -3,8 +3,12 @@ import vertragsbestandteillist from '../../components/vbform/vertragsbestandteil
 
 export default {
   template: `
-  <div class="overflow-auto scrollbar-gutter-stable pt-2" :id="preset.guioptions.id">
-    <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
+  <div class="row h-100 overflow-hidden">
+    <div class="col-12 h-100">
+      <div class="container-fluid p-0 pe-3 h-100 overflow-auto scrollbar-gutter-stable pt-2" :id="preset.guioptions.id">
+        <component ref="parts" v-for="(child, idx) in children" :is="child.type" :key="idx" :preset="child"></component>
+      </div>
+    </div>
   </div>
   `,
   data: function() {
