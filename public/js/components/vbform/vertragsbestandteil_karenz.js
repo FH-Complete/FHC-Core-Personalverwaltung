@@ -6,7 +6,8 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="py-2" :class="vbcssclasses">
+  <div class="card card-body border-white py-0 my-2">
+   <div class="card card-body border-white py-0">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config.guioptions.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config.guioptions.errors : []"></errors>
     <div class="row g-2 py-2">
@@ -65,6 +66,7 @@ export default {
         &nbsp;
       </div>
     </div>
+   </div>
   </div>
   `,
   components: {

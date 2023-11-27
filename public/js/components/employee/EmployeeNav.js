@@ -33,7 +33,7 @@ export const EmployeeNav = {
     },
     template: `    
     <nav
-        class="nav nav-pills nav-justified flex-column flex-sm-row ms-sm-auto col-lg-12 subnav"
+        class="nav nav-tabs nav-justified flex-column flex-sm-row ms-sm-auto mt-3 col-lg-12 subnav"
     >
     
         <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/summary' + maybeAddDate()" 

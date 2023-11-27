@@ -6,7 +6,7 @@ const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*
 
 export const CreateEmployeeFrm = {
     components: {
- 
+        "datepicker": VueDatePicker
     },
     props: {
         defaultval: { type: Object, required: false },
@@ -54,7 +54,7 @@ export const CreateEmployeeFrm = {
         }
 
         Vue.watch(props, () => {
-            currentValue.value.nachname = props.defaultval.surname
+            currentValue.value.nachname = props.defaultval.surname.charAt(0).toUpperCase() + props.defaultval.surname.slice(1)
             currentValue.value.gebdatum = props.defaultval.birthdate
           })
 
@@ -198,13 +198,13 @@ export const CreateEmployeeFrm = {
             <label for="surname" class="required form-label">Nachname</label>
             <input id="surname" 
                 @blur="frmState.nachnameBlured = true"
-                v-model="currentValue.nachname" 
+                v-model="currentValue.nachname"
                 type="text" 
                 class="form-control form-control-sm" 
                 :class="{ 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}"
                 placeholder="Nachname" aria-label="nachname">
             <div class="invalid-feedback" v-if="frmState.nachnameBlured && !validNachname(currentValue.nachname)">
-                Bitte geben Sie den Nachnamen an.
+                Pflichtfeld
             </div>
         </div>  
         <div class="col-md-2">
@@ -215,9 +215,9 @@ export const CreateEmployeeFrm = {
                 :class="{ 'is-invalid': !validNachname(currentValue.vorname) && frmState.vornameBlured}"
                 type="text" 
                 class="form-control form-control-sm" 
-                placeholder="Vorname" aria-label="vorname">
+                aria-label="vorname">
             <div class="invalid-feedback" v-if="frmState.vornameBlured && !validVorname(currentValue.vorname)">
-                Bitte geben Sie den Vornamen an.
+                Pflichtfeld
             </div>
         </div>
        
@@ -227,7 +227,7 @@ export const CreateEmployeeFrm = {
                 v-model="currentValue.vornamen" 
                 type="text" 
                 class="form-control form-control-sm" 
-                placeholder="Vornamen" aria-label="vornamen">
+                aria-label="vornamen">
         </div>
               
         <div class="col-md-5"></div>
@@ -246,19 +246,24 @@ export const CreateEmployeeFrm = {
                 <option value="u">unbekannt</option>
             </select>
             <div class="invalid-feedback" v-if="frmState.geschlechtBlured && !validGeschlecht(currentValue.geschlecht)">
-            Bitte geben Sie das Geschlecht an.
+            Pflichtfeld
             </div>
         </div>
         <div class="col-md-2">
             <label for="birthdate" class="required form-label">Geburtsdatum</label>
-            <input id="birthdate"
-                type="date"  
-                class="form-control form-control-sm"  
+            <datepicker id="birthdate"
+                :teleport="true"
                 :class="{ 'is-invalid': !validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured}"
-                @blur="frmState.geburtsdatumBlured = true"
-                v-model="currentValue.gebdatum" >
+                @blur="frmState.geburtsdatumBlured = true"             
+                v-model="currentValue.gebdatum"
+                v-bind:enable-time-picker="false"
+                text-input 
+                locale="de"
+                format="dd.MM.yyyy"
+                auto-apply 
+                model-type="yyyy-MM-dd"></datepicker>
                 <div class="invalid-feedback" v-if="frmState.geburtsdatumBlured && !validGeburtsdatum(currentValue.gebdatum)">
-                Bitte geben Sie das Geburtsdatum an.
+                Pflichtfeld
                 </div>
         </div>
         <div class="col-md-2">
@@ -269,7 +274,7 @@ export const CreateEmployeeFrm = {
                 type="text" 
                 class="form-control form-control-sm"
                 :class="{ 'is-invalid': !validSVNR(currentValue.svnr) && frmState.svnrBlured}" 
-                placeholder="SVNR" aria-label="svnr">
+                aria-label="svnr">
         </div>
         <div class="col-md-5"></div>
         <!-- Staatsbürgerschaft, etc. -->
@@ -290,9 +295,9 @@ export const CreateEmployeeFrm = {
                 type="text" 
                 class="form-control form-control-sm" 
                 :class="{ 'is-invalid': !validEmail(currentValue.email) && frmState.emailBlured}"
-                placeholder="Email" aria-label="email">
+                aria-label="email">
             <div class="invalid-feedback" v-if="frmState.emailBlured && !validEmail(currentValue.email)">
-                Bitte geben Sie eine Email-Adresse an.
+                Pflichtfeld
                 </div>
         </div><div class="col-md-5"></div>
         <div class="col-md-7">

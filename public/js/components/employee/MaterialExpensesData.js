@@ -1,13 +1,14 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const MaterialExpensesData = {
     components: {
         Modal,
         ModalDialog,
         Toast,
+        "datepicker": VueDatePicker
     },
     props: {
         editMode: { type: Boolean, required: true },
@@ -271,9 +272,9 @@ export const MaterialExpensesData = {
                 </div>
 
                 <div class="card-body">
-                    <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                        <button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-                        <i class="fa fa-plus"></i>
+                    <div class="d-grid d-md-flex justify-content-start py-2">
+                        <button type="button" class="btn btn-sm btn-primary" @click="showAddModal()">
+                        <i class="fa fa-plus"></i> {{ t('person','sachaufwand') }}
                         </button>            
                     </div>
                     <div class="table-responsive">
@@ -294,11 +295,11 @@ export const MaterialExpensesData = {
                                 <td class="align-middle">{{ materialdata.anmerkung }}</td>
                                 <td class="align-middle" width="5%">
                                     <div class="d-grid gap-2 d-md-flex align-middle">
-                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(materialdata.sachaufwand_id)">
-                                            <i class="fa fa-minus"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(materialdata.sachaufwand_id)">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(materialdata.sachaufwand_id)">
                                             <i class="fa fa-pen"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(materialdata.sachaufwand_id)">
+                                            <i class="fa fa-xmark"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -318,7 +319,7 @@ export const MaterialExpensesData = {
         <template #body>
             <form class="row g-3" ref="materialDataFrm">
                             
-                <div class="col-md-8">
+                <div class="col-md-4">
                     <label for="sachaufwandtyp_kurzbz" class="form-label">{{ t('global','typ') }}</label><br>
                     <select v-if="!readonly" id="sachaufwandtyp_kurzbz" v-model="currentValue.sachaufwandtyp_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option v-for="(item, index) in types" :value="item.sachaufwandtyp_kurzbz">
@@ -327,24 +328,41 @@ export const MaterialExpensesData = {
                     </select>
                     <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sachaufwandtyp_kurzbz" :value="currentValue.sachaufwandtyp_kurzbz">
                 </div>
-                <div class="col-md-4"></div>
                 <!--  -->
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.beginnBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validBeginn(currentValue.beginn) && frmState.beginnBlurred}" id="beginn" v-model="currentValue.beginn">
+                    <datepicker id="beginn" 
+                        :teleport="true" 
+                        @blur="frmState.beginnBlurred = true" 
+                        :input-class-name="(!validBeginn(currentValue.beginn) && frmState.beginnBlurred) ? 'dp-invalid-input' : ''"  
+                        v-model="currentValue.beginn"
+                        v-bind:enable-time-picker="false"
+                        text-input 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        auto-apply 
+                        model-type="yyyy-MM-dd"></datepicker>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="ende" class="form-label">{{ t('global','bis') }}</label>
-                    <input type="date" :readonly="readonly" @blur="frmState.endeBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="ende" v-model="currentValue.ende">
+                    <datepicker id="ende" 
+                        :teleport="true" 
+                        v-model="currentValue.ende"
+                        v-bind:enable-time-picker="false"
+                        text-input 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        auto-apply 
+                        model-type="yyyy-MM-dd"></datepicker>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                 </div>
                 <!-- -->
-                <div class="col-md-8">
+                <div class="col-md-10">
                     <label for="uid" class="form-label">{{ t('global','anmerkung') }}</label>
                     <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.anmerkung">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
                 </div>
                 
                 <!-- changes -->
@@ -355,11 +373,8 @@ export const MaterialExpensesData = {
             </form>
         </template>
         <template #footer>
-            <button type="button" class="btn btn-secondary" @click="hideModal()">
-                {{ t('ui','abbrechen') }}
-            </button>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-                {{ t('ui','ok') }}
+                {{ t('ui','speichern') }}
             </button>
         </template>
 

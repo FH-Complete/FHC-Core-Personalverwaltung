@@ -4,11 +4,11 @@ import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
   template: `
-  <div class="row py-2 pb-1">
-    <div class="col-12 ps-5">
+  <div class="row pt-3 pb-1">
+    <div class="col-12">
       <div class="position-relative">
-        <a class="btn btn-sm btn-light fs-6 fw-light" href="javascript:void(0);" @click="addGB">
-          <i class="fas fa-plus"></i>&nbsp;<em>Gehaltsbestandteil</em>
+        <a class="btn btn-sm btn-primary" href="javascript:void(0);" @click="addGB">
+          <i class="fas fa-plus"></i>&nbsp;Gehaltsbestandteil{{ childcount }}
         </a>
       </div>
     </div>
@@ -64,6 +64,11 @@ export default {
       for( var i in this.$refs.parts ) {
         this.$refs.parts[i].setDelete(hastobedeleted);
       }
+    }
+  },
+  computed: {
+    childcount: function() {
+      return (this.children.length > 0) ? ' (' + this.children.length + ')' : '';
     }
   }
 }

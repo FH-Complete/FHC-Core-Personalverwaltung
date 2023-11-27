@@ -3,10 +3,12 @@ import dv from './dv.js';
 
 export default {
   template: `
-    <div class="px-3">
-      <template v-for="(child, idx) in children" :key="idx">
-        <component ref="parts" :is="child.type" :preset="child"></component>
-      </template>
+    <div class="overflow-auto scrollbar-gutter-stable">
+      <div class="card card-body py-0 border-white">
+        <template v-for="(child, idx) in children" :key="idx">
+          <component ref="parts" :is="child.type" :preset="child"></component>
+        </template>
+      </div>
     </div>
   `,
   components: {

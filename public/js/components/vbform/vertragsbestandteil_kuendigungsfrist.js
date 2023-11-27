@@ -6,7 +6,8 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <div class="border-bottom py-2 mb-3">
+  <div class="card card-body border-white py-0 my-2">
+   <div class="card card-body border-white py-0">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2">
@@ -30,6 +31,7 @@ export default {
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
       </div>
     </div>
+   </div>
   </div>
   `,
   components: {

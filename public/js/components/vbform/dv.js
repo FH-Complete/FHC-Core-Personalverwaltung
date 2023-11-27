@@ -7,16 +7,23 @@ import gueltigkeit from './gueltigkeit.js';
 
 export default {
   template:`
-    <infos :infos="(dv?.guioptions?.infos !== undefined) ? dv?.guioptions?.infos : []"></infos>
-    <errors :errors="(dv?.guioptions?.errors !== undefined) ? dv?.guioptions?.errors : []"></errors>
-    <div v-if="store.mode == 'aenderung'" class="row g-2 py-1 border-bottom mb-1 flex-shrink-0 flex-grow-0">
-      <div class="col-6 text-end"><strong>Änderungen gelten</strong></div>
-      <div class="col-1">&nbsp;</div>
-      <gueltigkeit ref="gueltigkeitaenderung" :initialsharedstatemode="'set'" :config="getGueltigkeitsAenderung"></gueltigkeit>
-      <div class="col-1">&nbsp;</div>
-    </div>
-    <div class="row g-2 py-1 border-bottom mb-1 flex-shrink-0 flex-grow-0">
-      <dienstverhaeltnis ref="formheader" :config="dv.data"></dienstverhaeltnis>
+    <div class="card card-body border-white py-0">
+      <div class="card card-body border-white py-0">
+        <infos :infos="(dv?.guioptions?.infos !== undefined) ? dv?.guioptions?.infos : []"></infos>
+        <errors :errors="(dv?.guioptions?.errors !== undefined) ? dv?.guioptions?.errors : []"></errors>
+        <div v-if="store.mode == 'aenderung'" class="row g-2 mt-2 flex-shrink-0 flex-grow-0">
+          <div class="col-2 text-primary"><strong>ÄNDERUNGSMODUS</strong></div>
+          <div class="col-4 text-end"><strong>Änderungen gelten</strong></div>
+          <div class="col-1">&nbsp;</div>
+          <gueltigkeit ref="gueltigkeitaenderung" :initialsharedstatemode="'set'" :config="getGueltigkeitsAenderung"></gueltigkeit>
+        </div>
+        <div v-if="store.mode == 'korrektur'" class="row g-2 mt-2 flex-shrink-0 flex-grow-0">
+          <div class="col-12 text-danger"><strong>KORREKTURMODUS</strong></div>
+        </div>
+        <div class="row g-2 py-1 mb-1 flex-shrink-0 flex-grow-0 mt-2">
+          <dienstverhaeltnis ref="formheader" :config="dv.data"></dienstverhaeltnis>
+        </div>
+      </div>
     </div>
   `,
   components: {

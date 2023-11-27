@@ -16,7 +16,7 @@ export default {
         <template #body>
     
         <div class="vbformutilities flex-shrink-0 flex-grow-0">
-            <div class="row g-2 py-2">
+            <div class="row p-2 bg-light">
               <div class="col-3">
                 <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
               </div>
@@ -41,7 +41,7 @@ export default {
         <template #footer>
          <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
               <div v-if="mode === 'aenderung' || mode === 'korrektur'" class="btn-group me-2" role="group" aria-label="Second group">
-                  <button class="btn btn-secondary btn-sm float-end" @click="reload">zurücksetzen</button>
+                  <button class="btn btn-secondary btn-sm float-end" @click="reload">Zurücksetzen</button>
               </div>
               <div class="btn-group me-2" role="group" aria-label="Second group">
                   <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>

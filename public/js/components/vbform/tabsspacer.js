@@ -9,10 +9,12 @@ export default {
     </div>
 
     <div class="col-10">
-      <div class="w-100 px-3">
-        <template v-for="(child, idx) in children" :key="idx">
-          <component ref="parts" :is="child.type" :preset="child"></component>
-        </template>
+      <div class="overflow-auto scrollbar-gutter-stable pe-3">
+        <div class="card card-body border-white py-0">
+          <template v-for="(child, idx) in children" :key="idx">
+            <component ref="parts" :is="child.type" :preset="child"></component>
+          </template>
+        </div>
       </div>
     </div>
   </div>

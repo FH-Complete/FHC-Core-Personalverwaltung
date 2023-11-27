@@ -37,7 +37,7 @@ export default {
       <span class="input-group-text" v-else-if="(this.isendable)">
         <i @click="markended()" class="fas fa-calendar-times"></i>
       </span>
-      <span class="input-group-text bg-white border-0" v-else>
+      <span class="input-group-text bg-white border-0 opacity-0" v-else>
         <i class="fas fa-square text-white"></i>
       </span>
     </div>

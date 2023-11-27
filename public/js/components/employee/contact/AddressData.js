@@ -1,7 +1,7 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const AddressData = {
     components: {
@@ -265,10 +265,9 @@ export const AddressData = {
             </div>
 
             <div class="d-flex bd-highlight">
-                <div class="flex-grow-1 bd-highlight"></div>        
-                <div class="p-2 bd-highlight">                   
-                    <button type="button" class="btn btn-outline-secondary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
-                        <i class="fa fa-plus"></i>
+                <div class="py-2 bd-highlight">                   
+                    <button type="button" class="btn btn-primary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
+                        <i class="fa fa-plus"></i> {{ t('person','adresse') }}
                     </button>
                 </div>
             </div>
@@ -301,12 +300,12 @@ export const AddressData = {
                     <td class="align-middle">{{ address.zustelladresse == true ? "X" : "" }}</td>
                     <td class="align-middle">{{ address.co_name }}</td>
                     <td class="align-middle" width="5%">
-                        <div class="d-grid gap-2 d-md-flex align-middle">
-                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(address.adresse_id)">
-                                <i class="fa fa-xmark"></i>
-                            </button>
+                        <div class="d-grid gap-2 d-md-flex align-middle">                
                             <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(address.adresse_id)">
                                 <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(address.adresse_id)">
+                                <i class="fa fa-xmark"></i>
                             </button>
                         </div>
                     </td>
@@ -395,11 +394,8 @@ export const AddressData = {
 
             </template>
             <template #footer>
-                <button type="button" class="btn btn-secondary" @click="hideModal()">
-                    {{ t('ui','abbrechen') }}
-                </button>
                 <button type="button" class="btn btn-primary" @click="okHandler()" >
-                    {{ t('ui','ok') }}
+                    {{ t('ui','speichern') }}
                 </button>
             </template>
         </Modal>

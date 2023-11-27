@@ -1,7 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const HourlyRateData = {
 	components: {
@@ -282,9 +282,9 @@ export const HourlyRateData = {
 				</div>
 
 				<div class="card-body">
-					<div class="d-grid gap-2 d-md-flex justify-content-end ">
-						<button type="button" class="btn btn-sm btn-outline-secondary" @click="showAddModal()">
-						<i class="fa fa-plus"></i>
+					<div class="d-grid d-md-flex justify-content-start py-2">
+						<button type="button" class="btn btn-sm btn-primary" @click="showAddModal()">
+						<i class="fa fa-plus"></i> {{ t('ui','stundensatz') }}
 						</button>
 					</div>
 					<div class="table-responsive">
@@ -296,6 +296,7 @@ export const HourlyRateData = {
 								<th scope="col">{{ t('global','bis') }}</th>
 								<th scope="col">{{ t('core','unternehmen') }}</th>
 								<th scope="col">{{ t('ui','stundensatz') }}</th>
+								<th scope="col"></th>
 							</tr>
 							</thead>
 							<tbody>
@@ -307,11 +308,11 @@ export const HourlyRateData = {
 								<td class="align-middle">{{ hourlyratedata.stundensatz }}</td>
 								<td class="align-middle" width="5%">
 									<div class="d-grid gap-2 d-md-flex align-middle">
-										<button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(hourlyratedata.stundensatz_id)">
-											<i class="fa fa-minus"></i>
-										</button>
-										<button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(hourlyratedata.stundensatz_id)">
+										<button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(hourlyratedata.stundensatz_id)">
 											<i class="fa fa-pen"></i>
+										</button>
+										<button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(hourlyratedata.stundensatz_id)">
+											<i class="fa fa-xmark"></i>
 										</button>
 									</div>
 								</td>
@@ -329,7 +330,7 @@ export const HourlyRateData = {
 		<template #body>
 			<form class="row g-3" ref="houryrateDataFrm">
 							
-				<div class="col-md-8">
+				<div class="col-md-4">
 					<label for="stundensatztyp" class="required form-label">{{ t('global','typ') }}</label><br>
 					<select v-if="!readonly" id="stundensatztyp" @blur="frmState.typBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.stundensatztyp) && frmState.typBlurred}" v-model="currentValue.stundensatztyp" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option v-for="(item, index) in types" :value="item.stundensatztyp">
@@ -338,39 +339,34 @@ export const HourlyRateData = {
 					</select>
 					<input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="stundensatztyp" :value="currentValue.stundensatztyp">
 				</div>
-				<div class="col-md-4"></div>
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
-					<datepicker 
-						:readonly="readonly"
+					<datepicker id="beginn"
 						@blur="frmState.beginnBlurred = true"
 						v-bind:enable-time-picker="false"
-						class="startDate"
-						:class="{ 'form-control-plaintext': readonly, 'is-invalid': !validBeginn(currentValue.gueltig_von) && frmState.beginnBlurred}"
-						id="beginn"
+						:input-class-name="(!validBeginn(currentValue.gueltig_von) && frmState.beginnBlurred) ? 'dp-invalid-input' : ''"						
 						v-model="currentValue.gueltig_von"
+						text-input 
 						locale="de"
 						format="dd.MM.yyyy"
 						auto-apply 
 						model-type="yyyy-MM-dd"
 					></datepicker>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-3">
 					<label for="ende" class="form-label">{{ t('global','bis') }}</label>
-					<datepicker 
-						:readonly="readonly"
+					<datepicker id="ende"
 						@blur="frmState.bisBlurred = true"
 						v-bind:enable-time-picker="false"
-						:class="{ 'form-control-plaintext': readonly, 'is-invalid': !checkDates(currentValue.gueltig_von, currentValue.gueltig_bis) && frmState.bisBlurred}"
-						id="ende"
 						v-model="currentValue.gueltig_bis"
+						text-input 
 						locale="de"
 						format="dd.MM.yyyy"
 						auto-apply 
 						model-type="yyyy-MM-dd"
 					></datepicker>
 				</div>
-				<div class="col-md-4">
+				<div class="col-md-2">
 				</div>
 				<!-- -->
 			   <div class="col-md-4">
@@ -397,11 +393,8 @@ export const HourlyRateData = {
 			</form>
 		</template>
 		<template #footer>
-			<button type="button" class="btn btn-secondary" @click="hideModal()">
-				{{ t('ui','abbrechen') }}
-			</button>
 			<button type="button" class="btn btn-primary" @click="okHandler()" >
-				{{ t('ui','ok') }}
+				{{ t('ui','speichern') }}
 			</button>
 		</template>
 

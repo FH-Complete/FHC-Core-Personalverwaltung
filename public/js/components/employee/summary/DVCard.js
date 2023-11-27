@@ -75,11 +75,11 @@ export const DvCard = {
      },
      template: `
      <div class="card">
-        <div class="card-header">
+        <div class="card-header d-flex justify-content-between align-items-baseline">
             <h5 class="mb-0">{{ title }}</h5>
-                {{ formatDate(currentDate) }}
+                <span class="text-muted">{{ formatDate(currentDate) }}</span>
             </div>
-            <div class="card-body" style="text-align:center">
+            <div class="card-body" style="text-align:left">
             <div v-if="isFetching" class="spinner-border" role="status">
                  <span class="visually-hidden">Loading...</span>
             </div>     

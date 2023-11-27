@@ -3,7 +3,7 @@ const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*
 
 export const SearchExistingDialog = {
     components: {
- 
+        "datepicker": VueDatePicker,
     },
     props: {
        
@@ -100,7 +100,7 @@ export const SearchExistingDialog = {
         return {  currentValue, filterPerson, personSelectedHandler, personList, surnameRef, take, reset, formatDate, isFetching  };
     },
     template: `
-    <form class="row g-3" ref="searchExistingFrm" id="searchExistingFrm" >
+    <form class="row g-3 pb-4" ref="searchExistingFrm" id="searchExistingFrm" >
 
         <div class="col-md-3">
             <label for="surname" class="required form-label">Nachname</label>
@@ -110,21 +110,25 @@ export const SearchExistingDialog = {
                 @keyup="filterPerson"
                 type="text" 
                 class="form-control form-control-sm" 
-                placeholder="Nachname" aria-label="nachname"
+                aria-label="nachname"
                 autofocus >
         </div>
         <div class="col-md-3">
             <label for="birthdate" class="form-label">Geburtsdatum</label>
-            <input id="birthdate"
-                type="date"  
-                class="form-control form-control-sm"   
-                v-model="currentValue.birthdate" 
-                @change="filterPerson" >
+            <datepicker id="birthdate" 
+                :teleport="true"
+                v-model="currentValue.birthdate"
+                v-bind:enable-time-picker="false"
+                text-input 
+                locale="de"
+                format="dd.MM.yyyy"
+                auto-apply 
+                model-type="yyyy-MM-dd" 
+                @change="filterPerson" ></datepicker>
         </div>
-        <div class="col-md-12 pt-5">
-            <h6>Prüfung ob Person bereits existiert</h6>
-<!--            <p>{{ personList.length }} Übereinstimmungen</p>-->
-            <table class="table table-sm table-striped table-hover">
+        <div v-if="personList.length !== 0" class="col-md-12 py-3">
+            <span class="text-primary fw-semibold"><i class="fa fa-circle-info text-primary"></i>&nbsp;{{ personList.length }} Personen gefunden</span>
+            <table class="table table-sm table-striped table-hover mt-2">
                 <thead>
                     <tr><th>UID</th><th>Nachname</th><th>Vorname</th><th>Geb.Dat.</th><th>SVNr</th><th>Status</th><th>Aktion</th></tr>
                 </thead>
@@ -137,20 +141,19 @@ export const SearchExistingDialog = {
                         <td>{{ person.svnr }}</td>
                         <td>{{ person.status }}</td>
                         <td @click.stop>
-                            <div class="d-grid gap-2 d-md-flex align-middle">
-                                <button type="button" class="btn btn-outline-dark btn-sm" 
+                            <div class="d-grid gap-2 d-md-flex justify-content-start">
+                                <button type="button" class="btn btn-secondary btn-sm" 
                                     @click="take(person.person_id, person.uid, person.vorname, person.nachname)"
                                     style="white-space: nowrap"
                                     :disabled="isFetching"
                                     v-if="person.status=='Student' && !person.taken">
-                                    Als MA übernehmen
+                                    Person als MA anlegen
                                 </button>
                             </div>
                         </td>
                     </tr>
                 </tbody>
             </table>
-
         </div>
 
     </form>

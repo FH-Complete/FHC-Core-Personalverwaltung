@@ -5,27 +5,34 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <div class="border-bottom py-2 mb-3">
+  <div class="card card-body border-white py-0 my-2">
+   <div class="card card-body border-white py-0">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2">
-      <div class="col-2 form-check form-control-sm">
-        <input v-model="zeitaufzeichnung" :disabled="isinputdisabled('zeitaufzeichnung')" class="form-check-input" type="checkbox" value="" :id="'zeitaufzeichnung_' + config.guioptions.id">
-        <label class="form-check-label" :for="'zeitaufzeichnung_' + config.guioptions.id">
-          Zeitaufzeichnung
-        </label>
+      <div class="col-2">
+        <div class="form-check form-control-sm">
+            <input v-model="zeitaufzeichnung" :disabled="isinputdisabled('zeitaufzeichnung')" class="form-check-input" type="checkbox" value="" :id="'zeitaufzeichnung_' + config.guioptions.id">
+            <label class="form-check-label" :for="'zeitaufzeichnung_' + config.guioptions.id">
+              Zeitaufzeichnung
+            </label>
+        </div>
       </div>
-      <div class="col-2 form-check form-control-sm">
-        <input v-model="azgrelevant" :disabled="isinputdisabled('azgrelevant')" class="form-check-input" type="checkbox" value="" :id="'azgrelevant_' + config.guioptions.id">
-        <label class="form-check-label" :for="'azgrelevant_' + config.guioptions.id">
-          AZG-relevant
-        </label>
+      <div class="col-2">
+        <div class="form-check form-control-sm">
+            <input v-model="azgrelevant" :disabled="isinputdisabled('azgrelevant')" class="form-check-input" type="checkbox" value="" :id="'azgrelevant_' + config.guioptions.id">
+            <label class="form-check-label" :for="'azgrelevant_' + config.guioptions.id">
+              AZG-relevant
+            </label>
+        </div>
       </div>
-      <div class="col-2 form-check form-control-sm">
-        <input v-model="homeoffice" :disabled="isinputdisabled('homeoffice')" class="form-check-input" type="checkbox" value="" :id="'homeoffice_' + config.guioptions.id">
-        <label class="form-check-label" :for="'homeoffice_' + config.guioptions.id">
-          Home-Office
-        </label>
+      <div class="col-2">
+        <div class="form-check form-control-sm">
+            <input v-model="homeoffice" :disabled="isinputdisabled('homeoffice')" class="form-check-input" type="checkbox" value="" :id="'homeoffice_' + config.guioptions.id">
+            <label class="form-check-label" :for="'homeoffice_' + config.guioptions.id">
+              Home-Office
+            </label>
+        </div>
       </div>
       <div class="col-1 form-check form-control-sm">&nbsp;</div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
@@ -35,6 +42,7 @@ export default {
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
       </div>
     </div>
+   </div>
   </div>
   `,
   components: {

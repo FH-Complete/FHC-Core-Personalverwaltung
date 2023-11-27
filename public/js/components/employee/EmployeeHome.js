@@ -44,6 +44,10 @@ export default {
 				currentPersonID.value = parseInt(params.id);
 				currentPersonUID.value = params.uid;	
 				console.log('*** EmployeeHome params changed', currentPersonID.value);
+				if (verticalsplitRef.value.isCollapsed() == 'bottom') {
+					isEditorOpen.value = true; // TODO check notwendig? was macht isEditorOpen?
+					verticalsplitRef.value.collapseTop();
+				}
 			}
 		)
 
@@ -119,7 +123,7 @@ export default {
 		const employeesTabulatorOptions = {
 			height: "100%",
 			layout: 'fitColumns',
-                        footerElement: '<div><span id="search_count"></span> von <span id="total_count"></span></div>',
+            footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
 				{title: "Person ID", field: "PersonId", headerFilter: true},
@@ -130,7 +134,13 @@ export default {
 				{title: "TitelPost", field: "TitelPost", headerFilter: true},
 				{title: "Alias", field: "Alias", headerFilter: true},
 				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
-				{title: "Aktiv", field: "Aktiv", formatter:"tickCross",  headerFilter:"tickCross", hozAlign: "center", headerFilterParams:{"tristate":true,elementAttributes:{"value":"true"}}, headerFilterEmptyCheck:function(value){return value === null}},
+				{title: "Aktiv", field: "Aktiv", hozAlign: "center", formatter:"tickCross", formatterParams: {
+						tickElement: '<i class="fas fa-check text-success"></i>',
+						crossElement: '<i class="fas fa-times text-danger"></i>'
+					},
+					headerFilter:"tickCross", headerFilterParams: {
+						"tristate":true,elementAttributes:{"value":"true"}
+					}, headerFilterEmptyCheck:function(value){return value === null}},
 				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
 				{title: "SVNR", field: "SVNR", headerFilter: true},
 				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
@@ -205,7 +215,7 @@ export default {
 	},
     template: `
 
-        <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 border-bottom">
             <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="${FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router}">FHComplete [PV21]</a>
             <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -235,15 +245,11 @@ export default {
                 <verticalsplit id="macombined" ref="verticalsplitRef" >
                     <template #top>
                         <div class="d-flex  flex-column" style="height:100%"  >
-                        <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <div id="master" class="flex-shrink-0 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
                                     
                             <div class="flex-fill align-self-center">
                             <h1 class="h2" style="margin-bottom:0" > Mitarbeiter </h1>
                             </div>
-                            <div class="btn-toolbar mb-2 mb-md-0" style="margin-right:1.75rem">
-                                <button type="button" class="btn btn-outline-secondary" @click="openCreateWizard()"><i class="fa fa-plus"></i></button>
-                            </div>
-
 							<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 								<Toast ref="toastEmployeeCreatedRef">
 									<template #body><h4>Mitarbeiter erstellt.</h4></template>
@@ -259,7 +265,10 @@ export default {
                             :sideMenu="false"
                             :tabulator-options="employeesTabulatorOptions"
                             :tabulator-events="employeesTabulatorEvents"
-                            @nw-new-entry="newSideMenuEntryHandler">
+                            :new-btn-label="'Mitarbeiter'"
+                            :new-btn-show="true"
+                            @nw-new-entry="newSideMenuEntryHandler"
+							@click:new="openCreateWizard()">
                             </core-filter-cmpt>
                         </div>
                     </template>

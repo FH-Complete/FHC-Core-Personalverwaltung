@@ -5,69 +5,65 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []" :padleft="true"></infos>
-  <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []" :padleft="true"></errors>
-  <div class="row g-2 mb-1">
-    <div class="col-2 ps-5">
-      <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
-<!--        
-        <option value="" selected disabled>Gehaltstyp wählen</option>
-        <option value="basisgehalt">Basisgehalt</option>
-        <option value="grundgehalt">Grundgehalt</option>
-        <option value="zulage">Zulage</option>
--->        
-        <option
-          v-for="gt in gehaltstypen"
-          :value="gt.value"
-          :selected="isselected(gt.value, this.gehaltstyp)"
-          :disabled="gt.disabled">
-          {{ gt.label }}
-        </option>
-      </select>
-    </div>
-    <div class="col-2">
-      <div class="input-group input-group-sm">
-        <input v-model="betrag" :disabled="isinputdisabled('betrag')" type="text" class="form-control form-control-sm" placeholder="Betrag" aria-label="betrag">
-        <span class="input-group-text">&euro;</span>
+  <div class="card card-body border-0 bg-primary my-2" style="--bs-bg-opacity: .2;">
+    <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
+    <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
+    <div class="row g-2 mb-1">
+      <div class="col-2">
+        <select v-model="gehaltstyp" :disabled="isinputdisabled('gehaltstyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option
+            v-for="gt in gehaltstypen"
+            :value="gt.value"
+            :selected="isselected(gt.value, this.gehaltstyp)"
+            :disabled="gt.disabled">
+            {{ gt.label }}
+          </option>
+        </select>
+      </div>
+      <div class="col-2">
+        <div class="input-group input-group-sm">
+          <input v-model="betrag" :disabled="isinputdisabled('betrag')" type="text" class="form-control form-control-sm" placeholder="Betrag" aria-label="betrag">
+          <span class="input-group-text">&euro;</span>
+        </div>
+      </div>
+      <div class="col-2">
+        <select v-model="auszahlungen" :disabled="isinputdisabled('auszahlungen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option value="14" selected>14 Auszahlungen</option>
+          <option value="12">12 Auszahlungen</option>
+        </select>
+      </div>
+      <div class="col-1">&nbsp;</div>
+      <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
+      <div class="col-1">
+        <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>        
+        <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeGB" aria-label="Close"></button>
+        <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
       </div>
     </div>
-    <div class="col-2">
-      <select v-model="auszahlungen" :disabled="isinputdisabled('auszahlungen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
-        <option value="14" selected>14 Auszahlungen</option>
-        <option value="12">12 Auszahlungen</option>
-      </select>
-    </div>
-    <div class="col-1">&nbsp;</div>
-    <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
-    <div class="col-1">
-      <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>        
-      <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeGB" aria-label="Close"></button>
-      <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
-    </div>
-  </div>
-  <div class="row g-2 mb-3">
-    <div class="col-1 ps-5">&nbsp;</div>
-    <div class="col-2">
-      <div class="input-group input-group-sm">
-        <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
-          v-bind:enable-time-picker="false"
-          v-bind:placeholder="'Valorisierungssperre bis'"
-          six-weeks
-          auto-apply 
-          text-input 
-          locale="de"
-          format="dd.MM.yyyy"
-          model-type="yyyy-MM-dd"></datepicker>
+    <div class="row g-2 mb-3">
+      <div class="col-2">
+        <div class="input-group input-group-sm">
+            <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
+              v-bind:enable-time-picker="false"
+              v-bind:placeholder="'Valorisierungssperre bis'"
+              six-weeks
+              auto-apply 
+              text-input 
+              locale="de"
+              format="dd.MM.yyyy"
+              model-type="yyyy-MM-dd"></datepicker>
+        </div>
       </div>
+      <div class="col-2">
+        <div class="form-check form-control-sm">
+          <input v-model="valorisierung" :disabled="isinputdisabled('valorisierung')" class="form-check-input" type="checkbox" value="" :id="'valorisierung_' + config.guioptions.id">
+          <label class="form-check-label" :for="'valorisierung_' + config.guioptions.id">
+            Valorisierung
+          </label>
+        </div>
+      </div>
+      <div class="col-8">&nbsp;</div>
     </div>
-    <div class="col-1">&nbsp;</div>
-    <div class="col-2 form-check form-control-sm">
-      <input v-model="valorisierung" :disabled="isinputdisabled('valorisierung')" class="form-check-input" type="checkbox" value="" :id="'valorisierung_' + config.guioptions.id">
-      <label class="form-check-label" :for="'valorisierung_' + config.guioptions.id">
-        Valorisierung
-      </label>
-    </div>
-    <div class="col-6">&nbsp;</div>    
   </div>
   `,
   data: function() {

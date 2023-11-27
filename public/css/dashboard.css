@@ -100,10 +100,7 @@ body {
   }
 
   .subnav .nav-link {
-    border: 1px solid #FFF;
-    border-radius: 0;
-    background-color: #EFEFEF;
-    text-transform: capitalize!important;
+    text-transform: uppercase!important;
   }
 
 
