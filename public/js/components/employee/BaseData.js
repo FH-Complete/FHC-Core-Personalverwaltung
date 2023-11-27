@@ -14,7 +14,8 @@ export const BaseData = {
         personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },
-    setup(props) {
+    emits: ['updateHeader'],
+    setup(props, { emit }) {
 
         const { t } = usePhrasen();
         const readonly = Vue.ref(true);
@@ -193,6 +194,7 @@ export const BaseData = {
                     showToast();
                     currentValue.value = response.data.retval[0];
                     preservedValue.value = currentValue.value;
+                    emit('updateHeader')
                     toggleMode();  
                 } catch (error) {
                     console.log(error)              

@@ -22,6 +22,7 @@ export default {
         const currentPersonID = Vue.ref(null);
         const currentPersonUID = Vue.ref(null);
         const currentDate = Vue.ref(null);
+        const employeeHeaderRef = Vue.ref();
 
         const redirect = (params) => {
             emit('personSelected', params);
@@ -30,6 +31,10 @@ export default {
         const dateChanged = (params) => {
             console.log("-> date changed: ", params);
             //currentDate.value=params;
+        }
+
+        const updateHeaderHandler = () => {
+            employeeHeaderRef.value.refresh();
         }
 
         Vue.onMounted(() => {
@@ -53,11 +58,11 @@ export default {
 			}
 		)
 
-        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate }
+        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate, employeeHeaderRef, updateHeaderHandler }
     },
     template: `    
-        <EmployeeHeader   :personID="personid" :personUID="personuid" @person-selected="redirect"   ></EmployeeHeader> 
+        <EmployeeHeader ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" @person-selected="redirect"   ></EmployeeHeader> 
         <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
-        <router-view></router-view>       
+        <router-view @updateHeader="updateHeaderHandler"></router-view>       
     `
 }

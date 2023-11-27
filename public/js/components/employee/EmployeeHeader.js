@@ -15,6 +15,7 @@ export const EmployeeHeader = {
         personID: Number,
         personUID: String,
     },
+    expose: ['refresh'],
     emits: ['personSelected'],
     setup(props, { emit }) {
 
@@ -206,6 +207,11 @@ export const EmployeeHeader = {
             currentDate.value = e.target.value;
             router.push(url);
         }
+
+        const refresh = () => {
+            console.log('refresh called')
+            fetchHeaderData(props.personID, props.personUID)
+        }
         
 
         return {
@@ -232,6 +238,7 @@ export const EmployeeHeader = {
             formatDate,
             setDateHandler,
             checkPerson,
+            refresh,
             openissuescount
         }
     },

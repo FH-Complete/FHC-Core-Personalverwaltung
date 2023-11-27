@@ -20,7 +20,8 @@ export const EmployeePerson = {
     props: {
         // personid: { type: Number, default: 0 }
     },
-    setup() {
+    emits: ['updateHeader'],
+    setup(_, { emit }) {
 
         const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(0);
@@ -39,6 +40,10 @@ export const EmployeePerson = {
             console.log("activeItem: ", menuItem);
         };
 
+        const updateHeaderHandler = () => {
+            emit('updateHeader')
+        }
+
         Vue.watch(
 			() => route.params,
 			params => {
@@ -55,7 +60,7 @@ export const EmployeePerson = {
             currentPersonUID.value = route.params.uid;
         })
 */
-        return { items, isActive, setActive, currentPersonID, currentPersonUID, t }
+        return { items, isActive, setActive, currentPersonID, currentPersonUID, t, updateHeaderHandler }
 
     },
     template: `
@@ -120,14 +125,14 @@ export const EmployeePerson = {
                     :class="{ active: isActive(items[0]) }"
                     role="tabpanel"
                 >
-                    <base-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></base-data>
+                    <base-data editMode :personID="currentPersonID" :personUID="currentPersonUID" @updateHeader="updateHeaderHandler"></base-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[1]) }"
                     role="tabpanel"
                 >
-                <employee-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></employee-data>
+                <employee-data editMode :personID="currentPersonID" :personUID="currentPersonUID" @updateHeader="updateHeaderHandler"></employee-data>
                 </div>
                 <div
                     class="tab-pane"
