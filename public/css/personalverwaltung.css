@@ -163,6 +163,11 @@ i.fa.fa-xmark {
 
 :root {
     --bs-body-font-size: 14px;
+    --dp-input-padding: 3.5px 30px 3.5px 12px;
+    --dp-font-size: 0.875rem;
+    --dp-border-color: #ced4da;
+    --dp-border-color-hover:  #ced4da;
+    --dp-border-radius: 2.8px;
 }
 
 html {
@@ -172,3 +177,4 @@ html {
 .tabulator {
     font-size: var(--bs-body-font-size);
 }
+

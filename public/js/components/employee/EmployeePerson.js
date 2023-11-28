@@ -167,7 +167,7 @@ export const EmployeePerson = {
 					:class="{ active: isActive(items[6]) }"
 					role="tabpanel"
 				>
-				<job-function editMode :personID="currentPersonID"  :personUID="currentPersonUID"></job-function>
+				<job-function editMode :personID="currentPersonID"  :personUID="currentPersonUID" @updateHeader="updateHeaderHandler"></job-function>
 				</div>
                 
             </div>

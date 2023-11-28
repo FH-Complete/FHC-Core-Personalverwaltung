@@ -17,13 +17,13 @@
 			),
 			'vue3' => true,
 			'customCSSs' => [
+				'vendor/vuejs/vuedatepicker_css/main.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
 				'public/css/components/verticalsplit.css',
 				'public/css/components/searchbar.css',
-				'vendor/vuejs/vuedatepicker_css/main.css',
                 'public/extensions/FHC-Core-Personalverwaltung/css/vbform/vbform.css'
 			],
 			'customJSs' => [
