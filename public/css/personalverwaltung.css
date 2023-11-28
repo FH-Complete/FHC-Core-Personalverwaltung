@@ -168,6 +168,8 @@ i.fa.fa-xmark {
     --dp-border-color: #ced4da;
     --dp-border-color-hover:  #ced4da;
     --dp-border-radius: 2.8px;
+    --dp-month-year-row-height: 25px;
+    --dp-cell-size: 25px;
 }
 
 html {
