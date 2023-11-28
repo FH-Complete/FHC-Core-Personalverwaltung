@@ -3,6 +3,7 @@ import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/vbform/api.js";
+import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -36,4 +37,5 @@ const pvApp = Vue.createApp(	{
 });
 
 pvApp.use(primevue.config.default);
+pvApp.use(Phrasen);
 pvApp.mount('#wrapper');
