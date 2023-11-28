@@ -23,7 +23,8 @@ trait JSONData {
 
     protected function getJSONDataInt(&$target, &$decoded, $attributeName)
     {
-        if (isset($decoded[$attributeName]) && filter_var($decoded[$attributeName], FILTER_VALIDATE_INT))
+        if (isset($decoded[$attributeName]) && 
+			(false !== filter_var($decoded[$attributeName], FILTER_VALIDATE_INT)))
         {
             $target =  filter_var($decoded[$attributeName], FILTER_VALIDATE_INT);
             return true;
@@ -33,7 +34,8 @@ trait JSONData {
 
     protected function getJSONDataFloat(&$target, &$decoded, $attributeName)
     {
-        if (isset($decoded[$attributeName]) && filter_var($decoded[$attributeName], FILTER_VALIDATE_FLOAT))
+        if (isset($decoded[$attributeName]) && 
+			(false !== filter_var($decoded[$attributeName], FILTER_VALIDATE_FLOAT)))
         {
             $target =  filter_var($decoded[$attributeName], FILTER_VALIDATE_FLOAT);
             return true;

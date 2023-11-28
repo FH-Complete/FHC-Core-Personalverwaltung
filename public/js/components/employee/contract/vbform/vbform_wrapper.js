@@ -103,6 +103,7 @@ export default {
       if( this.mode === 'aenderung' || this.mode === 'korrektur' ) {
         // TODO cleanup and remove again
         this.store.dv.data = {};
+        this.store.dv.data.dienstverhaeltnisid = this.curdv.dienstverhaeltnis_id;
         this.store.dv.data.vertragsart_kurzbz = this.curdv.vertragsart_kurzbz;
       }  
     },
@@ -137,10 +138,15 @@ export default {
         };
         preset.dv.data.gueltigkeit.guioptions.sharedstatemode = 'ignore';
         if( this.mode === 'aenderung' ) {
-          preset.dv.data.gueltigkeit.guioptions.disabled = [
-              'gueltig_ab',
-              'gueltig_bis'
+          var disabled = [
+            'gueltig_ab',
+            'gueltig_bis'
           ];
+          if( vbgb2gui.isFuture(this.curdv) )
+          {
+            disabled = [];  
+          }
+          preset.dv.data.gueltigkeit.guioptions.disabled = disabled;
         }
       }
       this.preset = preset;
