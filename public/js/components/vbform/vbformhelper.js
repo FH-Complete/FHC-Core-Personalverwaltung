@@ -52,7 +52,8 @@ export default {
   ],
   created: function() {
     this.getFreitexttypen();
-    this.getGehaltstypen();  
+    this.getGehaltstypen();
+    this.setScrollBarWidthCSSVar();
   },
   methods: {
     getPayload: function() {
@@ -92,6 +93,14 @@ export default {
         disabled: true
       });
       this.lists.gehaltstypen = gehaltstypen;
+    },
+    setScrollBarWidthCSSVar: function() {
+        const scrollDiv = document.createElement('div');
+        scrollDiv.style.cssText = 'width: 99px; height: 99px; overflow: scroll; position: absolute; top: -9999px;';
+        document.body.appendChild(scrollDiv);
+        const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+        document.body.removeChild(scrollDiv);
+        document.body.style.setProperty('--scrollbar-width', `${scrollbarWidth}px`);
     }
   }
 }
