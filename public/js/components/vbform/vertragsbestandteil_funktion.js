@@ -189,10 +189,10 @@ export default {
     },
     resetDropdowns: function() {
       if(!this.isinputdisabled('funktion')) {
-        this.funktion = '';
+        this.autocomplete.selectedfunktion = '';
       }
       if(!this.isinputdisabled('orget')) {
-        this.orget = '';
+        this.autocomplete.selectedorget = '';
       }
       this.benutzerfunktionid = '';
     },
