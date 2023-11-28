@@ -2,11 +2,13 @@
 	width: 40%;
 }
 
+/*
 .input-group.input-group-sm .dp__input {
 	padding-top: .25rem;
 	padding-bottom: .25rem;
 	font-size: .875rem;
 }
+*/
 
 @media (min-width: 992px) {
 
