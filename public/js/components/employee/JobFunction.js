@@ -18,7 +18,8 @@ export const JobFunction = {
         personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },
-    setup( props ) {
+    emits: ['updateHeader'],
+    setup( props, { emit } ) {
 
         const readonly = Vue.ref(false);
 
@@ -282,6 +283,7 @@ export const JobFunction = {
                     if (res.data.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
+                        emit('updateHeader');
                     }
                 } catch (error) {
                     console.log(error)              
@@ -316,6 +318,7 @@ export const JobFunction = {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
+                        emit('updateHeader');
                         showToast();
                     }  
                 } catch (error) {
