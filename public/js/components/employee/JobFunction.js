@@ -163,8 +163,9 @@ export const JobFunction = {
 
                 if( cell.getRow().getData().dienstverhaeltnis_unternehmen === null ) {
                     nodeDiv.appendChild(nodeBtnEdit);
+                    nodeDiv.appendChild(nodeBtnDel);
                 }
-                nodeDiv.appendChild(nodeBtnDel);
+                
                 return nodeDiv;
             }
             
