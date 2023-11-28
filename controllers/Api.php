@@ -102,7 +102,8 @@ class Api extends Auth_Controller
 				'getStundensaetze' => Api::DEFAULT_PERMISSION,
 				'getStundensatztypen' => Api::DEFAULT_PERMISSION,
 				'updateStundensatz' => Api::DEFAULT_PERMISSION,
-				'deleteStundensatz' => Api::DEFAULT_PERMISSION
+				'deleteStundensatz' => Api::DEFAULT_PERMISSION,
+                'offTimeByPerson' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -1439,6 +1440,24 @@ class Api extends Auth_Controller
         $data = $this->ApiModel->getUID($person_id);
         
         return $this->outputJson($data);                   
+    }
+
+    /**
+     * get off time list of employee by uid
+     */
+    function offTimeByPerson()
+    {
+        $person_uid = $this->input->get('uid', TRUE);
+
+        if (!$person_uid)
+        {
+            $this->outputJsonError('invalid parameter person_uid');
+            exit;
+        }
+
+        $data = $this->ApiModel->getOffTimeList($person_uid);
+        
+        return $this->outputJson($data);
     }
 
     /**

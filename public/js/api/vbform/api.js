@@ -12,6 +12,7 @@ import Person from "./person.js";
 import Issue from "./issue.js";
 import Common from "./common.js";
 import Stundensatz from "./stundensatz.js";
+import Zeit from "./zeit.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -28,4 +29,5 @@ export default {
     "Issue": Issue,
     "Common": Common,
     "Stundensatz": Stundensatz,
+    "Zeit": Zeit,
 };
