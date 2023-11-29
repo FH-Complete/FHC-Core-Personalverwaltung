@@ -7,10 +7,10 @@ export default {
         
       <select v-model="selectedtmpstoreidx" class="form-select form-select-sm">
         <option value="-1" disabled>Zwischenspeicherung wählen</option>
-        <option v-for="(tmpstore, idx) in tmpstores[store.mode]" :key="tmpstore.tmp_store_id"
+        <option v-for="(tmpstore, idx) in getTmpStoresForModeAndDV" :key="tmpstore.tmp_store_id"
                 :value="idx">
                 <!-- TODO: statt uid von insertvon/updatevon bitte Nachnamen anzeigen (HR Wunsch) -->
-                  {{ tmpstore.insertamum }} - {{ tmpstore.insertvon }} {{ tmpstore.updateamum }} - {{ tmpstore.updatevon }}
+                  {{ getTmpStoreLabel(tmpstore) }}
                 </option>
       </select>
 
@@ -101,6 +101,31 @@ export default {
             });
         }
         
+    },
+    getTmpStoreLabel: function(tmpstore) {
+        var label = tmpstore.insertamum + ' - ' + tmpstore.ivorname + ' ' 
+                + tmpstore.inachname + ' (' + tmpstore.insertvon + ')';
+        if( tmpstore.updatevon !== null ) {
+          label += ' ' + tmpstore.updateamum + ' - ' + tmpstore.uvorname + ' ' 
+                  + tmpstore.unachname + ' (' + tmpstore.updatevon + ')';
+        }
+        return label;
     }
+  },
+  computed: {
+      getTmpStoresForModeAndDV: function() {
+          var tmpstores = {};
+          if( this.store.mode !== 'neuanlage' ) {
+              for(  var idx in this.tmpstores[this.store.mode] ) {
+                var tmpstore = this.tmpstores[this.store.mode][idx];
+                if( this.store.dv.data.dienstverhaeltnisid === parseInt(tmpstore.dienstverhaeltnisid) ) {
+                    tmpstores[idx] = tmpstore;
+                }
+              };
+          } else {
+              tmpstores = this.tmpstores[this.store.mode];
+          }
+          return tmpstores;
+      }
   }
 }

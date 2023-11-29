@@ -3,6 +3,7 @@ export default Vue.reactive({
   unternehmen: '',
   mitarbeiter_uid: '',
   tmpstoreid: null,
+  showmsgs: true, 
   gueltigkeit: {
     gueltig_ab: '',
     gueltig_bis: ''

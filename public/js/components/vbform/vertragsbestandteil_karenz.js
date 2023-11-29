@@ -39,6 +39,7 @@ export default {
               :disabled="isinputdisabled('geplanter_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'geplanter Geburtstermin'"
+              v-bind:teleport="true"
               six-weeks
               auto-apply 
               text-input 
@@ -54,6 +55,7 @@ export default {
               :disabled="isinputdisabled('tatsaechlicher_geburtstermin') || karenztyp_kurzbz !== 'elternkarenz'"
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'tatsaechlicher Geburtstermin'"
+              v-bind:teleport="true"
               six-weeks
               auto-apply 
               text-input 

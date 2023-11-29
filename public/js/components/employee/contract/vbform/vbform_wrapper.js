@@ -41,13 +41,21 @@ export default {
         <template #footer>
          <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
               <div v-if="mode === 'aenderung' || mode === 'korrektur'" class="btn-group me-2" role="group" aria-label="Second group">
-                  <button class="btn btn-secondary btn-sm float-end" @click="reload">Zurücksetzen</button>
+                  <button class="btn btn-secondary btn-sm float-end" @click="reload">
+                    Zurücksetzen
+                  </button>
               </div>
               <div class="btn-group me-2" role="group" aria-label="Second group">
-                  <button class="btn btn-secondary btn-sm float-end" @click="validate">Eingaben prüfen</button>
+                  <button class="btn btn-secondary btn-sm float-end" @click="validate">
+                    <span v-show="spinners.validating" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    Eingaben prüfen
+                  </button>
               </div>
                <div class="btn-group" role="group" aria-label="First group">
-                  <button class="btn btn-primary btn-sm float-end" @click="save">{{ getSaveButtonLabel }}</button>
+                  <button class="btn btn-primary btn-sm float-end" @click="save">
+                    <span v-show="spinners.saving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    {{ getSaveButtonLabel }}
+                  </button>
               </div>
           </div>
         </template>
@@ -65,7 +73,11 @@ export default {
       vbhjson: presets,
       presets: presets,
       preset: null,
-      store: store
+      store: store,
+      spinners: {
+        saving: false,
+        validating: false
+      }
     };
   },
   emits: [
@@ -200,21 +212,33 @@ export default {
         }
     },
     save: function() {
+      this.spinners.saving = true;
+      this.store.showmsgs = false;
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
       Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
       .then((response) => {
         that.handleSaved(response.data.data);
+      })
+      .finally(() => {
+          that.spinners.saving = false;
+          that.store.showmsgs = true;
       });
     },
     validate: function() {
+      this.spinners.validating = true;
+      this.store.showmsgs = false;
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
       Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
       .then((response) => {
         that.handleValidated(response.data.data);
+      })
+      .finally(() => {
+          that.spinners.validating = false;
+          that.store.showmsgs = true;
       });
     },        
     handlePresetSelected: function(preset) {

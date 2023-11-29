@@ -46,6 +46,7 @@ export default {
             <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
               v-bind:enable-time-picker="false"
               v-bind:placeholder="'Valorisierungssperre bis'"
+              v-bind:teleport="true"
               six-weeks
               auto-apply 
               text-input 

@@ -8,7 +8,8 @@ export default {
       <datepicker ref="dpvon" v-model="gueltig_ab" :disabled="isdisabled || isinputdisabled('gueltig_ab')"
         @update:model-value="gueltigkeitchanged"
         v-bind:enable-time-picker="false"
-        v-bind:placeholder="'gültig ab'"        
+        v-bind:placeholder="'gültig ab'"
+        v-bind:teleport="true"
         six-weeks
         auto-apply 
         text-input 
@@ -22,6 +23,7 @@ export default {
         v-bind:placeholder="'gültig bis'"
         v-bind:min-date="minDateBis"
         v-bind:start-date="minDateBis"
+        v-bind:teleport="true"
         six-weeks
         auto-apply 
         text-input

@@ -13,8 +13,8 @@ export default {
   template: `
     <div class="vbformhelper flex-shrink-1 flex-grow-1 d-flex flex-column overflow-hidden">
       <div class="py-1 mb-1">
-        <infos :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
-        <errors :errors="(preset?.guioptions?.errors !== undefined) ? preset?.guioptions?.errors : []" :padright="false"></errors>
+        <infos v-show="store.showmsgs" :infos="(preset?.guioptions?.infos !== undefined) ? preset?.guioptions?.infos : []" :padright="false"></infos>
+        <errors v-show="store.showmsgs" :errors="(preset?.guioptions?.errors !== undefined) ? preset?.guioptions?.errors : []" :padright="false"></errors>
       </div>
       <component ref="parts" v-for="(child, idx) in children" :key="idx" :is="child.type" :preset="child"></component>
     </div>
