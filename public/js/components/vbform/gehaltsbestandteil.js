@@ -5,7 +5,7 @@ import infos from './infos.js';
 
 export default {
   template: `
-  <div class="card card-body border-0 bg-primary my-2 px-0" style="--bs-bg-opacity: .2;">
+  <div class="card card-body border-0 bg-primary my-2 px-0" style="--bs-bg-opacity: .1;">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config?.guioptions?.errors : []"></errors>
     <div class="row g-2 mb-1">

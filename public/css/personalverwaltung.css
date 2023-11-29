@@ -195,3 +195,29 @@ html {
     padding: 0.2rem;
     width: 100%;
 }
+
+.btn-primary {
+    background-color: #00649c;
+    border-color:#00649c;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #3c6f8f;
+    border-color: #3c6f8f;
+}
+
+.nav-link {
+    color: #00649c;
+}
+
+.nav-link:focus, .nav-link:hover {
+    color: #3c6f8f;
+}
+
+.bg-primary {
+    color: #00649c;
+}
+
+.text-primary {
+    color: #00649c !important;
+}
