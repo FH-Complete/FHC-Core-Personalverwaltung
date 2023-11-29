@@ -744,8 +744,7 @@ export const EmployeeContract = {
                                     </template>
 
 
-                                    <!-- Arbeitszeit -->
-                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h6></div>
+                                
 
                                     <div class="col-md-12" v-if="currentVBS.stunden.length == 0">
                                         Kein aktiver Vertragsbestandteil vorhanden.
@@ -1057,7 +1056,7 @@ export const EmployeeContract = {
 
                         <div class="card">
                             <div class="card-header">
-                                <h5 class="mb-0">Zuordnung</h5>
+                                <h5 class="mb-0">Zuordnung & Tätigkeit</h5>
                             </div>
                             <div class="card-body" style="text-align:left">
 
@@ -1087,7 +1086,7 @@ export const EmployeeContract = {
                                     <template v-for="(item, index) in currentVBS.funktion.taetigkeit"  >
 
                                         <div class="col-md-4">
-                                            <label class="form-label" v-if="index == 0" >Zuordnung</label>
+                                            <label class="form-label" v-if="index == 0" >Tätigkeit</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
                                         </div>
 
