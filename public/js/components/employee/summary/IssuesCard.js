@@ -217,7 +217,7 @@ export const IssuesCard = {
                                 <template v-if="item.behebung_data && item.behebung_data.vbs">
                                      <span v-for="(vb, index) in item.behebung_data.vbs" > 
                                             <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + vb.dienstverhaeltnis_id" 
-                                                class="flex-sm-fill text-sm-center nav-link">
+                                                class="flex-sm-fill text-sm-start">
                                                 VB {{ formatVertragsbestandteiltyp(vb.vertragsbestandteiltyp_kurzbz) }} ({{ formatDate(vb.von) }} - {{ formatDate(vb.bis) }})
                                             </router-link>
                                         </span>
@@ -225,7 +225,7 @@ export const IssuesCard = {
                                 <template v-if="item.behebung_data && item.behebung_data.gbs">
                                      <span v-for="(gb, index) in item.behebung_data.gbs" > 
                                             <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + gb.dienstverhaeltnis_id" 
-                                                class="flex-sm-fill text-sm-center nav-link">
+                                                class="flex-sm-fill text-sm-start">
                                                 GB {{ formatGehaltstyp(gb.gehaltstyp_kurzbz) }} ({{ formatDate(gb.von) }} - {{ formatDate(gb.bis) }})
                                             </router-link>
                                         </span>
@@ -233,7 +233,7 @@ export const IssuesCard = {
                                 <template v-if="item.behebung_data && item.behebung_data.dvs">
                                      <span v-for="(dv, index) in item.behebung_data.dvs" > 
                                             <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + dv.dienstverhaeltnis_id" 
-                                                class="flex-sm-fill text-sm-center nav-link">
+                                                class="flex-sm-fill text-sm-start">
                                                 DV {{ formatVertragsart(dv.vertragsart_kurzbz) }}/{{ dv.unternehmen }} ({{ formatDate(dv.von) }} - {{ formatDate(dv.bis) }})
                                             </router-link>
                                         </span>
