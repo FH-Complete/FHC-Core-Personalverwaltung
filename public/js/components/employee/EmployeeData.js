@@ -56,7 +56,7 @@ export const EmployeeData= {
                 kurzbz: "",
                 lektor: false,
                 fixangestellt: false,
-                stundensatz: "0.00",
+                stundensatz: "0.00",   // deprecated
                 ausbildungcode: null,
                 ort_kurzbz: "",
                 ext_id: 0,
@@ -277,8 +277,14 @@ export const EmployeeData= {
                             <div class="col-md-4"></div>
                             <!--  -->
                             <div class="col-md-2">
-                                <label for="stundensatz" class="form-label">{{ t('ui','stundensatz') }}</label>
-                                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="stundensatz" v-model="currentValue.stundensatz">
+                                <label for="office" class="form-label">{{ t('person','buero') }}</label>
+                                <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                    <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                    <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
+                                        {{ item.ort_kurzbz }}
+                                    </option>         
+                                </select>
+                            <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
                             </div>
                             <div class="col-md-2">
                                 <label for="telefonklappe" class="form-label">{{ t('person','telefonklappe') }}</label>
@@ -295,36 +301,29 @@ export const EmployeeData= {
                                 <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="ausbildung" :value="getAusbildungbez(currentValue.ausbildungcode) ">
                             </div>
                             <div class="col-md-4"></div>
-                            <!--Location -->
+                            <!--Location -->       
+                            
                             <div class="col-md-4">
-                                <label for="office" class="form-label">{{ t('person','buero') }}</label>
-                                <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                                    <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
-                                    <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
-                                        {{ item.ort_kurzbz }}
-                                    </option>         
-                                </select>
-                                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
+                                <div class="row gy-3">    
+                                    <div class="col-12">                 
+                                        <label for="standort" class="form-label">{{ t('person','standort') }}</label>
+                                        <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                            <option value="0">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                            <option v-for="(item, index) in standorte" :value="item.standort_id">
+                                                {{ item.bezeichnung }}
+                                            </option>         
+                                        </select>
+                                        <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="anmerkung" class="form-label">{{ t('global', 'anmerkung') }}</label>
+                                        <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
+                                        </textarea>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4">
-                                <label for="standort" class="form-label">{{ t('person','standort') }}</label>
-                                <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                                    <option value="0">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
-                                    <option v-for="(item, index) in standorte" :value="item.standort_id">
-                                        {{ item.bezeichnung }}
-                                    </option>         
-                                </select>
-                                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">
-                            </div>
-                            <div class="col-md-4">
-                            </div>
-                            <!-- -->
-                            <div class="col-4">
-                                <label for="anmerkung" class="form-label">{{ t('global', 'anmerkung') }}</label>
-                                <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
-                                </textarea>
-                            </div>
-                            <div class="col-4">
+                            <div class="col-md-8">
+
                                 <label for="status" class="form-label">{{ t('global','status') }}</label>
                                 <div class="form-check">
                                     <label for="aktiv" class="form-check-label">{{ t('global','aktiv') }}</label>
@@ -342,6 +341,12 @@ export const EmployeeData= {
                                     <label for="bismelden" class="form-check-label" >{{ t('person','bismelden') }}</label>
                                     <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
                                 </div>
+
+                            </div>
+                            <!-- -->
+                            
+                            <div class="col-4">
+                                
                             </div>
                             <div class="col-4"></div>
                             <!-- changes -->
