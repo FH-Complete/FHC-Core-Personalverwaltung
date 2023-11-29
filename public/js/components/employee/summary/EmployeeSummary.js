@@ -3,6 +3,7 @@ import { CovidCard } from './CovidCard.js';
 import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
 import { IssuesCard } from './IssuesCard.js';
+import { OffTimeCard } from './OffTimeCard.js';
 
 export const EmployeeSummary = {
     components: {
@@ -10,6 +11,7 @@ export const EmployeeSummary = {
         DvCard,
         LehreCard,
         IssuesCard,
+        OffTimeCard,
     },
     props: {
         date: Date,
@@ -89,14 +91,8 @@ export const EmployeeSummary = {
                         <lehre-card :uid="currentUID" :date="date"></lehre-card>
 
                         <br/>
-                        <div class="card-header">
-                            <h5 class="mb-0">Urlaub/Krankenstand</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                            <div v-if="isFetching" class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>            
-                        </div>
+
+                        <off-time-card :uid="currentUID"></off-time-card> 
 
                     </div>
 

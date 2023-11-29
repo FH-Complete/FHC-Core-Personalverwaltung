@@ -219,6 +219,37 @@ class Api_model extends DB_Model
         return $this->execQuery($query, array($datestring, $datestring, $person_id));
     }
 
+    public function getOffTimeList($person_uid)
+    {
+        $qry = "
+        SELECT 
+            z.zeitsperre_id,
+            z.zeitsperretyp_kurzbz,
+            t.beschreibung as zeitsperretyp,
+            z.mitarbeiter_uid,
+            z.bezeichnung,
+            z.vondatum,
+            z.vonstunde,
+            z.bisdatum,
+            z.bisstunde,
+            z.vertretung_uid,
+            z.updateamum,
+            z.updatevon,
+            z.insertamum,
+            z.insertvon,
+            z.erreichbarkeit_kurzbz,
+            z.freigabeamum,
+            z.freigabevon
+
+        FROM campus.tbl_zeitsperre z
+            JOIN campus.tbl_zeitsperretyp t using(zeitsperretyp_kurzbz)
+        WHERE z.mitarbeiter_uid=? and z.vondatum>=now()
+        ";
+
+        return $this->execQuery($qry, array($person_uid));
+
+    }
+
     function runReport($sql, $filter)
     {
         // replace user
@@ -339,7 +370,7 @@ class Api_model extends DB_Model
         $personJson['insertamum'] = $this->escape('NOW()');
 
         $result = $this->PersonModel->insert($personJson);
-       
+
         if (isError($result))
         {
             return error($result->msg, EXIT_ERROR);
@@ -375,7 +406,7 @@ class Api_model extends DB_Model
 
     function insertUser($userJson)
     {
-        
+
         unset($userJson['updateamum']);
         unset($userJson['updatevon']);
         $userJson['aktiv'] = true;
@@ -384,7 +415,7 @@ class Api_model extends DB_Model
         $userJson['insertamum'] = $this->escape('NOW()');
 
         $result = $this->BenutzerModel->insert($userJson);
-       
+
         if (isError($result))
         {
             return error($result->msg, EXIT_ERROR);
@@ -490,7 +521,7 @@ class Api_model extends DB_Model
         $employeeJson['insertvon'] = getAuthUID();
         $employeeJson['insertamum'] = $this->escape('NOW()');
 
-        if (isset($employeeJson['standort_id']) 
+        if (isset($employeeJson['standort_id'])
 			&& $employeeJson['standort_id'] == 0)
         {
             $employeeJson['standort_id'] = null;
@@ -680,7 +711,7 @@ class Api_model extends DB_Model
         $contactDataJson['insertvon'] = getAuthUID();
         $contactDataJson['insertamum'] = $this->escape('NOW()');
 
-        if ( isset($contactDataJson['standort_id']) 
+        if ( isset($contactDataJson['standort_id'])
 			&& $contactDataJson['standort_id'] == 0)
         {
             $contactDataJson['standort_id'] = null;
@@ -818,7 +849,7 @@ class Api_model extends DB_Model
         }
 
         $qry='
-            SELECT 
+            SELECT
                 p.person_id,
                 b.uid,
                 p.svnr,
@@ -942,7 +973,7 @@ class Api_model extends DB_Model
     {
         $dvDataJson['insertvon'] = getAuthUID();
         $dvDataJson['insertamum'] = $this->escape('NOW()');
-            
+
         $result = $this->DVModel->insert($dvDataJson);
         $dvData = $this->KontaktModel->load($result->retval);
 
@@ -952,7 +983,7 @@ class Api_model extends DB_Model
 
         // Befristung
 
-        
+
 
         return $dvData;
     }
