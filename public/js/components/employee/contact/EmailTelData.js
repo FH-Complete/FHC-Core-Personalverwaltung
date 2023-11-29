@@ -1,7 +1,6 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmailTelData = {
     components: {
@@ -17,8 +16,6 @@ export const EmailTelData = {
     setup(props) {
 
         const { personID } = Vue.toRefs(props);
-
-        const { t } = usePhrasen();
 
         const urlContactData = Vue.ref("");
 
@@ -187,7 +184,7 @@ export const EmailTelData = {
         return {
             contactList, contactListArray, 
             currentContact, showEditModal, showAddModal, showDeleteModal, hideModal, modalRef,
-            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef, t,
+            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef,
             // form handling
             validKontakt, frmState, contactDataFrm, readonly
         }
@@ -197,13 +194,13 @@ export const EmailTelData = {
 
                 <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                     <Toast ref="toastRef">
-                        <template #body><h4>{{ t('person','kontaktdatenGespeichert') }}</h4></template>
+                        <template #body><h4>{{ $p.t('person','kontaktdatenGespeichert') }}</h4></template>
                     </Toast>
                 </div>
 
                 <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                     <Toast ref="deleteToastRef">
-                        <template #body><h4>{{ t('person','kontaktdatenGeloescht') }}</h4></template>
+                        <template #body><h4>{{ $p.t('person','kontaktdatenGeloescht') }}</h4></template>
                     </Toast>
                 </div>
 
@@ -219,17 +216,17 @@ export const EmailTelData = {
          
              
         <button type="button" class="btn btn-primary btn-sm my-2"  @click="showAddModal()">
-                <i class="fa fa-plus"></i> {{ t('global','kontakt') }}
+                <i class="fa fa-plus"></i> {{ $p.t('global','kontakt') }}
         </button>
         <div class="table-responsive">
             <table class="table table-hover table-sm">
                 <thead>
                 <tr>
-                    <th scope="col">{{ t('global','typ') }}</th>
-                    <th scope="col">{{ t('global','kontakt') }}</th>
-                    <th scope="col">{{ t('person', 'zustellung') }}</th>
-                    <th scope="col">{{ t('global', 'anmerkung') }}</th>
-                    <th scope="col">{{ t('ui','aktion') }}</th>
+                    <th scope="col">{{ $p.t('global','typ') }}</th>
+                    <th scope="col">{{ $p.t('global','kontakt') }}</th>
+                    <th scope="col">{{ $p.t('person', 'zustellung') }}</th>
+                    <th scope="col">{{ $p.t('global', 'anmerkung') }}</th>
+                    <th scope="col">{{ $p.t('ui','aktion') }}</th>
                 </tr>
                 </thead>
                 <tbody>               
@@ -256,12 +253,12 @@ export const EmailTelData = {
         </div>
 
         <!-- Detail Modal -->
-        <Modal :title="t('global','kontakt')" ref="modalRef">
+        <Modal :title="$p.t('global','kontakt')" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentContact != null"  ref="contactDataFrm" >
                                 
                     <div class="col-md-4">
-                        <label for="kontakttyp" class="form-label">{{ t('global','typ') }}</label>
+                        <label for="kontakttyp" class="form-label">{{ $p.t('global','typ') }}</label>
                         <select  id="kontakttyp" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentContact.kontakttyp" >
                             <option v-for="(item, index) in kontakttyp" :value="item.kontakttyp">
                                 {{ item.beschreibung }}
@@ -269,19 +266,19 @@ export const EmailTelData = {
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label for="kontakt" class="required form-label">{{ t('global','kontakt') }}</label>
+                        <label for="kontakt" class="required form-label">{{ $p.t('global','kontakt') }}</label>
                         <input type="text" @blur="frmState.kontaktBlured = true" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validKontakt(currentContact.kontakt) && frmState.kontaktBlured}" id="kontakt" maxlength="128" v-model="currentContact.kontakt">
                     </div>
                     
                     <div class="col-md-2">                                             
-                        <label for="zustellung" class="form-label">{{ t('person','zustellung') }}</label>
+                        <label for="zustellung" class="form-label">{{ $p.t('person','zustellung') }}</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="zustellung" v-model="currentContact.zustellung">
                         </div>
                     </div>      
                     
                     <div class="col-md-8">
-                        <label for="anmerkung" class="form-label">{{ t('global','anmerkung') }}</label>
+                        <label for="anmerkung" class="form-label">{{ $p.t('global','anmerkung') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkung" maxlength="64" v-model="currentContact.anmerkung">
                     </div>                                                            
 
@@ -290,14 +287,14 @@ export const EmailTelData = {
             </template>
             <template #footer>
                 <button type="button" class="btn btn-primary" @click="okHandler()" >
-                {{ t('ui','speichern') }}
+                {{ $p.t('ui','speichern') }}
                 </button>
             </template>
         </Modal>
 
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+        <ModalDialog :title="$p.t('global','warnung')" ref="confirmDeleteRef">
             <template #body>
-                {{ t('person','kontaktinformation') }} '{{ currentContact?.kontakt }}' {{ t('person','wirklichLoeschen') }}?
+                {{ $p.t('person','kontaktinformation') }} '{{ currentContact?.kontakt }}' {{ $p.t('person','wirklichLoeschen') }}?
             </template>
         </ModalDialog>
     `

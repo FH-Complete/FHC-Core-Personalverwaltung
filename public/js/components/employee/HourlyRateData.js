@@ -1,7 +1,6 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const HourlyRateData = {
 	components: {
@@ -19,8 +18,6 @@ export const HourlyRateData = {
 	},
 	setup (props) {
 		const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
-
-		const { t } = usePhrasen();
 
 		const readonly = Vue.ref(false);
 		const isFetching = Vue.ref(false);
@@ -256,7 +253,7 @@ export const HourlyRateData = {
 			validBeginn, validInput, checkDates, formatDate,
 			showToast, showDeletedToast,
 			showAddModal, hideModal, okHandler,
-			showDeleteModal, showEditModal, confirmDeleteRef, t,
+			showDeleteModal, showEditModal, confirmDeleteRef,
 		}
 	},
 	template: `
@@ -264,13 +261,13 @@ export const HourlyRateData = {
 
 		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 		  <Toast ref="toastRef">
-			<template #body><h4>{{ t('person','stundensatzGespeichert') }}</h4></template>
+			<template #body><h4>{{ $p.t('person','stundensatzGespeichert') }}</h4></template>
 		  </Toast>
 		</div>
 
 		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
 			<Toast ref="deleteToastRef">
-				<template #body><h4>{ t('person','stundensatzGeloescht') }}</h4></template>
+				<template #body><h4>{ $p.t('person','stundensatzGeloescht') }}</h4></template>
 			</Toast>
 		</div>
 	</div>
@@ -278,24 +275,24 @@ export const HourlyRateData = {
 		 <div class="col">
 			 <div class="card">
 				<div class="card-header">
-					<div class="h5"><h5>{{ t('person','stundensaetze') }}</h5></div>        
+					<div class="h5"><h5>{{ $p.t('person','stundensaetze') }}</h5></div>        
 				</div>
 
 				<div class="card-body">
 					<div class="d-grid d-md-flex justify-content-start py-2">
 						<button type="button" class="btn btn-sm btn-primary" @click="showAddModal()">
-						<i class="fa fa-plus"></i> {{ t('ui','stundensatz') }}
+						<i class="fa fa-plus"></i> {{ $p.t('ui','stundensatz') }}
 						</button>
 					</div>
 					<div class="table-responsive">
 						<table class="table table-hover table-sm">
 							<thead>                
 							<tr>
-								<th scope="col">{{ t('global','typ') }}</th>
-								<th scope="col">{{ t('ui','from') }}</th>
-								<th scope="col">{{ t('global','bis') }}</th>
-								<th scope="col">{{ t('core','unternehmen') }}</th>
-								<th scope="col">{{ t('ui','stundensatz') }}</th>
+								<th scope="col">{{ $p.t('global','typ') }}</th>
+								<th scope="col">{{ $p.t('ui','from') }}</th>
+								<th scope="col">{{ $p.t('global','bis') }}</th>
+								<th scope="col">{{ $p.t('core','unternehmen') }}</th>
+								<th scope="col">{{ $p.t('ui','stundensatz') }}</th>
 								<th scope="col"></th>
 							</tr>
 							</thead>
@@ -326,12 +323,12 @@ export const HourlyRateData = {
 	</div>
 
 	<!-- detail modal -->
-	<Modal :title="t('ui','stundensatz')" ref="modalRef" class="stundensatzModal">
+	<Modal :title="$p.t('ui','stundensatz')" ref="modalRef" class="stundensatzModal">
 		<template #body>
 			<form class="row g-3" ref="houryrateDataFrm">
 							
 				<div class="col-md-4">
-					<label for="stundensatztyp" class="required form-label">{{ t('global','typ') }}</label><br>
+					<label for="stundensatztyp" class="required form-label">{{ $p.t('global','typ') }}</label><br>
 					<select v-if="!readonly" id="stundensatztyp" @blur="frmState.typBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.stundensatztyp) && frmState.typBlurred}" v-model="currentValue.stundensatztyp" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option v-for="(item, index) in types" :value="item.stundensatztyp">
 							{{ item.bezeichnung }}
@@ -340,7 +337,7 @@ export const HourlyRateData = {
 					<input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="stundensatztyp" :value="currentValue.stundensatztyp">
 				</div>
 				<div class="col-md-3">
-					<label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
+					<label for="beginn" class="required form-label">{{ $p.t('ui','from') }}</label>
 					<datepicker id="beginn"
 						@blur="frmState.beginnBlurred = true"
 						v-bind:enable-time-picker="false"
@@ -354,7 +351,7 @@ export const HourlyRateData = {
 					></datepicker>
 				</div>
 				<div class="col-md-3">
-					<label for="ende" class="form-label">{{ t('global','bis') }}</label>
+					<label for="ende" class="form-label">{{ $p.t('global','bis') }}</label>
 					<datepicker id="ende"
 						@blur="frmState.bisBlurred = true"
 						v-bind:enable-time-picker="false"
@@ -370,12 +367,12 @@ export const HourlyRateData = {
 				</div>
 				<!-- -->
 			   <div class="col-md-4">
-					<label for="stundensatz" class="required form-label">{{ t('ui','stundensatz') }}</label>
+					<label for="stundensatz" class="required form-label">{{ $p.t('ui','stundensatz') }}</label>
 					<input type="number" :readonly="readonly" @blur="frmState.satzBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.stundensatz) && frmState.satzBlurred}" id="stundensatz" v-model="currentValue.stundensatz">
 				</div>
 			  
 			   <div class="col-md-4">
-					<label for="unternehmen" class="required form-label">{{ t('core','unternehmen') }}</label><br>
+					<label for="unternehmen" class="required form-label">{{ $p.t('core','unternehmen') }}</label><br>
 					<select v-if="!readonly" id="unternehmen" @blur="frmState.unternehmenBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.oe_kurzbz) && frmState.unternehmenBlurred}" v-model="currentValue.oe_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option v-for="(item, index) in unternehmen" :value="item.value">
 							{{ item.label }}
@@ -394,21 +391,21 @@ export const HourlyRateData = {
 		</template>
 		<template #footer>
 			<button type="button" class="btn btn-primary" @click="okHandler()" >
-				{{ t('ui','speichern') }}
+				{{ $p.t('ui','speichern') }}
 			</button>
 		</template>
 
 	</Modal>
 
-	<ModalDialog :title="t('global','warnung')" ref="dialogRef">
+	<ModalDialog :title="$p.t('global','warnung')" ref="dialogRef">
 	  <template #body>
-	  	{{ t('person','stundensatzNochNichtGespeichert') }}
+	  	{{ $p.t('person','stundensatzNochNichtGespeichert') }}
 	  </template>
 	</ModalDialog>
 
-	<ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+	<ModalDialog :title="$p.t('global','warnung')" ref="confirmDeleteRef">
 		<template #body>
-		{{ t('person','stundensatzWirklichLoeschen') }} '{{ currentValue?.stundensatztyp }}' ({{ currentValue?.gueltig_von }}<span v-if="currentValue?.gueltig_bis"> - {{ currentValue?.gueltig_bis }}</span>) {{ t('person','wirklichLoeschen') }}
+		{{ $p.t('person','stundensatzWirklichLoeschen') }} '{{ currentValue?.stundensatztyp }}' ({{ currentValue?.gueltig_von }}<span v-if="currentValue?.gueltig_bis"> - {{ currentValue?.gueltig_bis }}</span>) {{ $p.t('person','wirklichLoeschen') }}
 		</template>
 	</ModalDialog>
 	`

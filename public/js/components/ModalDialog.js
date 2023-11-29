@@ -1,5 +1,3 @@
-import { usePhrasen } from '../../../../../public/js/mixins/Phrasen.js';
-
 export const ModalDialog = {
     props: {
         type: String,
@@ -12,7 +10,6 @@ export const ModalDialog = {
         let thisModalObj;
         let _resolve;
         let _reject;
-        const { t } = usePhrasen();
 
         Vue.onMounted(() => {
             thisModalObj = new bootstrap.Modal(modalConfirmEle.value);
@@ -38,7 +35,7 @@ export const ModalDialog = {
             _resolve(false);
         }        
 
-        return { modalConfirmEle, show, hide, ok, cancel, t };
+        return { modalConfirmEle, show, hide, ok, cancel };
     },
 
     template:`
@@ -56,10 +53,10 @@ export const ModalDialog = {
                 <div class="modal-footer">
                     <slot name="footer"></slot>
                     <button type="button" class="btn btn-secondary" @click="cancel" data-bs-dismiss="modal">
-                      {{ t('ui','abbrechen') }}
+                      {{ $p.t('ui','abbrechen') }}
                     </button>
                     <button type="button" class="btn btn-primary" @click="ok" data-bs-dismiss="modal">
-                        {{ t('ui','ok') }}
+                        {{ $p.t('ui','ok') }}
                     </button>
                 </div>
             </div>

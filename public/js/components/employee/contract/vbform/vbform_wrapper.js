@@ -6,7 +6,6 @@ import presets_chooser from '../../../vbform/presets_chooser.js';
 import {Modal} from '../../../Modal.js';
 import tmpstorehelper from '../../../vbform/tmpstorehelper.js';
 import vbgb2gui from '../../../../helpers/vbform/vbgb2gui.js';
-import Phrasen from '../../../../../../../js/mixins/Phrasen.js';
 import savedpayloadchecker from '../../../../helpers/vbform/savedpayloadchecker.js';
 
 export default {
@@ -21,7 +20,7 @@ export default {
                 <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
               </div>
               <div class="col-1 text-center py-2">
-                <em>{{p.t('vbform', 'oder')}}</em>
+                <em>{{$p.t('vbform', 'oder')}}</em>
               </div>
               <div class="col-8">
                 <tmpstorehelper ref="tmpstorehelper" @loadedfromtmpstore="handleLoadedFromTmpStore" @savetotmpstore="saveToTmpStore"></tmpstorehelper>
@@ -82,9 +81,6 @@ export default {
   },
   emits: [
     "dvsaved"
-  ],
-  mixins: [
-    Phrasen
   ],
   components: {
     'presets_chooser': presets_chooser,

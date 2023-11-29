@@ -1,6 +1,5 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 
 export const EmployeeData= {
@@ -18,7 +17,6 @@ export const EmployeeData= {
     setup(props, { emit }) {
 
         const readonly = Vue.ref(true);
-        const { t } = usePhrasen();
 
         const { personID } = Vue.toRefs(props);
 
@@ -231,7 +229,6 @@ export const EmployeeData= {
             getAusbildungbez,
             getStandortbez,
             readonlyBlocker,
-            t,
         }
 
     },
@@ -239,7 +236,7 @@ export const EmployeeData= {
     <div class="row">
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="toastRef">
-                <template #body><h4>{{ t('person','mitarbeiterdatenGespeichert') }}</h4></template>
+                <template #body><h4>{{ $p.t('person','mitarbeiterdatenGespeichert') }}</h4></template>
             </Toast>
         </div>
     </div>
@@ -248,7 +245,7 @@ export const EmployeeData= {
              <div class="col">
                  <div class="card">
                     <div class="card-header">
-                        <div class="h5"><h5>{{ t('person','mitarbeiterdaten') }}</h5></div>        
+                        <div class="h5"><h5>{{ $p.t('person','mitarbeiterdaten') }}</h5></div>        
                     </div>
                     <div class="card-body">
                         <div class="d-grid gap-2 d-md-flex justify-content-end ">
@@ -260,34 +257,34 @@ export const EmployeeData= {
                         </div>
                         <form class="row g-3" ref="employeeDataFrm">
                             <div class="col-md-2">
-                                <label for="personalnummer" class="form-label">{{ t('global','personalnummer') }}</label>
+                                <label for="personalnummer" class="form-label">{{ $p.t('global','personalnummer') }}</label>
                                 <input type="text" readonly class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="personalnummer" v-model="currentValue.personalnummer">
                             </div>            
                             <div class="col-md-2">
-                                <label for="kurzbezeichnung" class="form-label">{{ t('gruppenmanagement','kurzbezeichnung') }}</label>
+                                <label for="kurzbezeichnung" class="form-label">{{ $p.t('gruppenmanagement','kurzbezeichnung') }}</label>
                                 <input type="text" :readonly="readonly" @blur="frmState.kurzbzBlured = true" @input="validateKurzbz()" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validKurzbz && frmState.kurzbzBlured }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
                                 <div class="invalid-feedback" v-if="!validKurzbz">
                                     Kurzbezeichnung existiert bereits. 
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <label for="alias" class="form-label">{{ t('person','alias') }}</label>
+                                <label for="alias" class="form-label">{{ $p.t('person','alias') }}</label>
                                 <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="alias" v-model="currentValue.alias">
                             </div>
                             <div class="col-md-4"></div>
                             <!--  -->
                             <div class="col-md-2">
-                                <label for="stundensatz" class="form-label">{{ t('ui','stundensatz') }}</label>
+                                <label for="stundensatz" class="form-label">{{ $p.t('ui','stundensatz') }}</label>
                                 <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="stundensatz" v-model="currentValue.stundensatz">
                             </div>
                             <div class="col-md-2">
-                                <label for="telefonklappe" class="form-label">{{ t('person','telefonklappe') }}</label>
+                                <label for="telefonklappe" class="form-label">{{ $p.t('person','telefonklappe') }}</label>
                                 <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
                             </div>
                             <div class="col-md-4">
-                                <label for="ausbildung" class="form-label">{{ t('person','ausbildung') }}</label>
+                                <label for="ausbildung" class="form-label">{{ $p.t('person','ausbildung') }}</label>
                                 <select v-if="!readonly" id="ausbildung" :readonly="readonly"  v-model="currentValue.ausbildungcode" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                                    <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                    <option value="">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
                                     <option v-for="(item, index) in ausbildung" :value="item.ausbildungcode">
                                         {{ item.ausbildungbez }}
                                     </option>         
@@ -297,9 +294,9 @@ export const EmployeeData= {
                             <div class="col-md-4"></div>
                             <!--Location -->
                             <div class="col-md-4">
-                                <label for="office" class="form-label">{{ t('person','buero') }}</label>
+                                <label for="office" class="form-label">{{ $p.t('person','buero') }}</label>
                                 <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                                    <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                    <option value="">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
                                     <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
                                         {{ item.ort_kurzbz }}
                                     </option>         
@@ -307,9 +304,9 @@ export const EmployeeData= {
                                 <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
                             </div>
                             <div class="col-md-4">
-                                <label for="standort" class="form-label">{{ t('person','standort') }}</label>
+                                <label for="standort" class="form-label">{{ $p.t('person','standort') }}</label>
                                 <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                                    <option value="0">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                    <option value="0">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
                                     <option v-for="(item, index) in standorte" :value="item.standort_id">
                                         {{ item.bezeichnung }}
                                     </option>         
@@ -320,26 +317,26 @@ export const EmployeeData= {
                             </div>
                             <!-- -->
                             <div class="col-4">
-                                <label for="anmerkung" class="form-label">{{ t('global', 'anmerkung') }}</label>
+                                <label for="anmerkung" class="form-label">{{ $p.t('global', 'anmerkung') }}</label>
                                 <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
                                 </textarea>
                             </div>
                             <div class="col-4">
-                                <label for="status" class="form-label">{{ t('global','status') }}</label>
+                                <label for="status" class="form-label">{{ $p.t('global','status') }}</label>
                                 <div class="form-check">
-                                    <label for="aktiv" class="form-check-label">{{ t('global','aktiv') }}</label>
+                                    <label for="aktiv" class="form-check-label">{{ $p.t('global','aktiv') }}</label>
                                     <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
                                 </div>
                                 <div class="form-check">
-                                    <label for="lektor" class="form-check-label">{{ t('lehre','lektor') }}</label>
+                                    <label for="lektor" class="form-check-label">{{ $p.t('lehre','lektor') }}</label>
                                     <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
                                 </div>
                                 <div class="form-check">
-                                    <label for="fixangestellt" class="form-check-label">{{ t('person','fixangestellt') }}</label>
+                                    <label for="fixangestellt" class="form-check-label">{{ $p.t('person','fixangestellt') }}</label>
                                     <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
                                 </div>
                                 <div class="form-check">
-                                    <label for="bismelden" class="form-check-label" >{{ t('person','bismelden') }}</label>
+                                    <label for="bismelden" class="form-check-label" >{{ $p.t('person','bismelden') }}</label>
                                     <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
                                 </div>
                             </div>
@@ -355,9 +352,9 @@ export const EmployeeData= {
         </div>
 
 
-    <ModalDialog :title="t('global', 'warnung')" ref="dialogRef">
+    <ModalDialog :title="$p.t('global', 'warnung')" ref="dialogRef">
       <template #body>
-        {{ t('t','mitarbeiterdatenGeandert') }}
+        {{ $p.t('t','mitarbeiterdatenGeandert') }}
       </template>
     </ModalDialog>
     `

@@ -1,7 +1,6 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const AddressData = {
     components: {
@@ -17,8 +16,6 @@ export const AddressData = {
     setup(props) {
 
         const { personID } = Vue.toRefs(props);
-
-        const { t } = usePhrasen();
 
         const urlAddressData = Vue.ref("");
 
@@ -243,7 +240,7 @@ export const AddressData = {
             addressList, addressListArray, isEditActive, showAddModal, 
             showDeleteModal, showEditModal, confirmDeleteRef, currentAddress, 
             modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
-            gemeinden, ortschaften, adressentyp, t,
+            gemeinden, ortschaften, adressentyp,
             // form handling
             validOrt, validPLZ, validTyp, frmState, addressDataFrm, readonly
         }
@@ -254,20 +251,20 @@ export const AddressData = {
 
             <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                 <Toast ref="toastRef">
-                    <template #body><h4>{{ t('person','adresseGespeichert') }}</h4></template>
+                    <template #body><h4>{{ $p.t('person','adresseGespeichert') }}</h4></template>
                 </Toast>
             </div>
 
             <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                 <Toast ref="deleteToastRef">
-                    <template #body><h4>{{ t('person','adresseGeloescht') }}</h4></template>
+                    <template #body><h4>{{ $p.t('person','adresseGeloescht') }}</h4></template>
                 </Toast>
             </div>
 
             <div class="d-flex bd-highlight">
                 <div class="py-2 bd-highlight">                   
                     <button type="button" class="btn btn-primary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
-                        <i class="fa fa-plus"></i> {{ t('person','adresse') }}
+                        <i class="fa fa-plus"></i> {{ $p.t('person','adresse') }}
                     </button>
                 </div>
             </div>
@@ -276,16 +273,16 @@ export const AddressData = {
             <table class="table table-hover table-sm">
                 <thead>                
                 <tr>
-                    <th scope="col">{{ t('global','typ') }}</th>
-                    <th scope="col">{{ t('person','strasse') }}</th>
-                    <th scope="col">{{ t('person','plz') }}</th>
-                    <th scope="col">{{ t('person','ort') }}</th>
-                    <th scope="col">{{ t('person','gemeinde') }}</th>
-                    <th scope="col">{{ t('person','nation') }}</th>
-                    <th scope="col">{{ t('person','heimatadresse') }}</th>
-                    <th scope="col">{{ t('person','zustelladresse') }}</th>
-                    <th scope="col">{{ t('person','abweichenderEmpfaenger') }}</th>
-                    <th scope="col">{{ t('ui','aktion') }}</th>
+                    <th scope="col">{{ $p.t('global','typ') }}</th>
+                    <th scope="col">{{ $p.t('person','strasse') }}</th>
+                    <th scope="col">{{ $p.t('person','plz') }}</th>
+                    <th scope="col">{{ $p.t('person','ort') }}</th>
+                    <th scope="col">{{ $p.t('person','gemeinde') }}</th>
+                    <th scope="col">{{ $p.t('person','nation') }}</th>
+                    <th scope="col">{{ $p.t('person','heimatadresse') }}</th>
+                    <th scope="col">{{ $p.t('person','zustelladresse') }}</th>
+                    <th scope="col">{{ $p.t('person','abweichenderEmpfaenger') }}</th>
+                    <th scope="col">{{ $p.t('ui','aktion') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -316,12 +313,12 @@ export const AddressData = {
         </div>
 
         <!-- Detail Modal -->
-        <Modal :title="t('person','adresse')" ref="modalRef">
+        <Modal :title="$p.t('person','adresse')" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentAddress != null"  ref="addressDataFrm" >
                                
                     <div class="col-md-6">
-                        <label for="strasse" class="form-label">{{ t('person','strasse') }}</label>
+                        <label for="strasse" class="form-label">{{ $p.t('person','strasse') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" maxlength="256">
                     </div>
                     <div class="col-md-6">
@@ -334,11 +331,11 @@ export const AddressData = {
                         
                     </div>
                     <div class="col-md-2">
-                        <label for="plz" class="required form-label" >{{ t('person','plz') }}</label>
+                        <label for="plz" class="required form-label" >{{ $p.t('person','plz') }}</label>
                         <input type="text" required :readonly="readonly" @blur="frmState.plzBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validPLZ(currentAddress.plz) && frmState.plzBlured}" id="plz" maxlength="16" v-model="currentAddress.plz" >
                     </div>
                     <div class="col-md-4">
-                        <label for="ort" class="required form-label">{{ t('person','ort') }}</label>
+                        <label for="ort" class="required form-label">{{ $p.t('person','ort') }}</label>
                         <input v-if="currentAddress.nation!='A'" type="text" required :readonly="readonly" @blur="frmState.ortBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validOrt(currentAddress.ort) && frmState.ortBlured}" id="ort" maxlength="256" v-model="currentAddress.ort" >
                         <select  v-if="currentAddress.nation=='A'" id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.ort" >
                             <option v-for="(item, index) in ortschaften" :value="item.ortschaftsname">
@@ -348,7 +345,7 @@ export const AddressData = {
                     </div>
                     <!-- Gemeinde -->
                     <div class="col-md-6">
-                        <label for="gemeinde" class="form-label">{{ t('person','gemeinde') }}</label>
+                        <label for="gemeinde" class="form-label">{{ $p.t('person','gemeinde') }}</label>
                         <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="256" v-model="currentAddress.gemeinde">
                         <select  v-if="currentAddress.nation=='A'" id="gemeinde" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.gemeinde" >
                             <option v-for="(item, index) in gemeinden" :value="item.name">
@@ -359,13 +356,13 @@ export const AddressData = {
 
                     <!-- c/o -->
                     <div class="col-md-6">
-                        <label for="co_name" class="form-label">{{ t('person','abweichenderEmpfaenger') }}</label>
+                        <label for="co_name" class="form-label">{{ $p.t('person','abweichenderEmpfaenger') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="256" v-model="currentAddress.co_name">
                     </div>
 
                     <!-- Adresstyp (Hauptwohnsitz, Nebenwohnsitz, etc.) -->
                     <div class="col-md-3">
-                        <label for="typ" class="required form-label">{{ t('global','typ') }}</label>
+                        <label for="typ" class="required form-label">{{ $p.t('global','typ') }}</label>
                         <select  id="typ" class="form-select form-select-sm" aria-label=".form-select-sm " @blur="frmState.typBlured = true" v-model="currentAddress.typ" :class="{'is-invalid': !validTyp(currentAddress.typ) && frmState.typBlured}">
                             <option v-for="(item, index) in adressentyp" :value="item.adressentyp_kurzbz">
                                 {{ item.bezeichnung }}
@@ -374,13 +371,13 @@ export const AddressData = {
                     </div>
                     
                     <div class="col-md-1">                                             
-                        <label for="heimatadresse" class="form-label">{{ t('person','heimatadresse') }}</label>
+                        <label for="heimatadresse" class="form-label">{{ $p.t('person','heimatadresse') }}</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="heimatadresse" v-model="currentAddress.heimatadresse">
                         </div>
                     </div>
                     <div class="col-md-1">
-                        <label for="zustelladresse" class="form-label">{{ t('person','zustelladresse') }}</label>
+                        <label for="zustelladresse" class="form-label">{{ $p.t('person','zustelladresse') }}</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="zustelladresse" v-model="currentAddress.zustelladresse">
                         </div>                        
@@ -395,18 +392,18 @@ export const AddressData = {
             </template>
             <template #footer>
                 <button type="button" class="btn btn-primary" @click="okHandler()" >
-                    {{ t('ui','speichern') }}
+                    {{ $p.t('ui','speichern') }}
                 </button>
             </template>
         </Modal>
 
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+        <ModalDialog :title="$p.t('global','warnung')" ref="confirmDeleteRef">
             <template #body>
                 <span v-if="!currentAddress?.heimatadresse">
-                   {{ t('person','adresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','wirklichLoeschen') }}?
+                   {{ $p.t('person','adresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ $p.t('person','wirklichLoeschen') }}?
                 </span>
                 <span v-else>
-                    {{ t('person','heimatadresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','kannNichtGeloeschtWerden') }}!
+                    {{ $p.t('person','heimatadresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ $p.t('person','kannNichtGeloeschtWerden') }}!
                 </span>
             </template>
         </ModalDialog>

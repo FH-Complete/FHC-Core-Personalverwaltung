@@ -2,7 +2,6 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const JobFunction = {
     components: {
@@ -20,10 +19,9 @@ export const JobFunction = {
     },
     emits: ['updateHeader'],
     setup( props, { emit } ) {
+        const $p = Vue.getCurrentInstance().appContext.config.globalProperties.$p;
 
         const readonly = Vue.ref(false);
-
-        const { t } = usePhrasen();
 
         const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
@@ -171,13 +169,13 @@ export const JobFunction = {
             
 
             const columnsDef = [
-                { title: t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: t('lehre','organisationseinheit'), field: "funktion_oebezeichnung", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
-                { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
-                { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
-                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: $p.t('person','dv_unternehmen'), field: "dienstverhaeltnis_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: $p.t('person','zuordnung_taetigkeit'), field: "funktion_beschreibung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: $p.t('lehre','organisationseinheit'), field: "funktion_oebezeichnung", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: $p.t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
+                { title: $p.t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
+                { title: $p.t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
+                { title: $p.t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true }
               ];
 
@@ -386,7 +384,7 @@ export const JobFunction = {
             const orgets = response.data.retval;
             orgets.unshift({
               value: '',
-              label: t('ui','bitteWaehlen'),
+              label: $p.t('ui','bitteWaehlen'),
             });
             orgUnitList.value = await  orgets;
         }
@@ -399,7 +397,7 @@ export const JobFunction = {
             const benutzerfunktionen = response.data.retval;
             benutzerfunktionen.unshift({
               value: '',
-              label: t('ui','bitteWaehlen'),
+              label: $p.t('ui','bitteWaehlen'),
             });
             jobfunctionDefList.value = benutzerfunktionen;
           }
@@ -432,7 +430,7 @@ export const JobFunction = {
             toggleMode, formatDate, notEmpty,
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler,
-            showDeleteModal, showEditModal, confirmDeleteRef, t, unternehmenSelectedHandler,
+            showDeleteModal, showEditModal, confirmDeleteRef, unternehmenSelectedHandler,
          }
     },
     template: `
@@ -440,13 +438,13 @@ export const JobFunction = {
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','funktionGespeichert') }}</h4></template>
+            <template #body><h4>{{ $p.t('person','funktionGespeichert') }}</h4></template>
           </Toast>
         </div>
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person', 'funktionGeloescht') }}</h4></template>
+                <template #body><h4>{{ $p.t('person', 'funktionGeloescht') }}</h4></template>
             </Toast>
         </div>
     </div>
@@ -454,13 +452,13 @@ export const JobFunction = {
          <div class="col">
              <div class="card">
                 <div class="card-header">
-                    <div class="h5"><h5>{{ t('person','funktionen') }}</h5></div>        
+                    <div class="h5"><h5>{{ $p.t('person','funktionen') }}</h5></div>        
                 </div>
 
                 <div class="card-body">
                     <div class="d-grid d-md-flex justify-content-between pt-2 pb-3">
                         <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
-                            <i class="fa fa-plus"></i> {{ t('person','funktion') }}
+                            <i class="fa fa-plus"></i> {{ $p.t('person','funktion') }}
                         </button>
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" role="switch" id="aktivChecked" v-model="aktivChecked">
@@ -478,19 +476,19 @@ export const JobFunction = {
             
 
     <!-- detail modal -->
-    <Modal :title="t('person','funktion')" ref="modalRef">
+    <Modal :title="$p.t('person','funktion')" ref="modalRef">
         <template #body>
             <form class="row g-3" ref="jobFunctionFrm">
                             
                 <div class="col-md-8">
-                    <label class="form-label">{{ t('core','unternehmen') }}</label><br>
+                    <label class="form-label">{{ $p.t('core','unternehmen') }}</label><br>
                     <org-chooser  @org-selected="unternehmenSelectedHandler" :oe="unternehmen" class="form-select form-select-sm"></org-chooser>
                 </div>
                 <div class="col-md-4">
                 </div>
                 <!--  -->
                 <div class="col-md-8">
-                    <label class="required form-label">{{ t('lehre','organisationseinheit') }}</label><br>
+                    <label class="required form-label">{{ $p.t('lehre','organisationseinheit') }}</label><br>
                     <select id="oe_kurzbz" v-model="currentValue.oe_kurzbz" 
                         @blur="frmState.orgetBlurred = true"
                         class="form-select form-select-sm" aria-label=".form-select-sm " 
@@ -505,7 +503,7 @@ export const JobFunction = {
                 </div>
                 <!--  -->
                 <div class="col-md-8">
-                    <label for="funktion_kurzbz" class="required form-label">{{ t('person','funktion') }}</label><br>
+                    <label for="funktion_kurzbz" class="required form-label">{{ $p.t('person','funktion') }}</label><br>
                     <select id="_kurzbz" v-model="currentValue.funktion_kurzbz" 
                         @blur="frmState.funktionBlurred = true"
                         class="form-select form-select-sm" aria-label=".form-select-sm " 
@@ -519,12 +517,12 @@ export const JobFunction = {
                 <div class="col-md-4"></div>
                 <!-- -->
                 <div class="col-md-2">
-                    <label for="uid" class="form-label">{{ t('person','wochenstunden') }}</label>
+                    <label for="uid" class="form-label">{{ $p.t('person','wochenstunden') }}</label>
                     <input type="number"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.wochenstunden">
                 </div>
                 <!--  -->
                 <div class="col-md-3">
-                    <label for="beginn" class="required form-label">{{ t('ui','from') }}</label>
+                    <label for="beginn" class="required form-label">{{ $p.t('ui','from') }}</label>
                     <datepicker id="beginn"
                         :teleport="true" 
                         @blur="frmState.beginnBlurred = true" 
@@ -538,7 +536,7 @@ export const JobFunction = {
                         model-type="yyyy-MM-dd"></datepicker>
                 </div>
                 <div class="col-md-3">
-                    <label for="ende" class="form-label">{{ t('global','bis') }}</label>
+                    <label for="ende" class="form-label">{{ $p.t('global','bis') }}</label>
                     <datepicker id="ende"
                         :teleport="true" 
                         v-model="currentValue.datum_bis"
@@ -553,7 +551,7 @@ export const JobFunction = {
                 </div>
                 <!-- -->
                 <div class="col-md-8">
-                    <label for="bezeichnung" class="form-label">{{ t('ui','bezeichnung') }}</label>
+                    <label for="bezeichnung" class="form-label">{{ $p.t('ui','bezeichnung') }}</label>
                     <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bezeichnung" v-model="currentValue.bezeichnung">
                 </div>
                 <div class="col-md-4">
@@ -569,21 +567,21 @@ export const JobFunction = {
         </template>
         <template #footer>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-                {{ t('ui','speichern') }}
+                {{ $p.t('ui','speichern') }}
             </button>
         </template>
 
     </Modal>
 
-    <ModalDialog :title="t('global','warnung')" ref="dialogRef">
+    <ModalDialog :title="$p.t('global','warnung')" ref="dialogRef">
       <template #body>
-        {{ t('person','funktionNochNichtGespeichert') }}
+        {{ $p.t('person','funktionNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 
-    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+    <ModalDialog :title="$p.t('global','warnung')" ref="confirmDeleteRef">
         <template #body>
-            {{ t('person','funktion') }} '{{ currentValue?.funktion_kurzbz }} ({{ currentValue?.datum_von }}-{{ currentValue?.datum_bis }})' {{ t('person', 'wirklichLoeschen') }}?
+            {{ $p.t('person','funktion') }} '{{ currentValue?.funktion_kurzbz }} ({{ currentValue?.datum_von }}-{{ currentValue?.datum_bis }})' {{ $p.t('person', 'wirklichLoeschen') }}?
         </template>
     </ModalDialog>
     `

@@ -1,7 +1,6 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BankData = {
     components: {
@@ -19,7 +18,6 @@ export const BankData = {
 
         const readonly = Vue.ref(false);
         const { personID } = Vue.toRefs(props);
-        const { t } = usePhrasen();
         const dialogRef = Vue.ref();
         const isFetching = Vue.ref(false);
         const bankdataList = Vue.ref([]);
@@ -232,7 +230,7 @@ export const BankData = {
             toggleMode,  
             validIban, 
             showToast, showDeletedToast,
-            showAddModal, hideModal, okHandler, t,
+            showAddModal, hideModal, okHandler,
             showDeleteModal, showEditModal, confirmDeleteRef,
          }
     },
@@ -241,13 +239,13 @@ export const BankData = {
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','bankdatenGespeichert') }}</h4></template>
+            <template #body><h4>{{ $p.t('person','bankdatenGespeichert') }}</h4></template>
           </Toast>
         </div>
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person','bankdatenGeloescht') }}</h4></template>
+                <template #body><h4>{{ $p.t('person','bankdatenGeloescht') }}</h4></template>
             </Toast>
         </div>
     </div>
@@ -256,26 +254,26 @@ export const BankData = {
          <div class="col">
              <div class="card">
                 <div class="card-header">
-                    <div class="h5"><h5>{{ t('person','bankdaten') }}</h5></div>        
+                    <div class="h5"><h5>{{ $p.t('person','bankdaten') }}</h5></div>        
                 </div>
         
                 <div class="card-body">
                     <div class="d-grid gap-2 d-md-flex justify-content-start py-2">
                         <button type="button" class="btn btn-sm btn-primary" @click="showAddModal()">
-                            <i class="fa fa-plus"></i> {{ t('person','bankdaten') }}
+                            <i class="fa fa-plus"></i> {{ $p.t('person','bankdaten') }}
                         </button>            
                     </div>
                     <div class="table-responsive">
                 <table class="table table-hover table-sm">
                     <thead>                
                     <tr>
-                        <th scope="col">{{ t('person','bank') }}</th>
-                        <th scope="col">{{ t('person','anschrift') }}</th>
-                        <th scope="col">{{ t('person','bic') }}</th>
-                        <th scope="col">{{ t('person','iban') }}</th>
-                        <th scope="col">{{ t('person','kontonr') }}</th>
-                        <th scope="col">{{ t('person','verrechnung') }}</th>
-                        <th scope="col">{{ t('ui','aktion') }}</th>
+                        <th scope="col">{{ $p.t('person','bank') }}</th>
+                        <th scope="col">{{ $p.t('person','anschrift') }}</th>
+                        <th scope="col">{{ $p.t('person','bic') }}</th>
+                        <th scope="col">{{ $p.t('person','iban') }}</th>
+                        <th scope="col">{{ $p.t('person','kontonr') }}</th>
+                        <th scope="col">{{ $p.t('person','verrechnung') }}</th>
+                        <th scope="col">{{ $p.t('ui','aktion') }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -307,44 +305,44 @@ export const BankData = {
     </div>
 
     <!-- detail modal -->
-    <Modal :title="t('person','bankverbindung')" ref="modalRef">
+    <Modal :title="$p.t('person','bankverbindung')" ref="modalRef">
         <template #body>
             <form class="row g-3" ref="bankDataFrm">
                             
                 <div class="col-md-8">
-                    <label for="receiver" class="form-label">{{ t('global','empfaenger') }}</label>
+                    <label for="receiver" class="form-label">{{ $p.t('global','empfaenger') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="receiver" v-model="currentValue.anschrift" maxlength="128">
                 </div>
                 <div class="col-md-4"></div>
                 <!--  -->
                 <div class="col-md-4">
-                    <label for="iban" class="required form-label" >{{ t('person','iban') }}</label>
+                    <label for="iban" class="required form-label" >{{ $p.t('person','iban') }}</label>
                     <input type="text" required  @blur="frmState.ibanBlured = true" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validIban(currentValue.iban) && frmState.ibanBlured}" id="iban" v-model="currentValue.iban"  maxlength="34"  >
                 </div>
                 <div class="col-md-4">
-                    <label for="bic" class="form-label">{{ t('person','bic') }}</label>
+                    <label for="bic" class="form-label">{{ $p.t('person','bic') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="bic" maxlength="11" v-model="currentValue.bic">
                 </div>
                 <div class="col-md-4">
                 </div>
                 <!-- -->
                 <div class="col-md-8">
-                    <label for="uid" class="form-label">{{ t('person','bank') }}</label>
+                    <label for="uid" class="form-label">{{ $p.t('person','bank') }}</label>
                     <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" maxlength="64"  v-model="currentValue.name">
                 </div>
                 <div class="col-md-4">
                 </div>
                 <!-- -->
                 <div class="col-md-2">
-                    <label for="blz" class="form-label">{{ t('person','blz') }}</label>
+                    <label for="blz" class="form-label">{{ $p.t('person','blz') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="blz" maxlength="16"  v-model="currentValue.blz">
                 </div>
                 <div class="col-md-4">
-                    <label for="kontonr" class="form-label">{{ t('person','kontonr') }}</label>
+                    <label for="kontonr" class="form-label">{{ $p.t('person','kontonr') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kontonr" maxlength="16"  v-model="currentValue.kontonr">
                 </div>
                 <div class="col-md-2">
-                    <label for="verrechnung" class="form-label">{{ t('person','verrechnung') }}</label>
+                    <label for="verrechnung" class="form-label">{{ $p.t('person','verrechnung') }}</label>
                     <div>
                         <input class="form-check-input" type="checkbox" id="verrechnung" v-model="currentValue.verrechnung">
                     </div>     
@@ -359,21 +357,21 @@ export const BankData = {
         </template>
         <template #footer>
             <button type="button" class="btn btn-primary" @click="okHandler()" >
-            {{ t('ui','speichern') }}
+            {{ $p.t('ui','speichern') }}
             </button>
         </template>
 
     </Modal>
 
-    <ModalDialog :title="t('global','warnung')" ref="dialogRef">
+    <ModalDialog :title="$p.t('global','warnung')" ref="dialogRef">
       <template #body>
-        {{ t('person','bankdatenGeaendert') }}
+        {{ $p.t('person','bankdatenGeaendert') }}
       </template>
     </ModalDialog>
 
-    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+    <ModalDialog :title="$p.t('global','warnung')" ref="confirmDeleteRef">
         <template #body>
-            {{ t('person','bankdaten') }} '{{ currentValue?.iban }} {{ currentValue?.bic }}, {{ currentValue?.name }}' {{ t('person','wirklichLoeschen') }}?
+            {{ $p.t('person','bankdaten') }} '{{ currentValue?.iban }} {{ currentValue?.bic }}, {{ currentValue?.name }}' {{ $p.t('person','wirklichLoeschen') }}?
         </template>
     </ModalDialog>
     `

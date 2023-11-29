@@ -5,7 +5,6 @@ import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeContract = {
     components: {
@@ -28,7 +27,6 @@ export const EmployeeContract = {
         const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
         const router = VueRouter.useRouter();
-        const { t } = usePhrasen();
         const dvList = ref([]);
         const vertragList = ref([]);
         const gbtList = ref([]);
@@ -568,7 +566,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
+            readonly, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
         }
     },
     template: `
