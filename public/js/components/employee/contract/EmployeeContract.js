@@ -699,17 +699,15 @@ export const EmployeeContract = {
                                     </div>
 
                                     <!-- Befristung -->
-                                    <div class="col-md-12"  v-if="currentVBS.befristung.length > 0"><h5 style="margin: 0.9rem 0 0 0;">Befristung</h5></div>
-
                                     <template v-for="(item, index) in currentVBS.befristung"  >
                                         
                                         <div class="col-md-4">
-                                            <label for="befristet_von" class="form-label" >Von</label>
+                                            <label for="befristet_von" class="form-label" >Befristung Von</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.von)" >
                                         </div>
 
                                         <div class="col-md-4">
-                                            <label for="befristet_bis" class="form-label" >Bis</label>
+                                            <label for="befristet_bis" class="form-label" >Befristung Bis</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.bis)" >
                                         </div>
 
