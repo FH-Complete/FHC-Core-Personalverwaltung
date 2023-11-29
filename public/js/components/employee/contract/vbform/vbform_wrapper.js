@@ -20,7 +20,7 @@ export default {
               <div class="col-3">
                 <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
               </div>
-              <div class="col-1 text-center py-2">
+              <div class="col-1 text-center py-3">
                 <em>{{p.t('vbform', 'oder')}}</em>
               </div>
               <div class="col-8">
