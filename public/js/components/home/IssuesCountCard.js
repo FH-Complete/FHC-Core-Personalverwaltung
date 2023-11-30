@@ -67,9 +67,9 @@ const IssuesCountCard = {
      </div>
 
      <p-overlaypanel ref="issuesOverlay">
-         <div class="form-check form-switch mb-2">
+         <div class="form-check mb-2">
             <input class="form-check-input" type="checkbox" role="switch" id="filterActiveDV" v-model="filterActiveDV">
-            <label class="form-check-label" for="filterActiveDV">aktive DV anzeigen</label>
+            <label class="form-check-label" for="filterActiveDV">Nur aktive DV anzeigen</label>
          </div>
          <p-datatable v-model:selection="selectedPerson" :value="issuesFiltered" selectionMode="single" sortMode="multiple" :paginator="true" :rows="5" @row-select="onPersonSelect">
             <p-column field="vorname" header="Vorname" sortable style="min-width: 12rem"></p-column>
