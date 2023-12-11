@@ -219,8 +219,19 @@ class Api_model extends DB_Model
         return $this->execQuery($query, array($datestring, $datestring, $person_id));
     }
 
-    public function getOffTimeList($person_uid)
+    public function getOffTimeList($person_uid, $year = 0)    
     {
+
+        $year_filter = " AND z.vondatum>=now()";
+        $query_parameter = array($person_uid);
+
+        if ($year > 0)
+        {
+            $year_filter = " AND date_part('year',vondatum)>=? AND date_part('year',bisdatum)<=? ";
+            $query_parameter[] = $year;
+            $query_parameter[] = $year;
+        }
+
         $qry = "
         SELECT 
             z.zeitsperre_id,
@@ -238,15 +249,17 @@ class Api_model extends DB_Model
             z.insertamum,
             z.insertvon,
             z.erreichbarkeit_kurzbz,
+            e.beschreibung as erreichbarkeit,
             z.freigabeamum,
             z.freigabevon
 
         FROM campus.tbl_zeitsperre z
-            JOIN campus.tbl_zeitsperretyp t using(zeitsperretyp_kurzbz)
-        WHERE z.mitarbeiter_uid=? and z.vondatum>=now()
+            LEFT JOIN campus.tbl_zeitsperretyp t using(zeitsperretyp_kurzbz)
+            LEFT JOIN campus.tbl_erreichbarkeit e using(erreichbarkeit_kurzbz)
+        WHERE z.mitarbeiter_uid=? $year_filter
         ";
 
-        return $this->execQuery($qry, array($person_uid));
+        return $this->execQuery($qry, $query_parameter);
 
     }
 

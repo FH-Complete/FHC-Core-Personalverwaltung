@@ -5,5 +5,10 @@ export default {
                 + '/extensions/FHC-Core-Personalverwaltung/api/offTimeByPerson';
         return axios.get(url, { params: { uid: uid} });
     },
+    personAbwesenheitenByYear: function(uid, year) {
+        let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+                + '/extensions/FHC-Core-Personalverwaltung/api/offTimeByPerson';
+        return axios.get(url, { params: { uid: uid, year: year } });
+    },
 
 }  

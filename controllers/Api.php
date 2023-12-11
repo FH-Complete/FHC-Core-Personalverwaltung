@@ -1455,7 +1455,17 @@ class Api extends Auth_Controller
             exit;
         }
 
-        $data = $this->ApiModel->getOffTimeList($person_uid);
+        // optional filter by year
+        $year = $this->input->get('year', null);
+
+        if (!is_numeric($year))
+        {
+            // no filter
+            $data = $this->ApiModel->getOffTimeList($person_uid);
+        } else {
+            // filter by year
+            $data = $this->ApiModel->getOffTimeList($person_uid, $year);
+        }
         
         return $this->outputJson($data);
     }
