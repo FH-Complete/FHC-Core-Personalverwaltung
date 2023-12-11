@@ -7,8 +7,8 @@ import gueltigkeit from './gueltigkeit.js';
 
 export default {
   template:`
-    <div class="card card-body border-white py-0">
-      <div class="card card-body border-white py-0">
+    <div class="py-0">
+      <div class="py-0">
         <infos :infos="(dv?.guioptions?.infos !== undefined) ? dv?.guioptions?.infos : []"></infos>
         <errors :errors="(dv?.guioptions?.errors !== undefined) ? dv?.guioptions?.errors : []"></errors>
         <div v-if="store.mode == 'aenderung'" class="row g-2 mt-2 flex-shrink-0 flex-grow-0">

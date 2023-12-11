@@ -10,7 +10,7 @@ export default {
 
     <div class="col-10">
       <div class="pe-3" style="margin-right: var(--scrollbar-width);">
-        <div class="card card-body py-0">
+        <div class="card card-body border-white py-0">
           <template v-for="(child, idx) in children" :key="idx">
             <component ref="parts" :is="child.type" :preset="child"></component>
           </template>

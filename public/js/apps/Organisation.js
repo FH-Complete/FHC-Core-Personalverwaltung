@@ -20,6 +20,7 @@ const pvApp = Vue.createApp(	{
 			searchbaroptions: searchbaroptions,
 			searchfunction: searchfunction,
 			appSideMenuEntries: {},
+			isCollapsed: true
 		}
 	},
 	methods: {
@@ -29,9 +30,11 @@ const pvApp = Vue.createApp(	{
 		},
 		expandAllHandler() {
 			this.$refs.orgviewer.expandAll();
+			this.isCollapsed = false;
 		},
 		collapseAllHandler() {
 			this.$refs.orgviewer.collapseAll();
+			this.isCollapsed = true;
 		},
 		personSelectedHandler(id) {
 			console.log('personSelected: ', id);

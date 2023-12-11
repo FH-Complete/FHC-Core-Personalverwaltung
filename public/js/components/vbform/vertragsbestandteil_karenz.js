@@ -6,8 +6,8 @@ import store from './vbsharedstate.js';
 
 export default {
   template: `
-  <div class="card card-body border-white py-0 my-2">
-   <div class="card card-body border-white py-0">
+  <div class="py-0 my-2">
+   <div class="py-0">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config.guioptions.infos : []"></infos>
     <errors :errors="(config?.guioptions?.errors !== undefined) ? config.guioptions.errors : []"></errors>
     <div class="row g-2 py-2">
@@ -26,7 +26,7 @@ export default {
         &nbsp;
       </div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit" @markended="markGBsEnded"></gueltigkeit>
-      <div class="col-1">
+      <div class="col-1 pe-3">
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>        

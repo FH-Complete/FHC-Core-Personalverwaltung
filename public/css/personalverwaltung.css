@@ -161,6 +161,10 @@ i.fa.fa-xmark {
     padding: 0.15em;
 }
 
+i.fa.fa-info {
+    padding: 0.15em;
+}
+
 :root {
     --bs-body-font-size: 14px;
     --dp-input-padding: 3.5px 30px 3.5px 12px;
@@ -180,3 +184,47 @@ html {
     font-size: var(--bs-body-font-size);
 }
 
+.p-treetable table {
+    border-top: 1px solid #dee2e6
+}
+
+.p-treetable.p-treetable-sm .p-treetable-thead > tr > th {
+    border: none;
+    padding: 0.3rem;
+    color: black;
+}
+
+.p-treetable.p-treetable-sm .p-treetable-tbody > tr > td {
+    padding: 0.3rem 0.3rem;
+}
+
+.p-treetable input.p-inputtext.p-component.p-column-filter{
+    padding: 0.2rem;
+    width: 100%;
+}
+
+.btn-primary {
+    background-color: #00649c;
+    border-color:#00649c;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #3c6f8f;
+    border-color: #3c6f8f;
+}
+
+.nav-link {
+    color: #00649c;
+}
+
+.nav-link:focus, .nav-link:hover {
+    color: #3c6f8f;
+}
+
+.bg-primary {
+    color: #00649c;
+}
+
+.text-primary {
+    color: #00649c !important;
+}

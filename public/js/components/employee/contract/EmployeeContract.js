@@ -654,21 +654,17 @@ export const EmployeeContract = {
                         </div>                        
                 </div>
                 <div class="row pt-md-2" v-if="isCurrentDVActive && dvList?.length">
-
-                    <div class="col">
+                    <div class="col-6">
+                        <!-- Allgemein -->
                         <div class="card">
                             <div class="card-header">
                                 <h5 class="mb-0">Allgemein</h5>
                             </div>
-                            <div class="card-body" style="text-align:left">
-     
-                                <form  ref="baseDataFrm" class="row g-3" v-if="currentDV != null">
+                            <div class="card-body">        
+                                <div ref="baseDataFrm" class="row g-3" v-if="currentDV != null">
 
-
-                                    <!-- Allgemein -->
-    
                                     <div class="col-md-4">
-                                        <label for="organisation" class="col-sm-6 form-label">Organisation</label>
+                                        <label class="col-sm-6 form-label">Organisation</label>
                                         <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentDV.oe_bezeichnung" >
                                     </div>
 
@@ -683,12 +679,12 @@ export const EmployeeContract = {
                                     
                                     <!-- von bis -->
                                     <div class="col-md-4">
-                                        <label for="zeitraum_von" class="form-label" >Von</label>
+                                        <label class="form-label" >Von</label>
                                         <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV.von)" >
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label for="zeitraum_bis" class="form-label" >Bis</label>
+                                        <label class="form-label" >Bis</label>
                                         <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV?.bis)" >
                                     </div>
 
@@ -702,17 +698,14 @@ export const EmployeeContract = {
                                     </div>
 
                                     <!-- Befristung -->
-                                    <div class="col-md-12"  v-if="currentVBS.befristung.length > 0"><h5 style="margin: 0.9rem 0 0 0;">Befristung</h5></div>
-
                                     <template v-for="(item, index) in currentVBS.befristung"  >
-                                        
                                         <div class="col-md-4">
-                                            <label for="befristet_von" class="form-label" >Von</label>
+                                            <label for="befristet_von" class="form-label" >Befristung Von</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.von)" >
                                         </div>
 
                                         <div class="col-md-4">
-                                            <label for="befristet_bis" class="form-label" >Bis</label>
+                                            <label for="befristet_bis" class="form-label" >Befristung Bis</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(item.bis)" >
                                         </div>
 
@@ -723,77 +716,84 @@ export const EmployeeContract = {
                                             </div>
                                         </div>
                                     </template>
-
-                                    <!--div class="col-md-3"></div-->
-
+    
                                     <!-- Kündigungsfrist -->
-                                    <div class="col-md-12" v-if="currentVBS.kuendigungsfrist.length >0"><h5 style="margin: 0.9rem 0 0 0;" >Kündigungsfrist</h5></div>
-
                                     <template v-for="(item, index) in currentVBS.kuendigungsfrist"  >
-
                                         <div class="col-md-4">
                                             <label for="dvKuendigungsfristAG" class="form-label">Kündigungsfrist AG</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAG" :value="item.arbeitgeber_frist">
                                         </div>
-                                        
 
                                         <div class="col-md-4">
                                             <label for="dvKuendigungsfristAN" class="form-label">Kündigungsfrist AN</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAN" :value="item.arbeitnehmer_frist">
                                         </div>
-
+                                        
                                         <div class="col-md-4"></div>
-
+                                    </template>
+                                    
+                                    <!-- Urlaubsanspruch -->
+                                    <template v-for="(item, index) in currentVBS.urlaubsanspruch"  >
+                                        <div class="col-md-3">
+                                            <label for="dvUrlaubsanspruch" class="form-label">Urlaubsanspruch</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch" :value="item.urlaubsanspruch">
+                                        </div>
                                     </template>
 
+                                </div>
+                            </div><!-- card body -->
+                        </div><!-- card -->
 
-                                    <!-- Arbeitszeit -->
-                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Arbeitszeit</h6></div>
-
-                                    <div class="col-md-12" v-if="currentVBS.stunden.length == 0">
-                                        Kein aktiver Vertragsbestandteil vorhanden.
-                                    </div>
-
-                                    <template v-for="(item, index) in currentVBS.stunden"  >
+                        <!-- Arbeitszeit -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Arbeitszeit</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="col-md-12 py-3" v-if="currentVBS.stunden.length == 0">
+                                    Kein aktiver Vertragsbestandteil vorhanden.
+                                </div>
+                                <template v-for="(item, index) in currentVBS.stunden"  >
+                                    <div class="row">
                                         <div class="col-md-4">
-
                                             <label for="dvStunden" class="form-label">Wochenstunden</label>
                                             <div class="col-sm-12">
                                                 <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="formatNumber(item.wochenstunden)">
                                             </div>
-                                            <div class="col-sm-1">
-
-                                            </div>
                                         </div>
-
+    
                                         <div class="col-md-4">
                                             <label for="dvTeilzeittyp" class="form-label">Teilzeittyp</label>
                                             <div class="col-sm-12">
                                                 <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp">
                                             </div>                                        
                                         </div>
-
+    
                                         <div class="col-md-4">
-                                            <template v-for="(item, index) in currentVBS.allIn"  >
-                                                <label  class="form-label" >AllIn</label>
-                                                <div class="col-sm-8">
-                                                    <input class="form-check-input mt-2" type="checkbox" id="allInCheck" checked disabled>
-                                                </div>
-                                            </template>
-                                        </div>
-
-                                    </template>
-
-                                    
-                                    <!--div class="col-md-3"></div-->
-
-                                    
-
-                                    <!-- Zeitaufzeichnung -->
+                                                <template v-for="(item, index) in currentVBS.allIn"  >
+                                                    <label  class="form-label" >AllIn</label>
+                                                    <div class="col-sm-8">
+                                                        <input class="form-check-input mt-2" type="checkbox" id="allInCheck" checked disabled>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                    </div>
+                                </template>
+                            </div><!-- card-body -->   
+                        </div><!-- card -->   
+                                                            
+                        <!-- Zeitaufzeichnung -->     
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Zeitaufzeichnung</h5>
+                            </div>
+                            <div class="card-body">
+                                 <div class="col-md-12 py-3" v-if="currentVBS.zeitaufzeichnung.length == 0">
+                                    Kein aktiver Vertragsbestandteil vorhanden.
+                                </div>
+                                <div class="row">
                                     <div class="col-md-4">
-
                                         <template v-for="(item, index) in currentVBS.zeitaufzeichnung"  >
-                                            <label for="zapflichtigCheck" class="form-label" >Zeitaufzeichnung</label>
                                             <div class="form-check">
                                                 <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung" disabled> 
                                                 <label class="form-check-label" >Zeitaufzeichnungspflichtig</label>
@@ -808,108 +808,178 @@ export const EmployeeContract = {
                                             </div>
                                         </template>
                                     </div>
-                                    <div class="col-md-3">
-                                        <template v-for="(item, index) in currentVBS.urlaubsanspruch"  >
-                                            <label for="dvUrlaubsanspruch" class="form-label">Urlaubsanspruch</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch" :value="item.urlaubsanspruch">
-                                        </template>
+                                    <div class="col-md-8"></div>
+                                </div>
+                            </div><!-- card body -->
+                        </div><!-- card -->
+                        
+                        <!-- Sonstige Vereinbarung -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Sonstige Vereinbarung</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" v-if="currentDV != null">
+                                    <div class="col-md-12 py-3" v-if="currentVBS.zusatzvereinbarung.length == 0">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
                                     </div>
-
-                                    <div class="col-md-5"></div>
-
-                                    <!-- div class="row mb-1">
-                                        <label for="dvFunktion" class="col-sm-3 col-form-label">Funktion</label>
-                                        <div class="col-sm-8">
-                                            
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col">Zeitraum</th>
-                                                    <th scope="col">Typ</th>
-                                                    <th scope="col">Zuordnung</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <th scope="row">1.12.2015-</th>
-                                                    <td>Disziplinär</td>
-                                                    <td>Virtual Technologies & Sensor Systems</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">1.12.2015-</th>
-                                                    <td>Fachlich</td>
-                                                    <td>Virtual Technologies & Sensor Systems</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">1.12.2015-</th>
-                                                    <td>Std.Kst.</td>
-                                                    <td>Virtual Technologies & Sensor Systems</td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">1.12.2015-</th>
-                                                    <td>OE-Zuordnung</td>
-                                                    <td></td>
-                                                </tr>
-                                                <tr>
-                                                    <th scope="row">1.12.2015-</th>
-                                                    <td>LektorIn</td>
-                                                    <td></td>
-                                                </tr>
-                                                
-                                            </tbody>
-                                        </table>
-
-
+                                    <template v-for="(item, index) in currentVBS.zusatzvereinbarung"  >
+                                        <div class="col-md-3">
+                                            <label class="form-label" >Freitexttyp</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatFreitexttyp(item.freitexttyp_kurzbz)" >
                                         </div>
-                                        <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+
+                                        <div class="col-md-5">
+                                            <label class="form-label" >Titel</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.titel" >
                                         </div>
-                                    </div -->
 
-                                    <!-- div class="row mb-1">
-                                        <label for="dvFreitext" class="col-sm-3 col-form-label">Freitext</label>
-                                        <div class="col-sm-8">
-                                            <b>1.2.2015-</b><br>
-                                            <textarea type="text" readonly rows="5"
-                                                class="form-control-sm form-control-plaintext" id="dvFreitext"
-                                                >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                                            </textarea>
-
-                                            <b>1.2.2015-</b><br>
-                                            <textarea type="text" readonly rows="5"
-                                                class="form-control-sm form-control-plaintext" id="dvFreitext"
-                                                >Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.
-                                            </textarea>
+                                        <div class="col-md-2">
+                                            <label  class="form-label" >Von</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.von)">
                                         </div>
-                                        
-                                        <div class="col-sm-1">
-                                            <button type="button" class="btn btn-sm btn-outline-secondary">
-                                                <i class="fa fa-pen"></i>
-                                            </button>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" >Bis</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
-                                    </div-->
-                                
 
-                                </form>
+                                        <div class="col-md-9">
+                                            <label class="form-label" >Text</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div><!-- card-body -->
+                        </div><!-- card -->
+                        
+                        <!-- Karenz -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Karenz</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" v-if="currentDV != null">
+                                    <div class="col-md-12 py-3" v-if="currentVBS.karenz.length == 0">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                    </div>
+                                    <template v-for="(item, index) in currentVBS.karenz"  >
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index==0" >Karenztyp</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatKarenztyp(item.karenztyp_kurzbz)">                                            
+                                        </div>
 
-                            </div>   <!-- card body -->
-                        </div>  <!-- card -->
-                        <br/>
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Von</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.von)">
+                                        </div>
 
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Bis</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Geplanter Geb.termin</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.geplanter_geburtstermin)">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Tats. Geb.termin</label>
+                                            <input  readonly class="form-control-sm form-control-plaintext" type="text" :value="formatDate(item.tatsaechlicher_geburtstermin)" >
+                                        </div>
+                                    </template>
+
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Dokumente -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Dokumente</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="col-md-12 py-3">
+                                    Keine Dokumente vorhanden.
+                                </div>
+                            </div>
+                        </div>
+                             
+                        <!-- Notizen -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Notizen</h5>
+                            </div>
+                            <div class="card-body">
+                               <div class="col-md-12 py-3">
+                                    Keine Notizen vorhanden.
+							   </div>
+                            </div>
+                        </div>
+                            
+                    </div><!-- col-6 -->
+
+                    <div class="col-6">
+                        <!-- Zuordnung und Tätigkeit -->
                         <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">Zuordnung &amp; Tätigkeit</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3" v-if="currentDV != null">
+                                    <template v-for="(item, index) in currentVBS.funktion.zuordnung"  >
+
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0" >Zuordnung</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label" v-if="index == 0">Organisationseinheit</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
+                                        </div>
+
+                                    </template>
+                                    
+                                    <div class="col-md-12 py-4" v-if="currentVBS.funktion.taetigkeit.length == 0">
+                                        Keine aktive Tätigkeit vorhanden.
+                                    </div>
+                                    <template v-for="(item, index) in currentVBS.funktion.taetigkeit"  >
+
+                                        <div class="col-md-4">
+                                            <label class="form-label" v-if="index == 0" >Tätigkeit</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label" v-if="index == 0">Organisationseinheit</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
+                                        </div>
+
+                                        <div class="col-md-2">                                            
+                                        </div>
+
+                                    </template>
+                                </div>
+                            </div><!-- card-body -->
+                        </div><!-- card -->
+                        
+                        <!-- Bruttomonatsgehalt  -->
+                        <div class="card mt-3">
                             <div class="card-header">
                                 <h5 class="mb-0">Bruttomonatsgehalt</h5>
                             </div>
-                            <div class="card-body" style="text-align:left">
-
-                                <form  class="row g-3" v-if="currentDV != null">
-    
-                                    <div class="col-md-12" v-if="gbtList.length == 0">
+                            <div class="card-body">
+                                <div class="row g-3" v-if="currentDV != null">
+                                    <div class="col-md-12 py-3" v-if="gbtList.length == 0">
                                         Kein aktiver Gehaltsbestandteil vorhanden.
                                     </div>
-
                                     <template v-for="(item, index) in gbtList"  >
 
                                         <div class="col-md-3">
@@ -945,262 +1015,25 @@ export const EmployeeContract = {
                                         </div>
 
                                     </template>
-
-                                </form>
-
-                            </div>
-                        </div>
-                        <br/>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Sonstige Vereinbarung</h5>
-                            </div>
-                            <div class="card-body" style="text-align:left">
-                                <form  class="row g-3" v-if="currentDV != null">
-        
-                                    <div class="col-md-12" v-if="currentVBS.zusatzvereinbarung.length == 0">
-                                        Kein aktiver Vertragsbestandteil vorhanden.
-                                    </div>
-
-                                    <template v-for="(item, index) in currentVBS.zusatzvereinbarung"  >
-
-                                        <div class="col-md-3">
-                                            <label class="form-label" >Freitexttyp</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatFreitexttyp(item.freitexttyp_kurzbz)" >
-                                        </div>
-
-                                        <div class="col-md-5">
-                                            <label class="form-label" >Titel</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.titel" >
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label  class="form-label" >Von</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.von)">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" >Bis</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
-                                        </div>
-
-                                        
-
-                                        <div class="col-md-9">
-                                            <label class="form-label" >Text</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
-                                        </div>
-
-                                    </template>
-
-                                    <div class="col-md-3">
-                                        
-                                    </div>
-
-                                </form>
-
-                            </div>
-                        </div>
-                        <br/>
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Karenz</h5>
-                            </div>
-                            <div class="card-body" style="text-align:left">
-
-                                <form  class="row g-3" v-if="currentDV != null">
-
-                                    <div class="col-md-12" v-if="currentVBS.karenz.length == 0">
-                                        Kein aktiver Vertragsbestandteil vorhanden.
-                                    </div>
-        
-                                    <template v-for="(item, index) in currentVBS.karenz"  >
-
-                                        <div class="col-md-4">
-                                            <label class="form-label" v-if="index==0" >Karenztyp</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatKarenztyp(item.karenztyp_kurzbz)">                                            
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Von</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.von)">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Bis</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Geplanter Geb.termin</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.geplanter_geburtstermin)">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Tats. Geb.termin</label>
-                                            <input  readonly class="form-control-sm form-control-plaintext" type="text" :value="formatDate(item.tatsaechlicher_geburtstermin)" >
-                                        </div>
-
-
-                                    </template>
-
-                                </form>
-
-
-                            </div>
-                        </div>
-                        <br/>
-
-                    </div>  <!-- col -->
-
-                    <div class="col">
-
-
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Zuordnung</h5>
-                            </div>
-                            <div class="card-body" style="text-align:left">
-
-                                <form  class="row g-3" v-if="currentDV != null">
-
-                                    <template v-for="(item, index) in currentVBS.funktion.zuordnung"  >
-
-                                        <div class="col-md-4">
-                                            <label class="form-label" v-if="index == 0" >Zuordnung</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label" v-if="index == 0">Organisationseinheit</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
-                                        </div>
-
-                                    </template>
-
-                                    <!-- taetigkeit -->
-                                    <div class="col-md-12 h6"><h6 style="margin: 0.9rem 0 0 0;">Tätigkeit</h6></div>
-                                    <template v-for="(item, index) in currentVBS.funktion.taetigkeit"  >
-
-                                        <div class="col-md-4">
-                                            <label class="form-label" v-if="index == 0" >Zuordnung</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.funktion_bezeichnung" >
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label" v-if="index == 0">Organisationseinheit</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
-                                        </div>
-
-                                        <div class="col-md-2">                                            
-                                        </div>
-
-
-                                    </template>
-
-                                    <div class="col-md-12" v-if="currentVBS.funktion.taetigkeit.length == 0">
-                                        Kein aktiver Vertragsbestandteil vorhanden.
-                                    </div>
-
-                                    
-                                
-
-                                </form>
-
-
-
-
-
-                            </div>
-                        </div>
-                        <br/>
-
-                        <div class="card">
+                                </div>
+                            </div><!-- card-body -->
+                        </div> <!-- card -->
+                        
+                        <!-- Gehalt -->
+                        <div class="card mt-3">
                             <div class="card-header">
                                 <h5 class="mb-0">Gehalt</h5>
                             </div>
                             <div class="card-body" style="text-align:center">
-
                                 <div style="width:100%;height:100%;overflow:auto">
                                     <figure>
                                         <highcharts class="chart" :options="chartOptions"></highcharts>
                                     </figure>
                                 </div>
-
-                                <!--table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Zeitraum</th>
-                                            <th scope="col">Typ</th>
-                                            <th scope="col">Betrag</th>
-                                            <th scope="cols"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">1.12.2015-</th>
-                                            <td>Grundgehalt</td>
-                                            <td>€ 4711,00</td>
-                                            <td><button type="button" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fa fa-pen"></i>
-                                                </button>
-                                            </td>
-                                        </tr>                                        
-                                        
-                                    </tbody>
-                                </table-->
-                            </div>
-                        </div>
-
-                        <br>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Dokumente</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                                <!--table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Zeitraum</th>
-                                            <th scope="col">Bezeichnung</th>
-                                            <th scope="col"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">1.12.2015-</th>
-                                            <td>Vertrag</td>
-                                            <td><button type="button" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fa fa-pen"></i>
-                                                </button>
-                                            </td>
-                                        </tr>                                        
-                                        
-                                    </tbody>
-                                </table-->
-                            </div>
-                        </div>
-                       
-
-                        <br/>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Notizen</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                                    ...
-                            </div>
-                        </div>     
-                    </div>  <!-- col -->
-
-                    
+                            </div><!-- card-body -->
+                        </div><!-- card -->   
+           
+                    </div>  <!-- col-6 -->
                 </div>  <!-- row -->
                 
             </div>
