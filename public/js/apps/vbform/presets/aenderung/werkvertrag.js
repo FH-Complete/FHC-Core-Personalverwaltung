@@ -4,13 +4,13 @@ export default {
   type: 'preset',
   guioptions: {
     id: 'werkvertrag',
-    label: 'Werkvertrag / Überlassungsvertrag',
-    description: 'Werkvertrag / Überlassungsvertrag',
+    label: 'Werkvertrag',
+    description: 'Werkvertrag',
     for_vertragsart_kurzbz: [
-        'werkvertrag', 'ueberlassungsvertrag'
+        'werkvertrag'
     ],
     default_for_vertragsart_kurzbz: [
-        'werkvertrag', 'ueberlassungsvertrag'
+        'werkvertrag'
     ]
   },
   children: [
