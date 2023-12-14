@@ -736,7 +736,7 @@ export const EmployeeContract = {
                                     <template v-for="(item, index) in currentVBS.urlaubsanspruch"  >
                                         <div class="col-md-3">
                                             <label for="dvUrlaubsanspruch" class="form-label">Urlaubsanspruch</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch" :value="item.urlaubsanspruch">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvUrlaubsanspruch" :value="item.tage">
                                         </div>
                                     </template>
 
