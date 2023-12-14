@@ -1816,7 +1816,10 @@ EOSQL;
 		}
 		
 		$sql = <<<EOSQL
-			SELECT oe.oe_kurzbz AS value, '[' || oet.bezeichnung || '] ' || oe.bezeichnung AS label 
+			SELECT 
+				oe.oe_kurzbz AS value, 
+				'[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) || 
+				'] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label 
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(
