@@ -29,6 +29,39 @@ export default {
         {
           type: 'tab',
           guioptions: {
+            title: 'Arbeitszeit & Basisgehalt',
+            id: 'arbeitszeit'
+          },
+          children: [
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Arbeitszeit',
+                vertragsbestandteiltyp: 'vertragsbestandteilstunden',
+                errors: [],
+                infos: []
+              },
+              children: [
+                uuid.get_uuidbyname('std1')
+              ]
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Zeitaufzeichnung',
+                vertragsbestandteiltyp: 'vertragsbestandteilzeitaufzeichnung',
+                errors: [],
+                infos: []
+              },
+              children: [
+                uuid.get_uuidbyname('za1')
+              ]
+            }
+          ]
+        },
+        {
+          type: 'tab',
+          guioptions: {
             title: 'Funktionen',
             id: 'funktionen'
           },
@@ -55,6 +88,7 @@ export default {
                 }
               },
               children: [
+                uuid.get_uuidbyname('oestdkst'),
                 uuid.get_uuidbyname('oediszpl')
               ]
             }
@@ -99,6 +133,72 @@ export default {
     }
   },
   vbs: {
+    [uuid.get_uuidbyname('std1')]: {
+      type: 'vertragsbestandteilstunden',
+      guioptions: {
+        id: uuid.get_uuidbyname('std1'),
+        infos: [],
+        errors: []
+      },
+      data: {
+        stunden: '38,5'
+      },
+      gbs: [
+        {
+          type: 'gehaltsbestandteil',
+          guioptions: {
+            id: uuid.get_uuid(),
+            infos: [],
+            errors: [],
+            disabled: [
+              'gehaltstyp'
+            ],
+            removeable: true
+          },
+          data: {
+            gehaltstyp: 'basisgehalt',
+            valorisierung: true
+          }
+        }
+      ]
+    },
+    [uuid.get_uuidbyname('za1')]: {
+      type: "vertragsbestandteilzeitaufzeichnung",
+      guioptions: {
+        id: uuid.get_uuidbyname('za1')
+      },
+      data: {
+        id: null,
+        zeitaufzeichnung: true,
+        azgrelevant: true,
+        homeoffice: true,
+        gueltigkeit: {
+          guioptions: {
+            sharedstatemode: "reflect"
+          },
+          data: {
+            "gueltig_ab": "",
+            "gueltig_bis": ""
+          }
+        }
+      }
+    },
+    [uuid.get_uuidbyname('oestdkst')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oestdkst'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'kstzuordnung'
+      }
+    },
     [uuid.get_uuidbyname('oediszpl')]: {
       type: 'vertragsbestandteilfunktion',
       guioptions: {

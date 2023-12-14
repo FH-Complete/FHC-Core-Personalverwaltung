@@ -92,7 +92,7 @@ export default {
                 infos: []
               },
               children: [
-                uuid.get_uuidbyname('test1')
+                uuid.get_uuidbyname('std1')
               ]
             },
             {
@@ -152,9 +152,7 @@ export default {
                 errors: [],
                 infos: []
               },
-              children: [
-                uuid.get_uuidbyname('test2')
-              ]
+              children: []
             }
           ]
         },
@@ -219,10 +217,10 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('test1')]: {
+    [uuid.get_uuidbyname('std1')]: {
       type: 'vertragsbestandteilstunden',
       guioptions: {
-        id: uuid.get_uuidbyname('test1'),
+        id: uuid.get_uuidbyname('std1'),
         infos: [],
         errors: []
       },
@@ -268,18 +266,6 @@ export default {
           }
         }
       }
-    },
-    [uuid.get_uuidbyname('test2')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('test2'),
-        removeable: true
-      },
-      data: {
-        funktion: 'Mitarbeiter',
-        oe_kurzbz: ''
-      },
-      gbs: []
     },
     [uuid.get_uuidbyname('oestdkst')]: {
       type: 'vertragsbestandteilfunktion',

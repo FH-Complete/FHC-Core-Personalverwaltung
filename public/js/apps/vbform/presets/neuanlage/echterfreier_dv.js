@@ -104,7 +104,7 @@ export default {
       guioptions: {
         id: uuid.get_uuidbyname('oediszpl'),
         removable: false,
-        canhavegehaltsbestandteile: false,
+        canhavegehaltsbestandteile: true,
         nobottomborder: true,
         nobottommargin: true,
         disabled: [
@@ -113,7 +113,27 @@ export default {
       },
       data: {
         funktion: 'oezuordnung'
-      }
+      },
+      gbs: [
+        {
+          type: 'gehaltsbestandteil',
+          guioptions: {
+            id: uuid.get_uuid(),
+            infos: [],
+            errors: [],
+            disabled: [
+              'gehaltstyp',
+			  'auszahlungen'
+            ],
+            removeable: true
+          },
+          data: {
+            gehaltstyp: 'basisgehalt',
+			auszahlungen: 12,
+            valorisierung: true
+          }
+        }
+      ]
     }
   }
 }
