@@ -5,7 +5,7 @@ export default {
   guioptions: {
     id: 'ueberlassungsvertrag',
     label: 'Überlassungsvertrag',
-    description: 'Ueberlassungsvertrag'
+    description: 'Ueberlassungsvertrag',
     for_vertragsart_kurzbz: [
         'ueberlassungsvertrag'
     ],
