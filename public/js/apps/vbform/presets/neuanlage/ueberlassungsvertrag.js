@@ -137,6 +137,7 @@ export default {
       type: 'vertragsbestandteilstunden',
       guioptions: {
         id: uuid.get_uuidbyname('std1'),
+        canhavegehaltsbestandteile: false,
         infos: [],
         errors: []
       },
@@ -144,22 +145,6 @@ export default {
         stunden: '38,5'
       },
       gbs: [
-        {
-          type: 'gehaltsbestandteil',
-          guioptions: {
-            id: uuid.get_uuid(),
-            infos: [],
-            errors: [],
-            disabled: [
-              'gehaltstyp'
-            ],
-            removeable: true
-          },
-          data: {
-            gehaltstyp: 'basisgehalt',
-            valorisierung: true
-          }
-        }
       ]
     },
     [uuid.get_uuidbyname('za1')]: {
