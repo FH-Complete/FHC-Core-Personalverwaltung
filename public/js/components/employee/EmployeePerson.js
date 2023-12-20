@@ -6,6 +6,7 @@ import { MaterialExpensesData } from './MaterialExpensesData.js';
 import { HourlyRateData } from './HourlyRateData.js';
 import { JobFunction } from './JobFunction.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import FhcTabs from '../../../../../../public/js/components/Tabs.js';
 
 export const EmployeePerson = {
     components: {
@@ -15,7 +16,8 @@ export const EmployeePerson = {
 		ContactData,
 		MaterialExpensesData,
 		HourlyRateData: HourlyRateData,
-        JobFunction,
+                JobFunction,
+                FhcTabs
 	},
     props: {
         // personid: { type: Number, default: 0 }
@@ -66,6 +68,9 @@ export const EmployeePerson = {
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
       <div class="container-fluid">
+    
+        <fhc-tabs config-url="/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/Stammdaten" style="flex: 1 1 0%; height: 0%"></fhc-tabs>
+    
         <div class="row pt-md-2">
             
             <nav class="nav flex-column col-md-2 subsubnav">
