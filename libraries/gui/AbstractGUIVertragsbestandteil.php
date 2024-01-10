@@ -94,6 +94,14 @@ abstract class AbstractGUIVertragsbestandteil extends AbstractBestandteil
         $this->mapGBS($decoded);
     }
 
+	protected function mapGUIOptions(&$decoded)
+	{
+		parent::mapGUIOptions($decoded);
+		if( isset($this->guioptions['canhavegehaltsbestandteile']) ) {
+			$this->hasGBS = $this->guioptions['canhavegehaltsbestandteile'];
+		}
+	}
+
     protected function mapGBS(&$decoded)
     {
 		if( !$this->getHasGBS() )

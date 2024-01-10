@@ -172,26 +172,6 @@ export default {
               children: []
             }
           ]
-        },
-        {
-          type: 'tab',
-          guioptions: {
-            title: 'Sonstiges',
-            id: 'sonstiges'
-          },
-          children: [
-            {
-              type: 'vertragsbestandteillist',
-              guioptions: {
-                title: 'Kündigungsfrist',
-                vertragsbestandteiltyp: 'vertragsbestandteilkuendigungsfrist',
-                errors: [],
-                infos: []
-              },
-              children: [
-              ]
-            }
-          ]
         }
       ]
     }

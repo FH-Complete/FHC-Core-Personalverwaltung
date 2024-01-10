@@ -854,6 +854,10 @@ class Api_model extends DB_Model
 
         $parametersArray = array($surname);
         $where ="p.nachname~* ? ";
+        if (mb_strlen($surname) == 2) 
+        {
+            $where = "p.nachname=? ";
+        }
 
         if (mb_strlen($surname) == 2) 
         {
