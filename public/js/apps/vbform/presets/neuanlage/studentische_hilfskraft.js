@@ -58,6 +58,19 @@ export default {
                 uuid.get_uuidbyname('oestdkst'),  
                 uuid.get_uuidbyname('oediszpl')
               ]
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Funktion',
+                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'funktion',
+                errors: [],
+                infos: []
+              },
+              children: [
+                uuid.get_uuidbyname('hilfskraft')
+              ]
             }
           ]
         },
@@ -130,6 +143,20 @@ export default {
       },
       data: {
         funktion: 'oezuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('hilfskraft')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('hilfskraft'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'hilfskraft'
       }
     }
   }
