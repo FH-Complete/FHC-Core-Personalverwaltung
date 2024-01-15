@@ -50,9 +50,7 @@ export default {
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
-                    disabled: [
-                      'funktion'
-                    ],
+                    disabled: [],
                     hidden: []
                   },
                   data: {
@@ -61,9 +59,6 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oestdkst'),
-                uuid.get_uuidbyname('oediszpl'),
-                uuid.get_uuidbyname('oefachl')
               ]
             }
           ]
