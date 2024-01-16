@@ -10,37 +10,59 @@ export default {
     },
     props: {
         personid: Number,
+        personuid: String,
         open: Boolean,
-        isNew:  Boolean
+        isNew:  Boolean,
     },
+    emits: ['personSelected'],
     setup( props, {emit }) {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
         const currentPersonID = Vue.ref(null);
+        const currentPersonUID = Vue.ref(null);
+        const currentDate = Vue.ref(null);
+        const employeeHeaderRef = Vue.ref();
 
-        const redirect = (person_id) => {
-            emit('personSelected', person_id);
+        const redirect = (params) => {
+            emit('personSelected', params);
+        }
+
+        const dateChanged = (params) => {
+            console.log("-> date changed: ", params);
+            //currentDate.value=params;
+        }
+
+        const updateHeaderHandler = () => {
+            employeeHeaderRef.value.refresh();
         }
 
         Vue.onMounted(() => {
-			console.log('EmployeeEditor mounted');
+			console.log('EmployeeEditor mounted', route.path);
+            currentDate.value = route.query.d;
         })
 
         Vue.watch(
-			() => route.params.id,
-			newId => {
-				currentPersonID.value = newId;
+			() => route.params,
+			params => {
+				currentPersonID.value = params.id;
+                currentPersonUID.value = params.uid;
 			}
 		)
 
-        return { redirect, currentPersonID }
+        Vue.watch(
+			() => route.query.d,
+			d => {
+                console.log('watch route.query.d', d)
+				currentDate.value = d;
+			}
+		)
+
+        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate, employeeHeaderRef, updateHeaderHandler }
     },
-    template: `
-        <EmployeeHeader  :personID="personid" @person-selected="redirect" :edit-mode="true" ></EmployeeHeader>
-        <EmployeeNav  :personID="personid" :edit-mode="true" ></EmployeeNav> 
-
-        <router-view></router-view>
-
+    template: `    
+        <EmployeeHeader ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" @person-selected="redirect"   ></EmployeeHeader> 
+        <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
+        <router-view @updateHeader="updateHeaderHandler"></router-view>       
     `
 }

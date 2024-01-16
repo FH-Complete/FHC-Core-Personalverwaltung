@@ -17,16 +17,21 @@
 			),
 			'vue3' => true,
 			'customCSSs' => [
+				'vendor/vuejs/vuedatepicker_css/main.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
-				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
 				'public/css/components/verticalsplit.css',
 				'public/css/components/searchbar.css',
+                'public/extensions/FHC-Core-Personalverwaltung/css/vbform/vbform.css'
 			],
 			'customJSs' => [
 				'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
+				'addons/reports/vendor/highcharts/highcharts-dist/highcharts.js',
+				'addons/reports/vendor/highcharts/highcharts-dist/modules/current-date-indicator.js',
+				'public/extensions/FHC-Core-Personalverwaltung/js/highchartsVue.js',
+				'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
 			],
 			'customJSModules' => ['public/extensions/FHC-Core-Personalverwaltung/js/apps/Employee.js']
 		)

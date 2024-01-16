@@ -1,17 +1,21 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BaseData = {
     components: {
         ModalDialog,
         Toast,
+        "datepicker": VueDatePicker
     },
     props: {
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
+        personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },
-    setup(props) {
+    emits: ['updateHeader'],
+    setup(props, { emit }) {
 
         const readonly = Vue.ref(true);
 
@@ -32,11 +36,6 @@ export const BaseData = {
             x: 'divers', 
             u: 'unbekannt'};
 
-        const generateEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personBaseData?person_id=${person_id}`;
-        };
-
         const printNation = (code) => {
             if (!code) return '';
             let result = nations.value?.filter((item) => item.nation_code == code);
@@ -52,16 +51,14 @@ export const BaseData = {
             }
             isFetching.value = true
             try {
-              console.log('url',url.value);
-              const res = await fetch(url.value);
-              let response = await res.json()              
-              currentValue.value = response.retval[0];
-              isFetching.value = false              
+              const res = await Vue.$fhcapi.Person.personBaseData(personID.value);                    
+              currentValue.value = res.data.retval[0];
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
-            }
-          }
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }          
+        }
 
         const createShape = () => {
             return {
@@ -87,30 +84,10 @@ export const BaseData = {
         }
 
 
-        let fakeEmployee = {
-            uid: "jonconnor",
-            person_id: 243,
-            kurzbz: "jonconnor",
-            aktiv: true,
-            alias: "",
-            anrede: "Hofrat",
-            titelpre: "Dr",
-            titelpost: "",
-            nachname: "Conner",
-            vorname: "Jon",
-            vornamen: "",
-            geschlecht: "m",
-            sprache: "",
-            anmerkung: "",
-            homepage: "",
-        };
-
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());        
 
-        Vue.watch(personID, (currentVal, oldVal) => {
-            console.log('BaseData watch',currentVal);
-            url.value = generateEndpointURL(currentVal);   
+        Vue.watch(personID, (currentVal, oldVal) => {  
             fetchData();         
         });
 
@@ -137,7 +114,6 @@ export const BaseData = {
             console.log('BaseData mounted', props.personID);
             currentValue.value = createShape();
             if (props.personID) {
-                url.value = generateEndpointURL(props.personID); 
                 fetchData();
             }
             
@@ -212,33 +188,19 @@ export const BaseData = {
             } else {
 
                 // submit
-                isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonBaseData`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(currentValue.value),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
+                try {
+                    const response = await Vue.$fhcapi.Person.updatePersonBaseData(currentValue.value);                    
+                    showToast();
+                    currentValue.value = response.data.retval[0];
+                    preservedValue.value = currentValue.value;
+                    emit('updateHeader')
+                    toggleMode();  
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
                 }
-                let response = await res.json();
-            
-                isFetching.value = false;
-
-                showToast();
-                currentValue.value = response.retval[0];
-                preservedValue.value = currentValue.value;
-                toggleMode();
+               
             }
 
             frmState.wasValidated  = true;  
@@ -291,154 +253,164 @@ export const BaseData = {
     },
     template: `
     <div class="row">
-
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
-            <template #body><h4>Stammdaten gespeichert.</h4></template>
+            <template #body><h4>{{ $p.t('person', 'stammdatenGespeichert') }}</h4></template>
           </Toast>
         </div>
-
-      <div class="d-flex bd-highlight">
-        <div class="flex-grow-1 bd-highlight"><h4>Stammdaten</h4></div>        
-        <div class="p-2 bd-highlight">
-          <div class="d-grid gap-2 d-md-flex justify-content-end ">
-            <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                <i class="fa fa-pen"></i>
-            </button>
-            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-minus"></i></button>
-            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-floppy-disk"></i></button>
-          </div>
-
-        </div>
-      </div>
-
-      
     </div>
-    <div class="col-md-12 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-start pt-3 pb-2 mb-3">
-
-        <form class="row g-3  col-lg-12" ref="baseDataFrm">
-            
-            <!-- Anrede -->
-            <div class="col-lg-2 col-md-4">
-                <label for="anrede" class="form-label">Anrede</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anrede" v-model="currentValue.anrede">
-            </div>
-            <div class="col-lg-2 col-md-4">
-                <label for="titelPre" class="form-label">TitelPre</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPre" v-model="currentValue.titelpre">
-            </div>
-            <div class="col-lg-2 col-md-4">
-                <label for="titelPost" class="form-label">TitelPost</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
-            </div>
-            <div class="col-lg-6"></div>
-            <!--Name -->
-            <div class="col-lg-3 col-md-4">
-                <label for="nachname" class="required form-label">Nachname</label>
-                <input type="text" required  @blur="frmState.nachnameBlured = true"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}" id="nachname" v-model="currentValue.nachname">
-                <div class="invalid-feedback" v-if="frmState.nachnameBlured && validNachname(currentValue.nachname)">
-                  Bitte geben Sie den Nachnamen an.
+    
+    <div class="row pt-md-4">      
+         <div class="col">
+             <div class="card">
+                <div class="card-header">
+                    <div class="h5 mb-0"><h5>{{ $p.t('global', 'stammdaten') }}</h5></div>        
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-4">
-                <label for="vorname" class="form-label">Vorname</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vorname" v-model="currentValue.vorname">
-            </div>
-            <div class="col-lg-2 col-md-4">
-                <label for="vornamen" class="form-label">Vornamen</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vornamen" v-model="currentValue.vornamen">
-            </div>
-            <div class="col-lg-4"></div>
-
-            <!-- Staatsbürgerschaft, etc. -->
-            <div class="col-lg-2 col-md-3">
-                <label for="staatsbuergerschaft" class="form-label">Staatsbürgerschaft</label>                
-                <select v-if="!readonly" id="staatsbuergerschaft" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.staatsbuergerschaft" >
-                    <option v-for="(item, index) in nations" :value="item.nation_code">
-                        {{ item.nation_text }}
-                    </option>
-                </select>
-                <input v-else type="text"  :readonly="readonly" class="form-control-sm form-control-plaintext" id="staatsbuergerschaft" :value="printNation(currentValue.staatsbuergerschaft)">
-            </div>
-            <div class="col-lg-2 col-md-3">
-                    <label for="geburtsnation" class="form-label">Geburtsnation</label>
-                    <select v-if="!readonly" id="geburtsnation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.geburtsnation" >
+                <div class="card-body">
+                <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                    <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
+                        <i class="fa fa-pen"></i>
+                    </button>
+                    <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-floppy-disk"></i></button>
+                    <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-xmark"></i></button>
+               </div>
+               <form class="row g-3  col-lg-12" ref="baseDataFrm">
+                
+                <!-- Anrede -->
+                <div class="col-lg-2 col-md-4">
+                    <label for="anrede" class="form-label">{{ $p.t('person','anrede') }}</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anrede" v-model="currentValue.anrede">
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label for="titelPre" class="form-label">{{ $p.t('person', 'titelpre') }}</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPre" v-model="currentValue.titelpre">
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label for="titelPost" class="form-label">{{ $p.t('person', 'titelpost' )}}</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
+                </div>
+                <div class="col-lg-6"></div>
+                <!--Name -->
+                <div class="col-lg-3 col-md-4">
+                    <label for="nachname" class="required form-label">{{ $p.t('person','nachname') }}</label>
+                    <input type="text" required  @blur="frmState.nachnameBlured = true"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}" id="nachname" v-model="currentValue.nachname">
+                    <div class="invalid-feedback" v-if="frmState.nachnameBlured && validNachname(currentValue.nachname)">
+                      Bitte geben Sie den Nachnamen an.
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-4">
+                    <label for="vorname" class="form-label">{{ $p.t('person','vorname') }}</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vorname" v-model="currentValue.vorname">
+                </div>
+                <div class="col-lg-2 col-md-4">
+                    <label for="vornamen" class="form-label">{{ $p.t('person','vornamen') }}</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vornamen" v-model="currentValue.vornamen">
+                </div>
+                <div class="col-lg-4"></div>
+    
+                <!-- Staatsbürgerschaft, etc. -->
+                <div class="col-lg-2 col-md-3">
+                    <label for="staatsbuergerschaft" class="form-label">{{ $p.t('person','staatsbuergerschaft') }}</label>                
+                    <select v-if="!readonly" id="staatsbuergerschaft" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.staatsbuergerschaft" >
                         <option v-for="(item, index) in nations" :value="item.nation_code">
                             {{ item.nation_text }}
                         </option>
                     </select>
-                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext"  id="geburtsnation" :value="printNation(currentValue.geburtsnation)" >
-            </div>
-            <div class="col-lg-2 col-md-3">
-                <label for="sprache" class="form-label">Sprache</label><br>
-                <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in sprache" :value="item.sprache">
-                        {{ item.sprache }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" v-model="currentValue.sprache">
-
-            </div>
-            <div class="col-lg-6 col-md-3"></div>
-            
-            <!-- Geschlecht -->
-            <div class="col-lg-2 col-md-3">
-                <label for="geschlecht" class="form-label">Geschlecht</label><br>
-                <select v-if="!readonly" id="geschlecht" v-model="currentValue.geschlecht" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="w">weiblich</option>
-                    <option value="m">männlich</option>
-                    <option val4e="x">divers</option>
-                    <option value="u">unbekannt</option>
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="geschlecht" :value="GESCHLECHT[currentValue.geschlecht]">
-            </div>
-
-            <div class="col-lg-2 col-md-3">
-                <label for="geburtsdatum" class="required form-label">Geburtsdatum</label>
-                <input type="date" :readonly="readonly" @blur="frmState.geburtsdatumBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured}" id="geburtsdatum" v-model="currentValue.gebdatum">
-            </div>
-
-            <div class="col-lg-2 col-md-3">
-                <label for="svnr" class="form-label">SVNR</label>
-                <input type="text" :readonly="readonly" @blur="frmState.svnrBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validSVNR(currentValue.svnr) && frmState.svnrBlured}" id="svnr" v-model="currentValue.svnr">
-            </div>
-
-            <div class="col-lg-2 col-md-3">
-                    <label for="ersatzkennzeichen" class="form-label">Ersatzkennzeichen</label>
-                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="ersatzkennzeichen" v-model="currentValue.ersatzkennzeichen">
-            </div>
-
-            <div class="col-lg-4">
+                    <input v-else type="text"  :readonly="readonly" class="form-control-sm form-control-plaintext" id="staatsbuergerschaft" :value="printNation(currentValue.staatsbuergerschaft)">
+                </div>
+                <div class="col-lg-2 col-md-3">
+                        <label for="geburtsnation" class="form-label">{{ $p.t('person','geburtsnation') }}</label>
+                        <select v-if="!readonly" id="geburtsnation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentValue.geburtsnation" >
+                            <option v-for="(item, index) in nations" :value="item.nation_code">
+                                {{ item.nation_text }}
+                            </option>
+                        </select>
+                        <input v-else type="text" readonly class="form-control-sm form-control-plaintext"  id="geburtsnation" :value="printNation(currentValue.geburtsnation)" >
+                </div>
+                <div class="col-lg-2 col-md-3">
+                    <label for="sprache" class="form-label">{{ $p.t('person','sprache') }}</label><br>
+                    <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                        <option value="">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                        <option v-for="(item, index) in sprache" :value="item.sprache">
+                            {{ item.sprache }}
+                        </option>         
+                    </select>
+                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" v-model="currentValue.sprache">
+    
+                </div>
+                <div class="col-lg-6 col-md-3"></div>
                 
+                <!-- Geschlecht -->
+                <div class="col-lg-2 col-md-3">
+                    <label for="geschlecht" class="form-label">{{ $p.t('person', 'geschlecht') }}</label><br>
+                    <select v-if="!readonly" id="geschlecht" v-model="currentValue.geschlecht" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                        <option value="w">weiblich</option>
+                        <option value="m">männlich</option>
+                        <option val4e="x">divers</option>
+                        <option value="u">unbekannt</option>
+                    </select>
+                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="geschlecht" :value="GESCHLECHT[currentValue.geschlecht]">
+                </div>
+    
+                <div class="col-lg-2 col-md-3">
+                    <label for="geburtsdatum" class="required form-label">{{ $p.t('person', 'geburtsdatum') }}</label>
+                    <template v-if="readonly">
+                        <input type="date" readonly class="form-control-sm form-control-plaintext" v-model="currentValue.gebdatum" id="geburtsdatum" >
+                    </template>
+                    <template v-else>
+                        <datepicker id="geburtsdatum"
+                            @blur="frmState.geburtsdatumBlured = true" 
+                            :input-class-name="(!validGeburtsdatum(currentValue.gebdatum) && frmState.geburtsdatumBlured) ? 'dp-invalid-input' : ''" 
+                            v-model="currentValue.gebdatum"
+                            v-bind:enable-time-picker="false"
+                            text-input 
+                            locale="de"
+                            format="dd.MM.yyyy"
+                            auto-apply 
+                            model-type="yyyy-MM-dd"></datepicker>
+                    </template>
+                </div>
+    
+                <div class="col-lg-2 col-md-3">
+                    <label for="svnr" class="form-label">{{ $p.t('person', 'svnr') }}</label>
+                    <input type="text" :readonly="readonly" @blur="frmState.svnrBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validSVNR(currentValue.svnr) && frmState.svnrBlured}" id="svnr" v-model="currentValue.svnr">
+                </div>
+    
+                <div class="col-lg-2 col-md-3">
+                        <label for="ersatzkennzeichen" class="form-label">{{ $p.t('person', 'ersatzkennzeichen') }}</label>
+                        <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="ersatzkennzeichen" v-model="currentValue.ersatzkennzeichen">
+                </div>
+    
+                <div class="col-lg-4">
+                    
+                </div>
+                
+                
+                
+                <!-- -->
+                <div class="col-lg-6">
+                    <label for="inputAddress" class="form-label">{{ $p.t('global', 'anmerkung') }}</label>
+                    <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkungen" v-model="currentValue.anmerkung">
+                    </textarea>
+                </div>
+    
+                
+                
+                <!-- changes -->
+                <div class="col-8">
+                    <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
+                </div>
+                
+    
+            </form>
             </div>
-            
-            
-            
-            <!-- -->
-            <div class="col-lg-6">
-                <label for="inputAddress" class="form-label">Anmerkung</label>
-                <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="anmerkungen" v-model="currentValue.anmerkung">
-                </textarea>
-            </div>
-
-            
-            
-            <!-- changes -->
-            <div class="col-8">
-                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
-            </div>
-            
-
-        </form>
-
-         
-        
+             </div>
+        </div>   
     </div>
 
-    <ModalDialog title="Warnung" ref="dialogRef">
+    <ModalDialog :title="$p.t('global', 'warnung')" ref="dialogRef">
       <template #body>
-        Stammdaten schließen? Geänderte Daten gehen verloren!
+        {{ $p.t('person','stammdatenNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 

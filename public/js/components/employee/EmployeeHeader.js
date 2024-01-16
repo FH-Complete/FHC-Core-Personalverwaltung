@@ -1,6 +1,7 @@
 import { Modal } from '../Modal.js';
 import { Toast } from '../Toast.js';
 import { ModalDialog } from '../ModalDialog.js';
+import { EmployeeStatus } from './EmployeeStatus.js';
 
 export const EmployeeHeader = {
     components: {
@@ -8,69 +9,115 @@ export const EmployeeHeader = {
 		Modal,
         ModalDialog,
         "p-skeleton": primevue.skeleton,
+        EmployeeStatus,
 	},	
     props: {
-        personID: { type: Number, default: 0 }
+        personID: Number,
+        personUID: String,
     },
+    expose: ['refresh'],
+    emits: ['personSelected'],
     setup(props, { emit }) {
 
-        const { personID } = Vue.toRefs(props);
+        const route = VueRouter.useRoute();
+        const router = VueRouter.useRouter();
+        const { watch, ref, onMounted } = Vue; 
+        const currentPersonID = ref(props.personID);
+        const currentPersonUID  = ref(props.personUID);
 
-        const employee = Vue.ref();
+        const employee = ref();
+        const fileInput = ref();
+        const previewImage = ref();
 
-        const headerUrl = Vue.ref("");
+        const isFetching = ref(false);        
+        const isFetchingName = ref(false);
+        const isFetchingIssues = ref(false);
+        
+        const currentDate = ref(null);        
 
-        const fileInput = Vue.ref();
-        const previewImage = Vue.ref();
+        const openissuescount = ref();
 
-        const isFetching = Vue.ref(false);        
-        const isFetchingName = Vue.ref(false);        
+        const formatDate = (ds) => {
+            if (ds == null) return '';
+            var d = new Date(ds);
+            return d?.toISOString().substring(0,10);
+        }
 
-        const generateEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personHeaderData?person_id=${person_id}`;
-        };
-
-        const fetchHeaderData = async () => {
+        const fetchHeaderData = async (personID, uid) => {
             isFetching.value = true;
             isFetchingName.value = true;
             try {
                 // fetch header data
-                const res = await fetch(headerUrl.value);
-                let response = await res.json();
-                employee.value = response.retval[0];
+                const res = await Vue.$fhcapi.Employee.personHeaderData(personID, uid);
+                employee.value = res.data.retval[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
-                const abteilungUrl = `${full}/extensions/FHC-Core-Personalverwaltung/api/personAbteilung?uid=${employee.value.uid}`
-                const resAbteilung = await fetch(abteilungUrl);
-                response = await resAbteilung.json();
-                employee.value = { ...employee.value, ...{ abteilung: response.retval[0] } };
-                isFetching.value = false;
+                const resAbteilung = await Vue.$fhcapi.Employee.personAbteilung(employee.value.uid);
+               // response = await resAbteilung.json();
+                employee.value = { ...employee.value, ...{ abteilung: resAbteilung.data.retval } };
             } catch (error) {
                 console.log(error);
+            } finally {
                 isFetching.value = false;
                 isFetchingName.value = false;
             }
         };
 
-        Vue.watch(personID, (currentValue, oldValue) => {
-            console.log('EmployeeHeaderData watch',currentValue);
-            headerUrl.value = generateEndpointURL(currentValue);
-            fetchHeaderData();
-            previewImage.value = null;
-            fileInput.value.value = null;
-        });
+        const fetchOpenIssuesCount = async(personID) => {
+            isFetchingIssues.value = true;
+            try {
+                const res = await Vue.$fhcapi.Issue.countPersonOpenIssues(personID);
+                openissuescount.value = res.data.data.openissues;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                isFetchingIssues.value = false;
+            }
+        };
 
-        Vue.onMounted(() => {
-            console.log("EmployeeHeader mounted", props.personID);
-            headerUrl.value = generateEndpointURL(props.personID);
-            fetchHeaderData();
+        const checkPerson = async() => {
+            isFetchingIssues.value = true;
+            try {            
+                const res = await Vue.$fhcapi.Issue.checkPerson(props.personID);
+                openissuescount.value = res.data.data.openissues;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                isFetchingIssues.value = false;
+            }
+        };
+
+        watch(
+            () => route.params.uid,
+            (newVal) => {   
+                currentPersonID.value = route.params.id;
+                currentPersonUID.value = newVal;           
+                if (currentPersonID.value!=null) {
+                    fetchHeaderData(route.params.id, newVal);
+                    fetchOpenIssuesCount(route.params.id);
+                } else {
+                    previewImage.value = null;
+                    fileInput.value.value = null;
+                }
+            }
+        )
+
+        watch(
+            currentDate,
+            (newVal) => {
+                console.log('header date changed: ', newVal);
+            }
+        )
+
+        onMounted(() => {
+            currentDate.value = route.query.d || new Date();
+            fetchHeaderData(props.personID, props.personUID);
+            fetchOpenIssuesCount(props.personID);
         })
 
         // Toast 
-        const toastRef = Vue.ref();
-        const toastDeleteRef = Vue.ref();
+        const toastRef = ref();
+        const toastDeleteRef = ref();
         
         const showToast = () => {
             toastRef.value.show();
@@ -93,64 +140,34 @@ export const EmployeeHeader = {
         }
 
         const postFile = async () => {
-            isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/uploadPersonEmployeeFoto`;
-                
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({person_id: props.personID,imagedata: previewImage.value}),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
-                }
-                let response = await res.json();
-
-                fetchHeaderData();
+            try  {
+                isFetching.value = true
+                const res = await Vue.$fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);                
+                fetchHeaderData(props.personID, props.personUID);
                 showToast();
-            
+            } catch (error) {
+                console.log(error);                
+            } finally {
                 isFetching.value = false;
+            }
         }
 
 
         const postDeleteFile = async () => {
-            isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonEmployeeFoto`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({person_id: props.personID}),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
-                }
-                let response = await res.json();
-
-                fetchHeaderData();
+            try  {
+                isFetching.value = true
+                const res = await Vue.$fhcapi.Employee.deletePersonEmployeeFoto(props.personID);                
+                fetchHeaderData(props.personID, props.personUID);
                 showDeleteToast();
-            
+            } catch (error) {
+                console.log(error);                
+            } finally {
                 isFetching.value = false;
+            }            
         }
 
         // Modal 
-        let modalRef = Vue.ref();
+        let modalRef = ref();
 
         const showModal = () => {
             modalRef.value.show();
@@ -161,7 +178,7 @@ export const EmployeeHeader = {
         }
 
         // confirm
-        let confirmDeleteRef = Vue.ref();
+        let confirmDeleteRef = ref();
 
         const showDeleteModal = async () => {            
             const ok = await confirmDeleteRef.value.show();
@@ -177,11 +194,24 @@ export const EmployeeHeader = {
             hideModal();
         }
 
-        const redirect = (person_id) => {
+        const redirect = (person_id, uid) => {
             console.log('person_id', person_id);
-            emit('personSelected', person_id);
+            let date = route.query.d;
+            emit('personSelected', { person_id, uid, date });
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
           }
+
+        const setDateHandler = (e) => {
+            console.log('setDateHandler', e.target.value);
+            let url = route.path + '?d=' + e.target.value;
+            currentDate.value = e.target.value;
+            router.push(url);
+        }
+
+        const refresh = () => {
+            console.log('refresh called')
+            fetchHeaderData(props.personID, props.personUID)
+        }
         
 
         return {
@@ -201,6 +231,15 @@ export const EmployeeHeader = {
             previewImage,
             isFetching,
             isFetchingName,
+            isFetchingIssues,
+            currentPersonID,
+            currentPersonUID,
+            currentDate,
+            formatDate,
+            setDateHandler,
+            checkPerson,
+            refresh,
+            openissuescount
         }
     },
     template: `
@@ -214,70 +253,87 @@ export const EmployeeHeader = {
             </Toast>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2" >
-        <div class="d-flex align-items-center flex-fill" >
-        
-            <div class="fotocontainer" v-if="!isFetchingName">
-                <img v-if="employee?.foto" class="img-thumbnail " style="max-width:101px;border-radius: 0.65rem!important" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
-                <div v-if="employee?.foto" class="fotobutton">
-                    <div class="d-grid gap-2 d-md-flex ">
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal">
+        <div class="d-flex justify-content-between ms-sm-auto col-lg-12 p-md-2" >
+            <div class="d-flex align-items-top flex-fill" >
+            
+                <div class="fotocontainer" v-if="!isFetchingName">
+                    <img v-if="employee?.foto" class="rounded" style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
+                    <div v-if="employee?.foto" class="fotobutton">
+                        <div class="d-grid gap-2 d-md-flex ">
+                                <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
+                                    <i class="fa fa-xmark"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
+                    <svg  class="bd-placeholder-img rounded" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
+                    <div class="fotobutton-visible" v-if="!isFetchingName">
+                        <div class="d-grid gap-2 d-md-flex ">                      
+                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
                                 <i class="fa fa-pen"></i>
                             </button>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
-                <svg  class="bd-placeholder-img img-thumbnail" style="border-radius: 0.65rem!important" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
-                <div class="fotobutton-visible" v-if="!isFetchingName">
-                    <div class="d-grid gap-2 d-md-flex ">                      
-                        <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
-                            <i class="fa fa-pen"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>                             
-            
-            <div class="ms-3 flex-fill" >
-
-                <h2 class="h2" v-if="!isFetchingName">{{ employee?.nachname }}, {{ employee?.vorname }} {{ employee?.titelpre }}</h2>
-                <h2 class="h2" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
-
-                <h6 v-if="employee?.abteilung && !isFetching" class="mb-2 text-muted">
-                    <b>{{ employee?.abteilung?.organisationseinheittyp_kurzbz }}</b> {{ employee?.abteilung?.bezeichnung }},
-                    <b>Vorgesetze(r) </b> <a href="#" @click.prevent="redirect(employee?.abteilung?.supervisor?.person_id)">{{ employee?.abteilung?.supervisor?.nachname }}, {{ employee?.abteilung?.supervisor?.vorname }} {{ employee?.abteilung?.supervisor?.titelpre }}</a>
-                </h6>  
-                <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>                
+                </div>                             
                 
-                <h6 v-if="!isFetchingName" class="mb-2 text-muted">
-                    <b>Email</b>&nbsp; 
-                    <span v-if="!employee?.alias">,  
-                        <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
-                    </span>
-                    <span v-if="employee?.alias">
-                        <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
-                    </span>
-                    <span v-if="employee?.telefonklappe" class="mb-2 text-muted">, <b>DW</b> {{  employee?.telefonklappe }}</span>  
-                </h6>  
-                <h6 v-else class="mb-2"><p-skeleton  style="width:35%"></p-skeleton></h6> 
-
+                <div class="ms-3 flex-fill d-flex flex-column" >
+                    <div class="align-items-top">
+                        <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}</h2>
+                        <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
+    
+                        <div v-if="employee?.abteilung && !isFetching" class="mb-1">
+                            <template v-for="(item, index) in employee?.abteilung">
+                                <strong class="text-muted">{{ item?.organisationseinheittyp_kurzbz }}</strong> {{ item?.bezeichnung }} |
+                                <strong class="text-muted">Vorgesetzte*r </strong> <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
+                                <br v-if="index < employee?.abteilung?.length - 1" />
+                            </template>    
+                            </div>  
+                        <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>                
+                        <div v-if="!isFetchingName" class="mb-1">
+                            <strong class="text-muted">Email</strong>&nbsp; 
+                            <span v-if="!employee?.alias">  
+                                <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
+                            </span>
+                            <span v-if="employee?.alias">
+                                <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
+                            </span>
+                            <span v-if="employee?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW</strong> {{  employee?.telefonklappe }}</span>  
+                        </div>  
+                        <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
+                    </div>
+                    <EmployeeStatus></EmployeeStatus>
+                   
+                </div>
+             
             </div>
+            
+            <div class="d-flex flex-column">
+                <div class="d-flex py-1">
+                    <div class="px-2">
+                        <h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
+                        <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6> 
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6> 
+                    </div>
+                    <div class="px-2">
+                        <h4 class="mb-1">PNr</h4>
+                        <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
+                    </div>
+                    <div class="px-2" style="border-left: 1px solid #EEE">
+                        <h4 class="mb-1">UID</h4>
+                        <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.uid }}</h6>  
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
+                    </div>
+                </div>                
+            </div>
+        
         </div>
         
-        <div class="p-2 bd-highlight">
-            <h3>PNr</h3>
-            <h6 class="text-muted">{{ employee?.personalnummer }}</h6>
-        </div>
-        <div class="p-2 bd-highlight" style="border-left: 1px solid #EEE">
-            <h3>UID</h3>
-            <h6 class="text-muted">{{ employee?.uid }}</h6>  
-        </div>
-        
-        </div>
 
         <!-- FotoModal -->
         <Modal title="Foto" ref="modalRef">

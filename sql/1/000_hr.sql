@@ -1,3 +1,0 @@
-CREATE SCHEMA IF NOT EXISTS hr;
-
-GRANT usage ON SCHEMA hr to vilesci;

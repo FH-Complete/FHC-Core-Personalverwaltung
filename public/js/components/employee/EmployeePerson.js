@@ -3,6 +3,9 @@ import { EmployeeData } from './EmployeeData.js';
 import { BankData } from './BankData.js';
 import { ContactData } from './contact/ContactData.js';
 import { MaterialExpensesData } from './MaterialExpensesData.js';
+import { HourlyRateData } from './HourlyRateData.js';
+import { JobFunction } from './JobFunction.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeePerson = {
     components: {
@@ -10,16 +13,21 @@ export const EmployeePerson = {
 		EmployeeData,
 		BankData,
 		ContactData,
-        MaterialExpensesData,
-	},	
+		MaterialExpensesData,
+		HourlyRateData: HourlyRateData,
+        JobFunction,
+	},
     props: {
         // personid: { type: Number, default: 0 }
     },
-    setup() {
+    emits: ['updateHeader'],
+    setup(_, { emit }) {
 
         const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(null);
-        const items = ["base", "employee", "contact", "bank", "material"];
+        const currentPersonID = Vue.ref(0);
+        const currentPersonUID = Vue.ref(null);
+        const { t } = usePhrasen();
+        const items = ["base", "employee", "contact", "bank", "material", "hourly", "funktion"];
         const activeItem = Vue.ref("base");
        // const { personID } = Vue.toRefs(props);
 
@@ -32,18 +40,27 @@ export const EmployeePerson = {
             console.log("activeItem: ", menuItem);
         };
 
+        const updateHeaderHandler = () => {
+            emit('updateHeader')
+        }
+
         Vue.watch(
-			() => route.params.id,
-			newId => {
-				currentPersonID.value = newId;
+			() => route.params,
+			params => {
+				currentPersonID.value = parseInt(params.id);
+                currentPersonUID.value = params.uid;
 			}
 		)
 
+        currentPersonID.value = parseInt(route.params.id);
+        currentPersonUID.value = route.params.uid;
+/*
         Vue.onMounted(() => {
-            currentPersonID.value = route.params.id;
+            currentPersonID.value = parseInt(route.params.id);
+            currentPersonUID.value = route.params.uid;
         })
-
-        return { items, isActive, setActive, currentPersonID }
+*/
+        return { items, isActive, setActive, currentPersonID, currentPersonUID, t, updateHeaderHandler }
 
     },
     template: `
@@ -57,35 +74,49 @@ export const EmployeePerson = {
                     :class="{ active: isActive(items[0]) }"
                     @click.prevent="setActive(items[0])"
                     href="#base"
-                >Stammdaten</a
+                >{{ t('global', 'stammdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[1]) }"
                     @click.prevent="setActive(items[1])"
                     href="#employee"
-                    >Mitarbeiterdaten</a
+                    >{{ t('person', 'mitarbeiterdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[2]) }"
                     @click.prevent="setActive(items[2])"
                     href="#contact"
-                    >Kontaktdaten</a
+                    >{{ t('person', 'kontaktdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[3]) }"
                     @click.prevent="setActive(items[3])"
                     href="#bank"
-                    >Bankdaten</a
+                    >{{ t('person', 'bankdaten') }}</a
                 >
                 <a
                     class="nav-link"
                     :class="{ active: isActive(items[4]) }"
                     @click.prevent="setActive(items[4])"
                     href="#bank"
-                    >Sachaufwand</a
+                    >{{ t('person','sachaufwand') }}</a
+                > 
+				<a
+					class="nav-link"
+					:class="{ active: isActive(items[5]) }"
+					@click.prevent="setActive(items[5])"
+					href="#hourly"
+					>{{ t('person', 'stundensaetze') }}</a
+                >
+                <a
+					class="nav-link"
+					:class="{ active: isActive(items[6]) }"
+					@click.prevent="setActive(items[6])"
+					href="#funktion"
+					>{{ t('person', 'funktionen') }}</a
                 >
             </nav>
             <div class="tab-content col-md-10" id="nav-tabContent">
@@ -94,36 +125,50 @@ export const EmployeePerson = {
                     :class="{ active: isActive(items[0]) }"
                     role="tabpanel"
                 >
-                    <base-data editMode :personID="currentPersonID" ></base-data>
+                    <base-data editMode :personID="currentPersonID" :personUID="currentPersonUID" @updateHeader="updateHeaderHandler"></base-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[1]) }"
                     role="tabpanel"
                 >
-                <employee-data editMode :personID="currentPersonID"></employee-data>
+                <employee-data editMode :personID="currentPersonID" :personUID="currentPersonUID" @updateHeader="updateHeaderHandler"></employee-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[2]) }"
                     role="tabpanel"
                 >
-                    <contact-data editMode :personID="currentPersonID"></contact-data>
+                    <contact-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></contact-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[3]) }"
                     role="tabpanel"
                 >
-                <bank-data editMode :personID="currentPersonID"></bank-data>
+                <bank-data editMode :personID="currentPersonID" :personUID="currentPersonUID"></bank-data>
                 </div>
                 <div
                     class="tab-pane"
                     :class="{ active: isActive(items[4]) }"
                     role="tabpanel"
                 >
-                <material-expenses-data editMode :personID="currentPersonID"></material-expenses-data>
+                <material-expenses-data editMode :personID="currentPersonID"  :personUID="currentPersonUID"></material-expenses-data>
                 </div>
+				<div
+					class="tab-pane"
+					:class="{ active: isActive(items[5]) }"
+					role="tabpanel"
+				>
+				<hourly-rate-data editMode :personID="currentPersonID"  :personUID="currentPersonUID"></hourly-rate-data>
+				</div>
+                <div
+					class="tab-pane"
+					:class="{ active: isActive(items[6]) }"
+					role="tabpanel"
+				>
+				<job-function editMode :personID="currentPersonID"  :personUID="currentPersonUID" @updateHeader="updateHeaderHandler"></job-function>
+				</div>
                 
             </div>
         </div>

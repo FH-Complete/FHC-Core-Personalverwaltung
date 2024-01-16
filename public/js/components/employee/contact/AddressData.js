@@ -1,6 +1,7 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
+import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const AddressData = {
     components: {
@@ -16,6 +17,8 @@ export const AddressData = {
     setup(props) {
 
         const { personID } = Vue.toRefs(props);
+
+        const { t } = usePhrasen();
 
         const urlAddressData = Vue.ref("");
 
@@ -36,20 +39,12 @@ export const AddressData = {
 
         const ortschaften = Vue.ref([]);
 
+        const readonly = Vue.ref(false);
+
         Vue.watch(personID, (currentValue, oldValue) => {
-            console.log('AddressData watch',currentValue);
-            urlAddressData.value = generateAddressDataEndpointURL(currentValue);
+            console.log('AddressData watch',currentValue);            
             fetchData();
         });
-
-        
-
-        const generateAddressDataEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personAddressData?person_id=${person_id}`;
-        };
-
-
 
         const fetchData = async () => {
             if (personID.value==null) {
@@ -57,60 +52,48 @@ export const AddressData = {
                 return;
             }
             isFetching.value = true
+            // submit
             try {
-              const res = await fetch(urlAddressData.value)
-              let response = await res.json()
-              isFetching.value = false
-              console.log(response.retval);
-              addressList.value = response.retval;
+                const response = await Vue.$fhcapi.Person.personAddressData(personID.value);                    
+                addressList.value = response.data.retval;
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
+                console.log(error)              
+            } finally {
+                isFetching.value = false
             }
-          }
-
-        const fetchGemeinden = async () => {
-            try {
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getGemeinden?plz=${currentAddress.value.plz}`;
-        
-              const res = await fetch(url)
-              let response = await res.json()              
-              return response.retval;
-            } catch (error) {
-              console.log(error)              
-            }		
+            
         }
 
-        const fetchOrtschaften = async () => {
-            try {
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrtschaften?plz=${currentAddress.value.plz}`;
-        
-              const res = await fetch(url)
-              let response = await res.json()              
-              return response.retval;
-            } catch (error) {
-              console.log(error)              
-            }		
-        }
 
         Vue.watchEffect(async () => {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
-                const response = await fetchGemeinden();
-                gemeinden.value = response?.retval;
+                try  {
+                    isFetching.value = true
+                    const response = await Vue.$fhcapi.Common.getGemeinden(currentAddress.value.plz);     
+                    gemeinden.value = response.data.retval;
+                } catch (error) {
+                    console.log(error)                    
+                } finally {
+                    isFetching.value = false
+                }
             }            
         })
 
         Vue.watchEffect(async () => {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
-                const response = await fetchOrtschaften();
-                ortschaften.value = response?.retval;
+                try  {
+                    isFetching.value = true
+                    const response = await Vue.$fhcapi.Common.getOrtschaften(currentAddress.value.plz);     
+                    ortschaften.value = response.data.retval;
+                } catch (error) {
+                    console.log(error)                    
+                } finally {
+                    isFetching.value = false
+                }
             }            
         })
 
-        Vue.onMounted(() => {
-            urlAddressData.value = generateAddressDataEndpointURL(props.personID); 
+        Vue.onMounted(() => {            
             fetchData();
             
         })
@@ -132,13 +115,17 @@ export const AddressData = {
             
             if (ok && !currentAddress.value.heimatadresse) {   
 
-                postDelete(id)
-                    .then((r) => {
-                        if (r.error == 0) {
-                            delete addressList.value[id];
-                            showDeletedToast();
-                        }
-                    });
+                try {
+                    const res = await Vue.$fhcapi.Person.deletePersonAddressData(id);                    
+                    if (res.data.error == 0) {
+                        delete addressList.value[id];
+                        showDeletedToast();
+                    }
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                      isFetching.value = false
+                }                  
                 
             }
         }
@@ -183,83 +170,28 @@ export const AddressData = {
             modalRef.value.hide();
         }
 
-        const postData = async () => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/upsertPersonAddressData`;
+       
 
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(currentAddress.value),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-            
-
-        const postDelete = async (id) => {
-            isFetching.value = true
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/deletePersonAddressData`;
-
-            const res = await fetch(endpoint,{
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({adresse_id: id}),
-            });    
-
-            if (!res.ok) {
-                isFetching.value = false;
-                const message = `An error has occured: ${res.status}`;
-                throw new Error(message);
-            }
-            let response = await res.json();
-        
-            isFetching.value = false;
-            return response;
-
-        };
-
-        const okHandler = () => {
+        const okHandler = async () => {
             if (!validate()) {
 
                 console.log("form invalid");
 
             } else {
-                postData()
-                    .then((r) => {
-                        if (r.error == 0) {
-                            addressList.value[r.retval[0].adresse_id] = r.retval[0];
-                            console.log('address successfully saved');
-                            showToast();
-                        }
-                        /*
-                        if (currentAddress.value) {
-                            addressList.value[currentAddress.value.adresse_id] = currentAddress.value;
-                            console.log('address successfully saved');
-                            showToast();
-                        }*/
+
+                // submit
+                try {
+                    const r = await Vue.$fhcapi.Person.upsertPersonAddressData(currentAddress.value);                    
+                    if (r.data.error == 0) {
+                        addressList.value[r.data.retval[0].adresse_id] = r.data.retval[0];
+                        console.log('address successfully saved');
+                        showToast();
                     }
-                    )
-                    .catch((error) => {
-                        console.log(error.message);
-                    });
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
                 
                 hideModal();
             }
@@ -311,9 +243,9 @@ export const AddressData = {
             addressList, addressListArray, isEditActive, showAddModal, 
             showDeleteModal, showEditModal, confirmDeleteRef, currentAddress, 
             modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
-            gemeinden, ortschaften, adressentyp,
+            gemeinden, ortschaften, adressentyp, t,
             // form handling
-            validOrt, validPLZ, validTyp, frmState, addressDataFrm, 
+            validOrt, validPLZ, validTyp, frmState, addressDataFrm, readonly
         }
         
     },
@@ -322,39 +254,38 @@ export const AddressData = {
 
             <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                 <Toast ref="toastRef">
-                    <template #body><h4>Adresse gespeichert.</h4></template>
+                    <template #body><h4>{{ t('person','adresseGespeichert') }}</h4></template>
                 </Toast>
             </div>
 
             <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
                 <Toast ref="deleteToastRef">
-                    <template #body><h4>Adresse gelöscht.</h4></template>
+                    <template #body><h4>{{ t('person','adresseGeloescht') }}</h4></template>
                 </Toast>
             </div>
 
             <div class="d-flex bd-highlight">
-                <div class="flex-grow-1 bd-highlight"></div>        
-                <div class="p-2 bd-highlight">                   
-                    <button type="button" class="btn btn-outline-dark btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
-                        <i class="fa fa-plus"></i>
+                <div class="py-2 bd-highlight">                   
+                    <button type="button" class="btn btn-primary btn-sm"  @click="showAddModal()" style="margin-right:1.85rem;">
+                        <i class="fa fa-plus"></i> {{ t('person','adresse') }}
                     </button>
                 </div>
             </div>
         </div>
         <div class="table-responsive">
-            <table class="table table-striped table-sm">
+            <table class="table table-hover table-sm">
                 <thead>                
                 <tr>
-                    <th scope="col">Typ</th>
-                    <th scope="col">Straße</th>
-                    <th scope="col">PLZ</th>
-                    <th scope="col">Ort</th>
-                    <th scope="col">Gemeinde</th>
-                    <th scope="col">Nation</th>
-                    <th scope="col">Heimatadresse</th>
-                    <th scope="col">Zustelladresse</th>
-                    <th scope="col">Abweich.Empf.(c/o)</th>
-                    <th scope="col">Aktion</th>
+                    <th scope="col">{{ t('global','typ') }}</th>
+                    <th scope="col">{{ t('person','strasse') }}</th>
+                    <th scope="col">{{ t('person','plz') }}</th>
+                    <th scope="col">{{ t('person','ort') }}</th>
+                    <th scope="col">{{ t('person','gemeinde') }}</th>
+                    <th scope="col">{{ t('person','nation') }}</th>
+                    <th scope="col">{{ t('person','heimatadresse') }}</th>
+                    <th scope="col">{{ t('person','zustelladresse') }}</th>
+                    <th scope="col">{{ t('person','abweichenderEmpfaenger') }}</th>
+                    <th scope="col">{{ t('ui','aktion') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -369,12 +300,12 @@ export const AddressData = {
                     <td class="align-middle">{{ address.zustelladresse == true ? "X" : "" }}</td>
                     <td class="align-middle">{{ address.co_name }}</td>
                     <td class="align-middle" width="5%">
-                        <div class="d-grid gap-2 d-md-flex align-middle">
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal(address.adresse_id)">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-dark btn-sm" @click="showEditModal(address.adresse_id)">
+                        <div class="d-grid gap-2 d-md-flex align-middle">                
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showEditModal(address.adresse_id)">
                                 <i class="fa fa-pen"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" @click="showDeleteModal(address.adresse_id)">
+                                <i class="fa fa-xmark"></i>
                             </button>
                         </div>
                     </td>
@@ -385,12 +316,12 @@ export const AddressData = {
         </div>
 
         <!-- Detail Modal -->
-        <Modal title="Adresse" ref="modalRef">
+        <Modal :title="t('person','adresse')" ref="modalRef">
             <template #body>
                 <form class="row g-3" v-if="currentAddress != null"  ref="addressDataFrm" >
                                
                     <div class="col-md-6">
-                        <label for="strasse" class="form-label">Strasse</label>
+                        <label for="strasse" class="form-label">{{ t('person','strasse') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="strasse" v-model="currentAddress.strasse" maxlength="256">
                     </div>
                     <div class="col-md-6">
@@ -403,11 +334,11 @@ export const AddressData = {
                         
                     </div>
                     <div class="col-md-2">
-                        <label for="plz" class="required form-label" >PLZ</label>
+                        <label for="plz" class="required form-label" >{{ t('person','plz') }}</label>
                         <input type="text" required :readonly="readonly" @blur="frmState.plzBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validPLZ(currentAddress.plz) && frmState.plzBlured}" id="plz" maxlength="16" v-model="currentAddress.plz" >
                     </div>
                     <div class="col-md-4">
-                        <label for="ort" class="required form-label">Ort</label>
+                        <label for="ort" class="required form-label">{{ t('person','ort') }}</label>
                         <input v-if="currentAddress.nation!='A'" type="text" required :readonly="readonly" @blur="frmState.ortBlured = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validOrt(currentAddress.ort) && frmState.ortBlured}" id="ort" maxlength="256" v-model="currentAddress.ort" >
                         <select  v-if="currentAddress.nation=='A'" id="nation" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.ort" >
                             <option v-for="(item, index) in ortschaften" :value="item.ortschaftsname">
@@ -417,7 +348,7 @@ export const AddressData = {
                     </div>
                     <!-- Gemeinde -->
                     <div class="col-md-6">
-                        <label for="gemeinde" class="form-label">Gemeinde</label>
+                        <label for="gemeinde" class="form-label">{{ t('person','gemeinde') }}</label>
                         <input v-if="currentAddress.nation!='A'" type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="gemeinde" maxlength="256" v-model="currentAddress.gemeinde">
                         <select  v-if="currentAddress.nation=='A'" id="gemeinde" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="currentAddress.gemeinde" >
                             <option v-for="(item, index) in gemeinden" :value="item.name">
@@ -428,13 +359,13 @@ export const AddressData = {
 
                     <!-- c/o -->
                     <div class="col-md-6">
-                        <label for="co_name" class="form-label">Abweich.Empfänger. (c/o)</label>
+                        <label for="co_name" class="form-label">{{ t('person','abweichenderEmpfaenger') }}</label>
                         <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="co_name" maxlength="256" v-model="currentAddress.co_name">
                     </div>
 
                     <!-- Adresstyp (Hauptwohnsitz, Nebenwohnsitz, etc.) -->
                     <div class="col-md-3">
-                        <label for="typ" class="required form-label">Typ</label>
+                        <label for="typ" class="required form-label">{{ t('global','typ') }}</label>
                         <select  id="typ" class="form-select form-select-sm" aria-label=".form-select-sm " @blur="frmState.typBlured = true" v-model="currentAddress.typ" :class="{'is-invalid': !validTyp(currentAddress.typ) && frmState.typBlured}">
                             <option v-for="(item, index) in adressentyp" :value="item.adressentyp_kurzbz">
                                 {{ item.bezeichnung }}
@@ -443,13 +374,13 @@ export const AddressData = {
                     </div>
                     
                     <div class="col-md-1">                                             
-                        <label for="heimatadresse" class="form-label">Heimatadr.</label>
+                        <label for="heimatadresse" class="form-label">{{ t('person','heimatadresse') }}</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="heimatadresse" v-model="currentAddress.heimatadresse">
                         </div>
                     </div>
                     <div class="col-md-1">
-                        <label for="zustelladresse" class="form-label">Zustelladr.</label>
+                        <label for="zustelladresse" class="form-label">{{ t('person','zustelladresse') }}</label>
                         <div>
                             <input class="form-check-input" type="checkbox" id="zustelladresse" v-model="currentAddress.zustelladresse">
                         </div>                        
@@ -463,22 +394,19 @@ export const AddressData = {
 
             </template>
             <template #footer>
-                <button type="button" class="btn btn-secondary" @click="hideModal()">
-                    Abbrechen
-                </button>
                 <button type="button" class="btn btn-primary" @click="okHandler()" >
-                    OK
+                    {{ t('ui','speichern') }}
                 </button>
             </template>
         </Modal>
 
-        <ModalDialog title="Warnung" ref="confirmDeleteRef">
+        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
             <template #body>
                 <span v-if="!currentAddress?.heimatadresse">
-                    Adresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' wirklich löschen?
+                   {{ t('person','adresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','wirklichLoeschen') }}?
                 </span>
                 <span v-else>
-                    Heimatadresse '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' kann nicht gelöscht werden!
+                    {{ t('person','heimatadresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','kannNichtGeloeschtWerden') }}!
                 </span>
             </template>
         </ModalDialog>

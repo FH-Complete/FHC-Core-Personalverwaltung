@@ -1,14 +1,18 @@
+import { usePhrasen } from '../../../../../public/js/mixins/Phrasen.js';
+
 export const ModalDialog = {
     props: {
         type: String,
         title: String,
     },
+    expose: ['show', 'hide'],
     setup(props, { emit }) {
        
         let modalConfirmEle = Vue.ref(null);
         let thisModalObj;
         let _resolve;
         let _reject;
+        const { t } = usePhrasen();
 
         Vue.onMounted(() => {
             thisModalObj = new bootstrap.Modal(modalConfirmEle.value);
@@ -32,11 +36,9 @@ export const ModalDialog = {
           
         const cancel = () =>  {
             _resolve(false);
-        }
+        }        
 
-        Vue.defineExpose({ show, hide});
-
-        return { modalConfirmEle, show, hide, ok, cancel };
+        return { modalConfirmEle, show, hide, ok, cancel, t };
     },
 
     template:`
@@ -54,10 +56,10 @@ export const ModalDialog = {
                 <div class="modal-footer">
                     <slot name="footer"></slot>
                     <button type="button" class="btn btn-secondary" @click="cancel" data-bs-dismiss="modal">
-                        Abbrechen
+                      {{ t('ui','abbrechen') }}
                     </button>
                     <button type="button" class="btn btn-primary" @click="ok" data-bs-dismiss="modal">
-                        OK
+                        {{ t('ui','ok') }}
                     </button>
                 </div>
             </div>

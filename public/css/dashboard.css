@@ -1,5 +1,5 @@
 body {
-    font-size: .875rem;
+    /* font-size: .875rem; */
   }
   
   .feather {
@@ -100,9 +100,7 @@ body {
   }
 
   .subnav .nav-link {
-    border: 1px solid #FFF;
-    border-radius: 0;
-    background-color: #EFEFEF;
+    text-transform: uppercase!important;
   }
 
 
@@ -136,6 +134,8 @@ div#collapseTable.minimized {
 
 .form-label {
   font-size: 0.75em;
+  text-transform: capitalize!important;
+  color: #6c757d;
 }  
   
 
@@ -162,3 +162,7 @@ div#collapseTable.minimized {
 .filter-filter-options {
   margin-bottom: 15px;
 } 
+
+table.dvcard  th {
+  text-align: left;
+}

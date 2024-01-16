@@ -1,57 +1,70 @@
 export const EmployeeNav = {
     props: {
-        personID: Number,
+        //date: Date,
     },
     setup(props, { emit }) {
         const route = VueRouter.useRoute();
+        const currentDate = Vue.ref(null);
         const close=() => {
-            console.log("close", props.personid)
-            emit("close-editor", props.personid)
+            console.log("close", route.params.id)
+            emit("close-editor", route.params.id)
+        }
+        Vue.onMounted(() => {
+			console.log('EmployeeNav mounted', route.path);
+            currentDate.value = route.query.d;
+        })
+        Vue.watch(
+			() => route.query.d,
+			d => {
+                console.log('EmployeeNav watch route.query.d', d)
+				currentDate.value = d;
+			}
+		)
+        const maybeAddDate = () => {
+            if (currentDate.value != null) {
+                return '?d=' + currentDate.value;
+            }
+            return '';
         }
 
         const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
-        return { close, route, fullPath }
+        return { close, route, fullPath, currentDate, maybeAddDate }
     },
-    template: `
+    template: `    
     <nav
-        class="nav nav-pills flex-column flex-sm-row ms-sm-auto col-lg-12 subnav"
+        class="nav nav-tabs nav-justified flex-column flex-sm-row ms-sm-auto mt-3 col-lg-12 subnav"
     >
     
-        <router-link :to="fullPath + personID + '/summary'" 
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/summary' + maybeAddDate()" 
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route?.name === 'summary'}]" >
             Überblick
         </router-link>
-        <router-link :to="fullPath + personID" 
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + maybeAddDate()" 
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route?.name === 'person'}]" >
             Person
         </router-link>
-        <router-link :to="'/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/' + personID + '/contract'" 
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract' + maybeAddDate()" 
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route.path.indexOf('contract') > -1 }]" >
-            Verträge
-        </router-link>
-        <a
+            Dienstverhältnis
+        </router-link>        
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/time' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + personID + '/salary'"
-        >Gehalt</a
+        :class="[{'router-link-active active': route?.name === 'time'}]"
+        >Zeiten</router-link
         >
-        <a
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/lifecycle' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + personID + '/time'"
-        >Zeiten</a
+        :class="[{'router-link-active active': route?.name === 'lifecycle'}]"
+        >Life Cycle</router-link
         >
-        <a
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/document' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + personID + '/lifecycle'"
-        >Life Cycle</a
-        >
-        <a
-        class="flex-sm-fill text-sm-center nav-link"
-        :href="fullPath + personID + '/documents'"
-        >Dokumente</a
+        :class="[{'router-link-active active': route?.name === 'document'}]"
+        >Dokumente</router-link
         >
     </nav>
     

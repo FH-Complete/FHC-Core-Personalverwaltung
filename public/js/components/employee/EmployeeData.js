@@ -1,5 +1,7 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+
 
 export const EmployeeData= {
     components: {
@@ -9,11 +11,14 @@ export const EmployeeData= {
     props: {
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
+        personUID: { type: String, required: true },
         writePermission: { type: Boolean, required: false },
     },
-    setup(props) {
+    emits: ['updateHeader'],
+    setup(props, { emit }) {
 
         const readonly = Vue.ref(true);
+        const { t } = usePhrasen();
 
         const { personID } = Vue.toRefs(props);
 
@@ -26,27 +31,21 @@ export const EmployeeData= {
         const ausbildung = Vue.inject('ausbildung');
         const standorte = Vue.inject('standorte');
         const orte = Vue.inject('orte');
-
-        const generateEndpointURL = (person_id) => {
-            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-            return `${full}/extensions/FHC-Core-Personalverwaltung/api/personEmployeeData?person_id=${person_id}`;
-        };
+        const validKurzbz = Vue.ref(true);
 
         const fetchData = async () => {
             if (personID.value==null) {                
                 return;
             }
-            isFetching.value = true
+            isFetching.value = true;
             try {
-              console.log('url',url.value);
-              const res = await fetch(url.value);
-              let response = await res.json()              
-              currentValue.value = response.retval[0];
-              isFetching.value = false              
+              const res = await Vue.$fhcapi.Person.personEmployeeData(personID.value);                    
+              currentValue.value = res.data.retval[0];
             } catch (error) {
-              console.log(error)
-              isFetching.value = false
-            }
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }   
           }
 
           const createShape = () => {
@@ -57,7 +56,7 @@ export const EmployeeData= {
                 kurzbz: "",
                 lektor: false,
                 fixangestellt: false,
-                stundensatz: "0.00",
+                stundensatz: "0.00",   // deprecated
                 ausbildungcode: null,
                 ort_kurzbz: "",
                 ext_id: 0,
@@ -76,8 +75,7 @@ export const EmployeeData= {
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());
 
-        Vue.watch(personID, (currentVal, oldVal) => {
-            url.value = generateEndpointURL(currentVal);   
+        Vue.watch(personID, (currentVal, oldVal) => { 
             fetchData();         
         });
 
@@ -102,9 +100,10 @@ export const EmployeeData= {
 
         Vue.onMounted(() => {
             currentValue.value = createShape();
-            url.value = generateEndpointURL(props.personID); 
-            fetchData();
-            console.log("EmployeeData mounted");
+            if (props.personID) {
+                fetchData();
+            }
+            console.log("EmployeeData mounted", props.personID);
         })
 
         const getAusbildungbez = (code) => {
@@ -131,15 +130,37 @@ export const EmployeeData= {
 
         const employeeDataFrm = Vue.ref();
 
-        const frmState = Vue.reactive({ nachnameBlured: false, geburtsdatumBlured: false, wasValidated: false });
+        const frmState = Vue.reactive({ nachnameBlured: false, kurzbzBlured: false, wasValidated: false });
 
         const validNachname = (n) => {
             return !!n && n.trim() != "";
         }
 
-        const validGeburtsdatum = (n) => {
-            return !!n && n.trim() != "";
+        const validateKurzbz = () => {
+
+                if (!!currentValue.value.kurzbz && currentValue.value.kurzbz.trim() != "") {
+
+                    console.log('validateKurzbz: ', currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz)
+                    isFetching.value = true;
+
+                    try {
+                        Vue.$fhcapi.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
+                            if (res.data.error == 1) {
+                                console.error("error checking kurzbz", res.data.msg)
+                            } else {                                
+                                validKurzbz.value = !res.data.retval
+                            }
+                        })
+                        
+                    } catch (error) {
+                        console.log(error)              
+                    } finally {
+                        isFetching.value = false
+                    }   
+                }
+                
         }
+        
 
         const readonlyBlocker = (e) => {
             if (readonly.value) e.preventDefault();
@@ -160,48 +181,22 @@ export const EmployeeData= {
             } else {
 
                 // submit
-                isFetching.value = true
-                let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-                const endpoint =
-                    `${full}/extensions/FHC-Core-Personalverwaltung/api/updatePersonEmployeeData`;
-
-                const res = await fetch(endpoint,{
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(currentValue.value),
-                });    
-
-                if (!res.ok) {
-                    isFetching.value = false;
-                    const message = `An error has occured: ${res.status}`;
-                    throw new Error(message);
+                try {
+                    const response = await Vue.$fhcapi.Person.updatePersonEmployeeData(currentValue.value);                    
+                    showToast();
+                    currentValue.value = response.data.retval[0];
+                    preservedValue.value = currentValue.value;
+                    emit('updateHeader')
+                    toggleMode();  
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
                 }
-                let response = await res.json();
-            
-                isFetching.value = false;
-
-                showToast();
-                currentValue.value = response.retval[0];
-                preservedValue.value = currentValue.value;
-                toggleMode();
+                
             }
 
             frmState.wasValidated  = true;  
-        }
-
-        const submitFormHandler = (event) => {
-        
-            if (!employeeDataFrm.value.checkValidity()) {
-                console.log("form invalid!!!");
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            console.log("form valid");
-            //form.classList.add('was-validated');
         }
 
         const hasChanged = Vue.computed(() => {
@@ -227,139 +222,148 @@ export const EmployeeData= {
             ausbildung,
             standorte,
             orte,
+            validKurzbz,
 
             save,
             toggleMode,  
-            validNachname,    
+            validNachname, 
+            validateKurzbz,   
             getAusbildungbez,
             getStandortbez,
             readonlyBlocker,
+            t,
         }
 
     },
     template: `
     <div class="row">
-
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="toastRef">
-                <template #body><h4>Mitarbeiterdaten gespeichert.</h4></template>
+                <template #body><h4>{{ t('person','mitarbeiterdatenGespeichert') }}</h4></template>
             </Toast>
         </div>
+    </div>
 
-        <div class="d-flex bd-highlight">
-            <div class="flex-grow-1 bd-highlight"><h4>Mitarbeiterdaten</h4></div>        
-            <div class="p-2 bd-highlight">
-            <div class="d-grid gap-2 d-md-flex justify-content-end ">
-                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
-                    <i class="fa fa-pen"></i>
-                </button>
-                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-minus"></i></button>
-                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-floppy-disk"></i></button>
-            </div>
+   <div class="row pt-md-4">      
+             <div class="col">
+                 <div class="card">
+                    <div class="card-header">
+                        <div class="h5"><h5>{{ t('person','mitarbeiterdaten') }}</h5></div>        
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                                <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
+                                    <i class="fa fa-pen"></i>
+                                </button>
+                                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="save()"><i class="fa fa-floppy-disk"></i></button>
+                                <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()"><i class="fa fa-xmark"></i></button>
+                        </div>
+                        <form class="row g-3" ref="employeeDataFrm">
+                            <div class="col-md-2">
+                                <label for="personalnummer" class="form-label">{{ t('global','personalnummer') }}</label>
+                                <input type="text" readonly class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="personalnummer" v-model="currentValue.personalnummer">
+                            </div>            
+                            <div class="col-md-2">
+                                <label for="kurzbezeichnung" class="form-label">{{ t('gruppenmanagement','kurzbezeichnung') }}</label>
+                                <input type="text" :readonly="readonly" @blur="frmState.kurzbzBlured = true" @input="validateKurzbz()" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validKurzbz && frmState.kurzbzBlured }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
+                                <div class="invalid-feedback" v-if="!validKurzbz">
+                                    Kurzbezeichnung existiert bereits. 
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="alias" class="form-label">{{ t('person','alias') }}</label>
+                                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="alias" v-model="currentValue.alias">
+                            </div>
+                            <div class="col-md-4"></div>
+                            <!--  -->
+                            <div class="col-md-2">
+                                <label for="office" class="form-label">{{ t('person','buero') }}</label>
+                                <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                    <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                    <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
+                                        {{ item.ort_kurzbz }}
+                                    </option>         
+                                </select>
+                            <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
+                            </div>
+                            <div class="col-md-2">
+                                <label for="telefonklappe" class="form-label">{{ t('person','telefonklappe') }}</label>
+                                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="ausbildung" class="form-label">{{ t('person','ausbildung') }}</label>
+                                <select v-if="!readonly" id="ausbildung" :readonly="readonly"  v-model="currentValue.ausbildungcode" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                    <option value="">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                    <option v-for="(item, index) in ausbildung" :value="item.ausbildungcode">
+                                        {{ item.ausbildungbez }}
+                                    </option>         
+                                </select>
+                                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="ausbildung" :value="getAusbildungbez(currentValue.ausbildungcode) ">
+                            </div>
+                            <div class="col-md-4"></div>
+                            <!--Location -->       
+                            
+                            <div class="col-md-4">
+                                <div class="row gy-3">    
+                                    <div class="col-12">                 
+                                        <label for="standort" class="form-label">{{ t('person','standort') }}</label>
+                                        <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                            <option value="0">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                            <option v-for="(item, index) in standorte" :value="item.standort_id">
+                                                {{ item.bezeichnung }}
+                                            </option>         
+                                        </select>
+                                        <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="anmerkung" class="form-label">{{ t('global', 'anmerkung') }}</label>
+                                        <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
+                                        </textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
 
+                                <label for="status" class="form-label">{{ t('global','status') }}</label>
+                                <div class="form-check">
+                                    <label for="aktiv" class="form-check-label">{{ t('global','aktiv') }}</label>
+                                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
+                                </div>
+                                <div class="form-check">
+                                    <label for="lektor" class="form-check-label">{{ t('lehre','lektor') }}</label>
+                                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
+                                </div>
+                                <div class="form-check">
+                                    <label for="fixangestellt" class="form-check-label">{{ t('person','fixangestellt') }}</label>
+                                    <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
+                                </div>
+                                <div class="form-check">
+                                    <label for="bismelden" class="form-check-label" >{{ t('person','bismelden') }}</label>
+                                    <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
+                                </div>
+
+                            </div>
+                            <!-- -->
+                            
+                            <div class="col-4">
+                                
+                            </div>
+                            <div class="col-4"></div>
+                            <!-- changes -->
+                            <div class="col-8">
+                                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
-    
-    </div>
-    <div class="col-md-12 d-flex justify-content-between flex-wrap flex-md-nowrap align-items-start pt-3 pb-2 mb-3">
 
-        <form class="row g-3" ref="employeeDataFrm">
-            <div class="col-md-2">
-                <label for="personalnummer" class="form-label">Personalnummer</label>
-                <input type="text" readonly class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="personalnummer" v-model="currentValue.personalnummer">
-            </div>            
-            <div class="col-md-2">
-                <label for="kurzbezeichnung" class="form-label">Kurzbezeichnung</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="kurzbezeichnung" v-model="currentValue.kurzbz">
-            </div>
-            <div class="col-md-4">
-                <label for="alias" class="form-label">Alias</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="alias" v-model="currentValue.alias">
-            </div>
-            <div class="col-md-4"></div>
-            <!--  -->
-            <div class="col-md-2">
-                <label for="stundensatz" class="form-label">Stundensatz</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="stundensatz" v-model="currentValue.stundensatz">
-            </div>
-            <div class="col-md-2">
-                <label for="telefonklappe" class="form-label">Telefonklappe</label>
-                <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="currentValue.telefonklappe">
-            </div>
-            <div class="col-md-4">
-                <label for="ausbildung" class="form-label">Ausbildung</label>
-                <select v-if="!readonly" id="ausbildung" :readonly="readonly"  v-model="currentValue.ausbildungcode" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in ausbildung" :value="item.ausbildungcode">
-                        {{ item.ausbildungbez }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="ausbildung" :value="getAusbildungbez(currentValue.ausbildungcode) ">
-            </div>
-            <div class="col-md-4"></div>
-            <!--Location -->
-            <div class="col-md-4">
-                <label for="office" class="form-label">Büro</label>
-                <select v-if="!readonly" id="office" :readonly="readonly"  v-model="currentValue.ort_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in orte" :value="item.ort_kurzbz">
-                        {{ item.ort_kurzbz }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="office" :value="currentValue.ort_kurzbz">
-            </div>
-            <div class="col-md-4">
-                <label for="standort" class="form-label">Standort</label>
-                <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
-                    <option value="0">-- keine Auswahl --</option>
-                    <option v-for="(item, index) in standorte" :value="item.standort_id">
-                        {{ item.bezeichnung }}
-                    </option>         
-                </select>
-                <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">
-            </div>
-            <div class="col-md-4">
-            </div>
-            <!-- -->
-            <div class="col-4">
-                <label for="anmerkung" class="form-label">Anmerkung</label>
-                <textarea type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" v-model="currentValue.anmerkung">
-                </textarea>
-            </div>
-            <div class="col-4">
-                <label for="status" class="form-label">Status</label>
-                <div class="form-check">
-                    <label for="aktiv" class="form-check-label">Aktiv</label>
-                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="aktiv" v-model="currentValue.aktiv">
-                </div>
-                <div class="form-check">
-                    <label for="lektor" class="form-check-label">LektorIn</label>
-                    <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
-                </div>
-                <div class="form-check">
-                    <label for="fixangestellt" class="form-check-label">Fixangestellt</label>
-                    <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
-                </div>
-                <div class="form-check">
-                    <label for="bismelden" class="form-check-label" >Bismelden</label>
-                    <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
-                </div>
-            </div>
-            <div class="col-4"></div>
-            <!-- changes -->
-            <div class="col-8">
-                <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
-            </div>
-        </form>
-        
-    </div>
-
-
-    <ModalDialog title="Warnung" ref="dialogRef">
+    <ModalDialog :title="t('global', 'warnung')" ref="dialogRef">
       <template #body>
-        Mitarbeiterdaten schließen? Geänderte Daten gehen verloren!
+        {{ t('t','mitarbeiterdatenGeandert') }}
       </template>
-    </ModalDialog
+    </ModalDialog>
     `
 }

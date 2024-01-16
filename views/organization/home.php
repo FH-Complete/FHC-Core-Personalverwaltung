@@ -63,7 +63,7 @@
 
 <div id="wrapper">
 
-  <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+  <header class="navbar navbar-expand-lg navbar-dark sticky-top bg-dark flex-md-nowrap p-0 border-bottom">
     <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="<?php echo APP_ROOT ?>">FHComplete [PV21]</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -86,19 +86,19 @@
   <div class="container-fluid">
     <div class="row">
         
-      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>      
+      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>      
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h1 class="h2">Organisation</h1>
-          <div class="btn-toolbar mb-2 mb-md-0">        
-                      
-            <div class="btn-group me-2">
-              <button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler">Expand</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler">Collapse</button>
+          <div class="d-flex justify-content-start flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+            <h1 class="h2">Organisation</h1>
+          </div>
+        <div class="d-flex justify-content-end flex-wrap flex-md-nowrap align-items-center pb-2">
+          <org-chooser @org-selected="orgSelectedHandler" ></org-chooser>
+          <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group ms-2">
+              <button v-show="isCollapsed" type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler"><i class="fa-solid fa-maximize"></i></button>
+              <button v-show="!isCollapsed" type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler"><i class="fa-solid fa-minimize"></i></button>
             </div>
-
-            <org-chooser  @org-selected="orgSelectedHandler" ></org-chooser>
           </div>
         </div>                
 

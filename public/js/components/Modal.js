@@ -2,7 +2,9 @@ export const Modal = {
     props: {
         type: String,
         title: String,
+        noscroll: Boolean
     },
+    expose: ['show', 'hide'],
     setup(props, { emit }) {
        
         let modalEle = Vue.ref(null);
@@ -17,7 +19,6 @@ export const Modal = {
         function hide() {
             thisModalObj.hide();
         }
-        Vue.defineExpose({ show, hide});
 
         return { modalEle, show, hide };
     },
@@ -25,7 +26,7 @@ export const Modal = {
     template:`
     <div class="modal fade " id="customModal" tabindex="-1" aria-labelledby=""
         aria-hidden="true" ref="modalEle">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-dialog modal-lg" :class="(!noscroll) ? 'modal-dialog-scrollable' : ''">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="customModalLabel">{{ title }}</h5>
