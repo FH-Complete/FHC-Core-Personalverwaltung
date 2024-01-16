@@ -496,8 +496,8 @@ class Api extends Auth_Controller
      * */
     function deleteDV()
     {
-        $dv_id = $this->input->get('dv_id', TRUE);
-        $stichtag = null;
+        $payload = json_decode($this->input->raw_input_stream, TRUE);
+		$dv_id = isset($payload['dv_id']) ? $payload['dv_id'] : false;
 
         if (!is_numeric($dv_id))
         {

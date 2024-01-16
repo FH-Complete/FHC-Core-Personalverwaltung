@@ -1,5 +1,6 @@
 import vbform_wrapper from './vbform/vbform_wrapper.js';
 import enddvmodal from './vbform/enddvmodal.js';
+import deletedvmodal from './vbform/deletedvmodal.js';
 import karenzmodal from './vbform/karenzmodal.js';
 import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
@@ -11,6 +12,7 @@ export const EmployeeContract = {
     components: {
         'vbform_wrapper': vbform_wrapper,
         'enddvmodal': enddvmodal,
+        'deletedvmodal': deletedvmodal,
         'karenzmodal': karenzmodal,
         'DropDownButton': DropDownButton,
         "p-skeleton": primevue.skeleton,
@@ -59,6 +61,9 @@ export const EmployeeContract = {
         
         const enddvmodalRef = ref();
         const endDV = ref(null);
+
+        const deletedvmodalRef = ref();
+        const delDV = ref(null);
 
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
@@ -379,6 +384,17 @@ export const EmployeeContract = {
             enddvmodalRef.value.showModal();            
         }
 
+        const deleteDVDialog = () => {
+            delDV.value = {
+                    dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
+                    label: formatVertragsart(currentDV.value.vertragsart_kurzbz) + '/' + 
+                           currentDV.value.oe_bezeichnung + ', ' + 
+                           formatDate(currentDV.value.von) + ' - ' + 
+                           formatDate(currentDV.value.bis)
+            };
+            deletedvmodalRef.value.showModal();    
+        }
+
         const linkToLehrtaetigkeitsbestaetigungODT = () => {
             window.location.href = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/mitarbeiter/lehrtaetigkeit.pdf.php?output=odt&uid=' + currentDV.value.uid;
         }
@@ -431,6 +447,18 @@ export const EmployeeContract = {
 
         const handleDvEnded = async () => {
             fetchData(route.params.uid);
+        }
+
+        const handleDvDeleted = () => {
+            delDV.value = null;
+            let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
+                + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+                + '/extensions/FHC-Core-Personalverwaltung/Employees/'
+                + route.params.id + '/' + route.params.uid
+                + '/contract';
+            router.push( url ).then(() => {
+                router.go(0)
+            });
         }
         
         const handleKarenzSaved = async () => {
@@ -569,6 +597,7 @@ export const EmployeeContract = {
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
+            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted,
         }
     },
     template: `
@@ -602,7 +631,7 @@ export const EmployeeContract = {
                                 Bestätigung drucken
                             </DropDownButton>
                             <!-- Drop Down Button -->
-                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:dvDeleteHandler,text:'DV löschen (DEV only)'},{action:'extensions/',text:'Testlink'}]">
+                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:deleteDVDialog,text:'DV löschen (nur in Ausnahmefällen)'}]">
                                 Weitere Aktionen
                             </DropDownButton>
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
@@ -1063,6 +1092,12 @@ export const EmployeeContract = {
         :curdv="endDV"
         @dvended="handleDvEnded">
     </enddvmodal>
+
+    <deletedvmodal 
+        ref="deletedvmodalRef" 
+        :curdv="delDV"
+        @dvdeleted="handleDvDeleted">
+    </deletedvmodal>
 
     <OffCanvasTimeline
         ref="offCanvasRef"
