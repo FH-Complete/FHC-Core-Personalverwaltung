@@ -290,7 +290,7 @@ export const JobFunction = {
                     if (res.data.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
-                        emit('updateHeader');
+                        theModel.value.updateHeader();
                     }
                 } catch (error) {
                     console.log(error)              
@@ -325,7 +325,7 @@ export const JobFunction = {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
-                        emit('updateHeader');
+                        theModel.value.updateHeader();
                         showToast();
                     }  
                 } catch (error) {

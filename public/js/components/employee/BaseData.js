@@ -197,7 +197,7 @@ export const BaseData = {
                     showToast();
                     currentValue.value = response.data.retval[0];
                     preservedValue.value = currentValue.value;
-                    emit('updateHeader')
+                    theModel.value.updateHeader();
                     toggleMode();  
                 } catch (error) {
                     console.log(error)              

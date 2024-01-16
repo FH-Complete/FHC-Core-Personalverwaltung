@@ -31,9 +31,7 @@ export const EmployeePerson = {
         const { t } = usePhrasen();
         const items = ["base", "employee", "contact", "bank", "material", "hourly", "funktion"];
         const activeItem = Vue.ref("base");
-        const theModel = Vue.reactive({personID: null, personUID: null,editmode: true});
-       //const theModel = Vue.ref('masik');
-       // const { personID } = Vue.toRefs(props);
+        const theModel = Vue.reactive({personID: null, personUID: null,editmode: true, updateHeader: () => emit('updateHeader')});
 
         const isActive = (menuItem) => {
              return activeItem.value === menuItem;
@@ -44,31 +42,12 @@ export const EmployeePerson = {
             console.log("activeItem: ", menuItem);
         };
 
-        const updateHeaderHandler = () => {
-            emit('updateHeader')
-        }
-/*
-        Vue.watch(
-			() => route.params,
-			params => {
-				currentPersonID.value = parseInt(params.id);
-                currentPersonUID.value = params.uid;
-                theModel.personID = currentPersonID.value;
-                theModel.personUID = currentPersonUID.value;
-			}
-		) */
-
         currentPersonID.value = parseInt(route.params.id);
         currentPersonUID.value = route.params.uid;
         theModel.personID = parseInt(route.params.id);
         theModel.personUID = route.params.uid;
-/*
-        Vue.onMounted(() => {
-            currentPersonID.value = parseInt(route.params.id);
-            currentPersonUID.value = route.params.uid;
-        })
-*/
-        return { items, isActive, setActive, currentPersonID, currentPersonUID, t, updateHeaderHandler,theModel }
+
+        return { items, isActive, setActive, currentPersonID, currentPersonUID, t, theModel }
 
     },
     template: `
