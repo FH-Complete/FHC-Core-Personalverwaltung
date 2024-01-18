@@ -16,16 +16,12 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 		$erste_dienstverhaeltnis_id = isset($params['erste_dienstverhaeltnis_id']) ? $params['erste_dienstverhaeltnis_id'] : null;
 		$zweite_dienstverhaeltnis_id = isset($params['zweite_dienstverhaeltnis_id']) ? $params['zweite_dienstverhaeltnis_id'] : null;
-		$erste_vertragsbestandteil_id = isset($params['erste_vertragsbestandteil_id']) ? $params['erste_vertragsbestandteil_id'] : null;
-		$zweite_vertragsbestandteil_id = isset($params['zweite_vertragsbestandteil_id']) ? $params['zweite_vertragsbestandteil_id'] : null;
 
 		// get employee data
 		$result = $this->getParalelleDienstverhaeltnisseEinUnternehmen(
 			$person_id,
 			$erste_dienstverhaeltnis_id,
-			$zweite_dienstverhaeltnis_id,
-			$erste_vertragsbestandteil_id,
-			$zweite_vertragsbestandteil_id
+			$zweite_dienstverhaeltnis_id
 		);
 
 		// If error occurred then return the error
@@ -43,19 +39,11 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 					'person_id' => $dataObj->person_id,
 					'resolution_params' => array(
 						'erste_dienstverhaeltnis_id' => $dataObj->erste_dienstverhaeltnis_id,
-						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id,
-						'erste_vertragsbestandteil_id' => $dataObj->erste_vertragsbestandteil_id,
-						'zweite_vertragsbestandteil_id' => $dataObj->zweite_vertragsbestandteil_id
+						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id
 					),
 					'fehlertext_params' => array(
 						'erste_dienstverhaeltnis_id' => $dataObj->erste_dienstverhaeltnis_id,
-						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id,
-						'erste_vertragsbestandteil_id' => isset($dataObj->erste_vertragsbestandteil_id)
-							? $dataObj->erste_vertragsbestandteil_id
-							: 'N/A',
-						'zweite_vertragsbestandteil_id' => isset($dataObj->zweite_vertragsbestandteil_id)
-							? $dataObj->zweite_vertragsbestandteil_id
-							: 'N/A'
+						'zweite_dienstverhaeltnis_id' => $dataObj->zweite_dienstverhaeltnis_id
 					)
 				);
 			}
@@ -70,31 +58,25 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 	 * @param person_id
 	 * @param erste_dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck
 	 * @param zweite_dienstverhaeltnis_id Dienstverhaeltnis violating the plausicheck, overlapping with first
-	 * @param erste_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck
-	 * @param zweite_vertragsbestandteil_id Vertragsbestandteil violating the plausicheck, overlapping with first
 	 * @return success with data or error
 	 */
 	public function getParalelleDienstverhaeltnisseEinUnternehmen(
 		$person_id = null,
 		$erste_dienstverhaeltnis_id = null,
-		$zweite_dienstverhaeltnis_id = null,
-		$erste_vertragsbestandteil_id = null,
-		$zweite_vertragsbestandteil_id = null
+		$zweite_dienstverhaeltnis_id = null
 	) {
 		$params = array();
 
 		$qry = "
 			WITH dienstverhaeltnisse AS (
 				SELECT
-					ben.person_id, dv.dienstverhaeltnis_id, vtb.vertragsbestandteil_id, dv.oe_kurzbz, vtb.vertragsbestandteiltyp_kurzbz,
-					vtb.von AS vtb_von, COALESCE(vtb.bis, '9999-12-31') AS vtb_bis, dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis
+						ben.person_id, dv.dienstverhaeltnis_id, dv.oe_kurzbz, dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis
 				FROM
-					public.tbl_benutzer ben
-					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
-					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
-					LEFT JOIN hr.tbl_vertragsbestandteil vtb USING (dienstverhaeltnis_id)
+						public.tbl_benutzer ben
+						JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+						JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
 				WHERE
-					vertragsbestandteiltyp_kurzbz IS NULL OR vertragsbestandteiltyp_kurzbz NOT IN ('karenz')";
+					vertragsart_kurzbz NOT IN ('werkvertrag')";
 
 		if (isset($person_id))
 		{
@@ -107,34 +89,14 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 			SELECT
 				DISTINCT person_id,
 				LEAST(erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id) AS erste_dienstverhaeltnis_id,
-				GREATEST(erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id) AS zweite_dienstverhaeltnis_id,
-				CASE
-					WHEN
-						paralelle_vtb = TRUE
-					THEN
-						LEAST(erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id)
-					ELSE
-						NULL
-				END AS erste_vertragsbestandteil_id,
-				CASE
-					WHEN
-						paralelle_vtb = TRUE
-					THEN
-						GREATEST(erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id)
-					ELSE
-						NULL
-				END AS zweite_vertragsbestandteil_id
+				GREATEST(erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id) AS zweite_dienstverhaeltnis_id
 			FROM
 			(
 				SELECT
 					dvs.person_id,
 					dvs.dienstverhaeltnis_id AS erste_dienstverhaeltnis_id, dvss.dienstverhaeltnis_id AS zweite_dienstverhaeltnis_id,
-					dvs.vertragsbestandteil_id AS erste_vertragsbestandteil_id, dvss.vertragsbestandteil_id AS zweite_vertragsbestandteil_id,
 					dvs.dv_von AS erstes_dv_von, dvss.dv_von AS zweites_dv_von,
-					dvs.vtb_von AS erstes_vtb_von, dvss.vtb_von AS zweites_vtb_von,
-					dvs.dv_bis AS erstes_dv_bis, dvss.dv_bis AS zweites_dv_bis,
-					dvs.vtb_bis AS erstes_vtb_bis, dvss.vtb_bis AS zweites_vtb_bis,
-					(dvss.vtb_von <= dvs.vtb_bis AND dvss.vtb_bis >= dvs.vtb_von) AS paralelle_vtb
+					dvs.dv_bis AS erstes_dv_bis, dvss.dv_bis AS zweites_dv_bis
 				FROM
 					dienstverhaeltnisse dvs, dienstverhaeltnisse dvss
 				WHERE
@@ -151,40 +113,26 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 			$params[] = $zweite_dienstverhaeltnis_id;
 		}
 
-		if (isset($erste_vertragsbestandteil_id) && isset($zweite_vertragsbestandteil_id))
-		{
-			$qry .= " AND dvs.vertragsbestandteil_id = ?";
-			$params[] = $erste_vertragsbestandteil_id;
-
-			$qry .= " AND dvss.vertragsbestandteil_id = ?";
-			$params[] = $zweite_vertragsbestandteil_id;
-		}
-
 		$qry .= "
 			) alle_dvs
-			WHERE (
-					-- vertragsbestandteil time paralell
-					paralelle_vtb
-					OR (
-						-- dienstverhaeltnis time paralell
-						alle_dvs.zweites_dv_von <= alle_dvs.erstes_dv_bis AND alle_dvs.zweites_dv_bis >= alle_dvs.erstes_dv_von
-						AND NOT EXISTS ( -- karenz time can be paralell
-							SELECT 1
-							FROM
-								hr.tbl_vertragsbestandteil vtb_karenz
-							WHERE
-								dienstverhaeltnis_id IN (alle_dvs.erste_dienstverhaeltnis_id, alle_dvs.zweite_dienstverhaeltnis_id)
-								AND vertragsbestandteiltyp_kurzbz = 'karenz'
-								AND von <= GREATEST(alle_dvs.erstes_dv_von, alle_dvs.zweites_dv_von)
-								AND COALESCE(bis, '9999-12-31') >= LEAST(alle_dvs.erstes_dv_bis, alle_dvs.zweites_dv_bis)
-						)
-					)
+			WHERE
+				-- dienstverhaeltnis time paralell
+				alle_dvs.zweites_dv_von <= alle_dvs.erstes_dv_bis AND alle_dvs.zweites_dv_bis >= alle_dvs.erstes_dv_von
+				AND NOT EXISTS ( -- karenz time can be paralell
+					SELECT 1
+					FROM
+						hr.tbl_vertragsbestandteil vtb_karenz
+						WHERE
+						dienstverhaeltnis_id IN (alle_dvs.erste_dienstverhaeltnis_id, alle_dvs.zweite_dienstverhaeltnis_id)
+						AND vertragsbestandteiltyp_kurzbz = 'karenz'
+						AND von <= GREATEST(alle_dvs.erstes_dv_von, alle_dvs.zweites_dv_von)
+						AND COALESCE(bis, '9999-12-31') >= LEAST(alle_dvs.erstes_dv_bis, alle_dvs.zweites_dv_bis)
 				)
 		";
 
 		$qry .= "
 			ORDER BY
-				person_id, erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id, erste_vertragsbestandteil_id, zweite_vertragsbestandteil_id";
+				person_id, erste_dienstverhaeltnis_id, zweite_dienstverhaeltnis_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
