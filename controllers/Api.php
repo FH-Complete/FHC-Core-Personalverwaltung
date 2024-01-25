@@ -1166,8 +1166,13 @@ class Api extends Auth_Controller
             }
 
             $userData = $result->retval[0];
-            $userData->alias = $alias;
-            $userData->aktiv = $aktiv;
+            $userData->alias = ($alias !== '') ? $alias : NULL;
+			if($userData->aktiv != $aktiv)
+			{
+				$userData->aktiv = $aktiv;
+				$userData->updateaktivvon = getAuthUID();
+				$userData->updateaktivam = 'NOW()';
+			}            
             $userData->updatevon = getAuthUID();
             $userData->updateamum = 'NOW()';
             $this->BenutzerModel->update(array($payload['mitarbeiter_uid']), $userData);
@@ -1667,6 +1672,28 @@ class Api extends Auth_Controller
                     return;
                 }
                 $uid = $result->retval;
+				
+				if (!defined('GENERATE_ALIAS_MITARBEITERIN') || GENERATE_ALIAS_MITARBEITERIN )
+				{
+					$aliasres = $this->BenutzerModel->generateAlias($uid);
+					if( hasData($aliasres) )
+					{
+						$alias = getData($aliasres);
+						if($alias !== '')
+						{
+							$aliasupdres = $this->BenutzerModel->update(
+								array('uid' => $uid), 
+								array('alias' => $alias)
+							);
+							if (isError($aliasupdres))
+							{
+								$this->CI->db->trans_rollback();
+								$this->outputJsonError('error setting alias for benutzer');
+								return;
+							}
+						}
+					}
+				}
 
                 
                 $employeeJson = [ 'mitarbeiter_uid' => $uid, 'personalnummer' => $personalnummer];

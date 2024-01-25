@@ -416,17 +416,18 @@ class Api_model extends DB_Model
 
         return $result->retval[0]->pnr;
     }
-
+	
     function insertUser($userJson)
     {
 
         unset($userJson['updateamum']);
         unset($userJson['updatevon']);
         $userJson['aktiv'] = true;
+		$userJson['aktivierungscode'] = md5(generateToken(64));
 
         $userJson['insertvon'] = getAuthUID();
         $userJson['insertamum'] = $this->escape('NOW()');
-
+		
         $result = $this->BenutzerModel->insert($userJson);
 
         if (isError($result))
