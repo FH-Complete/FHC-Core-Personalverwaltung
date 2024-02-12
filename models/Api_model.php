@@ -58,7 +58,7 @@ class Api_model extends DB_Model
     function getEmployeesWithoutContract() 
     {
         $qry="SELECT
-            vorname, nachname, uid, personalnummer, insertamum,anmerkung,
+            vorname, nachname, person_id, uid, campus.vw_mitarbeiter.personalnummer, campus.vw_mitarbeiter.insertamum,anmerkung,
             (
                 SELECT studiensemester_kurzbz FROM (
                     SELECT
@@ -82,16 +82,21 @@ class Api_model extends DB_Model
                 ) a
                 ORDER BY start DESC
                 LIMIT 1
-            ) as letzter_lehrauftrag
+            ) as letzter_lehrauftrag,
+            dv.dienstverhaeltnis_id, dv.von, dv.bis, dv.oe_kurzbz,  un.bezeichnung AS dv_unternehmen
         FROM
             campus.vw_mitarbeiter
+            LEFT JOIN 
+                hr.tbl_dienstverhaeltnis as dv on (campus.vw_mitarbeiter.uid=dv.mitarbeiter_uid)
+            LEFT JOIN 
+				public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
         WHERE
-            aktiv = true
+            campus.vw_mitarbeiter.aktiv = true
             AND fixangestellt = false
             AND lektor = true
             AND bismelden = true
             AND personalnummer > 0
-            AND insertamum <= now() - '5 months'::interval
+            AND campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval
             AND NOT EXISTS(
                 SELECT
                     1
