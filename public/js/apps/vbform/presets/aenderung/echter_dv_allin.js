@@ -301,7 +301,7 @@ export default {
             id: uuid.get_uuid(),
             infos: [],
             errors: [],
-            removeable: false,
+            removeable: true,
             disabled: [
               'gehaltstyp'
             ]
