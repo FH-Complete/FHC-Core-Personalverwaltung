@@ -55,6 +55,80 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, array($person_id));
     }
 
+    function getEmployeesWithoutContract() 
+    {
+        $qry="SELECT
+            vorname, nachname, uid, personalnummer, insertamum,anmerkung,
+            (
+                SELECT studiensemester_kurzbz FROM (
+                    SELECT
+                        studiensemester_kurzbz, tbl_studiensemester.start
+                    FROM
+                        lehre.tbl_lehreinheitmitarbeiter
+                        JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                        JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+                    WHERE
+                        tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+                    UNION
+                    SELECT
+                        studiensemester_kurzbz, tbl_studiensemester.start
+                    FROM
+                        lehre.tbl_projektbetreuer
+                        JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+                        JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                        JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+                    WHERE
+                        tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+                ) a
+                ORDER BY start DESC
+                LIMIT 1
+            ) as letzter_lehrauftrag
+        FROM
+            campus.vw_mitarbeiter
+        WHERE
+            aktiv = true
+            AND fixangestellt = false
+            AND lektor = true
+            AND bismelden = true
+            AND personalnummer > 0
+            AND insertamum <= now() - '5 months'::interval
+            AND NOT EXISTS(
+                SELECT
+                    1
+                FROM
+                    lehre.tbl_lehreinheitmitarbeiter
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                WHERE
+                    tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+                    AND tbl_lehreinheit.studiensemester_kurzbz IN(
+                            SELECT
+                                studiensemester_kurzbz
+                            FROM
+                                public.tbl_studiensemester
+                            WHERE start <= now()
+                            ORDER BY start DESC
+                            LIMIT 3)
+                UNION
+                SELECT
+                    1
+                FROM
+                    lehre.tbl_projektbetreuer
+                    JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                WHERE
+                    tbl_lehreinheit.studiensemester_kurzbz IN(SELECT
+                            studiensemester_kurzbz
+                        FROM
+                            public.tbl_studiensemester
+                        WHERE start <= now()
+                        ORDER BY start DESC
+                        LIMIT 3)
+                    AND tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+                )";
+
+        return $this->execQuery($qry);
+    }
+
     function getPersonHeaderData($person_id)
     {
         $qry = "
