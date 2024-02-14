@@ -104,7 +104,8 @@ class Api extends Auth_Controller
 				'updateStundensatz' => Api::DEFAULT_PERMISSION,
 				'deleteStundensatz' => Api::DEFAULT_PERMISSION,
                 'offTimeByPerson' => Api::DEFAULT_PERMISSION,
-                'timeRecordingByPerson' => Api::DEFAULT_PERMISSION
+                'timeRecordingByPerson' => Api::DEFAULT_PERMISSION,
+                'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -2560,8 +2561,14 @@ EOSQL;
 			return $this->outputJsonSuccess($result);
 		}
 		
-	
-		
-		
 	}
+    
+    /**
+     *  get employees without a contract during the last 3 semesters
+     */
+    public function getEmployeesWithoutContract() 
+    {
+        $data = $this->ApiModel->getEmployeesWithoutContract();
+        $this->outputJson($data); 
+    }
 }
