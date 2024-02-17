@@ -11,20 +11,12 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 {    
     const TYPE_STRING = "vertragsbestandteilfunktion";
 
-    const FACHZUORDNUNG_JOB_TYPE = 'fachzuordnung';
-    const OE_ZUORDNUNG_JOB_TYPE = 'oezuordnung';
-    const KSTZUORDNUNG_JOB_TYPE = 'kstzuordnung';
-    // job types that can not be linked to salary (canhavegehaltsbestandteil)
-    const NOGBS_JOB_TYPES = [
-        GUIVertragsbestandteilFunktion::FACHZUORDNUNG_JOB_TYPE,
-        GUIVertragsbestandteilFunktion::OE_ZUORDNUNG_JOB_TYPE,
-        GUIVertragsbestandteilFunktion::KSTZUORDNUNG_JOB_TYPE];
-
     public function __construct()
     {
 		parent::__construct();
         $this->type = self::TYPE_STRING;        
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => false];
+		$this->hasGBS = true;
         $this->data = [
                        "gueltigkeit" => [
                            "guioptions" => ["sharedstatemode" => "reflect"],
@@ -32,38 +24,6 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
                        ]
                       ];
         $this->gbs = [];
-    }
-
-    /**
-     * ["id" => null, 
-     *  "infos" => [], 
-     *  "errors" => [], 
-     *  "removeable" => true
-     * ]
-     * @param mixed $decoded decoded JSON data (use associative array)
-     */
-    protected function mapGUIOptions(&$decoded)
-    {
-        parent::mapGUIOptions($decoded);
-        $this->guioptions['canhavegehaltsbestandteile'] = $this->getHasGBS();
-    }
-
-    /**
-     * Override
-     * Gehaltsbestanddteile depends on type of employee job:
-     *  - Standardkostenstelle: hasGBS == false
-     *  - diszPl. Zuordnung: hasGBS == false
-     *  - fachliche Zuordnung: hasGBS == false
-     *  - everything else: hasGBS == true
-     */
-    public function getHasGBS()
-    {
-        if (isset($this->data['funktion'])
-            && in_array($this->data['funktion'], GlobalGUIVertragsbestandteilFunktion::NOGBS_JOB_TYPES))
-        {
-            return false;
-        }
-        return true;
     }
 
     /**

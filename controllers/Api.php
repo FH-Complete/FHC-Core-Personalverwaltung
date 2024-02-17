@@ -496,8 +496,8 @@ class Api extends Auth_Controller
      * */
     function deleteDV()
     {
-        $dv_id = $this->input->get('dv_id', TRUE);
-        $stichtag = null;
+        $payload = json_decode($this->input->raw_input_stream, TRUE);
+		$dv_id = isset($payload['dv_id']) ? $payload['dv_id'] : false;
 
         if (!is_numeric($dv_id))
         {
@@ -1455,7 +1455,17 @@ class Api extends Auth_Controller
             exit;
         }
 
-        $data = $this->ApiModel->getOffTimeList($person_uid);
+        // optional filter by year
+        $year = $this->input->get('year', null);
+
+        if (!is_numeric($year))
+        {
+            // no filter
+            $data = $this->ApiModel->getOffTimeList($person_uid);
+        } else {
+            // filter by year
+            $data = $this->ApiModel->getOffTimeList($person_uid, $year);
+        }
         
         return $this->outputJson($data);
     }
@@ -1806,7 +1816,10 @@ EOSQL;
 		}
 		
 		$sql = <<<EOSQL
-			SELECT oe.oe_kurzbz AS value, '[' || oet.bezeichnung || '] ' || oe.bezeichnung AS label 
+			SELECT 
+				oe.oe_kurzbz AS value, 
+				'[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) || 
+				'] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label 
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(

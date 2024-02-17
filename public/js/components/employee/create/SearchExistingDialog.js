@@ -36,7 +36,7 @@ export const SearchExistingDialog = {
             
             emit('change', currentValue );
 
-            if (currentValue.surname.length<=2) {
+            if (currentValue.surname.length<2) {
                 personList.value = [];
                 return;
             }

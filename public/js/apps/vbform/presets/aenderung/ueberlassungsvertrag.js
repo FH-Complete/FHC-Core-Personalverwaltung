@@ -3,14 +3,14 @@ import uuid from '../../../../helpers/vbform/uuid.js';
 export default {
   type: 'preset',
   guioptions: {
-    id: 'studhilfskraft',
-    label: 'Studentische Hilfskraft',
-    description: 'Echter DV für Studentische Hilfskräfte',
+    id: 'ueberlassungsvertrag',
+    label: 'Überlassungsvertrag',
+    description: 'Ueberlassungsvertrag',
     for_vertragsart_kurzbz: [
-        'studentischehilfskr'
+        'ueberlassungsvertrag'
     ],
     default_for_vertragsart_kurzbz: [
-        'studentischehilfskr'
+        'ueberlassungsvertrag'
     ]
   },
   children: [
@@ -35,6 +35,37 @@ export default {
         {
           type: 'tab',
           guioptions: {
+            title: 'Arbeitszeit & Basisgehalt',
+            id: 'arbeitszeit'
+          },
+          children: [
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Arbeitszeit',
+                vertragsbestandteiltyp: 'vertragsbestandteilstunden',
+                errors: [],
+                infos: []
+              },
+              children: [
+              ]
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Zeitaufzeichnung',
+                vertragsbestandteiltyp: 'vertragsbestandteilzeitaufzeichnung',
+                errors: [],
+                infos: []
+              },
+              children: [
+              ]
+            }
+          ]
+        },
+        {
+          type: 'tab',
+          guioptions: {
             title: 'Funktionen',
             id: 'funktionen'
           },
@@ -50,7 +81,9 @@ export default {
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
-                    disabled: [],
+                    disabled: [
+                      'funktion'
+                    ],
                     hidden: []
                   },
                   data: {
@@ -58,25 +91,8 @@ export default {
                   }
                 }
               },
-              children: []
-            },
-            {
-              type: 'vertragsbestandteillist',
-              guioptions: {
-                title: 'Funktion',
-                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
-                filter: 'funktion',
-                errors: [],
-                infos: [],
-                childdefaults: {
-                  guioptions: {
-                    canhavegehaltsbestandteile: false,
-                    disabled: [],
-                    hidden: []
-                  }
-                }
-              },
-              children: []
+              children: [
+              ]
             }
           ]
         },
@@ -109,10 +125,10 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'studentischehilfskr',
+      vertragsart_kurzbz: 'ueberlassungsvertrag',
       gueltigkeit: {
         guioptions: {
-          sharedstatemode: "set",
+          sharedstatemode: "ignore",
           disabled: []
         }
       }

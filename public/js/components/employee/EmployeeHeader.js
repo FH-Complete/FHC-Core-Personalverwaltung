@@ -296,7 +296,7 @@ export const EmployeeHeader = {
                         <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>                
                         <div v-if="!isFetchingName" class="mb-1">
                             <strong class="text-muted">Email</strong>&nbsp; 
-                            <span v-if="!employee?.alias">,  
+                            <span v-if="!employee?.alias">  
                                 <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
                             </span>
                             <span v-if="employee?.alias">

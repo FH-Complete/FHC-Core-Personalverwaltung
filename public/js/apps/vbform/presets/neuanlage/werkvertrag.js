@@ -55,7 +55,7 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oediszpl')
+                uuid.get_uuidbyname('oefachl')
               ]
             }
           ]
@@ -99,10 +99,10 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('oediszpl')]: {
+    [uuid.get_uuidbyname('oefachl')]: {
       type: 'vertragsbestandteilfunktion',
       guioptions: {
-        id: uuid.get_uuidbyname('oediszpl'),
+        id: uuid.get_uuidbyname('oefachl'),
         removable: false,
         canhavegehaltsbestandteile: false,
         nobottomborder: true,
@@ -112,7 +112,7 @@ export default {
         ]
       },
       data: {
-        funktion: 'oezuordnung'
+        funktion: 'fachzuordnung'
       }
     }
   }

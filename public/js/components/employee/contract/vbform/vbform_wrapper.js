@@ -20,7 +20,7 @@ export default {
               <div class="col-3">
                 <presets_chooser ref="presetchooserRef" :presets="presets" @presetselected="handlePresetSelected" :showselectmode="false"></presets_chooser>
               </div>
-              <div class="col-1 text-center py-2">
+              <div class="col-1 text-center py-3">
                 <em>{{p.t('vbform', 'oder')}}</em>
               </div>
               <div class="col-8">
@@ -41,9 +41,7 @@ export default {
         <template #footer>
          <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
               <div v-if="mode === 'aenderung' || mode === 'korrektur'" class="btn-group me-2" role="group" aria-label="Second group">
-                  <button class="btn btn-secondary btn-sm float-end" @click="reload">
-                    Zurücksetzen
-                  </button>
+                  <button class="btn btn-outline-secondary btn-sm float-end" @click="reload">Zurücksetzen</button>
               </div>
               <div class="btn-group me-2" role="group" aria-label="Second group">
                   <button class="btn btn-secondary btn-sm float-end" @click="validate">
