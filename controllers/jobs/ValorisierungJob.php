@@ -20,23 +20,45 @@ class ValorisierungJob extends JOB_Controller
 	}
 
 
-	public function do($dienstverhaeltnis_id=null)
+	public function do($valorisierungsdatum, $dienstverhaeltnis_id=null)
 	{
-		if( !$dienstverhaeltnis_id ) 
+		if( !$valorisierungsdatum ) 
 		{
-			echo "missing parameter dienstverhaeltnis_id\n";
+			echo "missing parameter valorisierungsdatum\n";
 		}
 		
+		$valorisierungsdatum . "\n";
 		$dienstverhaeltnis_id . "\n";
 		
-		$valinstanz = $this->ValorisierungInstanz_model->getValorisierungInstanzForDienstverhaeltnis($dienstverhaeltnis_id);
-		print_r($valinstanz);
+		$valinstanzen = $this->ValorisierungInstanz_model->getValorisierungInstanzForDatum($valorisierungsdatum);
 		
 		$gehaltsbestandteile = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, 
-			$valinstanz->valorisierungsdatum, false);
+			$valorisierungsdatum, false);
 		
-		$valmethod = $this->ValorisationFactory->getValorisationMethod($valinstanz->valorisierung_methode_kurzbz);
-		$params = json_decode($valinstanz->valorisierung_methode_parameter);
-		$valmethod->doValorisation($gehaltsbestandteile, $params);
+		$usedvalinstances = array();
+		foreach ($valinstanzen as $valinstanz)
+		{
+			$valmethod = $this->ValorisationFactory->getValorisationMethod($valinstanz->valorisierung_methode_kurzbz);
+			$params = json_decode($valinstanz->valorisierung_methode_parameter);
+			$valmethod->initialize($gehaltsbestandteile, $params);
+			$valmethod->checkParams();
+			if($valmethod->checkIfApplicable())
+			{
+				$usedvalinstances[] = $valmethod;
+			}
+		}
+
+		if(count($usedvalinstances) < 1) 
+		{
+			throw Exception('ERROR: no Valorisation Method applicable.');
+		}
+		
+		if(count($usedvalinstances) > 1) 
+		{
+			throw Exception('ERROR: more than one Valorisation Method applicable.');
+		}
+		
+		$usedvalinstanz = $usedvalinstances[0];
+		$usedvalinstanz->doValorisation();
 	}
 }

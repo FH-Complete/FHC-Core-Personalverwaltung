@@ -5,5 +5,8 @@
  */
 interface IValorisationMethod
 {
-	public function doValorisation($gehaltsbestandteile, $params);
+	public function initialize($gehaltsbestandteile, $params);
+	public function checkParams();
+	public function checkIfApplicable();
+	public function doValorisation();
 }

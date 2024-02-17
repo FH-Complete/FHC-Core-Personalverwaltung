@@ -11,6 +11,13 @@ class ValorisierungInstanz_model extends DB_Model
 		$this->pk = 'valorisierunginstanz_id';		
 	}
 
+	public function getValorisierungInstanzForDatum($valorisierungsdatum) {
+		$res = $this->loadWhere('valorisierungsdatum = ' . $this->db->escape($valorisierungsdatum));
+		if( hasData($res) ) {
+			return getData($res);
+		}
+	}
+	
 	public function getValorisierungInstanzForDienstverhaeltnis($dienstverhaeltnis_id) {
 		$this->dbTable .= ' vi';
 		$this->addSelect('vi.*');
