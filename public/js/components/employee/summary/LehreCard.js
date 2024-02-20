@@ -121,7 +121,7 @@ export const LehreCard = {
             </div>     
             <div v-if="!isFetching && courseData!=null">
                 {{ courseData.semesterstunden?.toLocaleString("de-DE", { useGrouping: true, } ) }} 
-                <span v-if="courseData.semesterstunden">Std/Sem</span>
+                <span v-if="courseData.semesterstunden !== null && courseData.semesterstunden >= 0">Std/Sem</span>
                 <span v-else>-</span>
             </div>
             
