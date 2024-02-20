@@ -535,6 +535,7 @@ class Api_model extends DB_Model
             p.telefonklappe,
             p.kurzbz,
             p.lektor,
+            p.habilitation,
             p.fixangestellt,
             p.stundensatz,
             p.ausbildungcode,
