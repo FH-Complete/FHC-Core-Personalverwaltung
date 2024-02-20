@@ -11,7 +11,7 @@ export const LehreCard = {
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Lehre");
         const currentDate = Vue.ref(null);
-        const currentUID = Vue.toRefs(props).uid        
+        const currentUID = Vue.toRefs(props).uid  
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -19,7 +19,7 @@ export const LehreCard = {
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        const currentSemester = Vue.computed(() => {
+        const calcSemester = () => {
             
             let d = new Date();
             if (currentDate.value != null) {
@@ -37,10 +37,27 @@ export const LehreCard = {
             semesterString = "WS";
             return semesterString + y;
             
-        })
+        }
 
+        const currentSemester = Vue.ref(calcSemester())   
+
+        const decSemester = () => {
+            if (currentSemester.value.startsWith('WS')) {
+                currentSemester.value = 'SS' + currentSemester.value.substring(2)
+            } else {
+                currentSemester.value = 'WS'+ (parseInt(currentSemester.value.substring(2)) - 1)
+            }
+        }
+
+        const incSemester = () => {
+            if (currentSemester.value.startsWith('WS')) {
+                currentSemester.value = 'SS' + (parseInt(currentSemester.value.substring(2)) + 1)
+            } else {
+                currentSemester.value = 'WS'+ currentSemester.value.substring(2)
+            }
+        }
         
-        const fetchCurrentDV = async () => {
+        const fetchCourseHours = async () => {
             if (currentUID.value == null || currentDate.value == null) {
                 return;
             }
@@ -67,42 +84,45 @@ export const LehreCard = {
 
         Vue.onMounted(() => {
             currentDate.value = props.date || new Date();
-            fetchCurrentDV();
+            fetchCourseHours();
         })
 
         Vue.watch(
 			currentUID,
 			() => {
-				fetchCurrentDV();
+				fetchCourseHours();
 			}
 		)
 
         Vue.watch(
-			[currentUID,() => props.date],
-			newVal => {
-                console.log('something changed: ', newVal)
-				if (newVal[1] != null) {
-                    currentDate.value = newVal[1];
-                }
-			}
-		)
+            currentSemester,
+            () => {
+                fetchCourseHours();
+            }
+        )
       
         return {
-            courseData, isFetching, formatDate, currentSemester, title, currentUID, currentDate,
+            courseData, isFetching, formatDate, currentSemester, title, currentUID, currentDate, incSemester, decSemester,
         }
      },
      template: `
      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-baseline">
-            <h5 class="mb-0">{{ title }}</h5>
-                <span class="text-muted">{{ currentSemester }}  ({{ formatDate(currentDate) }})</span>
+        <div class="card-header d-flex align-items-baseline">
+                <h5 class="mb-0 flex-grow-1">{{ title }}</h5>
+                <div>
+                <button type="button" class="btn btn-sm btn-primary me-2" @click="decSemester()"><i class="fa fa-minus"></i></button>
+                <span class="text-muted">{{ currentSemester }}</span>
+                <button type="button" class="btn btn-sm btn-primary ms-2" @click="incSemester()"><i class="fa fa-plus"></i></button>
+                </div>
             </div>
             <div class="card-body" style="text-align:center">
             <div v-if="isFetching" class="spinner-border" role="status">
                  <span class="visually-hidden">Loading...</span>
             </div>     
             <div v-if="!isFetching && courseData!=null">
-                {{ courseData.semesterstunden?.toLocaleString("de-DE", { useGrouping: true, } ) }} Std/Sem
+                {{ courseData.semesterstunden?.toLocaleString("de-DE", { useGrouping: true, } ) }} 
+                <span v-if="courseData.semesterstunden">Std/Sem</span>
+                <span v-else>-</span>
             </div>
             
             
