@@ -29,8 +29,8 @@ export const LehreCard = {
             let y=d.getFullYear(); 
             let semesterString = "SS";
 
-            if (d.getMonth < 8 && d.getMonth > 1) return semesterString + y;
-            else if (d.getMonth < 2) {
+            if (d.getMonth() < 8 && d.getMonth() > 1) return semesterString + y;
+            else if (d.getMonth() < 2) {
                 y--; 
             }
 
