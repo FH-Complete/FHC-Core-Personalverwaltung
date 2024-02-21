@@ -22,5 +22,14 @@ export default {
         'Content-Type': 'application/json'
       }
     });
+  },
+  deactivateDV: function(payload) {
+    var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+            + '/extensions/FHC-Core-Personalverwaltung/Api/deactivateDV';
+    return axios.post(url, payload, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
   }  
 };

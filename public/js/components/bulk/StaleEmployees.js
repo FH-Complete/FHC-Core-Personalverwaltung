@@ -68,13 +68,13 @@ export const StaleEmployees = {
             for (let index = 1; index <= selectedData.value.length; index++) {
                 progressValue.value = Math.round(index/selectedData.value.length*100);
                 const payload = { 
-                    dienstverhaeltnisid: selectedData.value[index-1].dienstverhaeltnis_id,
-                    gueltigkeit: { data: { gueltig_bis: currentDate.value} }
+                    dienstverhaeltnis_id: selectedData.value[index-1].dienstverhaeltnis_id,
+                    gueltig_bis: currentDate.value 
                 }
                 
                 // API call
                 try {
-                    const response = await Vue.$fhcapi.DV.endDV(payload)
+                    const response = await Vue.$fhcapi.DV.deactivateDV(payload)
                     console.log(response.data);
                     if (response.data.error === 1) {
                             console.log(response.data.retval)

@@ -92,6 +92,7 @@ class Api extends Auth_Controller
                 'deleteDV'  => Api::DEFAULT_PERMISSION,
                 'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
 				'endDV'  => Api::DEFAULT_PERMISSION,
+                'deactivateDV'  => Api::DEFAULT_PERMISSION,
 				'saveKarenz'  => Api::DEFAULT_PERMISSION,
 				'getKarenztypen' => Api::DEFAULT_PERMISSION,
 				'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
@@ -2394,6 +2395,35 @@ EOSQL;
         
         return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
         
+    }
+
+    /**
+     * same as endDV but also sets aktiv flag of benutzer to false
+     */
+    function deactivateDV()
+    {
+        $payload = json_decode($this->input->raw_input_stream);
+
+        if (!is_numeric($payload->dienstverhaeltnis_id))
+        {
+            $this->outputJsonError('invalid parameter dienstverhaeltnis_id');
+            return;
+        }
+
+		if( !$payload->gueltig_bis ) 
+		{
+			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+            return;
+		}
+		
+        $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnis_id));
+        $ret = $this->VertragsbestandteilLib->deactivateDienstverhaeltnis($dv, $payload->gueltig_bis, true);
+
+        if ( $ret !== TRUE) {
+            return $this->outputJsonError($ret);
+        }
+        
+        return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
     }
 	
 	
