@@ -220,6 +220,11 @@ export const MaterialExpensesData = {
             }
         }
 
+        const getType = (kurzbz) => {
+            let t = types.value.filter((item) => item.sachaufwandtyp_kurzbz == kurzbz);
+            return t.length > 0 ? t[0].bezeichnung : ''
+        }
+        
         // Toast 
         const toastRef = Vue.ref();
         const deleteToastRef = Vue.ref();
@@ -247,6 +252,7 @@ export const MaterialExpensesData = {
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler,
             showDeleteModal, showEditModal, confirmDeleteRef, t,
+            getType
          }
     },
     template: `
@@ -289,7 +295,7 @@ export const MaterialExpensesData = {
                             </thead>
                             <tbody>
                             <tr v-for="materialdata in materialdataListArray" :key="materialdata.sachaufwand_id">
-                                <td class="align-middle">{{ materialdata.bezeichnung }}</td>
+                                <td class="align-middle">{{ getType(materialdata.sachaufwandtyp_kurzbz) }}</td>
                                 <td class="align-middle">{{ formatDate(materialdata.beginn) }}</td>
                                 <td class="align-middle">{{ formatDate(materialdata.ende) }}</td>
                                 <td class="align-middle">{{ materialdata.anmerkung }}</td>
@@ -388,7 +394,7 @@ export const MaterialExpensesData = {
 
     <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
         <template #body>
-            {{ t('person','sachaufwand') }} '{{ currentValue?.sachaufwandtyp_kurzbz }} ({{ currentValue?.beginn }}-{{ currentValue?.ende }})' {{ t('person', 'wirklichLoeschen') }}?
+            {{ t('person','sachaufwand') }} '{{ getType(currentValue?.sachaufwandtyp_kurzbz) }} ({{ currentValue?.beginn }}-{{ currentValue?.ende }})' {{ t('person', 'wirklichLoeschen') }}?
         </template>
     </ModalDialog>
     `
