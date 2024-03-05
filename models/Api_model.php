@@ -55,7 +55,7 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, array($person_id));
     }
 
-    function getEmployeesWithoutContract() 
+    function getEmployeesWithoutContract()
     {
         $qry="SELECT
         vorname, nachname, person_id, uid, campus.vw_mitarbeiter.personalnummer, campus.vw_mitarbeiter.insertamum,anmerkung,
@@ -86,9 +86,9 @@ class Api_model extends DB_Model
         dv.dienstverhaeltnis_id, dv.von, dv.bis, dv.oe_kurzbz,  un.bezeichnung AS dv_unternehmen
     FROM
         campus.vw_mitarbeiter
-        LEFT JOIN 
+        LEFT JOIN
             hr.tbl_dienstverhaeltnis as dv on (campus.vw_mitarbeiter.uid=dv.mitarbeiter_uid)
-        LEFT JOIN 
+        LEFT JOIN
             public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
     WHERE
         campus.vw_mitarbeiter.aktiv = true
@@ -96,6 +96,7 @@ class Api_model extends DB_Model
         AND lektor = true
         AND bismelden = true
         AND personalnummer > 0
+		AND dv.bis is null
         AND campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval
         AND NOT EXISTS(
             SELECT
@@ -298,7 +299,7 @@ class Api_model extends DB_Model
         return $this->execQuery($query, array($datestring, $datestring, $person_id));
     }
 
-    public function getOffTimeList($person_uid, $year = 0)    
+    public function getOffTimeList($person_uid, $year = 0)
     {
 
         $year_filter = " AND z.vondatum>=now()";
@@ -312,7 +313,7 @@ class Api_model extends DB_Model
         }
 
         $qry = "
-        SELECT 
+        SELECT
             z.zeitsperre_id,
             z.zeitsperretyp_kurzbz,
             t.beschreibung as zeitsperretyp,
@@ -495,7 +496,7 @@ class Api_model extends DB_Model
 
         return $result->retval[0]->pnr;
     }
-	
+
     function insertUser($userJson)
     {
 
@@ -506,7 +507,7 @@ class Api_model extends DB_Model
 
         $userJson['insertvon'] = getAuthUID();
         $userJson['insertamum'] = $this->escape('NOW()');
-		
+
         $result = $this->BenutzerModel->insert($userJson);
 
         if (isError($result))
@@ -935,7 +936,7 @@ class Api_model extends DB_Model
 
         $parametersArray = array($surname);
         $where ="p.nachname~* ? ";
-        if (mb_strlen($surname) == 2) 
+        if (mb_strlen($surname) == 2)
         {
             $where = "p.nachname=? ";
         }
