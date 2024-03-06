@@ -884,7 +884,8 @@ class Api_model extends DB_Model
                      WHEN s.matrikelnr is not null THEN \'Student\'
                      ELSE \'-\'
                 END AS status,
-                exists (select 1 from public.tbl_benutzer tb join public.tbl_mitarbeiter tm on(tb.uid=tm.mitarbeiter_uid) where person_id=p.person_id) as taken
+                exists (select 1 from public.tbl_benutzer tb join public.tbl_mitarbeiter tm on(tb.uid=tm.mitarbeiter_uid) where person_id=p.person_id) as taken,
+                array(select kontakt from tbl_kontakt k where k.person_id=p.person_id and k.kontakttyp=\'email\') emails
             FROM
                 public.tbl_person p LEFT JOIN
                 public.tbl_benutzer b ON (p.person_id=b.person_id)  LEFT JOIN
