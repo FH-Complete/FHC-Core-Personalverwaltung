@@ -1,23 +1,53 @@
 
   const DeadlineIssueTable = {    
     props: {
-        fields: { type: Array, required: true},
-        tabledata: {type: Array, required: true},
     },
     setup(props, { emit }){
 
-        const protocol_host =
-          location.protocol + "//" +
-          location.hostname + ":" +
-          location.port;
+        const isFetching = Vue.ref(false);
+        const fristen = Vue.ref([]);
 
         const redirect = (issue_id) => {
           console.log('issue_id', person_id);
           emit('issueSelected', person_id);
           // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
-        }        
+        }   
+        
+        const fetchList = async () => {
+          try {
+            let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
+                  
+            const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getFristenListe`;
+            isFetching.value = true;
+            const res = await fetch(url)
+            let response = await res.json();
+            isFetching.value = false;              
+            console.log(response);	  
+            fristen.value = response;			  
+          } catch (error) {
+            console.log(error);
+            isFetching.value = false;           
+          }		
+        }
+    
+        Vue.onMounted(() => {
+            fetchList();
+        })
 
-        return { redirect }
+        const onPersonSelect = (uid, person_id) => {
+          let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+          window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}/summary`;
+        }
+
+        const formatDate = (d) => {
+          if (d != null && d != '') {
+          return d.substring(8, 10) + "." + d.substring(5, 7) + "." + d.substring(0, 4);
+          } else {
+              return ''
+          }
+        }
+
+        return { onPersonSelect, fristen, formatDate }
       },
     template: `
       <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-5 pb-2 mb-3">
@@ -28,48 +58,56 @@
     </div>
 
       <div id="collapseTable"  >
-        <table id="tableComponent" class="table table-sm table-hover table-striped">
+        <table id="tableComponent" class="table table-sm table-hover table-striped" v-if="fristen != null && fristen.length > 0">
             <thead>
             <tr>
-                <th> 
+                <th scope="col" class="col-1"> 
                   Ereignis
                 </th>
-                <th> 
-                  To Do
-                </th>
-                <th> 
+                <th scope="col" class="col-2"> 
                   MitarbeiterIn
                 </th>
-                <th> 
+                <th scope="col" class="col-1"> 
+                  Deadline
+                </th>                                
+                <th scope="col" class="col-2"> 
                   Verantwortlich
                 </th>
-                <th> 
-                  Fällig am
+
+                <th scope="col" class="col-2"> 
+                  To Do
                 </th>
-                <th> 
+                
+                <th scope="col" class="col-1"> 
                   Status
                 </th>
             </tr>
             </thead>
             <tbody>
-                <tr >
+                <tr v-for="frist in fristen" >
                   <td>
-                    Diensteintritt
+                    {{ frist.ereignis_bezeichnung }}
                   </td>
                   <td>
-                    Daten zur Meldung freigeben
+                    <a href="#" @click.prevent="onPersonSelect(frist.mitarbeiter_uid, frist.person_id)">
+                    {{ frist.vorname }} {{ frist.nachname }}</a>
                   </td>
                   <td>
-                    Cristina Hainberger
+                    {{ formatDate(frist.datum) }}
                   </td>
+                  
+                  
                   <td>
-                    HR
+                  <a href="#" @click.prevent="onPersonSelect(frist.verantwortlich_uid, frist.verantwortlich_person_id)">
+                  {{ frist.verantwortlich_vorname }} {{ frist.verantwortlich_nachname }}</a>
                   </td>
+
                   <td>
-                    Fällig am
+                    {{ frist.bezeichnung }}
                   </td>
+                  
                   <td>
-                    
+                    {{ frist.status_bezeichnung }}
                   </td>
                   <td>
                     <div class="d-grid gap-2 d-md-flex ">
@@ -84,6 +122,7 @@
                 </tr>
             </tbody>
         </table> 
+        <div v-else>0 Datensätze vorhanden.</div>
       </div>
     `
 }
