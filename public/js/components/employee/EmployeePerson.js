@@ -55,8 +55,9 @@ export const EmployeePerson = {
       <div class="container-fluid">
     
         <fhc-tabs 
-            config-url="/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/Stammdaten" 
+            config="/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/Stammdaten" 
             style="flex: 1 1 0%; height: 0%"
+            :vertical="true"
             v-model="theModel">
         </fhc-tabs>
 
