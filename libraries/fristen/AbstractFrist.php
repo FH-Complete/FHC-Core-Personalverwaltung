@@ -41,9 +41,6 @@ abstract class AbstractFrist {
             from $dbTable d  left join frist on (d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
             where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null";
 
-        /* $qry = "select d.*, frist.frist_id 
-            from $dbTable d  left join hr.tbl_frist ereignis_kurzbz=".$dbModel->escape($this->ereignis_kurzbz).")frist on (d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
-            where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null"; */
         $result = $dbModel->execReadOnlyQuery($qry);
 
 		if (isError($result)) return $result;

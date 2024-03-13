@@ -2,8 +2,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-// require_once  __DIR__.'/DVBeginFrist.php';
 require_once  __DIR__.'/DVEndFrist.php';
+require_once  __DIR__.'/DVBeginFrist.php';
 
 class FristenLib
 {
@@ -18,8 +18,24 @@ class FristenLib
 
     public function updateFristen(DateTime $date)
     {
+        $count = 0;
+        $dvBeginFrist = new DVBeginFrist();
         $dvEndFrist = new DVEndFrist();
-        $result = $dvEndFrist->getData($date);
+        $res=$this->runFristenUpdate($dvBeginFrist, $date);
+        if ($res !== false) {
+            $count+=$res;
+        }
+        $res=$this->runFristenUpdate($dvEndFrist, $date);
+        if ($res !== false) {
+            $count+=$res;
+        }
+        return $count;
+    }
+
+
+    private function runFristenUpdate(&$fristInstance, DateTime $date)
+    {       
+        $result = $fristInstance->getData($date);
      
         try {
             $this->_ci->db->trans_begin();
@@ -28,9 +44,9 @@ class FristenLib
 
             foreach ($result->retval as $rowData) {
                 
-                if (!$dvEndFrist->exists($rowData)) {
+                if (!$fristInstance->exists($rowData)) {
 
-                    $fristEreignis = $dvEndFrist->generateFristEreignis($rowData);
+                    $fristEreignis = $fristInstance->generateFristEreignis($rowData);
                     $fristEreignis['insertvon'] = $this->_insertvon;
                     $result = $this->_ci->FristModel->insert($fristEreignis);
             
