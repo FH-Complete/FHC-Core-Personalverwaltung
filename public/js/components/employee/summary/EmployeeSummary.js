@@ -4,6 +4,7 @@ import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
 import { IssuesCard } from './IssuesCard.js';
 import { OffTimeCard } from './OffTimeCard.js';
+import { DeadlineCard } from './DeadlineCard.js';
 
 export const EmployeeSummary = {
     components: {
@@ -12,6 +13,7 @@ export const EmployeeSummary = {
         LehreCard,
         IssuesCard,
         OffTimeCard,
+        DeadlineCard,
     },
     props: {
         date: Date,
@@ -64,6 +66,8 @@ export const EmployeeSummary = {
                     <div class="col">
                         
                         <dv-card :uid="currentUID" :date="date" ></dv-card>
+                        <br/>
+                        <deadline-card :uid="currentUID" :date="date" ></deadline-card>
             
                     </div>          
 

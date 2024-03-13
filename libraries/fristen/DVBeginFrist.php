@@ -1,10 +1,14 @@
 <?php
 
-require_once __DIR__.'/AbstractFrist.php';
-require_once __DIR__.'/FristTyp.php';
+require_once './AbstractFrist.php';
 
-class DVEndFrist extends AbstractFrist {
+class DVBeginFrist extends AbstractFrist {
 
+
+    public function __construct()
+	{
+        parent::__construct(FristTyp::BEGINN);
+    }
 
     public function getData($date)
     {
@@ -17,10 +21,10 @@ class DVEndFrist extends AbstractFrist {
 
         $fristEreignis = [];
         $fristEreignis['insertvon'] = getAuthUID();
-        $fristEreignis['ereignis_kurzbz'] = 'dv_ende';
+        $fristEreignis['ereignis_kurzbz'] = 'dv_begin';
         $fristEreignis['mitarbeiter_uid'] = $rowdata->mitarbeiter_uid;
-        $fristEreignis['datum'] = $rowdata->bis;
-        $fristEreignis['status_kurzbz'] = 'neu';
+        $fristEreignis['datum'] = $rowdata['von'];
+        $fristEreignis['status'] = 'neu';
         $fristEreignis['parameter'] = json_encode($parameter);
 
         return $fristEreignis;

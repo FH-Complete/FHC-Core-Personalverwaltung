@@ -5,12 +5,12 @@ abstract class AbstractFrist {
 
     private $_ci;
 
-    /** @var FristTyp ENDE=deadline expires within timespan */
-    protected FristTyp $fristTyp = FristTyp::ENDE;
+    /** @var string ENDE=deadline expires within timespan */
+    protected string $fristTyp = FristTyp::ENDE;
     /** @var int timespan in months */
     protected int $zeitraum = 2;
 
-    public function __construct(fristTyp $typ = FristTyp::ENDE, int $zeitraum = 2)
+    public function __construct(string $typ = FristTyp::ENDE, int $zeitraum = 2)
 	{
         $this->_ci =& get_instance();
         $this->fristTyp = $typ;
@@ -21,15 +21,16 @@ abstract class AbstractFrist {
      * query data from db. Depending on the type fo fristTyp it returns all records
      * that expire within timespan or that are about to start within the timespan.
      */
-    public function getDataByTable(string $dbTable)
+    public function getDataByTable(string $dbTable, DateTime $date)
     {
         $colname = "bis";
         if ($this->fristTyp == FristTyp::BEGINN) {
             $colname = "von";
         }
-        $qry = "select dv.* from $dbTable where $colname between now()::date and (now()::date + interval '? months')::date";
+        $d = $date->format('Y-m-d');
+        $qry = "select * from $dbTable where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date";
         $dbModel = new DB_Model();
-        $result = $dbModel->execReadOnlyQuery($qry, [$this->zeitraum]);
+        $result = $dbModel->execReadOnlyQuery($qry);
 
 		if (isError($result)) return $result;
 
@@ -38,9 +39,9 @@ abstract class AbstractFrist {
 		return $result;
     }
 
-    public function exists(string $ereignisKurzbz, string $paramName, int $paramValue)
+    public function exists($rowData)
     {
-
+        return false;
     }
 
     
@@ -49,21 +50,21 @@ abstract class AbstractFrist {
     /**
      * Get the value of fristTyp
      *
-     * @return FristTyp
+     * @return string
      */
-    public function getFristTyp(): FristTyp
+    public function getFristTyp(): string
     {
-        return $this->fristTyp;
+        return $this->fristTyp; 
     }
 
     /**
      * Set the value of fristTyp
      *
-     * @param FristTyp $fristTyp
+     * @param string $fristTyp
      *
      * @return self
      */
-    public function setFristTyp(FristTyp $fristTyp): self
+    public function setFristTyp(string $fristTyp): self
     {
         $this->fristTyp = $fristTyp;
 

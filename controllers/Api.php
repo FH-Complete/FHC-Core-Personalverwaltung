@@ -105,6 +105,8 @@ class Api extends Auth_Controller
 				'deleteStundensatz' => Api::DEFAULT_PERMISSION,
                 'offTimeByPerson' => Api::DEFAULT_PERMISSION,
                 'getFristenListe' => Api::DEFAULT_PERMISSION,
+                'getPersonFristenListe' => Api::DEFAULT_PERMISSION,
+                'updateFristenListe' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -117,6 +119,8 @@ class Api extends Auth_Controller
 			null, 'GehaltsbestandteilLib');
         $this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib',
 			null, 'GehaltsabrechnungLib');
+        $this->load->library('extensions/FHC-Core-Personalverwaltung/fristen/FristenLib',
+			null, 'FristenLib');
 
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
@@ -2380,26 +2384,25 @@ EOSQL;
 
         return $this->outputJsonSuccess('Karenz gespeichert');
     }
+    
 
     public function getFristenListe()
     {
-        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname,p.nachname,p.person_id,
-                verantwortlich_p.vorname verantwortlich_vorname, verantwortlich_p.nachname verantwortlich_nachname, verantwortlich_p.person_id verantwortlich_person_id
-                FROM hr.tbl_frist f JOIN hr.tbl_frist_status status using(status_kurzbz) 
-                    join hr.tbl_frist_ereignis ereignis using(ereignis_kurzbz) 
-                    left join public.tbl_mitarbeiter m using(mitarbeiter_uid)                     
-                    left join public.tbl_benutzer b on(m.mitarbeiter_uid=b.uid) 
-                    left join public.tbl_person p on (b.person_id=p.person_id)
-                    left join public.tbl_benutzer verantwortlich_b on(f.verantwortlich_uid=verantwortlich_b.uid) 
-                    left join public.tbl_person verantwortlich_p on (verantwortlich_b.person_id=verantwortlich_p.person_id)
-                ORDER BY f.datum ASC";
+        $result = $this->FristenLib->getFristenListe();
+        return $this->outputJson($result);
+    }
 
-      //  $sql="select frist_id,mitarbeiter_uid,ereignis_kurzbz,bezeichnung,datum,status_kurzbz,parameter,insertvon,insertamum,updatevon,updateamum from hr.tbl_frist";
+    public function getPersonFristenListe($uid)
+    {
+        $result = $this->FristenLib->getFristenListe($uid);
+        return $this->outputJson($result);
+    }
 
-		$query = $this->CI->db->query($sql, array());
-        $result = $query->result();
-//		$this->_remapData('frist_id',$result);
-		return $this->outputJson($result);
+    public function updateFristenListe()
+    {
+		$d = new DateTime();
+		$result = $this->FristenLib->updateFristen($d);
+        return $this->outputJson($result);
     }
 
 	public function getKarenztypen()

@@ -13,7 +13,7 @@ class FristenJob extends JOB_Controller
 
 		$this->_ci =& get_instance();
 
-		$this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib');
+		$this->load->library('extensions/FHC-Core-Personalverwaltung/fristen/FristenLib');
 	}
 
 	private function getDVList(int $months, bool $qryBis = true)
@@ -23,45 +23,37 @@ class FristenJob extends JOB_Controller
 	}
 
 
-	public function addFristen($date = null, $user = null, $oe_kurzbz = null)
+	public function addFristen($date = null)
 	{
 		$this->logInfo('Start Fristen Job');
-		
-		$result = $this->_ci->gehaltslib->getBestandteile($date, $user, $oe_kurzbz);
-		
-		if (isError($result))
-		{
-			$this->logError(getError($result));
-		}
+		echo "start Fristen Job\n";
 
-		$count = 0;
+		try {
 
-		if (!hasData($result))
-		{
-			$this->logInfo("Keine Gehaltsbestandteile gefunden!");
-		}
-		else
-		{
-			$bestandteile = getData($result);
-			foreach ($bestandteile as $bestandteil)
+			if ($date == null)
 			{
-				$abrechnung = $this->_ci->gehaltslib->existsFristen($bestandteil, $date);
-				if (!hasData($abrechnung))
-				{
-					$result = $this->_ci->gehaltslib->addHistorie($bestandteil, $date);
-					
-					if (isError($result))
-					{
-						$this->logError(getError($result));
-						break;
-					}
-					else
-						$count++;
-				}
+				$d = new DateTime();
+			} else {
+				$d = DateTime::createFromFormat( 'Y-m-d', $date );
+        		//$datestring = $date->format("Y-m-d");
 			}
+
+			echo "Datum: ",$d->format("Y-m-d"),"\n";
+			$result = $this->_ci->fristenlib->updateFristen($d);
+
+			if ($result !== false)
+			{
+				$this->logInfo('End Fristen Job', array('Number of Fristen added ' => $result));
+				echo 'End Fristen Job';
+			} else {
+				$this->logInfo('Fristen job failed');
+			}
+
+		} catch(\Exception $e) {
+			$this->logInfo('Fristen job failed');
+			echo $e->getMessage();
 		}
 		
-		$this->logInfo('End Fristen Job', array('Number of Abrechnungen added ' => $count));
 	}
 	
 	
