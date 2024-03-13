@@ -8,6 +8,8 @@ class DVBeginFrist extends AbstractFrist {
     public function __construct()
 	{
         parent::__construct(FristTyp::BEGINN);
+        $this->ereignis_kurzbz = 'dv_beginn';
+        $this->id_colname = 'dienstverhaeltnis_id';
     }
 
     public function getData($date)
@@ -17,11 +19,11 @@ class DVBeginFrist extends AbstractFrist {
 
     public function generateFristEreignis($rowdata)
     {
-        $parameter['dienstverhaeltnis_id'] = $rowdata->dienstverhaeltnis_id;
+        $parameter[$this->id_colname] = $rowdata->dienstverhaeltnis_id;
 
         $fristEreignis = [];
         $fristEreignis['insertvon'] = getAuthUID();
-        $fristEreignis['ereignis_kurzbz'] = 'dv_begin';
+        $fristEreignis['ereignis_kurzbz'] = $this->ereignis_kurzbz;
         $fristEreignis['mitarbeiter_uid'] = $rowdata->mitarbeiter_uid;
         $fristEreignis['datum'] = $rowdata['von'];
         $fristEreignis['status'] = 'neu';

@@ -9,6 +9,10 @@ abstract class AbstractFrist {
     protected string $fristTyp = FristTyp::ENDE;
     /** @var int timespan in months */
     protected int $zeitraum = 2;
+    /** @var string ereignis id (needs to be set in sub class) */
+    protected string $ereignis_kurzbz = '';
+    /** @var string name of id column (needs to be set in sub class) */
+    protected string $id_colname = '';
 
     public function __construct(string $typ = FristTyp::ENDE, int $zeitraum = 2)
 	{
@@ -28,14 +32,22 @@ abstract class AbstractFrist {
             $colname = "von";
         }
         $d = $date->format('Y-m-d');
-        $qry = "select * from $dbTable where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date";
+        //$qry = "select * from $dbTable where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date";
+
         $dbModel = new DB_Model();
+        $qry = "
+             WITH frist AS (select frist_id,ereignis_kurzbz, parameter from hr.tbl_frist where ereignis_kurzbz=".$dbModel->escape($this->ereignis_kurzbz).")
+            select d.*, frist.frist_id 
+            from $dbTable d  left join frist on (d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
+            where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null";
+
+        /* $qry = "select d.*, frist.frist_id 
+            from $dbTable d  left join hr.tbl_frist ereignis_kurzbz=".$dbModel->escape($this->ereignis_kurzbz).")frist on (d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
+            where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null"; */
         $result = $dbModel->execReadOnlyQuery($qry);
 
 		if (isError($result)) return $result;
-
-		if (!hasData($result)) return error("Keine Datensätze gefunden!");
-
+		
 		return $result;
     }
 

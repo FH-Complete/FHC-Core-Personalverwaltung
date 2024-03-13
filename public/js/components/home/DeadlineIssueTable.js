@@ -18,15 +18,10 @@ const DeadlineIssueTable = {
       
       const fetchList = async () => {
         try {
-          let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
-                
-          const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getFristenListe`;
           isFetching.value = true;
-          const res = await fetch(url)
-          let response = await res.json();
-          isFetching.value = false;              
-          console.log(response);	  
-          fristen.value = response;			  
+          const res = await Vue.$fhcapi.Deadline.all();
+          fristen.value = res.data;			  
+          isFetching.value = false;                        
         } catch (error) {
           console.log(error);
           isFetching.value = false;           
@@ -35,15 +30,10 @@ const DeadlineIssueTable = {
 
       const updateDeadlines = async () => {
         try {
-          let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
-                
-          const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/updateFristenListe`;
           isFetching.value = true;
-          const res = await fetch(url)
-          let response = await res.json();
+          const res = await Vue.$fhcapi.Deadline.updateFristenListe();
           isFetching.value = false;              
-          console.log(response);	  
-          fristen.value = response;			  
+          fetchList();		  
         } catch (error) {
           console.log(error);
           isFetching.value = false;           
