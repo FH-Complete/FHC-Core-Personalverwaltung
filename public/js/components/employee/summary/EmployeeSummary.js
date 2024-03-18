@@ -4,7 +4,9 @@ import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
 import { IssuesCard } from './IssuesCard.js';
 import { OffTimeCard } from './OffTimeCard.js';
+import { DeadlineIssueTable } from './DeadlineIssueTable.js'
 import { DeadlineCard } from './DeadlineCard.js';
+
 
 export const EmployeeSummary = {
     components: {
@@ -13,7 +15,9 @@ export const EmployeeSummary = {
         LehreCard,
         IssuesCard,
         OffTimeCard,
+        DeadlineIssueTable,
         DeadlineCard,
+        
     },
     props: {
         date: Date,
@@ -65,9 +69,7 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <dv-card :uid="currentUID" :date="date" ></dv-card>
-                        <br/>
-                        <deadline-card :uid="currentUID" :date="date" ></deadline-card>
+                        <dv-card :uid="currentUID" :date="date" ></dv-card>                        
             
                     </div>          
 
@@ -76,18 +78,7 @@ export const EmployeeSummary = {
                         <!--covid-card :personID="currentPersonID" :date="date"></covid-card-->
 
                         <issues-card></issues-card>
-
-                        <br/>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Home Office</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                    <div v-if="isFetching" class="spinner-border" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>            
-                            </div>
-                        </div>
+                       
                     </div>
 
                     <div class="col">
@@ -99,6 +90,8 @@ export const EmployeeSummary = {
                         <off-time-card :uid="currentUID"></off-time-card> 
 
                     </div>
+
+                    <deadline-issue-table :uid="currentUID"></deadline-issue-table>
 
                 </div>            
 

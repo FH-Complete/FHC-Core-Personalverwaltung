@@ -107,6 +107,10 @@ class Api extends Auth_Controller
                 'getFristenListe' => Api::DEFAULT_PERMISSION,
                 'getPersonFristenListe' => Api::DEFAULT_PERMISSION,
                 'updateFristenListe' => Api::DEFAULT_PERMISSION,
+                'getFristenStatus' => Api::DEFAULT_PERMISSION,
+                'getFristenEreignisse' => Api::DEFAULT_PERMISSION,
+                'updateFristStatus' => Api::DEFAULT_PERMISSION,
+                'deleteFrist' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -154,6 +158,7 @@ class Api extends Auth_Controller
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
 	    $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
 	    $this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+        $this->load->model('ressource/Frist_model', 'FristModel');
 
         // get CI for transaction management
         $this->CI = &get_instance();
@@ -2403,6 +2408,63 @@ EOSQL;
 		$d = new DateTime();
 		$result = $this->FristenLib->updateFristen($d);
         return $this->outputJson($result);
+    }
+
+    public function updateFristStatus()
+    {
+        $data = json_decode($this->input->raw_input_stream, true);
+
+        $data['updateamum'] = 'NOW()';
+		$data['updatevon'] = getAuthUID();
+        $frist_id = $data['frist_id'];
+		unset($data['frist_id']);
+        unset($data['datum']);
+        unset($data['ereignis_kurzbz']);
+    	$result = $this->FristModel->update(
+    		$frist_id,
+    		$data
+    	);
+
+		if (isError($result))
+			return $this->outputJsonError('Fehler beim Speichern von Friststatus');
+
+		$frist = $this->FristModel->load($result->retval);
+
+		if (hasData($frist))
+			$this->outputJsonSuccess($frist->retval);
+    }
+
+    public function getFristenStatus()
+	{
+		$result = $this->FristenLib->getFristenStatus();
+		return $this->outputJson($result);
+	}
+
+    public function getFristenEreignisse()
+	{
+		$result = $this->FristenLib->getFristenEreignis();
+		return $this->outputJson($result);
+	}
+
+    public function deleteFrist()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['frist_id']) && !is_numeric($payload['frist_id']))
+                show_error('frist_id is not numeric!');
+
+            $result = $this->FristModel->delete($payload['frist_id']);
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when deleting frist');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
     }
 
 	public function getKarenztypen()

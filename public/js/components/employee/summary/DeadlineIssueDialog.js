@@ -20,6 +20,8 @@ export const AddressData = {
         let _resolve
         let _reject
 
+        const fristStatusDef = Vue.ref()
+
         const showModal = () => {
             frist.value = createFristShape();
             // reset form state
@@ -38,6 +40,38 @@ export const AddressData = {
         const hideModal = () => {
             modalRef.value.hide();
         }
+
+        const fetchFristStatus = async () => {
+            try {
+                isFetching.value = true;
+                const res = await Vue.$fhcapi.Deadline.getFristStatus();
+                fristStatus.value = res.data;			  
+                isFetching.value = false;                        
+            } catch (error) {
+                console.log(error);
+                isFetching.value = false;           
+            }	
+        }
+
+        const fetchFristEreignis = async () => {
+            try {
+                isFetching.value = true;
+                const res = await Vue.$fhcapi.Deadline.getFristEreignis();
+                fristEreignis.value = res.data;			  
+                isFetching.value = false;                        
+            } catch (error) {
+                console.log(error);
+                isFetching.value = false;           
+            }	
+        }
+
+        Vue.onMounted(async () => {
+            if (currentUID.value == null) {
+              return;
+            }
+            fetchFristStatus()
+            fetchFristEreignis()
+        })
 
         Vue.defineExpose({
             showModal,

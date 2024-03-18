@@ -9,7 +9,7 @@ class FristenLib
 {
 	private $_ci; // Code igniter instance
     private $_insertvon = 'system';
-	
+
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
@@ -32,24 +32,39 @@ class FristenLib
         return $count;
     }
 
+    public function updateFristStatus(string $uid, int $frist_id, string $status)
+    {
+        $fristEreignis['frist_id'] = $frist_id;
+        $fristEreignis['updatevon'] = $uid;
+        $fristEreignis['status_kurzbz'] = $status;
+        $result = $this->_ci->FristModel->update($fristEreignis);
+
+        if (isError($result))
+        {
+            log_message('debug', "update frist failed" . $result->msg);
+            return false;
+        }
+        return true;
+    }
+
 
     private function runFristenUpdate(&$fristInstance, DateTime $date)
-    {       
+    {
         $result = $fristInstance->getData($date);
-     
+
         try {
             $this->_ci->db->trans_begin();
 
             $count = 0;
 
             foreach ($result->retval as $rowData) {
-                
+
                 if (!$fristInstance->exists($rowData)) {
 
                     $fristEreignis = $fristInstance->generateFristEreignis($rowData);
                     $fristEreignis['insertvon'] = $this->_insertvon;
                     $result = $this->_ci->FristModel->insert($fristEreignis);
-            
+
                     if (isError($result))
                     {
                         log_message('debug', "insert frist failed" . $result->msg);
@@ -70,25 +85,25 @@ class FristenLib
         return $count;
     }
 
-    /** 
-     * get list of current deadlines 
+    /**
+     * get list of current deadlines
      */
     public function getFristenListe($uid=null)
     {
         $WHERE = "";
         $param =  array();
-        
+
         if (!empty($uid))
         {
             $WHERE = "WHERE m.mitarbeiter_uid=?";
             $param = array($uid);
         }
 
-        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname,p.nachname,p.person_id                
-                FROM hr.tbl_frist f JOIN hr.tbl_frist_status status using(status_kurzbz) 
-                    join hr.tbl_frist_ereignis ereignis using(ereignis_kurzbz) 
+        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname,p.nachname,p.person_id
+                FROM hr.tbl_frist f JOIN hr.tbl_frist_status status using(status_kurzbz)
+                    join hr.tbl_frist_ereignis ereignis using(ereignis_kurzbz)
                     left join public.tbl_mitarbeiter m using(mitarbeiter_uid)
-                    left join public.tbl_benutzer b on(m.mitarbeiter_uid=b.uid) 
+                    left join public.tbl_benutzer b on(m.mitarbeiter_uid=b.uid)
                     left join public.tbl_person p on (b.person_id=p.person_id)
                 $WHERE
                 ORDER BY f.datum ASC";
@@ -96,4 +111,27 @@ class FristenLib
 		$query = $this->_ci->db->query($sql, $param);
         return $query->result();
     }
+
+    public function getFristenStatus()
+    {
+        $sql = "SELECT *
+                FROM hr.tbl_frist_status
+                ORDER BY bezeichnung ASC";
+
+		$query = $this->_ci->db->query($sql);
+        return $query->result();
+    }
+
+    public function getFristenEreignis()
+    {
+        $sql = "SELECT ereignis_kurzbz, bezeichnung, manuell
+                FROM hr.tbl_frist_ereignis
+                ORDER BY bezeichnung ASC";
+
+		$query = $this->_ci->db->query($sql);
+        return $query->result();
+    }
+
+
+
 }
