@@ -3,6 +3,7 @@ require_once 'IValorisationMethod.php';
 require_once 'AbstractValorisationMethod.php';
 require_once 'ValorisierungProzent.php';
 require_once 'ValorisierungFixBetrag.php';
+require_once 'ValorisierungGestaffelt.php';
 
 /**
  * Description of ValorisationFactory
@@ -11,8 +12,9 @@ require_once 'ValorisierungFixBetrag.php';
  */
 class ValorisationFactory
 {
-	const VALORISATION_PROZENT = 'ValorisierungProzent';
-	const VALORISATION_FIXBETRAG = 'ValorisierungFixBetrag';
+	const VALORISATION_PROZENT		= 'ValorisierungProzent';
+	const VALORISATION_FIXBETRAG	= 'ValorisierungFixBetrag';
+	const VALORISATION_STAGGERED	= 'ValorisierungGestaffelt';
 	
 	public function getValorisationMethod($method) {
 		$instance = null;
@@ -24,6 +26,10 @@ class ValorisationFactory
 			
 			case self::VALORISATION_FIXBETRAG:
 				$instance = new ValorisierungFixBetrag();
+				break;
+
+			case self::VALORISATION_STAGGERED:
+				$instance = new ValorisierungGestaffelt();
 				break;
 			
 			default:

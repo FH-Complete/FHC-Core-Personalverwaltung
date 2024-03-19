@@ -15,32 +15,43 @@ class ValorisierungJob extends JOB_Controller
 
 		$this->load->helper('hlp_authentication_helper.php');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanzMethod_model');
+		$this->load->library('vertragsbestandteil/VertragsbestandteilLib', null, 'VertragsbestandteilLib');
 		$this->load->library('vertragsbestandteil/GehaltsbestandteilLib', null, 'GehaltsbestandteilLib');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisationFactory', null, 'ValorisationFactory');
 	}
 
 
-	public function do($valorisierungsdatum, $dienstverhaeltnis_id=null)
+	public function do($valorisierung_kurzbz, $dienstverhaeltnis_id=null)
 	{
-		if( !$valorisierungsdatum ) 
+		if( !$valorisierung_kurzbz ) 
 		{
-			echo "missing parameter valorisierungsdatum\n";
+			echo "missing parameter valorisierung_kurzbz\n";
 		}
 		
-		$valorisierungsdatum . "\n";
-		$dienstverhaeltnis_id . "\n";
+		echo "ValorisierungKurzbz: " . $valorisierung_kurzbz . "\n";
+		echo "DienstverhaeltnisId: " . $dienstverhaeltnis_id . "\n";
 		
-		$valinstanzen = $this->ValorisierungInstanz_model->getValorisierungInstanzForDatum($valorisierungsdatum);
+		$valinstanz = $this->ValorisierungInstanz_model->loadValorisierungInstanzByKurzbz($valorisierung_kurzbz);
+		if( is_null($valinstanz) )
+		{
+			die('Valorisierung Instanz ' . $valorisierung_kurzbz . ' not found.' . "\n");
+		}
 		
+		$dienstverhaeltnis = $this->VertragsbestandteilLib->fetchDienstverhaeltnis($dienstverhaeltnis_id);
+		$vertragsbestandteile = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dienstverhaeltnis_id, 
+			$valinstanz->valorisierungsdatum, false);
 		$gehaltsbestandteile = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, 
-			$valorisierungsdatum, false);
+			$valinstanz->valorisierungsdatum, false);
+		
+		$valinstanzmethoden = $this->ValorisierungInstanzMethod_model->loadValorisierungInstanzByKurzbz($valinstanz->valorisierung_instanz_id);
 		
 		$usedvalinstances = array();
-		foreach ($valinstanzen as $valinstanz)
+		foreach ($valinstanzmethoden as $valinstanzmethod)
 		{
-			$valmethod = $this->ValorisationFactory->getValorisationMethod($valinstanz->valorisierung_methode_kurzbz);
-			$params = json_decode($valinstanz->valorisierung_methode_parameter);
-			$valmethod->initialize($gehaltsbestandteile, $params);
+			$valmethod = $this->ValorisationFactory->getValorisationMethod($valinstanzmethod->valorisierung_methode_kurzbz);
+			$params = json_decode($valinstanzmethod->valorisierung_methode_parameter);
+			$valmethod->initialize($dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params);
 			$valmethod->checkParams();
 			if($valmethod->checkIfApplicable())
 			{

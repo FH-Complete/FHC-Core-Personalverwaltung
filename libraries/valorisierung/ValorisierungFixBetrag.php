@@ -35,6 +35,8 @@ class ValorisierungFixBetrag extends AbstractValorisationMethod
 
 	public function doValorisation()
 	{
+		echo 'Using ValorisationMethod: ' . __CLASS__ . "\n";
+		print_r($this->params);
 		$sumsalary = $this->calcSummeGehaltsbestandteile(AbstractValorisationMethod::NUR_ZU_VALORISIERENDE_GBS);
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{

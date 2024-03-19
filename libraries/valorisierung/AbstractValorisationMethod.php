@@ -9,17 +9,23 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 	const ALLE_GBS = false;
 	const NUR_ZU_VALORISIERENDE_GBS = true;
 	
+	protected $dienstverhaeltnis;
+	protected $vertragsbestandteile;
 	protected $gehaltsbestandteile;
 	protected $params;
 	
 	public function __construct()
 	{
+		$this->dienstverhaeltnis = null;
+		$this->vertragsbestandteile = null;
 		$this->gehaltsbestandteile = null;
 		$this->params = null;
 	}
 	
-	public function initialize($gehaltsbestandteile, $params)
+	public function initialize($dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params)
 	{
+		$this->dienstverhaeltnis = $dienstverhaeltnis;
+		$this->vertragsbestandteile = $vertragsbestandteile;
 		$this->gehaltsbestandteile = $gehaltsbestandteile;
 		$this->params = $params;
 	}

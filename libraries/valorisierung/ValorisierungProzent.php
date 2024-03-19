@@ -33,7 +33,9 @@ class ValorisierungProzent extends AbstractValorisationMethod
 	}
 
 	public function doValorisation()
-	{		
+	{
+		echo 'Using ValorisationMethod: ' . __CLASS__ . "\n";
+		print_r($this->params);
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
