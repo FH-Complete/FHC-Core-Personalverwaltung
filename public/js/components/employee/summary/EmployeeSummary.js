@@ -5,7 +5,6 @@ import { LehreCard } from './LehreCard.js';
 import { IssuesCard } from './IssuesCard.js';
 import { OffTimeCard } from './OffTimeCard.js';
 import { DeadlineIssueTable } from './DeadlineIssueTable.js'
-import { DeadlineCard } from './DeadlineCard.js';
 
 
 export const EmployeeSummary = {
@@ -16,7 +15,6 @@ export const EmployeeSummary = {
         IssuesCard,
         OffTimeCard,
         DeadlineIssueTable,
-        DeadlineCard,
         
     },
     props: {
@@ -99,6 +97,7 @@ export const EmployeeSummary = {
         </div>
 
     </div>
+
 
     `
 }

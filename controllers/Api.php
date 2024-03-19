@@ -111,6 +111,7 @@ class Api extends Auth_Controller
                 'getFristenEreignisse' => Api::DEFAULT_PERMISSION,
                 'updateFristStatus' => Api::DEFAULT_PERMISSION,
                 'deleteFrist' => Api::DEFAULT_PERMISSION,
+                'upsertFrist' => Api::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -2433,6 +2434,52 @@ EOSQL;
 		if (hasData($frist))
 			$this->outputJsonSuccess($frist->retval);
     }
+
+
+    public function upsertFrist()
+    {
+        if($this->input->method() === 'post'){
+
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['frist_id']) && !is_numeric($payload['frist_id']))
+                show_error('frist_id is not numeric!');
+
+            if (!isset($payload['status_kurzbz']) || (isset($payload['status_kurzbz']) && $payload['status_kurzbz'] == ''))
+                show_error('status_kurzbz is empty!');
+
+            if (!isset($payload['ereignis_kurzbz']) || (isset($payload['ereignis_kurzbz']) && $payload['ereignis_kurzbz'] == ''))
+                show_error('status_kurzbz is empty!');
+
+            if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
+                show_error('mitarbeiter_uid is empty!');
+
+            if ($payload['frist_id'] == 0)
+            {
+                $payload['insertvon'] = getAuthUID();
+                $payload['parameter'] = '{}';
+                unset($payload['frist_id']);
+                $result = $this->FristModel->insert($payload);
+            } else {
+                $payload['updateamum'] = 'NOW()';
+		        $payload['updatevon'] = getAuthUID();
+                unset($payload['insertamum']);
+                unset($payload['insertvon']);
+                $result = $this->FristModel->update($payload['frist_id'], $payload);
+            }
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when updating deadline');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+
+
+
 
     public function getFristenStatus()
 	{

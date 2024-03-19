@@ -26,7 +26,17 @@ export default {
         'Content-Type': 'application/json'
       } 
     })  
-  },  
+  },
+  
+  upsertFrist: function(frist) {
+    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+            + '/extensions/FHC-Core-Personalverwaltung/api/upsertFrist';
+    return axios.post(url, frist, {
+      headers: {
+        'Content-Type': 'application/json'
+      } 
+    })  
+  },
 
   deleteFrist: function(frist_id) {
     let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 

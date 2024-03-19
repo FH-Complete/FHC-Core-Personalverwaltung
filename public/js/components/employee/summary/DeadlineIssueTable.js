@@ -1,12 +1,16 @@
 
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
+import { DeadlineIssueDialog } from './DeadlineIssueDialog.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const DeadlineIssueTable = {    
   components: {
     ModalDialog,
+    Toast,
+    "p-skeleton": primevue.skeleton,
+    DeadlineIssueDialog,
   },
   props: {
     uid: String,
@@ -16,13 +20,14 @@ export const DeadlineIssueTable = {
       const { watch, ref, toRefs, onMounted } = Vue; 
       const { t } = usePhrasen();
       const isFetching = ref(false);
+      const isFristFetching = ref(false);
       const currentUID = toRefs(props).uid
       const currentFrist = ref(null); 
       const fristen = ref([]);
       const fristStatus = ref([])
       const fristEreignisse = ref([])
-
-      const confirmDeleteRef = Vue.ref();
+      const dialogRef = ref();
+      const confirmDeleteRef = ref();
 
       const redirect = (issue_id) => {
         console.log('issue_id', person_id);
@@ -35,13 +40,13 @@ export const DeadlineIssueTable = {
           return;
         }
         try {
-          isFetching.value = true;
+          isFristFetching.value = true;
           const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value);
           fristen.value = res.data;			  
-          isFetching.value = false;                        
+          isFristFetching.value = false;                        
         } catch (error) {
           console.log(error);
-          isFetching.value = false;           
+          isFristFetching.value = false;           
         }		
       }
 
@@ -67,6 +72,17 @@ export const DeadlineIssueTable = {
             console.log(error);
             isFetching.value = false;           
         }	
+      }
+
+      const createFristShape = (mitarbeiter_uid) => {
+        return {
+            frist_id: 0,
+            ereignis_kurzbz: "manuell",
+            bezeichnung: "",
+            datum: null,
+            status_kurzbz: "neu",
+            mitarbeiter_uid: mitarbeiter_uid,
+        }
       }
 
       const getFristEreignisBezeichnung = (ereignis_kurzbz) => {
@@ -95,8 +111,8 @@ export const DeadlineIssueTable = {
             try {
                 const res = await Vue.$fhcapi.Deadline.deleteFrist(id);                    
                 if (res.data.error == 0) {
-                    //delete addressList.value[id];
-                    //showDeletedToast();
+                    fristen.value = fristen.value.filter((frist) => frist.frist_id != id);
+                    showDeletedToast();
                 }
             } catch (error) {
                 console.log(error)              
@@ -130,7 +146,8 @@ export const DeadlineIssueTable = {
         const frist = fristen.value.filter((frist) => frist.frist_id == frist_id)[0];
         try  {
           isFetching.value = true
-          const res = await Vue.$fhcapi.Deadline.updateFristStatus(frist_id, frist.status_kurzbz);         
+          const res = await Vue.$fhcapi.Deadline.updateFristStatus(frist_id, frist.status_kurzbz);    
+          showToast();     
         } catch (error) {
             console.log(error);                
         } finally {
@@ -147,19 +164,82 @@ export const DeadlineIssueTable = {
         }
       }
 
-      return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged }
+      const addDeadline = async () => {        
+        const res = await dialogRef.value.showModal(createFristShape(currentUID.value));
+        
+        if (res.type == 'OK') {   
+          let fristPayload = res.payload;
+          console.log('addDeadline', fristPayload)
+          try  {
+            isFetching.value = true
+            const res = await Vue.$fhcapi.Deadline.upsertFrist(fristPayload);    
+            showCreateToast();     
+            fetchList();
+          } catch (error) {
+              console.log(error);                
+          } finally {
+              isFetching.value = false;
+          }    
+        }
+        
+      }
+
+      // Toast 
+      const toastRef = Vue.ref();
+      const createToastRef = Vue.ref();
+      const deleteToastRef = Vue.ref();
+      
+      const showToast = () => {
+          toastRef.value.show();
+      }
+
+      const showCreateToast = () => {
+        createToastRef.value.show();
+      }
+
+      const showDeletedToast = () => {
+          deleteToastRef.value.show();
+      }
+
+      return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, 
+               fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged, addDeadline,
+               toastRef, createToastRef, deleteToastRef, dialogRef, isFetching, isFristFetching }
     },
   template: `
+
+    <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+      <Toast ref="toastRef">
+          <template #body><h4>{{ t('person','fristStatusGespeichert') }}</h4></template>
+      </Toast>
+    </div>
+
+    <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+      <Toast ref="createToastRef">
+          <template #body><h4>{{ t('person','fristGespeichert') }}</h4></template>
+      </Toast>
+    </div>
+
+    <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+      <Toast ref="deleteToastRef">
+          <template #body><h4>{{ t('person','fristGeloescht') }}</h4></template>
+      </Toast>
+    </div>
+
     <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-5 pb-2 mb-3">
                         
       <div class="flex-fill align-self-center">
         <h1 class="h2">Termine & Fristen 
-          <button type="button" class="btn btn-sm btn-outline btn-outline-secondary" @click="updateDeadlines"><i class="fas fa-sync"></i></button>
+          <button type="button" class="btn btn-sm btn-primary me-2" @click="addDeadline">
+            <i class="fas fa-plus"></i>
+            Termin/Frist  
+          </button>
         </h1>       
       </div>
-  </div>
+    </div>
 
     <div id="collapseTable"  >
+      <p-skeleton style="width:100%" v-if="isFristFetching"></p-skeleton>
+      <p-skeleton style="width:100%;margin-top:10px" v-if="isFristFetching"></p-skeleton>
       <table id="tableComponent" class="table table-sm table-hover table-striped" v-if="fristen != null && fristen.length > 0">
           <thead>
           <tr>
@@ -213,7 +293,7 @@ export const DeadlineIssueTable = {
               </tr>
           </tbody>
       </table> 
-      <div v-else>0 Datensätze vorhanden.</div>
+      <div v-else-if="!isFristFetching" >0 Datensätze vorhanden.</div>
     </div>   
     
     <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
@@ -221,5 +301,7 @@ export const DeadlineIssueTable = {
             {{ t('person','frist') }} '{{ getFristEreignisBezeichnung(currentFrist?.ereignis_kurzbz) }} {{ formatDate(currentFrist?.datum) }}' {{ t('person','wirklichLoeschen') }}?
         </template>
     </ModalDialog>
+
+    <DeadlineIssueDialog ref="dialogRef"></DeadlineIssueDialog>
   `
 }

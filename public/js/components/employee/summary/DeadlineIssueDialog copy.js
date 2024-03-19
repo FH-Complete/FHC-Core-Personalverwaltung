@@ -11,14 +11,15 @@ export const DeadlineIssueDialog = {
         "datepicker": VueDatePicker
     },
     props: {
+        uid: String,
     },  
     setup(props) {
 
-        const { watch, ref, toRefs, onMounted, defineExpose, toRaw, reactive } = Vue; 
+        const { watch, ref, toRefs, onMounted, defineExpose } = Vue; 
         const { t } = usePhrasen();
+        const currentUID = toRefs(props).uid
         const frist = ref()
         const fristStatus = ref([])
-        const fristEreignisse = ref([])
         const isFetching = ref(false)
 
         // Modal 
@@ -29,8 +30,8 @@ export const DeadlineIssueDialog = {
 
         
 
-        const showModal = (f) => {
-            frist.value = f;
+        const showModal = (frist) => {
+            frist.value = frist;
             // reset form state
             frmState.datumBlurred = false;
             frmState.bezeichnungBlurred = false;
@@ -73,7 +74,17 @@ export const DeadlineIssueDialog = {
 
         onMounted(async () => {
             fetchFristStatus()
-            fetchFristEreignisse()            
+            fetchFristEreignisse()
+            if (currentUID.value == null) {
+              return;
+            }
+            
+        })
+
+        
+        defineExpose({
+            showModal,
+            hideModal
         })
 
         // -------------
@@ -96,7 +107,7 @@ export const DeadlineIssueDialog = {
         const validate = () => {
             frmState.datumBlurred = true;
             frmState.bezeichnungBlurred = true;
-            if (validDatum(frist.value?.datum) && validBezeichnung(frist.value?.bezeichnung)) {
+            if (validDatum(frist.value.datum) && validBezeichnung(frist.value.bezeichnung)) {
                 return true;
             }
             return false;
@@ -115,7 +126,7 @@ export const DeadlineIssueDialog = {
 
                 // submit
                 try {
-                    _resolve({type: 'OK', payload: frist.value })
+                    _resolve({type: 'CREATED', payload: { frist }})
                     /* const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
                     if (r.data.error == 0) {
                         materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
