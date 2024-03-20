@@ -231,7 +231,7 @@ export const DeadlineIssueTable = {
         <h1 class="h2">Termine & Fristen 
           <button type="button" class="btn btn-sm btn-primary me-2" @click="addDeadline">
             <i class="fas fa-plus"></i>
-            Termin/Frist  
+            Termin/Frist
           </button>
         </h1>       
       </div>
@@ -243,7 +243,7 @@ export const DeadlineIssueTable = {
       <table id="tableComponent" class="table table-sm table-hover table-striped" v-if="fristen != null && fristen.length > 0">
           <thead>
           <tr>
-              <th scope="col" class="col-1"> 
+              <th scope="col" class="col-2"> 
                 Ereignis
               </th>
 

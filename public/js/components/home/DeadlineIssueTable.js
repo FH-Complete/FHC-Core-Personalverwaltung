@@ -63,8 +63,8 @@ const DeadlineIssueTable = {
     <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-5 pb-2 mb-3">
                         
       <div class="flex-fill align-self-center">
-        <h1 class="h2">Termine & Fristen 
-          <button type="button" class="btn btn-sm btn-outline btn-outline-secondary" @click="updateDeadlines"><i class="fas fa-sync"></i></button>
+        <h1 class="h2">Termine & Fristen <span v-if="fristen != null  && fristen.length > 0">({{ fristen.length }})</span> 
+          <button type="button" class="btn btn-sm btn-outline btn-outline-secondary  ms-2" @click="updateDeadlines"><i class="fas fa-sync"></i></button>
         </h1>       
       </div>
   </div>
@@ -73,7 +73,7 @@ const DeadlineIssueTable = {
       <table id="tableComponent" class="table table-sm table-hover table-striped" v-if="fristen != null && fristen.length > 0">
           <thead>
           <tr>
-              <th scope="col" class="col-1"> 
+              <th scope="col" class="col-2"> 
                 Ereignis
               </th>
               <th scope="col" class="col-2"> 

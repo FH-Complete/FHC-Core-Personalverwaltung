@@ -4,6 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once  __DIR__.'/DVEndFrist.php';
 require_once  __DIR__.'/DVBeginFrist.php';
+require_once  __DIR__.'/ZeitaufzeichnungBeginFrist.php';
 
 class FristenLib
 {
@@ -21,11 +22,16 @@ class FristenLib
         $count = 0;
         $dvBeginFrist = new DVBeginFrist();
         $dvEndFrist = new DVEndFrist();
+        $zeitaufzeichnungBeginFrist = new ZeitaufzeichnungBeginFrist();
         $res=$this->runFristenUpdate($dvBeginFrist, $date);
         if ($res !== false) {
             $count+=$res;
         }
         $res=$this->runFristenUpdate($dvEndFrist, $date);
+        if ($res !== false) {
+            $count+=$res;
+        }
+        $res=$this->runFristenUpdate($zeitaufzeichnungBeginFrist, $date);
         if ($res !== false) {
             $count+=$res;
         }
