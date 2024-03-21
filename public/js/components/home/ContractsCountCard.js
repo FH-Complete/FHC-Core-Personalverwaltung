@@ -28,12 +28,12 @@ const ContractCountCard = {
 	    von: { value: null, matchMode: primevue.api.FilterMatchMode.DATE_IS },
 	    bis: { value: null, matchMode: primevue.api.FilterMatchMode.DATE_IS }
         });
-        const datumssort = (props.showNew) ? {field: 'von', order: 0} : {field: 'bis', order: 0};
+        const datumssort = (props.showNew) ? {field: 'von', order: 1} : {field: 'bis', order: 1};
         const defaultsortorder = [
-            {field: 'vertragsart', order: 0},
+            {field: 'vertragsart', order: 1},
             datumssort,
-            {field: 'nachname', order: 0},
-            {field: 'vorname', order: 0}
+            {field: 'nachname', order: 1},
+            {field: 'vorname', order: 1}
         ];
 
         const vertragsarten = Vue.ref([]);
@@ -142,6 +142,7 @@ const ContractCountCard = {
             selectionMode="single"
             sortMode="multiple"
             :multiSortMeta="defaultsortorder"
+            removeableSort
             :paginator="true"
             :rows="12"
             @row-select="onPersonSelect">
