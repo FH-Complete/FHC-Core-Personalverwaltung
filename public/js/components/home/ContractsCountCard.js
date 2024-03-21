@@ -28,6 +28,13 @@ const ContractCountCard = {
 	    von: { value: null, matchMode: primevue.api.FilterMatchMode.DATE_IS },
 	    bis: { value: null, matchMode: primevue.api.FilterMatchMode.DATE_IS }
         });
+        const datumssort = (props.showNew) ? {field: 'von', order: 0} : {field: 'bis', order: 0};
+        const defaultsortorder = [
+            {field: 'vertragsart', order: 0},
+            datumssort,
+            {field: 'nachname', order: 0},
+            {field: 'vorname', order: 0}
+        ];
 
         const vertragsarten = Vue.ref([]);
         Vue.$fhcapi.DV.getVertragsarten().then((resp) => {
@@ -108,7 +115,7 @@ const ContractCountCard = {
         return {
             contractDataNew, currentYear, currentMonth, isFetching, title,
             contractsOverlay, onPersonSelect, selectedPerson, toggle, filters,
-            vertragsarten, formatDate
+            vertragsarten, formatDate, defaultsortorder
         }
      },
      template: `
@@ -133,6 +140,8 @@ const ContractCountCard = {
             v-model:selection="selectedPerson"
             :value="contractDataNew"
             selectionMode="single"
+            sortMode="multiple"
+            :multiSortMeta="defaultsortorder"
             :paginator="true"
             :rows="12"
             @row-select="onPersonSelect">
