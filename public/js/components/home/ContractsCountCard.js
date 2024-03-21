@@ -48,6 +48,10 @@ const ContractCountCard = {
 
 
         const formatDate = (ds) => {
+            if( ds === null ) {
+                return '-';
+            }
+
 	    if( ds instanceof Date ) {
                 return ds.toLocaleDateString('de-AT', {
                     day: '2-digit',
@@ -81,8 +85,8 @@ const ContractCountCard = {
 			  let response = await res.json();
               isFetching.value = false;              
 			  contractDataNew.value = response.retval.map((row) => {
-                              row.von = new Date(row.von);
-                              row.bis = new Date(row.bis);
+                              row.von = (row.von === null) ? null : new Date(row.von);
+                              row.bis = (row.bis === null) ? null : new Date(row.bis);
                               return row;
                           });
 			} catch (error) {
