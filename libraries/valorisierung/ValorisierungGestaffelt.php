@@ -82,7 +82,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		if( floatval($this->wochenstunden) < floatval('38.5') )
 		{
 			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval('38.5');
-			echo "PT salary: " . $this->sumvalsarary . " scaled to FTE salary: " . 
+			echo "PT salary: " . $this->sumvalsalary . " scaled to FTE salary: " . 
 				$this->sumvalsalaryfte . "\n";
 		}
 		else 

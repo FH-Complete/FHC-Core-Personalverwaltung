@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_methode (
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_methode TO vilesci;
 
 INSERT INTO hr.tbl_valorisierung_methode (valorisierung_methode_kurzbz, beschreibung) VALUES 
-    ('prozent', 'Valorisierung in Prozent'),
-    ('fixbetrag', 'Valorisierung um einen Fixbetrag'),
     ('ValorisierungProzent', 'Valorisierung um einen Prozentsatz'), 
     ('ValorisierungFixBetrag', 'Valorisierung um einen fixen Betrag'),
     ('ValorisierungGestaffelt', 'mehrere Stufen mit unterschiedlichen Prozentwerten')
