@@ -31,7 +31,7 @@
         }
     
         Vue.onMounted(() => {
-            fetchList();
+            //fetchList();
         })
 
         const onPersonSelect = (uid, person_id) => {
