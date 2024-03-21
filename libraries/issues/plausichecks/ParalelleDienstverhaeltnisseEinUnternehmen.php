@@ -70,7 +70,8 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 		$qry = "
 			WITH dienstverhaeltnisse AS (
 				SELECT
-						ben.person_id, dv.dienstverhaeltnis_id, dv.oe_kurzbz, dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis
+						ben.person_id,
+						dv.dienstverhaeltnis_id, dv.oe_kurzbz, dv.von AS dv_von, COALESCE(dv.bis, '9999-12-31') AS dv_bis, dv.vertragsart_kurzbz
 				FROM
 						public.tbl_benutzer ben
 						JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
@@ -96,7 +97,8 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 					dvs.person_id,
 					dvs.dienstverhaeltnis_id AS erste_dienstverhaeltnis_id, dvss.dienstverhaeltnis_id AS zweite_dienstverhaeltnis_id,
 					dvs.dv_von AS erstes_dv_von, dvss.dv_von AS zweites_dv_von,
-					dvs.dv_bis AS erstes_dv_bis, dvss.dv_bis AS zweites_dv_bis
+					dvs.dv_bis AS erstes_dv_bis, dvss.dv_bis AS zweites_dv_bis,
+					dvs.vertragsart_kurzbz AS erste_vertragsart_kurzbz, dvss.vertragsart_kurzbz AS zweite_vertragsart_kurzbz
 				FROM
 					dienstverhaeltnisse dvs, dienstverhaeltnisse dvss
 				WHERE
@@ -118,6 +120,11 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 			WHERE
 				-- dienstverhaeltnis time paralell
 				alle_dvs.zweites_dv_von <= alle_dvs.erstes_dv_bis AND alle_dvs.zweites_dv_bis >= alle_dvs.erstes_dv_von
+				-- exclude paralell contracts with certain types
+				AND NOT (
+					LEAST(erste_vertragsart_kurzbz, zweite_vertragsart_kurzbz) = 'externerlehrender'
+					AND GREATEST(erste_vertragsart_kurzbz, zweite_vertragsart_kurzbz) = 'studentischehilfskr'
+				)
 				AND NOT EXISTS ( -- karenz time can be paralell
 					SELECT 1
 					FROM
