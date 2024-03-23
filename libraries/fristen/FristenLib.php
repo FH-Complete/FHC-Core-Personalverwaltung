@@ -135,7 +135,7 @@ class FristenLib
             $param = array($uid);
         }
 
-        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname,p.nachname,p.person_id
+        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname || ' ' || p.nachname as ma_name,p.person_id
                 FROM hr.tbl_frist f JOIN hr.tbl_frist_status status using(status_kurzbz)
                     join hr.tbl_frist_ereignis ereignis using(ereignis_kurzbz)
                     left join public.tbl_mitarbeiter m using(mitarbeiter_uid)
