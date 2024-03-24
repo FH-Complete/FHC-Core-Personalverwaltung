@@ -160,7 +160,7 @@ const DeadlineIssueTable = {
         }
       }
 
-      return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef }
+      return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef, isFetching }
     },
   template: `
     <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-5 pb-2 mb-3">
@@ -175,8 +175,8 @@ const DeadlineIssueTable = {
   <!-- TABULATOR -->
   <div v-if="fristen != null && fristen.length > 0">
     <div ref="tableRef" class="fhc-tabulator"></div>
-  </div>/
-  <div v-else>0 Datensätze vorhanden.</div>
+  </div>
+  <div v-else-if="!isFetching">0 Datensätze vorhanden.</div>
   
   `
 }
