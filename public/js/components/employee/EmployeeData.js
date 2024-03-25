@@ -9,9 +9,11 @@ export const EmployeeData= {
         Toast,
     },
     props: {
-        editMode: { type: Boolean, required: true },
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},
+        editMode: { type: Boolean, required: false },
+        personID: { type: Number, required: false },
+        personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
     },
     emits: ['updateHeader'],
@@ -21,6 +23,11 @@ export const EmployeeData= {
         const { t } = usePhrasen();
 
         const { personID } = Vue.toRefs(props);
+
+        const theModel = Vue.computed({  // Use computed to wrap the object
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+          });
 
         const url = Vue.ref("");
 
@@ -34,12 +41,12 @@ export const EmployeeData= {
         const validKurzbz = Vue.ref(true);
 
         const fetchData = async () => {
-            if (personID.value==null) {                
+            if (theModel.value.personID==null && props.personID==null) {                
                 return;
             }
             isFetching.value = true;
             try {
-              const res = await Vue.$fhcapi.Person.personEmployeeData(personID.value);                    
+              const res = await Vue.$fhcapi.Person.personEmployeeData(theModel.value.personID || personID.value);                    
               currentValue.value = res.data.retval[0];
             } catch (error) {
               console.log(error)              
@@ -100,10 +107,9 @@ export const EmployeeData= {
 
         Vue.onMounted(() => {
             currentValue.value = createShape();
-            if (props.personID) {
+            if (theModel.value?.personID || props.personID) {
                 fetchData();
             }
-            console.log("EmployeeData mounted", props.personID);
         })
 
         const getAusbildungbez = (code) => {
@@ -186,7 +192,7 @@ export const EmployeeData= {
                     showToast();
                     currentValue.value = response.data.retval[0];
                     preservedValue.value = currentValue.value;
-                    emit('updateHeader')
+                    theModel.value.updateHeader();
                     toggleMode();  
                 } catch (error) {
                     console.log(error)              
@@ -367,3 +373,5 @@ export const EmployeeData= {
     </ModalDialog>
     `
 }
+
+export default EmployeeData;

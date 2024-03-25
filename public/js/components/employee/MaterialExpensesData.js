@@ -11,9 +11,8 @@ export const MaterialExpensesData = {
         "datepicker": VueDatePicker
     },
     props: {
-        editMode: { type: Boolean, required: true },
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},        
         writePermission: { type: Boolean, required: false },
     },
     setup( props ) {
@@ -22,7 +21,12 @@ export const MaterialExpensesData = {
 
         const { t } = usePhrasen();
 
-        const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        const theModel = Vue.computed({
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+        });
+
+       // const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
         const uid = Vue.ref("");
 
@@ -39,43 +43,28 @@ export const MaterialExpensesData = {
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
         const fetchData = async () => {
-            if (currentPersonID.value==null) {    
+            if (theModel.value.personID==null && props.personID==null) {    
                 materialdataList.value = [];            
                 return;
             }
             isFetching.value = true
  
-            const urlMaterial = `${full}/extensions/FHC-Core-Personalverwaltung/api/personMaterialExpenses?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
-            const urlUID = `${full}/extensions/FHC-Core-Personalverwaltung/api/uidByPerson?person_id=${currentPersonID.value}&person_uid=${currentPersonUID.value}`;
-            
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personMaterialExpenses(currentPersonID.value, currentPersonUID.value);                    
+                const response = await Vue.$fhcapi.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
                 materialdataList.value = response.data.retval;
             } catch (error) {
                 console.log(error)              
             } finally {
                 isFetching.value = false
             }
-            
-            /*
-            try {
-              
-              // get uid
-              const resUID = await fetch(urlUID);
-              let responseUID = await resUID.json();
-              uid.value = responseUID.retval[0].uid;
-              isFetching.value = false              
-            } catch (error) {
-              console.log(error)
-              isFetching.value = false;
-            }*/
+                       
         }
 
         const createShape = () => {
             return {
                 sachaufwand_id: 0,
-                mitarbeiter_uid: currentPersonUID.value,
+                mitarbeiter_uid: theModel.value.personUID,
                 sachaufwandtyp_kurzbz: "",
                 beginn: "",
                 ende: "",  
@@ -86,7 +75,7 @@ export const MaterialExpensesData = {
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());
 
-        Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
+        Vue.watch([theModel], ([id,uid]) => {
             fetchData();                     
         });
 
@@ -110,10 +99,8 @@ export const MaterialExpensesData = {
         }
 
         Vue.onMounted(() => {
-            console.log('MaterialData mounted', props.personID);
             currentValue.value = createShape();
             fetchData();
-            
         })
 
         const materialdataListArray = Vue.computed(() => (materialdataList.value ? Object.values(materialdataList.value) : []));
@@ -393,3 +380,5 @@ export const MaterialExpensesData = {
     </ModalDialog>
     `
 }
+
+export default MaterialExpensesData;

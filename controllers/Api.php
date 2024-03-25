@@ -104,6 +104,8 @@ class Api extends Auth_Controller
 				'updateStundensatz' => Api::DEFAULT_PERMISSION,
 				'deleteStundensatz' => Api::DEFAULT_PERMISSION,
                 'offTimeByPerson' => Api::DEFAULT_PERMISSION,
+                'timeRecordingByPerson' => Api::DEFAULT_PERMISSION,
+                'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
                 'getFristenListe' => Api::DEFAULT_PERMISSION,
 			)
 		);
@@ -150,6 +152,7 @@ class Api extends Auth_Controller
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
 	    $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
 	    $this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+        $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
 
         // get CI for transaction management
         $this->CI = &get_instance();
@@ -1476,6 +1479,40 @@ class Api extends Auth_Controller
         return $this->outputJson($data);
     }
 
+    function timeRecordingByPerson()
+    {
+        $person_uid = $this->input->get('uid', TRUE);
+        $year = $this->input->get('year', TRUE);
+        $week = $this->input->get('week', TRUE);
+
+        if (!$person_uid)
+        {
+            $this->outputJsonError('invalid parameter person_uid');
+            exit;
+        }
+
+        if (!is_numeric($year))
+        {
+            $this->outputJsonError('invalid parameter year');
+            exit;
+        }
+
+        if (!is_numeric($week))
+        {
+            $this->outputJsonError('invalid parameter week');
+            exit;
+        }
+
+        $week_start = new DateTime();
+        $week_start->setISODate($year,$week);
+        $fromDate = $week_start->format('Y-m-d');
+        $toDate = $week_start->add(new DateInterval( "P6D" ))->format('Y-m-d');
+
+        $data = $this->ZeitaufzeichnungModel->getFullInterval($person_uid, $fromDate, $toDate);
+        
+        return $this->outputJson($data);
+    }
+
     /**
      * get list of Dienstverhaeltnis by uid
      */
@@ -2544,9 +2581,15 @@ EOSQL;
 
 			return $this->outputJsonSuccess($result);
 		}
-
-
-
-
 	}
+
+    
+    /**
+     *  get employees without a contract during the last 3 semesters
+     */
+    public function getEmployeesWithoutContract() 
+    {
+        $data = $this->ApiModel->getEmployeesWithoutContract();
+        $this->outputJson($data); 
+    }
 }
