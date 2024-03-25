@@ -72,6 +72,7 @@ export const EmployeeData= {
                 standort_id: null,
                 kleriker: false,
                 aktiv: false,
+                habilitation: false,
                 insertamum: "",
                 insertvon: "",
                 updatevon: "",
@@ -340,6 +341,10 @@ export const EmployeeData= {
                                     <input class="form-check-input" :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="lektor" v-model="currentValue.lektor">
                                 </div>
                                 <div class="form-check">
+                                    <label for="habilitation" class="form-check-label" >{{ t('person','habilitation') }}</label>
+                                    <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="habilitation" v-model="currentValue.habilitation">
+                                </div>
+                                <div class="form-check">
                                     <label for="fixangestellt" class="form-check-label">{{ t('person','fixangestellt') }}</label>
                                     <input class="form-check-input"  :readonly="readonly" @click="readonlyBlocker" type="checkbox" id="fixangestellt" v-model="currentValue.fixangestellt">
                                 </div>
@@ -347,6 +352,7 @@ export const EmployeeData= {
                                     <label for="bismelden" class="form-check-label" >{{ t('person','bismelden') }}</label>
                                     <input class="form-check-input"  :readonly="readonly"  @click="readonlyBlocker" type="checkbox" id="bismelden" v-model="currentValue.bismelden">
                                 </div>
+                                
 
                             </div>
                             <!-- -->

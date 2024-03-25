@@ -59,7 +59,7 @@ export default {
         'Content-Type': 'application/json'
       }
     });
-  }  ,
+  },
   getEmployeesWithoutContract: function() {
     var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
             + '/extensions/FHC-Core-Personalverwaltung/api/getEmployeesWithoutContract';
