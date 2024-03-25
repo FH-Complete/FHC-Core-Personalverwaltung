@@ -37,7 +37,7 @@ trait JSONData {
         if (isset($decoded[$attributeName]) && 
 			(false !== filter_var($decoded[$attributeName], FILTER_VALIDATE_FLOAT)))
         {
-            $target =  filter_var($decoded[$attributeName], FILTER_VALIDATE_FLOAT);
+            $target =  $decoded[$attributeName];
             return true;
         }
         return false;

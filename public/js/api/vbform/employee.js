@@ -40,7 +40,7 @@ export default {
   deleteDV: function(dv_id) {
     var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
             + '/extensions/FHC-Core-Personalverwaltung/api/deleteDV';
-    return axios.get(url, { params: { dv_id: dv_id  } });
+    return axios.post(url, { dv_id: dv_id  });
   },
   uploadPersonEmployeeFoto: function(person_id, imagedata) {
     var url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 

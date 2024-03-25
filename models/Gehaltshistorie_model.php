@@ -16,7 +16,7 @@ class Gehaltshistorie_model extends DB_Model
 		return array(
 			'betrag' => array(
 				DB_Model::CRYPT_CAST => 'numeric',
-				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEY'
+				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEYGEHALT'
 			)
 		);
     }

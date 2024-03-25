@@ -185,7 +185,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: '',
+      vertragsart_kurzbz: null,
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "ignore",

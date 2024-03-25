@@ -262,6 +262,7 @@ export default {
             id: uuid.get_uuid(),
             infos: [],
             errors: [],
+            removeable: true,
             disabled: [
               'gehaltstyp'
             ]
@@ -301,7 +302,7 @@ export default {
             id: uuid.get_uuid(),
             infos: [],
             errors: [],
-            removeable: false,
+            removeable: true,
             disabled: [
               'gehaltstyp'
             ]
