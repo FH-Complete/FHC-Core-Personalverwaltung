@@ -12,15 +12,19 @@ export const HourlyRateData = {
 
 	},
 	props: {
-		editMode: { type: Boolean, required: true },
-		personID: { type: Number, required: true },
-		personUID: { type: String, required: true },
+		modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},
 		writePermission: { type: Boolean, required: false },
 	},
 	setup (props) {
-		const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+		//const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
 		const { t } = usePhrasen();
+
+		const theModel = Vue.computed({ 
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+        });
 
 		const readonly = Vue.ref(false);
 		const isFetching = Vue.ref(false);
@@ -32,7 +36,7 @@ export const HourlyRateData = {
 		const unternehmen = Vue.inject('unternehmen');
 
 		const fetchData = async () => {
-			if (currentPersonUID.value == null)
+			if (theModel.value.personUID==null)
 			{
 				hourlyRatedataList.value = [];
 				return;
@@ -41,7 +45,7 @@ export const HourlyRateData = {
 
 			try
 			{
-				const response = await Vue.$fhcapi.Stundensatz.getStundensaetze(currentPersonUID.value);
+				const response = await Vue.$fhcapi.Stundensatz.getStundensaetze(theModel.value.personUID);
 				hourlyRatedataList.value = response.data.retval;
 			}
 			catch (error)
@@ -58,7 +62,7 @@ export const HourlyRateData = {
 		const createShape = () => {
 			return {
 				stundensatz_id: 0,
-				uid: currentPersonUID.value,
+				uid: theModel.value.personUID,
 				stundensatztyp: "",
 				stundensatz: "",
 				oe_kurzbz: "",
@@ -70,7 +74,7 @@ export const HourlyRateData = {
 		const currentValue = Vue.ref(createShape());
 		const preservedValue = Vue.ref(createShape());
 
-		Vue.watch(currentPersonUID, (currentVal, oldVal) => {
+		Vue.watch(theModel, (currentVal, oldVal) => {
 			fetchData();
 		});
 
@@ -413,3 +417,5 @@ export const HourlyRateData = {
 	</ModalDialog>
 	`
 }
+
+export default HourlyRateData;

@@ -10,6 +10,8 @@ export const BankData = {
         Toast,
     },
     props: {
+        modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},
         editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
         personUID: { type: String, required: true },
@@ -24,14 +26,19 @@ export const BankData = {
         const isFetching = Vue.ref(false);
         const bankdataList = Vue.ref([]);
 
+        const theModel = Vue.computed({  // Use computed to wrap the object
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+        });
+
         const fetchData = async () => {
-            if (personID.value==null) {    
+            if (theModel.value.personID==null && props.personID==null) {
                 bankdataList.value = [];            
                 return;
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Person.personBankData(personID.value);                    
+              const res = await Vue.$fhcapi.Person.personBankData(theModel.value.personID || personID.value);                    
               bankdataList.value = res.data.retval;
             } catch (error) {
               console.log(error)              
@@ -55,12 +62,8 @@ export const BankData = {
             } 
         }
 
-        const currentValue = Vue.ref(createShape());
-        const preservedValue = Vue.ref(createShape());
-
-        Vue.watch(personID, (currentVal, oldVal) => {
-            fetchData();         
-        });
+        const currentValue = Vue.ref(createShape(theModel.value.personID || personID.value));
+        const preservedValue = Vue.ref(createShape(theModel.value.personID || personID.value));
 
         const toggleMode = async () => {
             if (!readonly.value) {
@@ -82,8 +85,7 @@ export const BankData = {
         }
 
         Vue.onMounted(() => {
-            console.log('BankData mounted', props.personID);
-            currentValue.value = createShape();
+            currentValue.value = createShape(theModel.value.personID || personID.value);
             fetchData();
             
         })
@@ -95,7 +97,7 @@ export const BankData = {
         const confirmDeleteRef = Vue.ref();
 
         const showAddModal = () => {
-            currentValue.value = createShape(personID);
+            currentValue.value = createShape(theModel.value.personID || personID.value);
             // reset form state
             frmState.ibanBlured=false;
             frmState.bankBlured=false;
@@ -378,3 +380,5 @@ export const BankData = {
     </ModalDialog>
     `
 }
+
+export default BankData;

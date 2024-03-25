@@ -241,3 +241,6 @@ html {
     min-height: 530px;
 }
 
+#macombined .fhc-tabs .nav.nav-pills.flex-column {
+    min-width: 220px;
+}
