@@ -258,9 +258,20 @@ class Api_model extends DB_Model
         }
 
         $qry="
-        select m.personalnummer, p.person_id, b.uid, p.nachname, p.vorname, p.nachname || ', ' || coalesce(p.vorname,'') || ' ' || coalesce(p.titelpre,'') as name,dv.mitarbeiter_uid,dv.von,dv.bis
-        from hr.tbl_dienstverhaeltnis dv join public.tbl_benutzer b on  (dv.mitarbeiter_uid=b.uid)  join public.tbl_person p using(person_id)
-             join public.tbl_mitarbeiter m  on (b.uid=m.mitarbeiter_uid)
+		SELECT
+			m.personalnummer, p.person_id, b.uid, p.nachname, p.vorname,
+			p.nachname || ', ' || COALESCE(p.vorname,'') || ' ' || COALESCE(p.titelpre,'') AS name,
+			dv.mitarbeiter_uid, dv.von, dv.bis, dv.vertragsart_kurzbz, va.bezeichnung AS vertragsart
+		FROM
+			hr.tbl_dienstverhaeltnis dv
+		JOIN
+			hr.tbl_vertragsart va USING(vertragsart_kurzbz)
+		JOIN
+			public.tbl_benutzer b ON (dv.mitarbeiter_uid=b.uid)
+		JOIN
+			public.tbl_person p USING(person_id)
+		JOIN
+			public.tbl_mitarbeiter m  ON (b.uid=m.mitarbeiter_uid)
         $where
         $order
         ";
@@ -965,7 +976,8 @@ class Api_model extends DB_Model
                      WHEN s.matrikelnr is not null THEN \'Student\'
                      ELSE \'-\'
                 END AS status,
-                exists (select 1 from public.tbl_benutzer tb join public.tbl_mitarbeiter tm on(tb.uid=tm.mitarbeiter_uid) where person_id=p.person_id) as taken
+                exists (select 1 from public.tbl_benutzer tb join public.tbl_mitarbeiter tm on(tb.uid=tm.mitarbeiter_uid) where person_id=p.person_id) as taken,
+                array(select kontakt from tbl_kontakt k where k.person_id=p.person_id and k.kontakttyp=\'email\') emails
             FROM
                 public.tbl_person p LEFT JOIN
                 public.tbl_benutzer b ON (p.person_id=b.person_id)  LEFT JOIN

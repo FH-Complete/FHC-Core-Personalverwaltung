@@ -17,13 +17,13 @@ class Api extends Auth_Controller
     public function __construct() {
 
         parent::__construct(
-			array(
-				'index' => Api::DEFAULT_PERMISSION,
-				'getSprache' => Api::DEFAULT_PERMISSION,
-				'getSachaufwandtyp' => Api::DEFAULT_PERMISSION,
-				'getNations' => Api::DEFAULT_PERMISSION,
-				'getAusbildung' => Api::DEFAULT_PERMISSION,
-				'getStandorteIntern' => Api::DEFAULT_PERMISSION,
+	    array(
+		'index' => Api::DEFAULT_PERMISSION,
+		'getSprache' => Api::DEFAULT_PERMISSION,
+		'getSachaufwandtyp' => Api::DEFAULT_PERMISSION,
+		'getNations' => Api::DEFAULT_PERMISSION,
+		'getAusbildung' => Api::DEFAULT_PERMISSION,
+		'getStandorteIntern' => Api::DEFAULT_PERMISSION,
                 'getOrte' => Api::DEFAULT_PERMISSION,
                 'getGemeinden' => Api::DEFAULT_PERMISSION,
                 'getOrtschaften' => Api::DEFAULT_PERMISSION,
@@ -68,58 +68,57 @@ class Api extends Auth_Controller
                 'dvByPerson' => Api::DEFAULT_PERMISSION,
                 'vertragByDV' => Api::DEFAULT_PERMISSION,
                 'getCompanyByOrget'  => Api::DEFAULT_PERMISSION,
-				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
-				'getAllFunctions' => Api::DEFAULT_PERMISSION,
-				'getContractFunctions' => Api::DEFAULT_PERMISSION,
-				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
-				'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
+		'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
+		'getAllFunctions' => Api::DEFAULT_PERMISSION,
+		'getContractFunctions' => Api::DEFAULT_PERMISSION,
+		'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
+		'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
                 'getAllFunctions' => Api::DEFAULT_PERMISSION,
-				'saveVertrag' => Api::DEFAULT_PERMISSION,
-				'getCurrentVBs' => Api::DEFAULT_PERMISSION,
-				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
-				'getAllVBs' => Api::DEFAULT_PERMISSION,
-				'storeToTmpStore' => Api::DEFAULT_PERMISSION,
-				'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
-				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
-				'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
-				'getUnternehmen' => Api::DEFAULT_PERMISSION,
+		'saveVertrag' => Api::DEFAULT_PERMISSION,
+		'getCurrentVBs' => Api::DEFAULT_PERMISSION,
+		'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
+		'getAllVBs' => Api::DEFAULT_PERMISSION,
+		'storeToTmpStore' => Api::DEFAULT_PERMISSION,
+		'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
+		'getTmpStoreById' => Api::DEFAULT_PERMISSION,
+		'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
+		'getUnternehmen' => Api::DEFAULT_PERMISSION,
                 'getGehaltstypen' => Api::DEFAULT_PERMISSION,
-				'getVertragsarten' => Api::DEFAULT_PERMISSION,
+		'getVertragsarten' => Api::DEFAULT_PERMISSION,
                 'getVertragsbestandteiltypen' => Api::DEFAULT_PERMISSION,
                 'filterPerson' => Api::DEFAULT_PERMISSION,
                 'createEmployee' => Api::DEFAULT_PERMISSION,
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
                 'deleteDV'  => Api::DEFAULT_PERMISSION,
                 'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
-				'endDV'  => Api::DEFAULT_PERMISSION,
+		'endDV'  => Api::DEFAULT_PERMISSION,
                 'deactivateDV'  => Api::DEFAULT_PERMISSION,
-				'saveKarenz'  => Api::DEFAULT_PERMISSION,
-				'getKarenztypen' => Api::DEFAULT_PERMISSION,
-				'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
-				'getFreitexttypen' => Api::DEFAULT_PERMISSION,
+		'saveKarenz'  => Api::DEFAULT_PERMISSION,
+		'getKarenztypen' => Api::DEFAULT_PERMISSION,
+		'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
+		'getFreitexttypen' => Api::DEFAULT_PERMISSION,
                 'getVB' => Api::DEFAULT_PERMISSION,
                 'getGB' => Api::DEFAULT_PERMISSION,
                 'dvByID'=> Api::DEFAULT_PERMISSION,
-				'getStundensaetze' => Api::DEFAULT_PERMISSION,
-				'getStundensatztypen' => Api::DEFAULT_PERMISSION,
-				'updateStundensatz' => Api::DEFAULT_PERMISSION,
-				'deleteStundensatz' => Api::DEFAULT_PERMISSION,
+		'getStundensaetze' => Api::DEFAULT_PERMISSION,
+		'getStundensatztypen' => Api::DEFAULT_PERMISSION,
+		'updateStundensatz' => Api::DEFAULT_PERMISSION,
+		'deleteStundensatz' => Api::DEFAULT_PERMISSION,
                 'offTimeByPerson' => Api::DEFAULT_PERMISSION,
                 'timeRecordingByPerson' => Api::DEFAULT_PERMISSION,
                 'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
-			)
-		);
+                'getFristenListe' => Api::DEFAULT_PERMISSION,
+	    )
+	);
 
-
-		// Loads authentication library and starts authenticationfetc
-		$this->load->library('AuthLib');
+	// Loads authentication library and starts authenticationfetc
+	$this->load->library('AuthLib');
         $this->load->library('vertragsbestandteil/VertragsbestandteilLib',
 			null, 'VertragsbestandteilLib');
         $this->load->library('vertragsbestandteil/GehaltsbestandteilLib',
 			null, 'GehaltsbestandteilLib');
         $this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib',
 			null, 'GehaltsabrechnungLib');
-
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
         $this->load->model('person/Person_model','PersonModel');
@@ -144,14 +143,14 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
-		$this->load->model('ressource/Funktion_model', 'FunktionModel');
+	$this->load->model('ressource/Funktion_model', 'FunktionModel');
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
-	    $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
-	    $this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+	$this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
+	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
         $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
 
         // get CI for transaction management
@@ -167,13 +166,13 @@ class Api extends Auth_Controller
     function getSprache()
     {
         //$this->SpracheModel->addOrder("sprache");
-		$spracheRes = $this->SpracheModel->load();
+	$spracheRes = $this->SpracheModel->load();
 
-		if (isError($spracheRes))
-		{
-			$this->outputJsonError(getError($spracheRes));
-			exit;
-		}
+	if (isError($spracheRes))
+	{
+		$this->outputJsonError(getError($spracheRes));
+		exit;
+	}
 
         $this->outputJson($spracheRes);
     }
@@ -182,14 +181,14 @@ class Api extends Auth_Controller
     function getSachaufwandtyp()
     {
         $this->SachaufwandtypModel->addSelect("sachaufwandtyp_kurzbz, bezeichnung, sort, aktiv");
-		$this->SachaufwandtypModel->addOrder("bezeichnung");
-		$sachaufwandTypRes = $this->SachaufwandtypModel->load();
+	$this->SachaufwandtypModel->addOrder("bezeichnung");
+	$sachaufwandTypRes = $this->SachaufwandtypModel->load();
 
-		if (isError($sachaufwandTypRes))
-		{
-			$this->outputJsonError(getError($sachaufwandTypRes));
-			exit;
-		}
+	if (isError($sachaufwandTypRes))
+	{
+		$this->outputJsonError(getError($sachaufwandTypRes));
+		exit;
+	}
 
         $this->outputJson($sachaufwandTypRes);
     }
@@ -198,17 +197,17 @@ class Api extends Auth_Controller
     {
         $language = getUserLanguage();
 
-		$nationTextFieldName = $language == 'German' ? 'langtext' : 'engltext';
+	$nationTextFieldName = $language == 'German' ? 'langtext' : 'engltext';
 
         $this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text, sperre");
-		$this->NationModel->addOrder("nation_text");
-		$nationRes = $this->NationModel->load();
+	$this->NationModel->addOrder("nation_text");
+	$nationRes = $this->NationModel->load();
 
-		if (isError($nationRes))
-		{
-			$this->outputJsonError(getError($nationRes));
-			exit;
-		}
+	if (isError($nationRes))
+	{
+	    $this->outputJsonError(getError($nationRes));
+	    exit;
+	}
 
         $this->outputJson($nationRes);
     }
@@ -216,13 +215,13 @@ class Api extends Auth_Controller
     function getAusbildung()
     {
         $this->AusbildungModel->addOrder("ausbildungcode");
-		$result = $this->AusbildungModel->load();
+	$result = $this->AusbildungModel->load();
 
-		if (isError($result))
-		{
-			$this->outputJsonError(getError($result));
-			exit;
-		}
+	if (isError($result))
+	{
+	    $this->outputJsonError(getError($result));
+	    exit;
+	}
 
         $this->outputJson($result);
     }
@@ -492,7 +491,6 @@ class Api extends Auth_Controller
 
         $data = $this->ApiModel->getCovidDate($person_id, $date);
         $this->outputJson($data);
-
     }
 
     /**
@@ -517,7 +515,6 @@ class Api extends Auth_Controller
         }
 
         return $this->outputJsonSuccess(TRUE);
-
     }
 
 
@@ -545,7 +542,6 @@ class Api extends Auth_Controller
 
         if (isSuccess($data))
         {
-
             /**
              * @var Gehaltsbestandteil_model
              */
@@ -565,8 +561,6 @@ class Api extends Auth_Controller
         } else {
             $this->outputJsonError("Error when getting current DV");
         }
-
-
     }
 
     function gbtByDV()
@@ -685,14 +679,14 @@ class Api extends Auth_Controller
         $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);*/
 
         $now = new DateTime();
-		if( version_compare(phpversion(), '7.1.0', 'lt') )
-		{
-			$now->setTime(0,0,0);
-		}
-		else
-		{
-			$now->setTime(0,0,0,0);
-		}
+	if( version_compare(phpversion(), '7.1.0', 'lt') )
+	{
+	    $now->setTime(0,0,0);
+	}
+	else
+	{
+	    $now->setTime(0,0,0,0);
+	}
 
         // fetch Gesamtgehalt
         $data = $this->gbtChartDataGesamt($now, $dv_id);
@@ -705,10 +699,10 @@ class Api extends Auth_Controller
         $abgerechnet_data = $this->gbtChartDataAbgerechnet($from_date, $to_date, $dv_id);
 
         if(isError($abgerechnet_data))
-		{
-			$this->outputJsonError("error getting chart data");
+	{
+	    $this->outputJsonError("error getting chart data");
             return;
-		}
+	}
 
         $this->outputJson(array('gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
 
@@ -734,7 +728,6 @@ class Api extends Auth_Controller
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
         $this->outputJson($data);
-
     }
 
     // --------------------------------------
@@ -2426,7 +2419,6 @@ EOSQL;
         return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
     }
 
-
     function saveKarenz()
     {
         $payload = json_decode($this->input->raw_input_stream);
@@ -2446,6 +2438,27 @@ EOSQL;
         }
 
         return $this->outputJsonSuccess('Karenz gespeichert');
+    }
+
+    public function getFristenListe()
+    {
+        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname,p.nachname,p.person_id,
+                verantwortlich_p.vorname verantwortlich_vorname, verantwortlich_p.nachname verantwortlich_nachname, verantwortlich_p.person_id verantwortlich_person_id
+                FROM hr.tbl_frist f JOIN hr.tbl_frist_status status using(status_kurzbz) 
+                    join hr.tbl_frist_ereignis ereignis using(ereignis_kurzbz) 
+                    left join public.tbl_mitarbeiter m using(mitarbeiter_uid)                     
+                    left join public.tbl_benutzer b on(m.mitarbeiter_uid=b.uid) 
+                    left join public.tbl_person p on (b.person_id=p.person_id)
+                    left join public.tbl_benutzer verantwortlich_b on(f.verantwortlich_uid=verantwortlich_b.uid) 
+                    left join public.tbl_person verantwortlich_p on (verantwortlich_b.person_id=verantwortlich_p.person_id)
+                ORDER BY f.datum ASC";
+
+      //  $sql="select frist_id,mitarbeiter_uid,ereignis_kurzbz,bezeichnung,datum,status_kurzbz,parameter,insertvon,insertamum,updatevon,updateamum from hr.tbl_frist";
+
+		$query = $this->CI->db->query($sql, array());
+        $result = $query->result();
+//		$this->_remapData('frist_id',$result);
+		return $this->outputJson($result);
     }
 
 	public function getKarenztypen()
@@ -2590,7 +2603,6 @@ EOSQL;
 
 			return $this->outputJsonSuccess($result);
 		}
-
 	}
 
     /**

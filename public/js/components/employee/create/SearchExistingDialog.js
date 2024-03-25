@@ -36,7 +36,7 @@ export const SearchExistingDialog = {
             
             emit('change', currentValue );
 
-            if (currentValue.surname.length<2) {
+            if (currentValue.surname.length<2 || currentValue.birthdate == null || currentValue.birthdate == '') {
                 personList.value = [];
                 return;
             }
@@ -103,6 +103,20 @@ export const SearchExistingDialog = {
     <form class="row g-3 pb-4" ref="searchExistingFrm" id="searchExistingFrm" >
 
         <div class="col-md-3">
+            <label for="birthdate" class="form-label required">Geburtsdatum</label>
+            <datepicker id="birthdate" 
+                :teleport="true"
+                v-model="currentValue.birthdate"
+                v-bind:enable-time-picker="false"
+                text-input 
+                locale="de"
+                format="d.M.yyyy"
+                auto-apply 
+                model-type="yyyy-MM-dd" 
+                @change="filterPerson" ></datepicker>
+        </div>
+
+        <div class="col-md-3">
             <label for="surname" class="required form-label">Nachname</label>
             <input id="surname" 
                 ref="surnameRef"
@@ -113,32 +127,20 @@ export const SearchExistingDialog = {
                 aria-label="nachname"
                 autofocus >
         </div>
-        <div class="col-md-3">
-            <label for="birthdate" class="form-label">Geburtsdatum</label>
-            <datepicker id="birthdate" 
-                :teleport="true"
-                v-model="currentValue.birthdate"
-                v-bind:enable-time-picker="false"
-                text-input 
-                locale="de"
-                format="dd.MM.yyyy"
-                auto-apply 
-                model-type="yyyy-MM-dd" 
-                @change="filterPerson" ></datepicker>
-        </div>
+        
         <div v-if="personList.length !== 0" class="col-md-12 py-3">
             <span class="text-primary fw-semibold"><i class="fa fa-circle-info text-primary"></i>&nbsp;{{ personList.length }} Personen gefunden</span>
             <table class="table table-sm table-striped table-hover mt-2">
                 <thead>
-                    <tr><th>UID</th><th>Nachname</th><th>Vorname</th><th>Geb.Dat.</th><th>SVNr</th><th>Status</th><th>Aktion</th></tr>
+                    <tr><th>UID</th><th>Name</th><th>Geb.Dat.</th><th>SVNr</th><th>Email</th><th>Status</th><th>Aktion</th></tr>
                 </thead>
                 <tbody>
-                    <tr v-for="person in personList"  @click="personSelectedHandler(person.person_id, person.uid, 'select')">
+                    <tr v-for="person in personList" >
                         <td>{{ person.uid }}</td>
-                        <td>{{ person.nachname }}</td>
-                        <td>{{ person.vorname }}</td>
+                        <td>{{ person.nachname }}, {{ person.vorname }}</td>
                         <td>{{ formatDate(person.gebdatum) }}</td>
                         <td>{{ person.svnr }}</td>
+                        <td><span v-if="person.emails.length > 0">{{ person.emails.join(", ") }}</span></td>
                         <td>{{ person.status }}</td>
                         <td @click.stop>
                             <div class="d-grid gap-2 d-md-flex justify-content-start">
@@ -146,8 +148,15 @@ export const SearchExistingDialog = {
                                     @click="take(person.person_id, person.uid, person.vorname, person.nachname)"
                                     style="white-space: nowrap"
                                     :disabled="isFetching"
-                                    v-if="person.status=='Student' && !person.taken">
+                                    v-if="!person.taken">
                                     Person als MA anlegen
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" 
+                                    @click="personSelectedHandler(person.person_id, person.uid, 'select')"
+                                    style="white-space: nowrap"
+                                    :disabled="isFetching"
+                                    v-if="person.taken">
+                                    MA auswählen
                                 </button>
                             </div>
                         </td>
