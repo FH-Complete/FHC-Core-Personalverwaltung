@@ -55,6 +55,86 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, array($person_id));
     }
 
+    function getEmployeesWithoutContract()
+    {
+        $qry="SELECT
+        vorname, nachname, person_id, uid, campus.vw_mitarbeiter.personalnummer, campus.vw_mitarbeiter.insertamum,anmerkung,
+        (
+            SELECT studiensemester_kurzbz FROM (
+                SELECT
+                    studiensemester_kurzbz, tbl_studiensemester.start
+                FROM
+                    lehre.tbl_lehreinheitmitarbeiter
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                    JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+                WHERE
+                    tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+                UNION
+                SELECT
+                    studiensemester_kurzbz, tbl_studiensemester.start
+                FROM
+                    lehre.tbl_projektbetreuer
+                    JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                    JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+                WHERE
+                    tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+            ) a
+            ORDER BY start DESC
+            LIMIT 1
+        ) as letzter_lehrauftrag,
+        dv.dienstverhaeltnis_id, dv.von, dv.bis, dv.oe_kurzbz,  un.bezeichnung AS dv_unternehmen
+    FROM
+        campus.vw_mitarbeiter
+        LEFT JOIN
+            hr.tbl_dienstverhaeltnis as dv on (campus.vw_mitarbeiter.uid=dv.mitarbeiter_uid)
+        LEFT JOIN
+            public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
+    WHERE
+        campus.vw_mitarbeiter.aktiv = true
+        AND fixangestellt = false
+        AND lektor = true
+        AND bismelden = true
+        AND personalnummer > 0
+		AND dv.bis is null
+        AND campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval
+        AND NOT EXISTS(
+            SELECT
+                1
+            FROM
+                lehre.tbl_lehreinheitmitarbeiter
+                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+            WHERE
+                tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+                AND tbl_lehreinheit.studiensemester_kurzbz IN(
+                        SELECT
+                            studiensemester_kurzbz
+                        FROM
+                            public.tbl_studiensemester
+                        WHERE start <= now()
+                        ORDER BY start DESC
+                        LIMIT 3)
+            UNION
+            SELECT
+                1
+            FROM
+                lehre.tbl_projektbetreuer
+                JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+            WHERE
+                tbl_lehreinheit.studiensemester_kurzbz IN(SELECT
+                        studiensemester_kurzbz
+                    FROM
+                        public.tbl_studiensemester
+                    WHERE start <= now()
+                    ORDER BY start DESC
+                    LIMIT 3)
+                AND tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+            )";
+
+        return $this->execQuery($qry);
+    }
+
     function getPersonHeaderData($person_id)
     {
         $qry = "
@@ -230,7 +310,7 @@ class Api_model extends DB_Model
         return $this->execQuery($query, array($datestring, $datestring, $person_id));
     }
 
-    public function getOffTimeList($person_uid, $year = 0)    
+    public function getOffTimeList($person_uid, $year = 0)
     {
 
         $year_filter = " AND z.vondatum>=now()";
@@ -244,7 +324,7 @@ class Api_model extends DB_Model
         }
 
         $qry = "
-        SELECT 
+        SELECT
             z.zeitsperre_id,
             z.zeitsperretyp_kurzbz,
             t.beschreibung as zeitsperretyp,
@@ -427,7 +507,7 @@ class Api_model extends DB_Model
 
         return $result->retval[0]->pnr;
     }
-	
+
     function insertUser($userJson)
     {
 
@@ -438,7 +518,7 @@ class Api_model extends DB_Model
 
         $userJson['insertvon'] = getAuthUID();
         $userJson['insertamum'] = $this->escape('NOW()');
-		
+
         $result = $this->BenutzerModel->insert($userJson);
 
         if (isError($result))
@@ -467,6 +547,7 @@ class Api_model extends DB_Model
             p.telefonklappe,
             p.kurzbz,
             p.lektor,
+            p.habilitation,
             p.fixangestellt,
             p.stundensatz,
             p.ausbildungcode,
@@ -866,6 +947,11 @@ class Api_model extends DB_Model
 
         $parametersArray = array($surname);
         $where ="p.nachname~* ? ";
+        if (mb_strlen($surname) == 2)
+        {
+            $where = "p.nachname=? ";
+        }
+
         if (mb_strlen($surname) == 2) 
         {
             $where = "p.nachname=? ";

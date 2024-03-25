@@ -13,9 +13,11 @@ export const JobFunction = {
         "datepicker": VueDatePicker
     },
     props: {
-        editMode: { type: Boolean, required: true },
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},
+        editMode: { type: Boolean, required: false },
+        personID: { type: Number, required: false },
+        personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
     },
     emits: ['updateHeader'],
@@ -30,6 +32,11 @@ export const JobFunction = {
         const dialogRef = Vue.ref();
 
         const isFetching = Vue.ref(false);
+
+        const theModel = Vue.computed({
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+        });
 
         const unternehmen = Vue.ref();
         const jobfunctionList = Vue.ref([]);
@@ -57,7 +64,7 @@ export const JobFunction = {
           };
 
         const fetchData = async () => {
-            if (currentPersonID.value==null) {    
+            if (currentPersonID.value==null && theModel.value.personID==null) {    
                 jobfunctionList.value = [];            
                 return;
             }
@@ -65,7 +72,7 @@ export const JobFunction = {
  
             // fetch data and map them for easier access
             try {
-                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(currentPersonUID.value);
+                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
                 let rawList = response.data.retval;
                 tableData.value = response.data.retval;
                 jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
@@ -80,7 +87,7 @@ export const JobFunction = {
         const createShape = () => {
             return {
                 benutzerfunktion_id: 0,
-                uid: currentPersonUID.value,
+                uid: theModel.value.personUID || currentPersonUID.value,
                 oe_kurzbz: "",
                 funktion_kurzbz: "",
                 datum_von: "",
@@ -122,7 +129,6 @@ export const JobFunction = {
         }
 
         Vue.onMounted(async () => {
-            console.log('Job function mounted', props.personID);
             currentValue.value = createShape();
             await fetchData();
 
@@ -284,7 +290,7 @@ export const JobFunction = {
                     if (res.data.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
-                        emit('updateHeader');
+                        theModel.value.updateHeader();
                     }
                 } catch (error) {
                     console.log(error)              
@@ -319,7 +325,7 @@ export const JobFunction = {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
-                        emit('updateHeader');
+                        theModel.value.updateHeader();
                         showToast();
                     }  
                 } catch (error) {
@@ -588,3 +594,5 @@ export const JobFunction = {
     </ModalDialog>
     `
 }
+
+export default JobFunction;
