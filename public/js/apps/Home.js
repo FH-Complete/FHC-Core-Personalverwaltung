@@ -4,6 +4,7 @@ import {searchbaroptions, searchfunction } from "./common.js";
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/vbform/api.js";
 import Phrasen from '../../../../js/plugin/Phrasen.js';
+import { DeadlineIssueTable } from '../components/home/DeadlineIssueTable.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 

@@ -23,7 +23,7 @@
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/IssuesCountCard.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
                       ],
       'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'),
        

@@ -27,6 +27,16 @@ export default {
       } 
     })  
   },
+
+  batchUpdateFristStatus: function(fristen, status_kurzbz) {
+    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+            + '/extensions/FHC-Core-Personalverwaltung/api/batchUpdateFristStatus';
+    return axios.post(url, {fristen, status_kurzbz}, {
+      headers: {
+        'Content-Type': 'application/json'
+      } 
+    })  
+  },
   
   upsertFrist: function(frist) {
     let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 

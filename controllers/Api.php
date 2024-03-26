@@ -112,6 +112,7 @@ class Api extends Auth_Controller
                 'updateFristStatus' => Api::DEFAULT_PERMISSION,
                 'deleteFrist' => Api::DEFAULT_PERMISSION,
                 'upsertFrist' => Api::DEFAULT_PERMISSION,
+                'batchUpdateFristStatus' => Api::DEFAULT_PERMISSION
 			)
 		);
 
@@ -2435,6 +2436,31 @@ EOSQL;
 			$this->outputJsonSuccess($frist->retval);
     }
 
+
+    /**
+     * update multiple deadlines at once
+     */
+    public function batchUpdateFristStatus()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['fristen']) && !is_array($payload['fristen']))
+                show_error('fristen does not seem to be an array!');
+
+            $result = $this->FristModel->batchUpdateStatus($payload['fristen'], $payload['status_kurzbz'], getAuthUID());
+
+            if ($result === true)
+                $this->outputJsonSuccess($result);
+            else
+                $this->outputJsonError('Error when updating deadlines');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
+
+    }
 
     public function upsertFrist()
     {
