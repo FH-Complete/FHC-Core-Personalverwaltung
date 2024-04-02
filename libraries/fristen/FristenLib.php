@@ -4,8 +4,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 require_once  __DIR__.'/DVEndFrist.php';
 require_once  __DIR__.'/DVBeginFrist.php';
-require_once  __DIR__.'/ZeitaufzeichnungBeginFrist.php';
-require_once  __DIR__.'/ZeitaufzeichnungEndFrist.php';
+require_once  __DIR__.'/BefristungBeginFrist.php';
+require_once  __DIR__.'/BefristungEndFrist.php';
 require_once  __DIR__.'/KarenzBeginFrist.php';
 require_once  __DIR__.'/KarenzEndFrist.php';
 require_once  __DIR__.'/StundenBeginFrist.php';
@@ -27,8 +27,8 @@ class FristenLib
         $count = 0;
         $dvBeginFrist = new DVBeginFrist();
         $dvEndFrist = new DVEndFrist();
-        $zeitaufzeichnungBeginFrist = new ZeitaufzeichnungBeginFrist();
-        $zeitaufzeichnungEndFrist = new ZeitaufzeichnungEndFrist();
+        $befristungBeginFrist = new BefristungBeginFrist();
+        $befristungEndFrist = new BefristungEndFrist();
         $karenzBeginFrist = new KarenzBeginFrist();
         $karenzEndFrist = new KarenzEndFrist();
         $stundenBeginFrist = new StundenBeginFrist();
@@ -41,11 +41,11 @@ class FristenLib
         if ($res !== false) {
             $count+=$res;
         }
-        $res=$this->runFristenUpdate($zeitaufzeichnungBeginFrist, $date);
+        $res=$this->runFristenUpdate($befristungBeginFrist, $date);
         if ($res !== false) {
             $count+=$res;
         }
-        $res=$this->runFristenUpdate($zeitaufzeichnungEndFrist, $date);
+        $res=$this->runFristenUpdate($befristungEndFrist, $date);
         if ($res !== false) {
             $count+=$res;
         }
