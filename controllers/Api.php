@@ -2515,7 +2515,8 @@ EOSQL;
 
     public function getFristenEreignisse()
 	{
-		$result = $this->FristenLib->getFristenEreignis();
+        $manuell = $this->input->get('manuell', FALSE);
+		$result = $this->FristenLib->getFristenEreignis($manuell);
 		return $this->outputJson($result);
 	}
 

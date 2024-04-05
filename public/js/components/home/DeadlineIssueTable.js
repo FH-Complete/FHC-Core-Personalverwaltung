@@ -118,7 +118,8 @@ export const DeadlineIssueTable = {
                 //row.getElement().childNodes[5].style.backgroundColor = "#0080004d"
                 row.getElement().childNodes[5].style.color = "#198754"
             } else if (Date.parse(data.datum) <= now) {
-                row.getElement().childNodes[5].style.color = "#871954"
+                row.getElement().childNodes[5].style.color = "#871919"
+                row.getElement().childNodes[5].style.fontWeight = "bold"
             }
           }
 

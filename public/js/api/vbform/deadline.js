@@ -70,4 +70,10 @@ export default {
     return axios.get(url);
   },
 
+  getFristenEreignisseManuell: function() {
+    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+            + '/extensions/FHC-Core-Personalverwaltung/api/getFristenEreignisse?manuell=1';
+    return axios.get(url);
+  },
+
 };

@@ -62,7 +62,7 @@ export const DeadlineIssueDialog = {
         const fetchFristEreignisse = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenEreignisse();
+                const res = await Vue.$fhcapi.Deadline.getFristenEreignisseManuell();
                 fristEreignisse.value = res.data;			  
                 isFetching.value = false;                        
             } catch (error) {
@@ -82,8 +82,11 @@ export const DeadlineIssueDialog = {
 
         const fristDataFrm = Vue.ref();
 
-        const frmState = Vue.reactive({ bezeichnungBlurred: false, datumBlurred: false, wasValidated: false });
+        const frmState = Vue.reactive({ ereignisBlurred: false, bezeichnungBlurred: false, datumBlurred: false, wasValidated: false });
 
+        const validEreignis = (n) => {
+            return !!n && n != "";
+        }
 
         const validBezeichnung = (n) => {
             return !!n && n.trim() != "";
@@ -94,9 +97,10 @@ export const DeadlineIssueDialog = {
         }
 
         const validate = () => {
+            frmState.ereignisBlurred = true;
             frmState.datumBlurred = true;
             frmState.bezeichnungBlurred = true;
-            if (validDatum(frist.value?.datum) && validBezeichnung(frist.value?.bezeichnung)) {
+            if (validEreignis(frist.value?.ereignis_kurzbz) && validDatum(frist.value?.datum) && validBezeichnung(frist.value?.bezeichnung)) {
                 return true;
             }
             return false;
@@ -133,15 +137,29 @@ export const DeadlineIssueDialog = {
             }
         }
 
-        return { modalRef, fristDataFrm, frist, t, showModal, hideModal, fristStatus, validDatum, validBezeichnung, frmState, okHandler }
+        return { modalRef, fristDataFrm, frist, t, showModal, hideModal, fristStatus, fristEreignisse, 
+            validEreignis, validDatum, validBezeichnung, frmState, okHandler }
     },
     template: `
     <Modal :title="'Termin/Frist'" ref="modalRef">
         <template #body>
             <form class="row g-3" v-if="frist != null"  ref="fristDataFrm" >
-                           
+                         
                 <div class="col-md-6">
-                    <label for="bezeichnung" class="form-label required">{{ t('person','bezeichnung') }}</label>
+                    <label for="ereignis_kurzbz" class="form-label required">Ereignis</label>
+                    <select  id="ereignis_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " 
+                        @blur="frmState.ereignisBlurred = true"   v-model="frist.ereignis_kurzbz" 
+                        :class="{'is-invalid': !validEreignis(frist.ereignis_kurzbz) && frmState.ereignisBlurred}">
+                        <option v-for="(item, index) in fristEreignisse" :value="item.ereignis_kurzbz" >
+                            {{ item.bezeichnung }}
+                        </option>
+                    </select>
+
+                </div>    
+
+
+                <div class="col-md-6">
+                    <label for="bezeichnung" class="form-label required">{{ t('person','todo') }}</label>
                     <input type="text" class="form-control form-control-sm" @blur="frmState.bezeichnungBlurred = true"  
                         id="bezeichnung" 
                         v-model="frist.bezeichnung" 
