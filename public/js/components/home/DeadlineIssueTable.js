@@ -1,5 +1,6 @@
 import { Toast } from "../Toast.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 
 export const DeadlineIssueTable = {    
   components: {
@@ -239,34 +240,35 @@ export const DeadlineIssueTable = {
       }
 
       return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef, isFetching, fristStatus, current_status_kurzbz, 
-        updateStatus, updateStatusToastRef, refreshDeadlinesToastRef, t }
+        updateStatus, updateStatusToastRef, refreshDeadlinesToastRef, t, selectedData }
     },
   template: `
 
     <div class="toast-container position-absolute z-3 top-0 end-0 pt-4 pe-2">
       <Toast ref="updateStatusToastRef">
-          <template #body><h4>{{ t('person','fristStatusGespeichert') }}</h4></template>
+          <template #body><h4>{{ t('fristenmanagement','fristStatusGespeichert') }}</h4></template>
       </Toast>
     </div>
 
     <div class="toast-container position-fixed top-0 end-0 pt-5 pe-2">
       <Toast ref="refreshDeadlinesToastRef">
-          <template #body><h4>{{ t('person','fristenAktualisiert') }}</h4></template>
+          <template #body><h4>{{ t('fristenmanagement','fristenAktualisiert') }}</h4></template>
       </Toast>
     </div>
 
-    <div id="master" class="d-flex  pt-4 pb-1 mb-1">
+    <div id="master" class="d-flex flex-column  pt-4 pb-1 mb-1">
                         
       <div class="me-auto">
-        <h4 class="h4">Termine & Fristen<span v-if="fristen != null  && fristen.length > 0"> ({{ fristen.length }})</span> 
-          <button type="button" class="btn btn-sm btn-outline btn-outline-secondary  ms-2" @click="updateDeadlines"><i class="fas fa-sync"></i></button>
+        <h4 class="h4">Termine & Fristen<span v-if="fristen != null  && fristen.length > 0"> ({{ fristen.length }})</span>           
         </h4>   
         
         
       </div>
 
-      <div class="d-flex align-items-end flex-column">
-        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">
+      <div class="d-flex align-items-start flex-column">        
+        <div class="d-grid d-sm-flex gap-2 mb-2 mt-4 flex-nowrap align-items-center">
+          <button type="button" class="btn btn-sm btn-primary " @click="updateDeadlines"><i class="fas fa-sync"></i></button>
+          <div style="flex-shrink: 0">Mit {{ selectedData.length }} ausgewählten: </div>
           <select  id="status_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm "  v-model="current_status_kurzbz" >
               <option value="">- Status -</option>
               <option v-for="(item, index) in fristStatus" :value="item.status_kurzbz" >

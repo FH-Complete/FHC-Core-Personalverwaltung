@@ -141,7 +141,7 @@ export const DeadlineIssueDialog = {
             validEreignis, validDatum, validBezeichnung, frmState, okHandler }
     },
     template: `
-    <Modal :title="'Termin/Frist'" ref="modalRef">
+    <Modal :title="t('fristenmanagement','termin_frist')" ref="modalRef">
         <template #body>
             <form class="row g-3" v-if="frist != null"  ref="fristDataFrm" >
                          
@@ -159,7 +159,7 @@ export const DeadlineIssueDialog = {
 
 
                 <div class="col-md-6">
-                    <label for="bezeichnung" class="form-label required">{{ t('person','todo') }}</label>
+                    <label for="bezeichnung" class="form-label required">{{ t('fristenmanagement','todo') }}</label>
                     <input type="text" class="form-control form-control-sm" @blur="frmState.bezeichnungBlurred = true"  
                         id="bezeichnung" 
                         v-model="frist.bezeichnung" 
@@ -169,7 +169,7 @@ export const DeadlineIssueDialog = {
                 </div>
 
                 <div class="col-md-6">
-                    <label for="datum" class="required form-label">{{ t('ui','deadline') }}</label>
+                    <label for="datum" class="required form-label">{{ t('fristenmanagement','frist') }}</label>
                     <datepicker id="datum" 
                         :teleport="true" 
                         @blur="frmState.datumBlurred = true" 

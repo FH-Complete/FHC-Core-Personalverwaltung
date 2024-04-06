@@ -4,18 +4,7 @@ import { ModalDialog } from '../../ModalDialog.js';
 import { DeadlineIssueDialog } from './DeadlineIssueDialog.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
-
-// Tabulator
-//import FhcAlert from "../../../../../../js/plugin/FhcAlert.js";
-
-// Load Helpers:
-// =============
-import { CoreRESTClient } from "../../../../../../js/RESTClient.js";
-
-// Load Components:
-// ===============
 import { CoreFilterCmpt } from "../../../../../../js/components/filter/Filter.js";
-import BsModal from "../../../../../../js/components/Bootstrap/Modal.js";
 
 
 export const DeadlineIssueTable = {    
@@ -24,9 +13,7 @@ export const DeadlineIssueTable = {
     Toast,
     "p-skeleton": primevue.skeleton,
     DeadlineIssueDialog,
-
     CoreFilterCmpt,
-		BsModal,
   },
   props: {
     uid: String,
@@ -456,19 +443,19 @@ export const DeadlineIssueTable = {
 
     <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
       <Toast ref="toastRef">
-          <template #body><h4>{{ t('person','fristStatusGespeichert') }}</h4></template>
+          <template #body><h4>{{ t('fristenmanagement','fristStatusGespeichert') }}</h4></template>
       </Toast>
     </div>
 
     <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
       <Toast ref="createToastRef">
-          <template #body><h4>{{ t('person','fristGespeichert') }}</h4></template>
+          <template #body><h4>{{ t('fristenmanagement','fristGespeichert') }}</h4></template>
       </Toast>
     </div>
 
     <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
       <Toast ref="deleteToastRef">
-          <template #body><h4>{{ t('person','fristGeloescht') }}</h4></template>
+          <template #body><h4>{{ t('fristenmanagement','fristGeloescht') }}</h4></template>
       </Toast>
     </div>
 
@@ -481,7 +468,7 @@ export const DeadlineIssueTable = {
     
     <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
         <template #body>
-            {{ t('person','frist') }} '{{ getFristEreignisBezeichnung(currentFrist?.ereignis_kurzbz) }} {{ formatDate(currentFrist?.datum) }}' {{ t('person','wirklichLoeschen') }}?
+            {{ t('fristenmanagement','frist') }} '{{ getFristEreignisBezeichnung(currentFrist?.ereignis_kurzbz) }} {{ formatDate(currentFrist?.datum) }}' {{ t('person','wirklichLoeschen') }}?
         </template>
     </ModalDialog>
 
@@ -517,13 +504,5 @@ export const DeadlineIssueTable = {
 			</template>
 		</core-filter-cmpt>
 		
-		<!-- Modal -->
-		<bs-modal ref="modalContainer" class="bootstrap-prompt" v-bind="$props" @hidden-bs-modal="onHiddenBsModal">
-			<template #title>{{ modalTitel }}</template>
-			<template #default>Content</template>
-			<template #footer>
-				<button type="button" class="btn btn-primary" @click="onBsModalSave">{{ modalTitel }}</button>
-			</template>
-		</bs-modal>
   `
 }
