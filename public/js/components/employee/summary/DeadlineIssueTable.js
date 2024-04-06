@@ -71,13 +71,24 @@ export const DeadlineIssueTable = {
         try {
             isFetching.value = true;
             const res = await Vue.$fhcapi.Deadline.getFristenStatus();
-            fristStatus.value = res.data;			  
+            fristStatus.value = res.data;		
             isFetching.value = false;                        
         } catch (error) {
             console.log(error);
             isFetching.value = false;           
         }	
       }
+
+      
+      const fristStatusList = Vue.computed(() => {
+        // let res = fristStatus.value.map((element) => ({label: element.bezeichnung, value: element.status_kurzbz }) )
+        let result = fristStatus.value.reduce((res, x) => {
+          res[x.status_kurzbz] = x.bezeichnung;
+          return res;
+        }, {});
+        console.log(result);
+        return result
+      })
 
       const fetchFristEreignisse = async () => {
         try {
@@ -305,6 +316,8 @@ export const DeadlineIssueTable = {
         }
       }
 
+
+
       const columnsDef = [
         {
           formatter: 'rowSelection',
@@ -322,7 +335,17 @@ export const DeadlineIssueTable = {
         { title: 'Ereignis', field: "ereignis_bezeichnung", sorter:"string",  width: 140, headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
         { title: 'Deadline', field: "datum", hozAlign: "center",  width: 140, headerFilter:true,formatter: dateFormatter, headerFilterFunc:customHeaderFilter },
         { title: 'To Do', field: "bezeichnung", hozAlign: "left", headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-        { title: 'Status', field: "status_bezeichnung", hozAlign: "center", width: 140, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+        { title: 'Status', field: "status_kurzbz", hozAlign: "center", width: 140, sorter:"string", 
+          headerFilter:"list",
+          headerFilterParams: {valuesLookup:() => fristStatus.value.map((element) => ({label: element.bezeichnung, value: element.status_kurzbz })) },
+          editor: "list", 
+          editorParams:{
+            values:fristStatusList
+          },
+          formatter: (cell) => {
+            return fristStatus.value.find((element) => element.status_kurzbz == cell.getValue())?.bezeichnung
+          }
+        },
         {
           title: 'Aktionen',
           field: 'actions',
@@ -360,8 +383,8 @@ export const DeadlineIssueTable = {
 
       // Options
 
-      const tabulatorOptions = Vue.computed(() => {
-        return {
+      const tabulatorOptions = Vue.reactive({
+        //return {
           reactiveData: true,
           data: fristen.value,
           
@@ -376,7 +399,7 @@ export const DeadlineIssueTable = {
           columns: columnsDef,
 
           rowFormatter: rowFormatter,
-        }
+        //}
       })
 
 
@@ -384,6 +407,14 @@ export const DeadlineIssueTable = {
         console.log('fristenList changed');
         fristenTable.value?.tabulator.setData(fristen.value);
       }, {deep: true})
+
+    /*   Vue.watch(fristStatusList, (newVal, oldVal) => {
+        let colDefs = fristenTable.value?.tabulator.getColumnDefinitions()
+        let statusCol = colDefs.find(col => col.field === 'status_kurzbz')
+        if (statusCol !== undefined) {
+          statusCol.headerFilterParams.values = newVal;
+        }
+      }) */
 
 
       // Toast 
