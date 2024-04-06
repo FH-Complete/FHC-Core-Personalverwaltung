@@ -248,6 +248,19 @@ export const DeadlineIssueTable = {
 
       // Methods
 
+      const onTableCellEdited = async (cell) => {
+        console.log('onTableCellEdited', cell.getValue(), cell.getRow().getIndex())
+        try  {
+          isFetching.value = true
+          const res = await Vue.$fhcapi.Deadline.updateFristStatus(cell.getRow().getIndex(), cell.getValue());    
+          showToast();     
+        } catch (error) {
+            console.log(error);                
+        } finally {
+            isFetching.value = false;
+        }   
+      }
+
       const dateFormatter = (cell) => {
         return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
       }
@@ -434,7 +447,7 @@ export const DeadlineIssueTable = {
           deleteToastRef.value.show();
       }
 
-      return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, 
+      return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, onTableCellEdited,
                fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged, addDeadline,
                toastRef, createToastRef, deleteToastRef, dialogRef, isFetching, isFristFetching, updateStatus,
                fristenTable, tabulatorOptions, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel, current_status_kurzbz}
@@ -479,6 +492,9 @@ export const DeadlineIssueTable = {
 			table-only
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
+      :tabulator-events="[
+        {event: 'cellEdited', handler: onTableCellEdited},        
+      ]"
 			new-btn-label="Termin/Frist"
 			new-btn-show
 			new-btn-class="btn-primary"
