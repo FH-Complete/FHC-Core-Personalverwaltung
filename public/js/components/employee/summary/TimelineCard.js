@@ -1,3 +1,4 @@
+import { ref, toRefs, computed, watch, onMounted } from 'vue';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const TimelineCard = {
@@ -9,17 +10,17 @@ export const TimelineCard = {
      },
      setup( props ) {
         
-        const courseData = Vue.ref();
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("Timeline");
-        const currentUID = Vue.toRefs(props).uid        
+        const courseData = ref();
+        const isFetching = ref(false);
+        const title = ref("Timeline");
+        const currentUID = toRefs(props).uid        
 
         const formatDate = (ds) => {
             var d = new Date(ds);
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        const currentSemester = Vue.computed(() => {
+        const currentSemester = computed(() => {
             const d = new Date();
             let y= d.getFullYear(); 
             let semesterString = "SS";
@@ -60,11 +61,11 @@ export const TimelineCard = {
 			}		
 		}
 
-        Vue.onMounted(() => {
+        onMounted(() => {
           //  fetchCurrentDV();
         })
 
-        Vue.watch(
+        watch(
 			currentUID,
 			() => {
 				//fetchCurrentDV();

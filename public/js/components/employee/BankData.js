@@ -1,3 +1,4 @@
+import { reactive, ref, toRefs, computed, inject, watch, onMounted } from 'vue';
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
@@ -19,14 +20,15 @@ export const BankData = {
     },
     setup( props ) {
 
-        const readonly = Vue.ref(false);
-        const { personID } = Vue.toRefs(props);
+        const readonly = ref(false);
+        const { personID } = toRefs(props);
         const { t } = usePhrasen();
-        const dialogRef = Vue.ref();
-        const isFetching = Vue.ref(false);
-        const bankdataList = Vue.ref([]);
+        const dialogRef = ref();
+        const isFetching = ref(false);
+        const bankdataList = ref([]);
+        const fhcapi = inject("fhcapi");
 
-        const theModel = Vue.computed({  // Use computed to wrap the object
+        const theModel = computed({  // Use computed to wrap the object
             get: () => props.modelValue,
             set: (value) => emit('update:modelValue', value),
         });
@@ -38,7 +40,7 @@ export const BankData = {
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Person.personBankData(theModel.value.personID || personID.value);                    
+              const res = await fhcapi.Person.personBankData(theModel.value.personID || personID.value);                    
               bankdataList.value = res.data.retval;
             } catch (error) {
               console.log(error)              
@@ -62,8 +64,8 @@ export const BankData = {
             } 
         }
 
-        const currentValue = Vue.ref(createShape(theModel.value.personID || personID.value));
-        const preservedValue = Vue.ref(createShape(theModel.value.personID || personID.value));
+        const currentValue = ref(createShape(theModel.value.personID || personID.value));
+        const preservedValue = ref(createShape(theModel.value.personID || personID.value));
 
         const toggleMode = async () => {
             if (!readonly.value) {
@@ -84,17 +86,17 @@ export const BankData = {
               readonly.value = !readonly.value;
         }
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             currentValue.value = createShape(theModel.value.personID || personID.value);
             fetchData();
             
         })
 
-        const bankdataListArray = Vue.computed(() => (bankdataList.value ? Object.values(bankdataList.value) : []));
+        const bankdataListArray = computed(() => (bankdataList.value ? Object.values(bankdataList.value) : []));
 
         // Modal 
-        const modalRef = Vue.ref();
-        const confirmDeleteRef = Vue.ref();
+        const modalRef = ref();
+        const confirmDeleteRef = ref();
 
         const showAddModal = () => {
             currentValue.value = createShape(theModel.value.personID || personID.value);
@@ -122,7 +124,7 @@ export const BankData = {
 
                 isFetching.value = true
                 try {
-                  const res = await Vue.$fhcapi.Person.deletePersonBankData(id);                    
+                  const res = await fhcapi.Person.deletePersonBankData(id);                    
                   if (res.data.error == 0) {
                     delete bankdataList.value[id];
                     showDeletedToast();
@@ -148,7 +150,7 @@ export const BankData = {
             } else {
 
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonBankData(currentValue.value);                    
+                    const r = await fhcapi.Person.upsertPersonBankData(currentValue.value);                    
                     if (r.data.error == 0) {
                         bankdataList.value[r.data.retval[0].bankverbindung_id] = r.data.retval[0];
                         console.log('bankdata successfully saved');
@@ -169,9 +171,9 @@ export const BankData = {
         // form handling
         // -------------
 
-        const bankDataFrm = Vue.ref();
+        const bankDataFrm = ref();
 
-        const frmState = Vue.reactive({ ibanBlured: false, wasValidated: false });
+        const frmState = reactive({ ibanBlured: false, wasValidated: false });
 
         const validIban = (n) => {
             return !!n && n.trim() != "" && isChecksumValid(n.replace(/\s/g, ''));
@@ -205,13 +207,13 @@ export const BankData = {
             return false;
         }
 
-        const hasChanged = Vue.computed(() => {
+        const hasChanged = computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
         });
 
         // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
+        const toastRef = ref();
+        const deleteToastRef = ref();
         
         const showToast = () => {
             toastRef.value.show();

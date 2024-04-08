@@ -1,3 +1,5 @@
+import { inject } from 'vue';
+
 export default {
     props: {
         title: {
@@ -6,7 +8,7 @@ export default {
         }
       },
     setup() {
-      const selectedTitle = Vue.inject("selectedTitle")
+      const selectedTitle = inject("selectedTitle")
       return {
         selectedTitle
       }

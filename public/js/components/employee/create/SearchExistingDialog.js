@@ -1,3 +1,8 @@
+import { reactive, ref, onMounted, getCurrentInstance } from 'vue';
+import { useRouter, useRoute, } from 'vue-router';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -11,19 +16,19 @@ export const SearchExistingDialog = {
     emits: ["change", "select", "take"],
     setup( props, { emit } ) {
 
-        const router = VueRouter.useRouter();
-    	const route = VueRouter.useRoute();
+        const router = useRouter();
+    	const route = useRoute();
 
-        const currentValue = Vue.reactive({
+        const currentValue = reactive({
             surname: "",
             birthdate: "",
         });
 
-        const personList = Vue.ref([]);
+        const personList = ref([]);
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const surnameRef = Vue.ref(null);
+        const surnameRef = ref(null);
 
         const formatDate = (ds) => {
             if (ds == null || ds == '') return '';
@@ -43,7 +48,7 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Employee.filterPerson(currentValue);                
+                const res = await getCurrentInstance().$fhcapi.Employee.filterPerson(currentValue);                
                 isFetching.value = false;              
 			    console.log(res.data);	  
 			    personList.value = res.data.retval;
@@ -68,7 +73,7 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await getCurrentInstance().$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
                 isFetching.value = false;    
 
                 if (!res.data.error) {            
@@ -92,7 +97,7 @@ export const SearchExistingDialog = {
             personList.value = [];
         }
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             surnameRef.value.focus();            
         })
 

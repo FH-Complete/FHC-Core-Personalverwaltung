@@ -1,3 +1,4 @@
+import { toRefs, ref, watch, inject, onMounted } from 'vue';
 import { Modal } from '../Modal.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
@@ -14,7 +15,7 @@ export const StaleEmployees = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue
+        const fhcapi = inject("fhcapi");
         const employeeList = ref([])
         const isFetching = ref(false);
         const { t } = usePhrasen();
@@ -47,7 +48,7 @@ export const StaleEmployees = {
             
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Employee.getEmployeesWithoutContract();                    
+              const res = await fhcapi.Employee.getEmployeesWithoutContract();                    
               employeeList.value = res.data.retval;
             } catch (error) {
               console.log(error)              
@@ -74,7 +75,7 @@ export const StaleEmployees = {
                 
                 // API call
                 try {
-                    const response = await Vue.$fhcapi.DV.deactivateDV(payload)
+                    const response = await fhcapi.DV.deactivateDV(payload)
                     console.log(response.data);
                     if (response.data.error === 1) {
                             console.log(response.data.retval)
@@ -100,7 +101,7 @@ export const StaleEmployees = {
             // await fetchData();
         }
 
-        Vue.onMounted(async () => {
+        onMounted(async () => {
 
             const dvFormatter = (cell) => {
                 const rowData = cell.getRow().getData()
@@ -185,7 +186,7 @@ export const StaleEmployees = {
         })
 
         // Workaround to update tabulator
-        Vue.watch(employeeList, (newVal, oldVal) => {
+        watch(employeeList, (newVal, oldVal) => {
             console.log('employeeList changed');
             tabulator.value?.setData(employeeList.value);
         }, {deep: true})        

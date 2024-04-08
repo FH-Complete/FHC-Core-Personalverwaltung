@@ -25,6 +25,9 @@ export default {
         </template>
   </Modal>
   `,
+  inject: [
+    'fhcapi'
+  ],
   props: [
       'curkarenz'
   ],
@@ -48,7 +51,7 @@ export default {
     enddv: function() {
       const payload = this.$refs['vertragsbestandteil_karenzRef'].getPayload();
       
-      Vue.$fhcapi.Karenz.saveKarenz(payload)
+      this.fhcapi.Karenz.saveKarenz(payload)
       .then((response) => {
         this.handleKarenzSaved(response.data);
       });

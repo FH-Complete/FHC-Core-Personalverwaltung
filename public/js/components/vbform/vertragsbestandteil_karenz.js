@@ -3,6 +3,8 @@ import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
 import store from './vbsharedstate.js';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
   template: `
@@ -71,6 +73,9 @@ export default {
    </div>
   </div>
   `,
+  inject: [
+    'fhcapi'
+  ],
   components: {
     'gueltigkeit': gueltigkeit,
     'infos': infos,
@@ -127,7 +132,7 @@ export default {
       }
     },
     getKarenztypen: async function() {
-      const response = await Vue.$fhcapi.Karenz.getKarenztypen();
+      const response = await this.fhcapi.Karenz.getKarenztypen();
       const karenztypen = response.data.retval;
       karenztypen.unshift({
         value: '',

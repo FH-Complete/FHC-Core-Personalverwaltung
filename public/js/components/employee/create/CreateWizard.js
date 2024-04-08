@@ -4,6 +4,8 @@ import { CreateEmployeeFrm } from './CreateEmployeeFrm.js';
 import Step from './stepper/Step.js'
 import Steps from './stepper/Steps.js';
 
+import { watch, ref } from 'vue';
+
 export const CreateWizard = {
     components: {
         Modal,
@@ -19,7 +21,6 @@ export const CreateWizard = {
     setup( props ) {
 
         // Modal 
-        const { watch, ref } = Vue;
         const modalRef = ref();
         const stepsRef = ref();
         const searchExistingRef = ref();

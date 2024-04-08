@@ -1,4 +1,5 @@
-
+import { watch, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { CovidCard } from './CovidCard.js';
 import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
@@ -19,8 +20,7 @@ export const EmployeeSummary = {
     setup() {
 
 
-        const route = VueRouter.useRoute();
-        const { watch, ref, onMounted } = Vue; 
+        const route = useRoute();
         const currentPersonID = ref(null);
         const currentUID = ref(null);
         const isFetching = ref(false);

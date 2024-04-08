@@ -1,5 +1,7 @@
 import configurable from '../../mixins/vbform/configurable.js';
 import sharedstate from './vbsharedstate.js';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export default {
   template: `

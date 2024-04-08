@@ -1,19 +1,22 @@
+import { ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
 export const EmployeeNav = {
     props: {
         //date: Date,
     },
     setup(props, { emit }) {
-        const route = VueRouter.useRoute();
-        const currentDate = Vue.ref(null);
+        const route = useRoute();
+        const currentDate = ref(null);
         const close=() => {
             console.log("close", route.params.id)
             emit("close-editor", route.params.id)
         }
-        Vue.onMounted(() => {
+        onMounted(() => {
 			console.log('EmployeeNav mounted', route.path);
             currentDate.value = route.query.d;
         })
-        Vue.watch(
+        watch(
 			() => route.query.d,
 			d => {
                 console.log('EmployeeNav watch route.query.d', d)

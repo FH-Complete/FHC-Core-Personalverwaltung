@@ -1,5 +1,6 @@
+import { ref, toRefs, inject, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
-
+import primevue from 'primevue/config';
 
 export const OffCanvasTimeline = {
      components: {
@@ -15,23 +16,24 @@ export const OffCanvasTimeline = {
      emits: [ 'dateSelected' ],
      setup( props, { expose, emit } ) {
 
+        const fhcapi = inject("fhcapi");
         const colorPalette = ["#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"];
-        const courseData = Vue.ref();
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("Timeline");
-        const showAllDVChecked = Vue.ref(false);
-        const currentUID = Vue.toRefs(props).uid
-        const vbsData = Vue.ref();
-        const events =Vue.ref([]);
-        const isHidden = Vue.ref(true);
-        let offCanvasEle = Vue.ref(null);
+        const courseData = ref();
+        const isFetching = ref(false);
+        const title = ref("Timeline");
+        const showAllDVChecked = ref(false);
+        const currentUID = toRefs(props).uid
+        const vbsData = ref();
+        const events =ref([]);
+        const isHidden = ref(true);
+        let offCanvasEle = ref(null);
         let thisOffCanvasObj;
         const numberFormat = new Intl.NumberFormat();
-        const selectedVBSTypen = Vue.ref([]);
-        const selectedGBSTypen = Vue.ref([]);
-        const vertragsarten = Vue.inject('vertragsarten');
-        const vertragsbestandteiltypen = Vue.inject('vertragsbestandteiltypen');
-        const gehaltstypen = Vue.inject('gehaltstypen');        
+        const selectedVBSTypen = ref([]);
+        const selectedGBSTypen = ref([]);
+        const vertragsarten = inject('vertragsarten');
+        const vertragsbestandteiltypen = inject('vertragsbestandteiltypen');
+        const gehaltstypen = inject('gehaltstypen');        
 
         const formatDate = (ds) => {
             if (!ds) return ""
@@ -39,7 +41,7 @@ export const OffCanvasTimeline = {
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
 
-        const currentSemester = Vue.computed(() => {
+        const currentSemester = computed(() => {
             const d = new Date();
             let y= d.getFullYear();
             let semesterString = "SS";
@@ -68,25 +70,25 @@ export const OffCanvasTimeline = {
             isHidden.value = false;
         }
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             thisOffCanvasObj = new bootstrap.Offcanvas(offCanvasEle.value);
             offCanvasEle.value.addEventListener('hidden.bs.offcanvas', hiddenCanvasHandler);
             offCanvasEle.value.addEventListener('shown.bs.offcanvas', shownCanvasHandler);
         })
 
-        Vue.onBeforeUnmount(() => {
+        onBeforeUnmount(() => {
             offCanvasEle.value.removeEventListener('hidden.bs.offcanvas', hiddenCanvasHandler);
             offCanvasEle.value.removeEventListener('shown.bs.offcanvas', shownCanvasHandler);
         })
 
 
         async function show() {
-            //let response = await Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
+            //let response = await this.fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
             //console.log('curdv: ',response.data)
             vbsData.value = []
                         
             for (const dv of props.alldv){
-                let response = await Vue.$fhcapi.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
+                let response = await this.fhcapi.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
                 console.log('alldv: ',response.data)
                 vbsData.value.push(response.data.data)
             }            
@@ -165,7 +167,7 @@ export const OffCanvasTimeline = {
             return gbstypMap[gbsTyp] !== undefined ? gbstypMap[gbsTyp] : gbsTyp;
         }
 
-        Vue.watch([selectedVBSTypen, selectedGBSTypen, showAllDVChecked], ([id,uid]) => {
+        watch([selectedVBSTypen, selectedGBSTypen, showAllDVChecked], ([id,uid]) => {
             events.value = generateTimeline(vbsData.value);                     
         });
 

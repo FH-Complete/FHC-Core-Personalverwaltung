@@ -3,6 +3,8 @@ import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export const JobFunction = {
     components: {

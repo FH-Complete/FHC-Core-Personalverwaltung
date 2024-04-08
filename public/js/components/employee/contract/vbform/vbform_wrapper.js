@@ -59,6 +59,9 @@ export default {
         </template>
   </Modal>
   `,
+  inject: [
+    'fhcapi'
+  ],
   props: [
       'mode',
       'title',
@@ -215,7 +218,7 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
+      this.fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
       .then((response) => {
         that.handleSaved(response.data.data);
       })
@@ -230,7 +233,7 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
+      this.fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
       .then((response) => {
         that.handleValidated(response.data.data);
       })
@@ -242,7 +245,7 @@ export default {
     handlePresetSelected: function(preset) {
       if( this.mode === 'aenderung' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
+        this.fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
           this.iterateChilds(preset.children, response.data.data, preset);          
           this.presetselected(preset);
@@ -250,7 +253,7 @@ export default {
         });
       } else if( this.mode === 'korrektur' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
+        this.fhcapi.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
           this.iterateChilds(preset.children, response.data.data, preset);          
           this.presetselected(preset);
@@ -293,7 +296,7 @@ export default {
         mitarbeiter_uid: this.store.mitarbeiter_uid,  
         formdata: formdata
       };
-      Vue.$fhcapi.TmpStore.storeToTmpStore(payload)
+      this.fhcapi.TmpStore.storeToTmpStore(payload)
       .then((response) => {
         this.store.setTmpStoreId(response.data.meta.tmpstoreid);
         this.$refs['tmpstorehelper'].fetchTmpStoreList(false);

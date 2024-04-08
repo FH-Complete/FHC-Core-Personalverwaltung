@@ -1,3 +1,5 @@
+import { ref, onMounted } from 'vue';
+
 export const DropDownButton = {
     props: {
         links: { type: Array, required: true }
@@ -5,10 +7,10 @@ export const DropDownButton = {
     expose: [ 'show', 'toggle', 'hide'],
     setup() {
 
-        let buttonEle = Vue.ref(null);
+        let buttonEle = ref(null);
         let thisDropDownButtonObj;
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             thisDropDownButtonObj = new bootstrap.Dropdown(buttonEle.value);
         });
 

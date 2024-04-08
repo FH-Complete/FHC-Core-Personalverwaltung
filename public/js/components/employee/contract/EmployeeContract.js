@@ -1,3 +1,5 @@
+import { watch, ref, reactive, computed, inject } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import vbform_wrapper from './vbform/vbform_wrapper.js';
 import enddvmodal from './vbform/enddvmodal.js';
 import deletedvmodal from './vbform/deletedvmodal.js';
@@ -7,6 +9,9 @@ import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import primevue from 'primevue/config';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export const EmployeeContract = {
     components: {
@@ -27,9 +32,8 @@ export const EmployeeContract = {
     emits: ['updateHeader'],
     setup(_, { emit }) {
 
-        const { watch, ref, reactive, computed, inject } = Vue;
-        const route = VueRouter.useRoute();
-        const router = VueRouter.useRouter();
+        const route = useRoute();
+        const router = useRouter();
         const { t } = usePhrasen();
         const dvList = ref([]);
         const vertragList = ref([]);
@@ -78,9 +82,11 @@ export const EmployeeContract = {
 
         const offCanvasRef = ref();
 
-        const karenztypen = Vue.inject('karenztypen');
+        const karenztypen = inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
         const freitexttypen = inject('freitexttypen');
+
+        const fhcapi = inject("fhcapi");
 
         const readonly = ref(false);
 
@@ -166,7 +172,7 @@ export const EmployeeContract = {
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
+              const res = await fhcapi.Employee.dvByPerson(uid);
                 dvList.value = res.data.retval;          
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
@@ -192,7 +198,7 @@ export const EmployeeContract = {
         const fetchVertrag = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Vertrag.vertragByDV(dv_id, convert2UnixTS(date));
+                const res = await fhcapi.Vertrag.vertragByDV(dv_id, convert2UnixTS(date));
                 vertragList.value = res.data;
                 getCurrentVertragsbestandteil();
                 //}
@@ -208,7 +214,7 @@ export const EmployeeContract = {
 
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
+                const res = await fhcapi.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
                 gbtList.value = res.data;
             } catch (error) {
                 console.log(error)                
@@ -222,7 +228,7 @@ export const EmployeeContract = {
         const fetchGBTChartData = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                const res = await fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
                 gbtChartData.value = res.data;
                 let tempData1 = [], tempData2 = [];
                 // chartOptions.series[0].data.length = 0;
@@ -245,7 +251,7 @@ export const EmployeeContract = {
         const deleteDV = async (dv_id) => {
             isFetching.value = true            
             try {
-                const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
+                const res = await fhcapi.Employee.deleteDV(dv_id);
                 theModel.value.updateHeader();
             } catch (error) {
                 console.log(error);

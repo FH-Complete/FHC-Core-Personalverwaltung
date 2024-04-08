@@ -1,3 +1,4 @@
+import { ref, toRefs, computed, inject, watch, onMounted } from 'vue';
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
@@ -16,25 +17,26 @@ export const EmailTelData = {
     },  
     setup(props) {
 
-        const { personID } = Vue.toRefs(props);
+        const fhcapi = inject("fhcapi");
+        const { personID } = toRefs(props);
 
         const { t } = usePhrasen();
 
-        const urlContactData = Vue.ref("");
+        const urlContactData = ref("");
 
-        const contactList = Vue.ref([]);
+        const contactList = ref([]);
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const currentContact = Vue.ref();
+        const currentContact = ref();
 
-        const confirmDeleteRef = Vue.ref();
+        const confirmDeleteRef = ref();
 
-        const kontakttyp = Vue.inject('kontakttyp');
+        const kontakttyp = inject('kontakttyp');
 
-        const readonly = Vue.ref(false);
+        const readonly = ref(false);
 
-        Vue.watch(personID, (currentValue, oldValue) => {
+        watch(personID, (currentValue, oldValue) => {
             console.log('ContactData watch',currentValue);
             fetchData();
         });
@@ -47,7 +49,7 @@ export const EmailTelData = {
             }
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personContactData(personID.value);
+                const response = await fhcapi.Person.personContactData(personID.value);
                 contactList.value = response.data.retval;
             } catch (error) {
                 console.log(error)              
@@ -57,14 +59,14 @@ export const EmailTelData = {
             
         }
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             console.log('ContactData mounted', props.personID);                        
             fetchData();
             
         })
 
 
-        const contactListArray = Vue.computed(() => Object.values(contactList.value));
+        const contactListArray = computed(() => Object.values(contactList.value));
 
     
         const createContactShape = (person_id) => {
@@ -86,7 +88,7 @@ export const EmailTelData = {
         }
 
         // Modal 
-        let modalRef = Vue.ref();
+        let modalRef = ref();
         
         const showEditModal = (id) => {
             currentContact.value = { ...contactList.value[id] };
@@ -108,7 +110,7 @@ export const EmailTelData = {
             if (ok) {
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonContactData(id);                    
+                    const res = await fhcapi.Person.deletePersonContactData(id);                    
                     if (res.data.error == 0) {
                         delete contactList.value[id];
                         showDeleteToast();
@@ -135,7 +137,7 @@ export const EmailTelData = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonContactData(currentContact.value);                    
+                    const r = await fhcapi.Person.upsertPersonContactData(currentContact.value);                    
                     if (r.data.error == 0) {
                         contactList.value[r.data.retval[0].kontakt_id] = r.data.retval[0];
                         console.log('contact successfully saved');
@@ -156,9 +158,9 @@ export const EmailTelData = {
         // form handling
         // -------------
 
-        const contactDataFrm = Vue.ref();
+        const contactDataFrm = ref();
 
-        const frmState = Vue.reactive({ kontaktBlured: false, wasValidated: false });
+        const frmState = reactive({ kontaktBlured: false, wasValidated: false });
 
         const validKontakt = (n) => {
             return !!n && n.trim() != "";
@@ -173,8 +175,8 @@ export const EmailTelData = {
         }
 
         // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
+        const toastRef = ref();
+        const deleteToastRef = ref();
         
         const showToast = () => {
             toastRef.value.show();

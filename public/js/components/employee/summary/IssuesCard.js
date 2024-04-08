@@ -1,3 +1,5 @@
+import { watch, ref, toRefs, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const IssuesCard = {
@@ -8,17 +10,16 @@ export const IssuesCard = {
        
      },
      setup( props ) {
-
-        const { watch, ref, toRefs, onMounted, inject } = Vue;         
-        const route = VueRouter.useRoute();
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("Issues");
+        const route = useRoute();
+        const isFetching = ref(false);
+        const title = ref("Issues");
         const currentPersonID = ref(null);
-        const currentDate = Vue.ref(null);        
+        const currentDate = ref(null);        
         const issues = ref([]);
         const vertragsbestandteiltypen = inject('vertragsbestandteiltypen');
         const gehaltstypen = inject('gehaltstypen');
         const vertragsarten = inject('vertragsarten');
+        const fhcapi = inject("fhcapi");
         
         const formatVertragsbestandteiltyp = (item) => {
           let va = vertragsbestandteiltypen.value.find(kt => kt.value == item);
@@ -48,7 +49,7 @@ export const IssuesCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Issue.byPerson(currentPersonID.value);
+              const response = await fhcapi.Issue.byPerson(currentPersonID.value);
               isFetching.value = false;              
 			  console.log(response.data.retval);	  
               if (response.data.retval.length>0) {
@@ -72,7 +73,7 @@ export const IssuesCard = {
 
         const getVB = async (vbid) =>  {
             try {
-                let res = await Vue.$fhcapi.Vertragsbestandteil.getVB(vbid)
+                let res = await fhcapi.Vertragsbestandteil.getVB(vbid)
                 console.log(res);
                 return res;
             } catch(error) {
@@ -83,7 +84,7 @@ export const IssuesCard = {
 
         const getGB = async (gbid) =>  {
             try {
-                let res = await Vue.$fhcapi.Gehaltsbestandteil.getGB(gbid)
+                let res = await fhcapi.Gehaltsbestandteil.getGB(gbid)
                 console.log(res);
                 return res;
             } catch(error) {
@@ -93,7 +94,7 @@ export const IssuesCard = {
         }
         const getDV = async (dvid) =>  {
             try {
-                let res = await Vue.$fhcapi.DV.getDVByID(dvid)
+                let res = await fhcapi.DV.getDVByID(dvid)
                 console.log(res);
                 return res;
             } catch(error) {

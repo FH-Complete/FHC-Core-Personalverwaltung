@@ -1,14 +1,16 @@
+import { createApp } from 'vue';
+import PrimeVue from 'primevue/config';
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/vbform/api.js";
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import {CoreFilterCmpt} from "../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "./common.js";
-//test
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
+import { searchbaroptions, searchfunction } from "./common.js";
 
-const valApp = Vue.createApp(	{
+import 'tabulator-tables/dist/css/tabulator_simple.min.css';
+
+const valApp = createApp(	{
     components: {
         searchbar,			
         CoreNavigationCmpt,
@@ -33,7 +35,7 @@ const valApp = Vue.createApp(	{
             console.log('do Valorisation');
             console.log(this.valorisierungsinstanz_kurzbz);
             this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-            const res = Vue.$fhcapi.Valorisierung.doValorisation().then((response) => {
+            const res = this.$fhcapi.Valorisierung.doValorisation().then((response) => {
                 console.log(response.data.data);
                 this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
                 this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();               
@@ -169,6 +171,8 @@ const valApp = Vue.createApp(	{
     `
 });
 
-valApp.use(primevue.config.default)
+valApp.config.globalProperties.$fhcapi = {...fhcapifactory, ...pv21apifactory};
+
+valApp.use(PrimeVue)
     .use(Phrasen)
     .mount('#wrapper');

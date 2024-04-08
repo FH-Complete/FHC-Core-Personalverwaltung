@@ -1,3 +1,4 @@
+import { ref, toRefs, watch, onMounted } from 'vue';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const CovidCard = {
@@ -7,11 +8,11 @@ export const CovidCard = {
      },
      setup( props ) {
         
-        const covidData = Vue.ref();
-        const currentDate = Vue.ref(new Date());
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("COVID Status");
-        const currentPersonID = Vue.toRefs(props).personID        
+        const covidData = ref();
+        const currentDate = ref(new Date());
+        const isFetching = ref(false);
+        const title = ref("COVID Status");
+        const currentPersonID = toRefs(props).personID        
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -59,12 +60,12 @@ export const CovidCard = {
 			}		
 		}
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             currentDate.value = props.date || getCurrentDate();
             fetchCovidState();
         })
 
-        Vue.watch(
+        watch(
 			[currentPersonID,() => props.date],
 			newVal => {
 				if (newVal[1] != null) {

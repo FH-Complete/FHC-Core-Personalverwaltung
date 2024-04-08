@@ -1,3 +1,5 @@
+import { watch, ref, toRefs, onMounted, inject } from 'vue';
+import { useRoute } from 'vue-router';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const OffTimeCard = {
@@ -8,15 +10,14 @@ export const OffTimeCard = {
         uid: String,
      },
      setup( props ) {
-
-        const { watch, ref, toRefs, onMounted, inject } = Vue;         
-        const route = VueRouter.useRoute();
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("Abwesenheiten");
+        const route = useRoute();
+        const isFetching = ref(false);
+        const title = ref("Abwesenheiten");
         const currentPersonID = ref(null);
-        const currentDate = Vue.ref(null);        
+        const currentDate = ref(null);        
         const offTimeList = ref([]);
-        const currentUID = toRefs(props).uid;  
+        const currentUID = toRefs(props).uid;
+        const fhcapi = inject("fhcapi");
         
         const formatDate = (ds) => {
             if (ds == undefined) return '';
@@ -30,7 +31,7 @@ export const OffTimeCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personAbwesenheiten(currentUID.value);
+              const response = await fhcapi.Zeit.personAbwesenheiten(currentUID.value);
               isFetching.value = false;              
 			  console.log('abwesenheiten', response.data.retval);	  
               if (response.data.retval.length>0) {

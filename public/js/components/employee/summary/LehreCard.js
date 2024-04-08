@@ -1,3 +1,4 @@
+import { ref, toRefs, watch, onMounted } from 'vue';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const LehreCard = {
@@ -7,11 +8,11 @@ export const LehreCard = {
      },
      setup( props ) {
         
-        const courseData = Vue.ref();
-        const isFetching = Vue.ref(false);
-        const title = Vue.ref("Lehre");
-        const currentDate = Vue.ref(null);
-        const currentUID = Vue.toRefs(props).uid  
+        const courseData = ref();
+        const isFetching = ref(false);
+        const title = ref("Lehre");
+        const currentDate = ref(null);
+        const currentUID = toRefs(props).uid  
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -39,7 +40,7 @@ export const LehreCard = {
             
         }
 
-        const currentSemester = Vue.ref(calcSemester())   
+        const currentSemester = ref(calcSemester())   
 
         const decSemester = () => {
             if (currentSemester.value.startsWith('WS')) {
@@ -82,19 +83,19 @@ export const LehreCard = {
 			}		
 		}
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             currentDate.value = props.date || new Date();
             fetchCourseHours();
         })
 
-        Vue.watch(
+        watch(
 			currentUID,
 			() => {
 				fetchCourseHours();
 			}
 		)
 
-        Vue.watch(
+        watch(
             currentSemester,
             () => {
                 fetchCourseHours();

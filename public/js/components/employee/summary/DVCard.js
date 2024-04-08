@@ -1,3 +1,4 @@
+import { watch, ref, toRefs, onMounted, inject } from 'vue';
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const DvCard = {
@@ -6,13 +7,12 @@ export const DvCard = {
         date: Date,
      },
      setup( props ) {
-        
-        const { watch, ref, toRefs, onMounted } = Vue; 
         const dvData = ref();
         const currentDate = ref(null);
         const isFetching = ref(false);
         const title = ref("Dienstverhältnis");
-        const currentUID = toRefs(props).uid;       
+        const currentUID = toRefs(props).uid;
+        const fhcapi = inject("fhcapi");
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -32,7 +32,7 @@ export const DvCard = {
 			try {
               let ts = convert2UnixTS(currentDate.value);  // unix timestamp
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Employee.getCurrentDV(currentUID.value, ts);
+              const response = await fhcapi.Employee.getCurrentDV(currentUID.value, ts);
               isFetching.value = false;              
 			  console.log(response.data.retval);	  
               if (response.data.retval.length>0) {

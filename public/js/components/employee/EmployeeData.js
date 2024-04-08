@@ -1,3 +1,4 @@
+import { ref, toRefs, computed, inject, watch, onMounted } from 'vue';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
@@ -19,26 +20,28 @@ export const EmployeeData= {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
-        const readonly = Vue.ref(true);
+        const readonly = ref(true);
         const { t } = usePhrasen();
 
-        const { personID } = Vue.toRefs(props);
+        const { personID } = toRefs(props);
 
-        const theModel = Vue.computed({  // Use computed to wrap the object
+        const theModel = computed({  // Use computed to wrap the object
             get: () => props.modelValue,
             set: (value) => emit('update:modelValue', value),
           });
 
-        const url = Vue.ref("");
+        const url = ref("");
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const dialogRef = Vue.ref();
+        const dialogRef = ref();
 
-        const ausbildung = Vue.inject('ausbildung');
-        const standorte = Vue.inject('standorte');
-        const orte = Vue.inject('orte');
-        const validKurzbz = Vue.ref(true);
+        const ausbildung = inject('ausbildung');
+        const standorte = inject('standorte');
+        const orte = inject('orte');
+        const validKurzbz = ref(true);
+
+        const fhcapi = inject("fhcapi");
 
         const fetchData = async () => {
             if (theModel.value.personID==null && props.personID==null) {                
@@ -46,7 +49,7 @@ export const EmployeeData= {
             }
             isFetching.value = true;
             try {
-              const res = await Vue.$fhcapi.Person.personEmployeeData(theModel.value.personID || personID.value);                    
+              const res = await fhcapi.Person.personEmployeeData(theModel.value.personID || personID.value);                    
               currentValue.value = res.data.retval[0];
             } catch (error) {
               console.log(error)              
@@ -80,10 +83,10 @@ export const EmployeeData= {
                 }
             }
 
-        const currentValue = Vue.ref(createShape());
-        const preservedValue = Vue.ref(createShape());
+        const currentValue = ref(createShape());
+        const preservedValue = ref(createShape());
 
-        Vue.watch(personID, (currentVal, oldVal) => { 
+        watch(personID, (currentVal, oldVal) => { 
             fetchData();         
         });
 
@@ -106,7 +109,7 @@ export const EmployeeData= {
               readonly.value = !readonly.value;
         }
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             currentValue.value = createShape();
             if (theModel.value?.personID || props.personID) {
                 fetchData();
@@ -135,9 +138,9 @@ export const EmployeeData= {
         // form handling
         // -------------
 
-        const employeeDataFrm = Vue.ref();
+        const employeeDataFrm = ref();
 
-        const frmState = Vue.reactive({ nachnameBlured: false, kurzbzBlured: false, wasValidated: false });
+        const frmState = reactive({ nachnameBlured: false, kurzbzBlured: false, wasValidated: false });
 
         const validNachname = (n) => {
             return !!n && n.trim() != "";
@@ -151,7 +154,7 @@ export const EmployeeData= {
                     isFetching.value = true;
 
                     try {
-                        Vue.$fhcapi.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
+                        fhcapi.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
                             if (res.data.error == 1) {
                                 console.error("error checking kurzbz", res.data.msg)
                             } else {                                
@@ -189,7 +192,7 @@ export const EmployeeData= {
 
                 // submit
                 try {
-                    const response = await Vue.$fhcapi.Person.updatePersonEmployeeData(currentValue.value);                    
+                    const response = await fhcapi.Person.updatePersonEmployeeData(currentValue.value);                    
                     showToast();
                     currentValue.value = response.data.retval[0];
                     preservedValue.value = currentValue.value;
@@ -206,12 +209,12 @@ export const EmployeeData= {
             frmState.wasValidated  = true;  
         }
 
-        const hasChanged = Vue.computed(() => {
+        const hasChanged = computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
         });
 
         // Toast 
-        const toastRef = Vue.ref();
+        const toastRef = ref();
         
         const showToast = () => {
             toastRef.value.show();

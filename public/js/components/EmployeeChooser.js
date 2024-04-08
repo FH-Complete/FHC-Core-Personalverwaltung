@@ -1,3 +1,4 @@
+import { ref } from 'vue';
 /**
  * @deprecated replaced by filter widget
  */
@@ -18,10 +19,10 @@ const EmployeeChooser = {
       "/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/filter";
     let url = "";
 
-    const searchString = Vue.ref("");
-    const showDropDown = Vue.ref(false);
-    const maList = Vue.ref([]);
-    const isFetching = Vue.ref(false);
+    const searchString = ref("");
+    const showDropDown = ref(false);
+    const maList = ref([]);
+    const isFetching = ref(false);
 
     const hideDropDown = () => {
       searchString.value = "";

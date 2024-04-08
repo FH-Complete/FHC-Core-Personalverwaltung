@@ -1,3 +1,7 @@
+import { ref, reactive, watch, inject, toRef, getCurrentInstance } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 import { validSVNR } from "../../../helpers/validation/svnr.js";
 
@@ -14,13 +18,13 @@ export const CreateEmployeeFrm = {
     expose: [ 'save', 'reset'],
     setup( props ) {
 
-        const router = VueRouter.useRouter();
-    	const route = VueRouter.useRoute();     
+        const router = useRouter();
+    	const route = useRoute();     
         
-        const defaultvalRef = Vue.toRef(props, 'defaultval')
+        const defaultvalRef = toRef(props, 'defaultval')
 
-        const sprache = Vue.inject('sprache');
-        const nations = Vue.inject('nations');
+        const sprache = inject('sprache');
+        const nations = inject('nations');
 
         const GESCHLECHT = {
             w: 'weiblich', 
@@ -42,8 +46,8 @@ export const CreateEmployeeFrm = {
             }
         }
 
-        const currentValue = Vue.ref(createShape());
-        const preservedValue = Vue.ref(createShape());
+        const currentValue = ref(createShape());
+        const preservedValue = ref(createShape());
 
         const printNation = (code) => {
             if (!code) return '';
@@ -53,7 +57,7 @@ export const CreateEmployeeFrm = {
             return '';
         }
 
-        Vue.watch(props, () => {
+        watch(props, () => {
             currentValue.value.nachname = props.defaultval.surname.charAt(0).toUpperCase() + props.defaultval.surname.slice(1)
             currentValue.value.gebdatum = props.defaultval.birthdate
           })
@@ -63,11 +67,11 @@ export const CreateEmployeeFrm = {
         // form handling
         // -------------
 
-        const createEmployeeFrm = Vue.ref();
+        const createEmployeeFrm = ref();
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const frmState = Vue.reactive({ nachnameBlured: false, vornameBlured: false, emailBlured: false, geburtsdatumBlured: false, geschlechtBlured: false, svnrBlured: false, wasValidated: false });
+        const frmState = reactive({ nachnameBlured: false, vornameBlured: false, emailBlured: false, geburtsdatumBlured: false, geschlechtBlured: false, svnrBlured: false, wasValidated: false });
 
 
         const validNachname = (n) => {
@@ -130,7 +134,7 @@ export const CreateEmployeeFrm = {
                 // submit
                 isFetching.value = true
                 try {
-                    const response = await Vue.$fhcapi.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
+                    const response = await getCurrentInstance().$fhcapi.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
                     redirect2Employee(response.data.retval.person_id, response.data.retval.uid);
                 } catch (error) {
                     console.log(error);                    
@@ -147,7 +151,7 @@ export const CreateEmployeeFrm = {
                                 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await getCurrentInstance().$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
                 isFetching.value = false;                
                 personSelectedHandler(person_id, res.data.retval.uid);
 

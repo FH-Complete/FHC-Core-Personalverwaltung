@@ -1,4 +1,6 @@
-export default Vue.reactive({
+import { reactive } from 'vue';
+
+export default reactive({
   mode: '',
   unternehmen: '',
   mitarbeiter_uid: '',

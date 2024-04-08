@@ -1,8 +1,15 @@
+import { ref, toRefs, watch, inject, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
 import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
+
+import { TabulatorFull as Tabulator } from 'tabulator-tables';
+import 'tabulator-tables/dist/css/tabulator_simple.min.css';
 
 export const OffTime = {
     components: {
@@ -19,36 +26,37 @@ export const OffTime = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
-        const readonly = Vue.ref(false);
+        const fhcapi = inject('fhcapi');
+        const readonly = ref(false);
 
         const { t } = usePhrasen();
 
-        const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        const { personID: currentPersonID , personUID: currentPersonUID  } = toRefs(props);
 
-        const dialogRef = Vue.ref();
+        const dialogRef = ref();
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const unternehmen = Vue.ref();
-        const offTimeList = Vue.ref([]);
-        const jobfunctionDefList = Vue.ref([]);
-        const orgUnitList = Vue.ref([{value: '', label: '-'}]);
+        const unternehmen = ref();
+        const offTimeList = ref([]);
+        const jobfunctionDefList = ref([]);
+        const orgUnitList = ref([{value: '', label: '-'}]);
 
         let currentDate = new Date();
-        const currentYear = Vue.ref(currentDate.getFullYear());
+        const currentYear = ref(currentDate.getFullYear());
 
 
-        const offTimeTable = Vue.ref(null); // reference to your table element
-        const tabulator = Vue.ref(null); // variable to hold your table
+        const offTimeTable = ref(null); // reference to your table element
+        const tabulator = ref(null); // variable to hold your table
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-        const route = VueRouter.useRoute();
-        const currentValue = Vue.ref();
+        const route = useRoute();
+        const currentValue = ref();
 
-        Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
+        watch([currentPersonID, currentPersonUID], ([id,uid]) => {
             fetchOffTimeList();
         });
 
-        Vue.watch(currentYear, (newVal, oldVal) => {            
+        watch(currentYear, (newVal, oldVal) => {            
             fetchOffTimeList();             
         });     
         
@@ -72,7 +80,7 @@ export const OffTime = {
             }
             try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value);
+              const response = await fhcapi.Zeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value);
               isFetching.value = false;              
               console.log('abwesenheiten', response.data.retval);	  
               if (response.data.retval.length>0) {
@@ -87,7 +95,7 @@ export const OffTime = {
             }	
         }
 
-        Vue.onMounted(async () => {
+        onMounted(async () => {
             console.log('Off time view mounted', props.personID);
 
             await fetchOffTimeList();
@@ -141,7 +149,7 @@ export const OffTime = {
             
         })
 
-        Vue.watch(offTimeList, (newVal, oldVal) => {
+        watch(offTimeList, (newVal, oldVal) => {
             console.log('offTimeList changed');
             tabulator.value?.setData(offTimeList.value);
         }, {deep: true})

@@ -1,7 +1,10 @@
+import { watch, ref, onMounted, getCurrentInstance, inject } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { Modal } from '../Modal.js';
 import { Toast } from '../Toast.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
+import primevue from 'primevue/config';
 
 export const EmployeeHeader = {
     components: {
@@ -19,9 +22,8 @@ export const EmployeeHeader = {
     emits: ['personSelected'],
     setup(props, { emit }) {
 
-        const route = VueRouter.useRoute();
-        const router = VueRouter.useRouter();
-        const { watch, ref, onMounted } = Vue; 
+        const route = useRoute();
+        const router = useRouter();
         const currentPersonID = ref(props.personID);
         const currentPersonUID  = ref(props.personUID);
 
@@ -37,6 +39,8 @@ export const EmployeeHeader = {
 
         const openissuescount = ref();
 
+        const fhcapi = inject("fhcapi");
+
         const formatDate = (ds) => {
             if (ds == null) return '';
             var d = new Date(ds);
@@ -48,11 +52,12 @@ export const EmployeeHeader = {
             isFetchingName.value = true;
             try {
                 // fetch header data
-                const res = await Vue.$fhcapi.Employee.personHeaderData(personID, uid);
+                const app = getCurrentInstance();
+                const res = await fhcapi.Employee.personHeaderData(personID, uid);
                 employee.value = res.data.retval[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
-                const resAbteilung = await Vue.$fhcapi.Employee.personAbteilung(employee.value.uid);
+                const resAbteilung = await fhcapi.Employee.personAbteilung(employee.value.uid);
                // response = await resAbteilung.json();
                 employee.value = { ...employee.value, ...{ abteilung: resAbteilung.data.retval } };
             } catch (error) {
@@ -66,7 +71,7 @@ export const EmployeeHeader = {
         const fetchOpenIssuesCount = async(personID) => {
             isFetchingIssues.value = true;
             try {
-                const res = await Vue.$fhcapi.Issue.countPersonOpenIssues(personID);
+                const res = await fhcapi.Issue.countPersonOpenIssues(personID);
                 openissuescount.value = res.data.data.openissues;
             } catch (error) {
                 console.log(error);
@@ -78,7 +83,7 @@ export const EmployeeHeader = {
         const checkPerson = async() => {
             isFetchingIssues.value = true;
             try {            
-                const res = await Vue.$fhcapi.Issue.checkPerson(props.personID);
+                const res = await fhcapi.Issue.checkPerson(props.personID);
                 openissuescount.value = res.data.data.openissues;
             } catch (error) {
                 console.log(error);
@@ -142,7 +147,7 @@ export const EmployeeHeader = {
         const postFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);                
+                const res = await fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);                
                 fetchHeaderData(props.personID, props.personUID);
                 showToast();
             } catch (error) {
@@ -156,7 +161,7 @@ export const EmployeeHeader = {
         const postDeleteFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.deletePersonEmployeeFoto(props.personID);                
+                const res = await fhcapi.Employee.deletePersonEmployeeFoto(props.personID);                
                 fetchHeaderData(props.personID, props.personUID);
                 showDeleteToast();
             } catch (error) {

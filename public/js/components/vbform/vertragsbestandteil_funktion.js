@@ -4,6 +4,7 @@ import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
 import store from './vbsharedstate.js';
+import primevue from 'primevue/config';
 
 export default {
   template: `
@@ -111,6 +112,9 @@ export default {
     <gehaltsbestandteilhelper v-if="canhavegehaltsbestandteile" ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
+  inject: [
+    'fhcapi'
+  ],
   components: {
     'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
     'gueltigkeit': gueltigkeit,
@@ -218,7 +222,7 @@ export default {
     },
     getFunktionen: async function() {
       const filter = (this.config.guioptions?.filter) ? this.config.guioptions?.filter : 'all';
-      const response = await Vue.$fhcapi.Funktion.getContractFunctions(filter);
+      const response = await this.fhcapi.Funktion.getContractFunctions(filter);
       const funktionen = response.data.retval;
       funktionen.unshift({
         value: '',
@@ -233,7 +237,7 @@ export default {
       if( this.store.unternehmen === '' ) {
           return;
       }
-      const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(this.store.unternehmen);
+      const response = await this.fhcapi.Funktion.getOrgetsForCompany(this.store.unternehmen);
       const orgets = response.data.retval;
       orgets.unshift({
         value: '',
@@ -248,7 +252,7 @@ export default {
       if(this.store.unternehmen === '' || this.store.mitarbeiter_uid === '' ) {
         return;  
       }
-      const response = await Vue.$fhcapi.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
+      const response = await this.fhcapi.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
       const benutzerfunktionen = (response.error === 1) ? [] : response.data.retval;
       benutzerfunktionen.unshift({
         value: '',

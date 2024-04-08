@@ -1,3 +1,6 @@
+import { createApp, ref, provide } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import PrimeVue from 'primevue/config';
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/vbform/api.js";
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
@@ -10,17 +13,18 @@ import { EmployeeDocument } from "../components/employee/document/EmployeeDocume
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
+import highchartsPlugin from '../highchartsVue.js';
 
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
+import 'tabulator-tables/dist/css/tabulator_simple.min.css';
 
 var personSelectedRef = { callback: () => {}};
 
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
-const router = VueRouter.createRouter(
+const router = createRouter(
 	{
-		history: VueRouter.createWebHistory(),
+		history: createWebHistory(),
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
@@ -46,28 +50,28 @@ Highcharts.setOptions({
 	}
   })
 
-const pvApp = Vue.createApp({
+const pvApp = createApp({
 	setup() {
 
 		// init shared data
-		const sprache = Vue.ref([]);
-		const nations = Vue.ref([]);
-		const standorte = Vue.ref([]);
-		const orte = Vue.ref([]);
-		const ausbildung = Vue.ref([]);
-		const kontakttyp = Vue.ref([]);
-		const adressentyp = Vue.ref([]);
-		const sachaufwandtyp  = Vue.ref([]);
-		const karenztypen = Vue.ref([]);
-        const teilzeittypen = Vue.ref([]);
-		const vertragsarten = Vue.ref([]);
-		const vertragsbestandteiltypen = Vue.ref([]);
-		const freitexttypen = Vue.ref([]);
-		const gehaltstypen = Vue.ref([]);
-		const hourlyratetypes = Vue.ref([]);
-		const unternehmen = Vue.ref([]);
+		const sprache = ref([]);
+		const nations = ref([]);
+		const standorte = ref([]);
+		const orte = ref([]);
+		const ausbildung = ref([]);
+		const kontakttyp = ref([]);
+		const adressentyp = ref([]);
+		const sachaufwandtyp  = ref([]);
+		const karenztypen = ref([]);
+        const teilzeittypen = ref([]);
+		const vertragsarten = ref([]);
+		const vertragsbestandteiltypen = ref([]);
+		const freitexttypen = ref([]);
+		const gehaltstypen = ref([]);
+		const hourlyratetypes = ref([]);
+		const unternehmen = ref([]);
 
-		const currentDate = Vue.ref('2022-03-04');
+		const currentDate = ref('2022-03-04');
 
 		fetchSprache().then((r) => {
 			sprache.value = r;
@@ -134,26 +138,27 @@ const pvApp = Vue.createApp({
 			unternehmen.value = r;
 		})
 
-		Vue.provide("sprache",sprache);
-		Vue.provide("nations",nations);
-		Vue.provide("standorte",standorte);
-		Vue.provide("orte",orte);
-		Vue.provide("ausbildung",ausbildung);
-		Vue.provide("kontakttyp",kontakttyp);
-		Vue.provide("adressentyp",adressentyp);
-		Vue.provide("sachaufwandtyp",sachaufwandtyp);
-		Vue.provide("karenztypen",karenztypen);
-		Vue.provide("teilzeittypen",teilzeittypen);
-		Vue.provide("vertragsarten",vertragsarten);
-		Vue.provide("vertragsbestandteiltypen",vertragsbestandteiltypen);
-		Vue.provide("gehaltstypen",gehaltstypen);
-		Vue.provide("freitexttypen",freitexttypen);
-		Vue.provide("hourlyratetypes",hourlyratetypes);
-		Vue.provide("unternehmen",unternehmen);
+		provide("sprache",sprache);
+		provide("nations",nations);
+		provide("standorte",standorte);
+		provide("orte",orte);
+		provide("ausbildung",ausbildung);
+		provide("kontakttyp",kontakttyp);
+		provide("adressentyp",adressentyp);
+		provide("sachaufwandtyp",sachaufwandtyp);
+		provide("karenztypen",karenztypen);
+		provide("teilzeittypen",teilzeittypen);
+		provide("vertragsarten",vertragsarten);
+		provide("vertragsbestandteiltypen",vertragsbestandteiltypen);
+		provide("gehaltstypen",gehaltstypen);
+		provide("freitexttypen",freitexttypen);
+		provide("hourlyratetypes",hourlyratetypes);
+		provide("unternehmen",unternehmen);
+                provide("fhcapi", {...fhcapifactory, ...pv21apifactory});
 	}
 }).use(router);
 
-
+//pvApp.config.globalProperties.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 const fetchNations = async () => {
 	const res = await CoreRESTClient.get(
@@ -245,7 +250,7 @@ const fetchUnternehmen = async () => {
 	return CoreRESTClient.getData(res.data);
 }
 
-pvApp.use(primevue.config.default);
+pvApp.use(PrimeVue);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(Phrasen);
 pvApp.use(FhcAlert);

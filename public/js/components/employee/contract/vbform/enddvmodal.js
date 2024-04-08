@@ -27,6 +27,9 @@ export default {
         </template>
   </Modal>
   `,
+  inject: [
+    'fhcapi'
+  ],
   props: [
       'curdv'
   ],
@@ -50,7 +53,7 @@ export default {
     enddv: function() {
       const payload = this.$refs['dienstverhaeltnisRef'].getPayload();
       
-      Vue.$fhcapi.DV.endDV(payload)
+      this.fhcapi.DV.endDV(payload)
       .then((response) => {
         this.handleDVEnded(response.data);
       });

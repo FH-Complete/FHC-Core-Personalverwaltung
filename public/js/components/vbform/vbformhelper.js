@@ -1,3 +1,4 @@
+import { computed } from 'vue';
 import presetable from '../../mixins/vbform/presetable.js';
 import tabs from './tabs.js';
 import vblistgroup from './vblistgroup.js';
@@ -19,6 +20,9 @@ export default {
       <component ref="parts" v-for="(child, idx) in children" :key="idx" :is="child.type" :preset="child"></component>
     </div>
   `,
+  inject: [
+    'fhcapi'
+  ],
   components: {
     "tabs": tabs,
     "vblistgroup": vblistgroup, 
@@ -43,8 +47,8 @@ export default {
   },
   provide: function() {
     return {
-        'freitexttypen': Vue.computed(() => this.lists.freitexttypen),
-        'gehaltstypen': Vue.computed(() => this.lists.gehaltstypen)
+        'freitexttypen': computed(() => this.lists.freitexttypen),
+        'gehaltstypen': computed(() => this.lists.gehaltstypen)
     }  
   },
   emits: [
@@ -75,7 +79,7 @@ export default {
       this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
     },
     getFreitexttypen: async function() {
-      const response = await Vue.$fhcapi.Freitext.getFreitexttypen();
+      const response = await this.fhcapi.Freitext.getFreitexttypen();
       const freitexttypen = response.data.retval;
       freitexttypen.unshift({
         value: '',
@@ -85,7 +89,7 @@ export default {
       this.lists.freitexttypen = freitexttypen;
     },
     getGehaltstypen: async function() {
-      const response = await Vue.$fhcapi.Gehaltsbestandteil.getGehaltstypen();
+      const response = await this.fhcapi.Gehaltsbestandteil.getGehaltstypen();
       const gehaltstypen = response.data.retval;
       gehaltstypen.unshift({
         value: '',

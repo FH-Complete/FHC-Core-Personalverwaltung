@@ -1,3 +1,5 @@
+import { watch, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import { OffTime } from './OffTime.js';
 import { TimeRecording } from './TimeRecording.js';
@@ -11,14 +13,12 @@ export const EmployeeTime = {
     },
     setup() {
 
-
-        const route = VueRouter.useRoute();
-        const { watch, ref, onMounted } = Vue; 
+        const route = useRoute();
         const currentPersonID = ref(null);
         const currentUID = ref(null);
         const isFetching = ref(false);
         const items = ["offtime", "timerecording"];
-        const activeItem = Vue.ref("offtime");
+        const activeItem = ref("offtime");
         const { t } = usePhrasen();
 
         onMounted(() => {

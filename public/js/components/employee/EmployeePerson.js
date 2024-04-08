@@ -1,3 +1,5 @@
+import { ref, reactive } from 'vue';
+import { useRoute } from 'vue-router';
 import { BaseData } from './BaseData.js';
 import { EmployeeData } from './EmployeeData.js';
 import { BankData } from './BankData.js';
@@ -25,13 +27,13 @@ export const EmployeePerson = {
     emits: ['updateHeader'],
     setup(_, { emit }) {
 
-        const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(0);
-        const currentPersonUID = Vue.ref(null);
+        const route = useRoute();
+        const currentPersonID = ref(0);
+        const currentPersonUID = ref(null);
         const { t } = usePhrasen();
         const items = ["base", "employee", "contact", "bank", "material", "hourly", "funktion"];
-        const activeItem = Vue.ref("base");
-        const theModel = Vue.reactive({personID: null, personUID: null,editmode: true, updateHeader: () => emit('updateHeader')});
+        const activeItem = ref("base");
+        const theModel = reactive({personID: null, personUID: null,editmode: true, updateHeader: () => emit('updateHeader')});
 
         const isActive = (menuItem) => {
              return activeItem.value === menuItem;

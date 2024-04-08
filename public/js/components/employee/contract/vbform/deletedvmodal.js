@@ -21,6 +21,9 @@ export default {
         </template>
   </Modal>
   `,
+  inject: [
+    'fhcapi'
+  ],
   props: [
       'curdv'
   ],
@@ -33,7 +36,7 @@ export default {
   methods: {
     deletedv: async function() {  
       try {
-        const res = await Vue.$fhcapi.Employee.deleteDV(this.curdv.dienstverhaeltnisid);
+        const res = await this.fhcapi.Employee.deleteDV(this.curdv.dienstverhaeltnisid);
         this.$emit('dvdeleted');
         this.$refs['modalRef'].hide();
       } catch (error) {

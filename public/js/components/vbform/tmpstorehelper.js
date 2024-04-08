@@ -30,6 +30,9 @@ export default {
     </div>
   </div>
   `,
+  inject: [
+    'fhcapi'
+  ],
   data: function() {
     return {
       store: store,
@@ -57,7 +60,7 @@ export default {
       if( typeof resetselected === 'undefined' ) {
           var resetselected = true;
       }  
-      Vue.$fhcapi.TmpStore.listTmpStoreForMA(this.store.mitarbeiter_uid)
+      this.fhcapi.TmpStore.listTmpStoreForMA(this.store.mitarbeiter_uid)
       .then((response) => {
         this.tmpstores = response.data.data;
         if(resetselected === true) {
@@ -71,7 +74,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            return Vue.$fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid);
+            return this.fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid);
         }
         return Promise.resolve('noTmpStoreUsed');
     },
@@ -79,7 +82,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            Vue.$fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid)
+            this.fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid)
             .then((response) => {
               this.fetchTmpStoreList();
               console.log('deleteFromTmpStore executed.');
@@ -93,7 +96,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            Vue.$fhcapi.TmpStore.getTmpStoreById(tmpstoreid)
+            this.fhcapi.TmpStore.getTmpStoreById(tmpstoreid)
             .then((response) => {
               console.log('loadFromTmpStore executed.');
               this.store.setTmpStoreId(response.data.data.tmp_store_id);

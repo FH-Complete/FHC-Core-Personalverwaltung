@@ -1,3 +1,5 @@
+import { ref, onMounted } from 'vue';
+
 export const Modal = {
     props: {
         type: String,
@@ -7,10 +9,10 @@ export const Modal = {
     expose: ['show', 'hide'],
     setup(props, { emit }) {
        
-        let modalEle = Vue.ref(null);
+        let modalEle = ref(null);
         let thisModalObj;
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             thisModalObj = new bootstrap.Modal(modalEle.value);
         });
         const show = () => {

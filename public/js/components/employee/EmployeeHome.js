@@ -9,6 +9,9 @@ import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
 import { Toast } from '../Toast.js';
 
+import { watch, ref, onMounted } from 'vue';
+import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router';
+
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -24,10 +27,9 @@ export default {
 		Toast,
 	},
     setup() {
-
-		const { watch, ref } = Vue;
-		const router = VueRouter.useRouter();
-		const route = VueRouter.useRoute();
+		
+		const router = useRouter();
+		const route = useRoute();
 		const isEditorOpen = ref(false);
 		const currentPersonID = ref(null);
 		const currentPersonUID = ref(null);
@@ -160,7 +162,7 @@ export default {
 			toastEmployeeCreateFailedRef.value.show();
 		}
 
-		Vue.onMounted(() => {
+		onMounted(() => {
 			let person_id = route.params.id;
 			let person_uid = route.params.uid;
 			console.log('EMPLOYEE APP CREATED; person_id=',person_id);
@@ -175,7 +177,7 @@ export default {
 			}
 		})
 		
-		VueRouter.onBeforeRouteUpdate((to, from) => {
+		onBeforeRouteUpdate((to, from) => {
 			/*console.log('onBeforeUpdate',to,from);
 			const answer = window.confirm(
 			  'Do you really want to leave? you have unsaved changes! (' + to + ', ' + from + ')' 

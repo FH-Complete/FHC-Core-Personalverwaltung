@@ -1,3 +1,4 @@
+import { ref, onMounted } from 'vue';
 import { usePhrasen } from '../../../../../public/js/mixins/Phrasen.js';
 
 export const ModalDialog = {
@@ -8,13 +9,13 @@ export const ModalDialog = {
     expose: ['show', 'hide'],
     setup(props, { emit }) {
        
-        let modalConfirmEle = Vue.ref(null);
+        let modalConfirmEle = ref(null);
         let thisModalObj;
         let _resolve;
         let _reject;
         const { t } = usePhrasen();
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             thisModalObj = new bootstrap.Modal(modalConfirmEle.value);
         });
         

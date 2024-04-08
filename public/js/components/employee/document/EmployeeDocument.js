@@ -1,4 +1,5 @@
-
+import { watch, ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 export const EmployeeDocument = {
     components: {
@@ -9,8 +10,7 @@ export const EmployeeDocument = {
     setup() {
 
 
-        const route = VueRouter.useRoute();
-        const { watch, ref, onMounted } = Vue; 
+        const route = useRoute();
         const currentPersonID = ref(null);
         const currentUID = ref(null);
         const isFetching = ref(false);

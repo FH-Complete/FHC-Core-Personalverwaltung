@@ -1,3 +1,4 @@
+import { reactive, computed, toRefs, ref, watch, watchEffect, inject, onMounted } from 'vue';
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
@@ -16,32 +17,33 @@ export const AddressData = {
     },  
     setup(props) {
 
-        const { personID } = Vue.toRefs(props);
+        const fhcapi = inject("fhcapi");
+        const { personID } = toRefs(props);
 
         const { t } = usePhrasen();
 
-        const urlAddressData = Vue.ref("");
+        const urlAddressData = ref("");
 
-        const addressList = Vue.ref([]);
+        const addressList = ref([]);
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const isEditActive = Vue.ref(false);
+        const isEditActive = ref(false);
 
-        const currentAddress = Vue.ref();
+        const currentAddress = ref();
 
-        const confirmDeleteRef = Vue.ref();
+        const confirmDeleteRef = ref();
 
-        const nations = Vue.inject('nations');
-        const adressentyp = Vue.inject('adressentyp');
+        const nations = inject('nations');
+        const adressentyp = inject('adressentyp');
 
-        const gemeinden = Vue.ref([]);
+        const gemeinden = ref([]);
 
-        const ortschaften = Vue.ref([]);
+        const ortschaften = ref([]);
 
-        const readonly = Vue.ref(false);
+        const readonly = ref(false);
 
-        Vue.watch(personID, (currentValue, oldValue) => {
+        watch(personID, (currentValue, oldValue) => {
             console.log('AddressData watch',currentValue);            
             fetchData();
         });
@@ -54,7 +56,7 @@ export const AddressData = {
             isFetching.value = true
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personAddressData(personID.value);                    
+                const response = await fhcapi.Person.personAddressData(personID.value);                    
                 addressList.value = response.data.retval;
             } catch (error) {
                 console.log(error)              
@@ -65,11 +67,11 @@ export const AddressData = {
         }
 
 
-        Vue.watchEffect(async () => {
+        watchEffect(async () => {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 try  {
                     isFetching.value = true
-                    const response = await Vue.$fhcapi.Common.getGemeinden(currentAddress.value.plz);     
+                    const response = await fhcapi.Common.getGemeinden(currentAddress.value.plz);     
                     gemeinden.value = response.data.retval;
                 } catch (error) {
                     console.log(error)                    
@@ -79,11 +81,11 @@ export const AddressData = {
             }            
         })
 
-        Vue.watchEffect(async () => {
+        watchEffect(async () => {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 try  {
                     isFetching.value = true
-                    const response = await Vue.$fhcapi.Common.getOrtschaften(currentAddress.value.plz);     
+                    const response = await fhcapi.Common.getOrtschaften(currentAddress.value.plz);     
                     ortschaften.value = response.data.retval;
                 } catch (error) {
                     console.log(error)                    
@@ -93,16 +95,16 @@ export const AddressData = {
             }            
         })
 
-        Vue.onMounted(() => {            
+        onMounted(() => {            
             fetchData();
             
         })
 
 
-        const addressListArray = Vue.computed(() => Object.values(addressList.value));
+        const addressListArray = computed(() => Object.values(addressList.value));
 
         // Modal 
-        let modalRef = Vue.ref();
+        let modalRef = ref();
         
         const showEditModal = (id) => {
             currentAddress.value = { ...addressList.value[id] };
@@ -116,7 +118,7 @@ export const AddressData = {
             if (ok && !currentAddress.value.heimatadresse) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonAddressData(id);                    
+                    const res = await fhcapi.Person.deletePersonAddressData(id);                    
                     if (res.data.error == 0) {
                         delete addressList.value[id];
                         showDeletedToast();
@@ -181,7 +183,7 @@ export const AddressData = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonAddressData(currentAddress.value);                    
+                    const r = await fhcapi.Person.upsertPersonAddressData(currentAddress.value);                    
                     if (r.data.error == 0) {
                         addressList.value[r.data.retval[0].adresse_id] = r.data.retval[0];
                         console.log('address successfully saved');
@@ -201,9 +203,9 @@ export const AddressData = {
         // form handling
         // -------------
 
-        const addressDataFrm = Vue.ref();
+        const addressDataFrm = ref();
 
-        const frmState = Vue.reactive({ plzBlured: false, ortBlured: false, typBlured:false, wasValidated: false });
+        const frmState = reactive({ plzBlured: false, ortBlured: false, typBlured:false, wasValidated: false });
 
         const validPLZ = (n) => {
             return !!n && n.trim() != "";
@@ -228,8 +230,8 @@ export const AddressData = {
         }
 
         // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
+        const toastRef = ref();
+        const deleteToastRef = ref();
         
         const showToast = () => {
             toastRef.value.show();

@@ -1,3 +1,5 @@
+import { h, version } from 'vue';
+
 function doCopy (copy, original, copyArray) {
     // Callback function to iterate on array or object elements
     function callback (value, key) {
@@ -47,7 +49,7 @@ const highchartsPlugin = {
                 // The new Vue's 3 syntax.
                 } : {
                     render () { 
-                        return Vue.h('div', { ref: 'chart' }) 
+                        return h('div', { ref: 'chart' }) 
                     },
                     beforeUnmount: destroyChart
                 }
@@ -104,7 +106,7 @@ const highchartsPlugin = {
 
         app.component(
             options.tagName || 'highcharts',
-            generateVueComponent(options.highcharts || Highcharts, Vue.version)
+            generateVueComponent(options.highcharts || Highcharts, version)
         )
     },
 
@@ -113,3 +115,5 @@ const highchartsPlugin = {
     
 
 }
+
+export default highchartsPlugin;

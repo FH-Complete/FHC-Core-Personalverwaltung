@@ -1,8 +1,12 @@
+import { ref, toRefs, watch, inject, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
 import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 export const TimeRecording = {
     components: {
@@ -19,19 +23,20 @@ export const TimeRecording = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
-        const readonly = Vue.ref(false);
+        const fhcapi = inject('fhcapi');
+        const readonly = ref(false);
 
         const { t } = usePhrasen();
 
-        const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        const { personID: currentPersonID , personUID: currentPersonUID  } = toRefs(props);
 
-        const dialogRef = Vue.ref();
+        const dialogRef = ref();
 
-        const isFetching = Vue.ref(false);
+        const isFetching = ref(false);
 
-        const unternehmen = Vue.ref();
-        const jobfunctionDefList = Vue.ref([]);
-        const orgUnitList = Vue.ref([{value: '', label: '-'}]);
+        const unternehmen = ref();
+        const jobfunctionDefList = ref([]);
+        const orgUnitList = ref([{value: '', label: '-'}]);
 
         const calcWeekNumber = (date) => {
             let  startDate = new Date(date.getFullYear(), 0, 1);
@@ -43,19 +48,19 @@ export const TimeRecording = {
         
 
         let currentDate = new Date();
-        const currentYear = Vue.ref(currentDate.getFullYear());
-        const currentWeek = Vue.ref(calcWeekNumber(currentDate));
+        const currentYear = ref(currentDate.getFullYear());
+        const currentWeek = ref(calcWeekNumber(currentDate));
 
-        const timeRecordList = Vue.ref([]);
+        const timeRecordList = ref([]);
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-        const route = VueRouter.useRoute();
-        const currentValue = Vue.ref();
+        const route = useRoute();
+        const currentValue = ref();
 
-        Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
+        watch([currentPersonID, currentPersonUID], ([id,uid]) => {
             fetchTimeRecordingList();
         });    
 
-        Vue.watch([currentYear, currentWeek], ([y,w]) => {
+        watch([currentYear, currentWeek], ([y,w]) => {
             fetchTimeRecordingList();
         });
         
@@ -65,7 +70,7 @@ export const TimeRecording = {
             }
             try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
+              const response = await fhcapi.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
               isFetching.value = false;              
               console.log('zeiterfassung', response.data.retval);	  
               if (response.data.retval.length>0) {
@@ -80,7 +85,7 @@ export const TimeRecording = {
             }	
         }
 
-        Vue.onMounted(async () => {
+        onMounted(async () => {
             console.log('Time Recording view mounted', props.personID);
 
             await fetchTimeRecordingList();

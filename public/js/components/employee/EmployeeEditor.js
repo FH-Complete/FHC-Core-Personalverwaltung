@@ -1,3 +1,6 @@
+import { ref, watch, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
 import { EmployeePerson } from './EmployeePerson.js';
 import { EmployeeHeader } from './EmployeeHeader.js';
 import { EmployeeNav } from './EmployeeNav.js';
@@ -17,12 +20,12 @@ export default {
     emits: ['personSelected'],
     setup( props, {emit }) {
 
-        const router = VueRouter.useRouter();
-    	const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(null);
-        const currentPersonUID = Vue.ref(null);
-        const currentDate = Vue.ref(null);
-        const employeeHeaderRef = Vue.ref();
+        const router = useRouter();
+    	const route = useRoute();
+        const currentPersonID = ref(null);
+        const currentPersonUID = ref(null);
+        const currentDate = ref(null);
+        const employeeHeaderRef = ref();
 
         const redirect = (params) => {
             emit('personSelected', params);
@@ -37,12 +40,12 @@ export default {
             employeeHeaderRef.value.refresh();
         }
 
-        Vue.onMounted(() => {
+        onMounted(() => {
 			console.log('EmployeeEditor mounted', route.path);
             currentDate.value = route.query.d;
         })
 
-        Vue.watch(
+        watch(
 			() => route.params,
 			params => {
 				currentPersonID.value = params.id;
@@ -50,7 +53,7 @@ export default {
 			}
 		)
 
-        Vue.watch(
+        watch(
 			() => route.query.d,
 			d => {
                 console.log('watch route.query.d', d)

@@ -1,3 +1,5 @@
+import { ref, onMounted, computed } from 'vue';
+
 export const Toast = {
     props: {
         title: {
@@ -12,10 +14,10 @@ export const Toast = {
     expose: ['show', 'hide'],
     setup(props) {
 
-        let toastEle = Vue.ref(null);
+        let toastEle = ref(null);
         let thisToastObj;
 
-        Vue.onMounted(() => {
+        onMounted(() => {
             thisToastObj = new bootstrap.Toast(toastEle.value);
         });
 
@@ -27,7 +29,7 @@ export const Toast = {
             thisToastObj.hide();
         }
 
-        const backgroundColor = Vue.computed(() => {
+        const backgroundColor = computed(() => {
             return props.type == "success" ? "bg-primary"  : "bg-danger"
         })
 

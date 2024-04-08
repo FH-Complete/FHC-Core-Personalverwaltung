@@ -1,9 +1,10 @@
+import { watch, ref, reactive, computed, onMounted, inject } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+
 export const EmployeeStatus = {
     setup() {
-
-        const { watch, ref, reactive, computed, onMounted, inject } = Vue;
-        const route = VueRouter.useRoute();
-        const router = VueRouter.useRouter()
+        const route = useRoute();
+        const router = useRouter()
         const currentPersonID = ref();
         const currentPersonUID  = ref();
         const dvList = ref([]);
@@ -13,6 +14,7 @@ export const EmployeeStatus = {
         const vertragsarten = inject('vertragsarten');
         const karenztypen = inject('karenztypen');
         const teilzeittypen = inject('teilzeittypen');
+        const fhcapi = inject("fhcapi");
         
         const formatVertragsart = (item) => {
           let va = vertragsarten.value.find(kt => kt.value == item);
@@ -29,7 +31,7 @@ export const EmployeeStatus = {
           return teilzeittyp != undefined ? teilzeittyp.label : item;
         }
 
-        let statusList = Vue.ref([]);    
+        let statusList = ref([]);    
 
         const generateStatusList = () => {
           let anzDV = 0;
@@ -53,7 +55,7 @@ export const EmployeeStatus = {
             statusList.value.unshift({text: 'derzeit kein aktives DV', description:'', css: 'bg-dv rounded-0'});
           }
           console.log("dvIDs", dvIDs)
-          Promise.all(dvIDs.map((dvID) => Vue.$fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
+          Promise.all(dvIDs.map((dvID) => fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
             (allData) => {
               allData.map((item) => {
                 item.data.data.map((vbs => {
@@ -93,7 +95,7 @@ export const EmployeeStatus = {
           }
           isFetching.value = true
           try {
-            const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
+            const res = await fhcapi.Employee.dvByPerson(uid);
               dvList.value = res.data.retval;          
               isFetching.value = false;
               generateStatusList();           

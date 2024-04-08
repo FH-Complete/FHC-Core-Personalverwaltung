@@ -40,6 +40,9 @@ export default {
     <gehaltsbestandteilhelper ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
+  inject: [
+    'fhcapi'
+  ],
   components: {
     'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
     'gueltigkeit': gueltigkeit,
@@ -93,7 +96,7 @@ export default {
       }
     },
     getTeilzeittypen: async function() {
-      const response = await Vue.$fhcapi.Stunden.getTeilzeittypen();
+      const response = await this.fhcapi.Stunden.getTeilzeittypen();
       const teilzeittypen = response.data.retval;
       teilzeittypen.unshift({
         value: '',

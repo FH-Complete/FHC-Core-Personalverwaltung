@@ -38,6 +38,9 @@ export default {
     <span v-else>&nbsp;</span>
   </div>
   `,
+  inject: [
+    'fhcapi'
+  ],
   data: function() {
     return {
       'vertragsart_kurzbz': '',
@@ -70,7 +73,7 @@ export default {
       return (optvalue === selvalue);
     },
     getUnternehmen: async function() {
-      const response = await Vue.$fhcapi.DV.getUnternehmen();
+      const response = await this.fhcapi.DV.getUnternehmen();
       const unternehmen = response.data.retval;
       unternehmen.unshift({
         value: '',
@@ -80,7 +83,7 @@ export default {
       this.lists.unternehmen = unternehmen;
     },
     getVertragsarten: async function() {
-      const response = await Vue.$fhcapi.DV.getVertragsarten();
+      const response = await this.fhcapi.DV.getVertragsarten();
       const vertragsarten = response.data.retval;
       vertragsarten.unshift({
         value: '',

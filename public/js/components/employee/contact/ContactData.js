@@ -1,3 +1,4 @@
+import { ref, computed } from 'vue';
 import { AddressData } from "./AddressData.js";
 import { EmailTelData } from "./EmailTelData.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
@@ -19,14 +20,14 @@ export const ContactData = {
 
         const { t } = usePhrasen();
 
-        const theModel = Vue.computed({ 
+        const theModel = computed({ 
             get: () => props.modelValue,
             set: (value) => emit('update:modelValue', value),
         });
 
         // tabs
         const items = ["address", "contact"];
-        const activeItem = Vue.ref("address");
+        const activeItem = ref("address");
 
         const isActive = (menuItem) => {
             return activeItem.value === menuItem;
