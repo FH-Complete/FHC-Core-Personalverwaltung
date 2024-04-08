@@ -142,7 +142,10 @@ export const DeadlineIssueTable = {
             { title: 'MitarbeiterIn', field: "ma_name", formatter: maFormatter, hozAlign: "left", headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
             { title: 'Deadline', field: "datum", hozAlign: "center", headerFilter:true,formatter: dateFormatter, headerFilterFunc:customHeaderFilter },
             { title: 'To Do', field: "bezeichnung", hozAlign: "right", width: 140, headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-            { title: 'Status', field: "status_bezeichnung", hozAlign: "center", width: 140, sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+            { title: 'Status', field: "status_bezeichnung", hozAlign: "center", width: 140, sorter:"string", 
+                headerFilter:"list",
+                headerFilterParams: {valuesLookup:() => fristStatus.value.map((element) => ({label: element.bezeichnung, value: element.status_kurzbz })) },
+            },
           ];    
 
           let tabulatorOptions = {
@@ -285,7 +288,7 @@ export const DeadlineIssueTable = {
 
   <!-- TABULATOR -->
   <div v-show="fristen != null && fristen.length > 0" style="flex: 1; position: relative">
-    <div ref="tableRef" class="fhc-tabulator"></div>
+    <div ref="tableRef" class="filter-table-dataset"></div>
 
   </div>
   <div v-if="fristen != null && fristen.length == 0 && !isFetching" >0 Datensätze vorhanden.</div>
