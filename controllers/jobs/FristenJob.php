@@ -35,16 +35,14 @@ class FristenJob extends JOB_Controller
 				$d = new DateTime();
 			} else {
 				$d = DateTime::createFromFormat( 'Y-m-d', $date );
-        		//$datestring = $date->format("Y-m-d");
 			}
 
-			echo "Datum: ",$d->format("Y-m-d"),"\n";
+			$this->logInfo("Fristen Job Datum=",$d->format("Y-m-d"));
 			$result = $this->_ci->fristenlib->updateFristen($d);
 
 			if ($result !== false)
 			{
-				$this->logInfo('End Fristen Job', array('Number of Fristen added ' => $result));
-				echo 'End Fristen Job';
+				$this->logInfo('End Fristen Job');
 			} else {
 				$this->logInfo('Fristen job failed');
 			}
