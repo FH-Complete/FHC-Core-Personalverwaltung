@@ -166,3 +166,7 @@ div#collapseTable.minimized {
 table.dvcard  th {
   text-align: left;
 }
+
+.deadline_filter_all {
+    min-width: 250px;
+}
