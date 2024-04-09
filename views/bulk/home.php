@@ -2,18 +2,23 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Personalverwaltung',		
+			'title' => 'Personalverwaltung',
 			'bootstrap5' => true,
 			'fontawesome6' => true,
+			'tabulator5' => true,
       'axios027' => true,
 			'navigationcomponent' => true,
-      'vue3' => true,  
-      'primevue3' => true,    
-      'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
+      'vue3' => true,
+      'primevue3' => true,
+      'customCSSs' => ['vendor/vuejs/vuedatepicker_css/main.css',
+                       'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
                        'public/css/components/searchbar.css'],
-      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Valorisation.js'),
+      'customJSs' =>  [
+                        'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
+                      ],
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Bulk.js'),
 		)
 	);
 ?>
@@ -47,27 +52,25 @@
         
       <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>      
 
-      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="height:100%">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-          <h1 class="h2">Valorisierung</h1>
-          <div class="btn-toolbar mb-2 mb-md-0">        
+          <h1 class="h2">MA ohne Lehrauftrag</h1>
+          <div class="btn-toolbar mb-2 mb-md-0">
                       
             <div class="btn-group me-2">
-              <!-- button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler">Expand</button>
-              <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler">Collapse</button -->
+              <!--button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler">Expand</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler">Collapse</button-->
             </div>
 
             
           </div>
-        </div>                
+        </div>
 
-        <div class="d-flex justify-content-between align-items-center col-md-9 ms-sm-auto col-lg-12 p-md-2" >         
-         
-
+        <div class="mh-100 pb-5" >         
           <!--+
-              | TODO 
+              | employees without a contract within the last 3 semesters  
               +-->
-
+          <stale-employees></stale-employees>
 
         </div>    
         

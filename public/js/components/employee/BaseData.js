@@ -9,9 +9,11 @@ export const BaseData = {
         "datepicker": VueDatePicker
     },
     props: {
-        editMode: { type: Boolean, required: true },
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},
+        editMode: { type: Boolean, required: false },
+        personID: { type: Number, required: false },
+        personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
     },
     emits: ['updateHeader'],
@@ -20,6 +22,11 @@ export const BaseData = {
         const readonly = Vue.ref(true);
 
         const { personID } = Vue.toRefs(props);
+
+        const theModel = Vue.computed({
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+        });
 
         const url = Vue.ref("");
 
@@ -46,12 +53,12 @@ export const BaseData = {
 
         
         const fetchData = async () => {
-            if (personID.value==null) {                
+            if (theModel.value.personID==null && props.personID==null) {                
                 return;
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Person.personBaseData(personID.value);                    
+              const res = await Vue.$fhcapi.Person.personBaseData(theModel.value.personID || personID.value);
               currentValue.value = res.data.retval[0];
             } catch (error) {
               console.log(error)              
@@ -83,13 +90,16 @@ export const BaseData = {
             } 
         }
 
-
         const currentValue = Vue.ref(createShape());
         const preservedValue = Vue.ref(createShape());        
 
         Vue.watch(personID, (currentVal, oldVal) => {  
             fetchData();         
         });
+
+        Vue.watch(theModel, (currentVal, oldVal) => {
+            console.log('BaseData: theModel changed: ', currentVal);
+        })
 
         const toggleMode = async () => {
             if (!readonly.value) {
@@ -111,9 +121,9 @@ export const BaseData = {
         }
 
         Vue.onMounted(() => {
-            console.log('BaseData mounted', props.personID);
+            console.log('BaseData mounted', props.personID, theModel);
             currentValue.value = createShape();
-            if (props.personID) {
+            if (theModel.value?.personID || props.personID) {
                 fetchData();
             }
             
@@ -143,15 +153,12 @@ export const BaseData = {
 //            var date_regex = /^(((0[1-9]|[12]|[13]\d|3[01])(0[13578]|1[02])(\d{2}))|((0[1-9]|[12]|[13]\d|30)(0[13456789]|1[012])(\d{2}))|((0[1-9]|1\d|2[0-8])02(\d{2}))|(2902((1[6-9]|[2-9]\d)(0[48]|[2468][048]|[13579][26])|(([1][26]|[2468][048]|[3579][26])00))))$/gm;
             // extract date
             var datum = svnr.substring(4);
-            console.log('datum = ',datum);                   
 
             var nummer = svnr.substring(0,3);
-            console.log('nummer:',nummer);
 
             var pruefzahl = svnr.substring(3,4);
-            console.log('pruefzahl:', pruefzahl);
             
-            let isValid = true; //date_regex.test(datum);
+            let isValid = true;
 
             if(isValid){   
                 // calc checksum
@@ -164,7 +171,6 @@ export const BaseData = {
                 }
 
                 let rest = sum % 11;
-                console.log('rest:', rest);
 
                 if (rest == pruefzahl) return true;
             } else {
@@ -174,8 +180,6 @@ export const BaseData = {
         }
 
         const save = async () => {
-            console.log('haschanged: ', hasChanged);
-            console.log('frmState: ', frmState);
 
             if (!baseDataFrm.value.checkValidity()) {
 
@@ -193,7 +197,7 @@ export const BaseData = {
                     showToast();
                     currentValue.value = response.data.retval[0];
                     preservedValue.value = currentValue.value;
-                    emit('updateHeader')
+                    theModel.value.updateHeader();
                     toggleMode();  
                 } catch (error) {
                     console.log(error)              
@@ -204,18 +208,6 @@ export const BaseData = {
             }
 
             frmState.wasValidated  = true;  
-        }
-
-        const submitFormHandler = (event) => {
-        
-            if (!baseDataFrm.value.checkValidity()) {
-                console.log("form invalid!!!");
-                event.preventDefault();
-                event.stopPropagation();
-            }
-
-            console.log("form valid");
-            //form.classList.add('was-validated');
         }
 
         const hasChanged = Vue.computed(() => {
@@ -416,3 +408,6 @@ export const BaseData = {
 
     `
 }
+
+
+export default BaseData;

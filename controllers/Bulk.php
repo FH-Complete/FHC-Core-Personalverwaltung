@@ -1,7 +1,7 @@
 <?php
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Valorisation extends Auth_Controller
+class Bulk extends Auth_Controller
 {
 
 	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -12,7 +12,7 @@ class Valorisation extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct(array(
-			'index'=> Valorisation::DEFAULT_PERMISSION
+			'index'=> Bulk::DEFAULT_PERMISSION
 			)
 		);
 	}
@@ -24,7 +24,7 @@ class Valorisation extends Auth_Controller
 	public function index()
 	{
 		$this->load->library('WidgetLib');
-		$this->load->view('extensions/FHC-Core-Personalverwaltung/valorisation/home');
+		$this->load->view('extensions/FHC-Core-Personalverwaltung/bulk/home');
 	}
 }
 

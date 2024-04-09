@@ -131,7 +131,7 @@ export const CreateWizard = {
                     <button type="button" class="btn btn-primary" @click="okHandler()" v-if="getSelectedTitle() != 'Suche'" >
                         Mitarbeiter anlegen
                     </button>
-                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue.surname == ''"  @click="showCreateHandler()" v-if="getSelectedTitle() != 'Schnellanlage'">
+                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue.surname == '' || currentValue.birthdate==null || currentValue.birthdate==''"  @click="showCreateHandler()" v-if="getSelectedTitle() != 'Schnellanlage'">
                         Neue Person anlegen <i class="fa fa-chevron-right"></i>
                     </button>
                 </div>

@@ -28,7 +28,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	),
 	'Valorisierung' => array(
-		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Valorisation'),
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Bulk'),
 		'description' => 'Bulk Edit',
 		'icon' => 'percent',
 		'requiredPermissions' => 'basis/mitarbeiter:r'

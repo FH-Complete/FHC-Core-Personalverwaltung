@@ -9,6 +9,7 @@ import { EmployeeLifeCycle } from "../components/employee/lifecycle/EmployeeLife
 import { EmployeeDocument } from "../components/employee/document/EmployeeDocument.js";
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
+import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -247,5 +248,6 @@ const fetchUnternehmen = async () => {
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(Phrasen);
+pvApp.use(FhcAlert);
 pvApp.mount('#wrapper');
 

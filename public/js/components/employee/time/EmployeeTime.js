@@ -1,9 +1,11 @@
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import { OffTime } from './OffTime.js';
+import { TimeRecording } from './TimeRecording.js';
 
 export const EmployeeTime = {
     components: {
         OffTime,
+        TimeRecording,
     },
     props: {
     },

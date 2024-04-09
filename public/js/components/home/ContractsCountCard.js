@@ -3,6 +3,9 @@ const ContractCountCard = {
         "p-overlaypanel": primevue.overlaypanel,
         "p-datatable": primevue.datatable,
         "p-column": primevue.column,
+        "InputText": primevue.inputtext,
+        "MultiSelect": primevue.multiselect,
+	"Calendar": primevue.calendar
      },
      props: {
         showNew: Boolean
@@ -17,6 +20,34 @@ const ContractCountCard = {
         const title = Vue.ref("Dienstantritte");
         const contractsOverlay = Vue.ref();
         const selectedPerson = Vue.ref();
+        const filters = Vue.ref({
+            global: { value: null, matchMode: primevue.api.FilterMatchMode.CONTAINS },
+            vorname: { value: null, matchMode: primevue.api.FilterMatchMode.STARTS_WITH },
+            nachname: { value: null, matchMode: primevue.api.FilterMatchMode.STARTS_WITH },
+            vertragsart: { value: [], matchMode: primevue.api.FilterMatchMode.IN },
+	    von: { value: null, matchMode: primevue.api.FilterMatchMode.DATE_IS },
+	    bis: { value: null, matchMode: primevue.api.FilterMatchMode.DATE_IS }
+        });
+        const datumssort = (props.showNew) ? {field: 'von', order: 1} : {field: 'bis', order: 1};
+        const defaultsortorder = [
+            {field: 'vertragsart', order: 1},
+            datumssort,
+            {field: 'nachname', order: 1},
+            {field: 'vorname', order: 1}
+        ];
+
+        const vertragsarten = Vue.ref([]);
+        Vue.$fhcapi.DV.getVertragsarten().then((resp) => {
+            let varts = [];
+            let defaultfilter = ['Echter DV', 'Studentische Hilfskraft'];
+            for( let vart of resp.data.retval) {
+                varts.push(vart.label);
+                if( defaultfilter.includes(vart.label) ) {
+                    filters.value.vertragsart.value.push(vart.label);
+                }
+            }
+            vertragsarten.value = varts;
+        });
 
         const toggle = (event) => {
             contractsOverlay.value.toggle(event);
@@ -24,8 +55,22 @@ const ContractCountCard = {
 
 
         const formatDate = (ds) => {
+            if( ds === null ) {
+                return '-';
+            }
+
+	    if( ds instanceof Date ) {
+                return ds.toLocaleDateString('de-AT', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            }
+
             var d = new Date(ds);
-            return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
+            var dd = ((d.getDate()).toString()).padStart(2, '0');
+            var mm = ((d.getMonth() + 1).toString()).padStart(2, '0');
+            return  dd + "." + mm + "." + d.getFullYear();
         }
 
         const capitalize = (s) => {
@@ -46,8 +91,11 @@ const ContractCountCard = {
 			  const res = await fetch(url)
 			  let response = await res.json();
               isFetching.value = false;              
-			  console.log(response.retval);	  
-			  contractDataNew.value = response.retval;			  
+			  contractDataNew.value = response.retval.map((row) => {
+                              row.von = (row.von === null) ? null : new Date(row.von);
+                              row.bis = (row.bis === null) ? null : new Date(row.bis);
+                              return row;
+                          });
 			} catch (error) {
 			  console.log(error);
               isFetching.value = false;           
@@ -65,7 +113,9 @@ const ContractCountCard = {
         }
       
         return {
-            contractDataNew, currentYear, currentMonth, isFetching, title, contractsOverlay, onPersonSelect, selectedPerson, toggle,
+            contractDataNew, currentYear, currentMonth, isFetching, title,
+            contractsOverlay, onPersonSelect, selectedPerson, toggle, filters,
+            vertragsarten, formatDate, defaultsortorder
         }
      },
      template: `
@@ -82,10 +132,58 @@ const ContractCountCard = {
         </div>
      </div>
 
-     <p-overlaypanel ref="contractsOverlay">
-        <p-datatable v-model:selection="selectedPerson" :value="contractDataNew" selectionMode="single" :paginator="true" :rows="5" @row-select="onPersonSelect">
-            <p-column field="vorname" header="Vorname" sortable style="min-width: 12rem"></p-column>
-            <p-column field="nachname" header="Nachname" sortable style="min-width: 12rem"></p-column>
+     <p-overlaypanel class="contractscountcards" ref="contractsOverlay">
+        <p-datatable
+            v-model:filters="filters"
+            filterDisplay="row"
+            :globalFilterFields="['vorname', 'nachname', 'vertragsart']"
+            v-model:selection="selectedPerson"
+            :value="contractDataNew"
+            selectionMode="single"
+            sortMode="multiple"
+            :multiSortMeta="defaultsortorder"
+            removeableSort
+            :paginator="true"
+            :rows="12"
+            @row-select="onPersonSelect">
+	    <template #empty> Keine Datensätze gefunden. </template>
+            <p-column field="vorname" header="Vorname" sortable style="min-width: 12rem">
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Vorname filtern" />
+                </template>
+            </p-column>
+            <p-column field="nachname" header="Nachname" sortable style="min-width: 12rem">
+                <template #filter="{ filterModel, filterCallback }">
+                    <InputText v-model="filterModel.value" type="text" @input="filterCallback()" class="p-column-filter" placeholder="Nachname filtern" />
+                </template>
+            </p-column>
+            <p-column field="vertragsart" header="Vertragsart" sortable style="min-width: 12rem">
+                <template #filter="{ filterModel, filterCallback }">
+                    <MultiSelect v-model="filterModel.value" @change="filterCallback()" :options="vertragsarten" placeholder="Vertragsarten filtern" class="p-column-filter" style="min-width: 14rem" :maxSelectedLabels="1">
+                        <template #option="slotProps">
+                            <div class="flex align-items-center gap-2">
+                                <span>{{ slotProps.option }}</span>
+                            </div>
+                        </template>
+                    </MultiSelect>
+                </template>
+            </p-column>
+            <p-column field="von" header="DV-Beginn" dataType="date" sortable style="min-width: 12rem">
+                <template #body="{ data }">
+                    <span>{{ formatDate(data.von) }}</span>
+                </template>
+		<template #filter="{ filterModel, filterCallback }">
+                    <Calendar v-model="filterModel.value" @date-select="filterCallback()" showIcon :showOnFocus="false" dateFormat="dd.mm.yy" placeholder="dd.mm.yyyy" mask="99.99.9999" />
+                </template>
+            </p-column>
+            <p-column field="bis" header="DV-Ende" dataType="date" sortable style="min-width: 12rem">
+                <template #body="{ data }">
+                    <span>{{ formatDate(data.bis) }}</span>
+                </template>
+		<template #filter="{ filterModel, filterCallback }">
+                    <Calendar v-model="filterModel.value" @date-select="filterCallback()" showIcon :showOnFocus="false" dateFormat="dd.mm.yy" placeholder="dd.mm.yyyy" mask="99.99.9999" />
+                </template>
+            </p-column>
         </p-datatable>
      </p-overlaypanel>
      

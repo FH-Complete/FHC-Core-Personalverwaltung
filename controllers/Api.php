@@ -10,20 +10,20 @@ require_once DOC_ROOT . '/include/' . EXT_FKT_PATH . '/generateuid.inc.php';
 class Api extends Auth_Controller
 {
 
-    const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
-    // code igniter 
+    const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
+    // code igniter
     protected $CI;
 
     public function __construct() {
-        
+
         parent::__construct(
-			array(
-				'index' => Api::DEFAULT_PERMISSION,
-				'getSprache' => Api::DEFAULT_PERMISSION,
-				'getSachaufwandtyp' => Api::DEFAULT_PERMISSION,
-				'getNations' => Api::DEFAULT_PERMISSION,
-				'getAusbildung' => Api::DEFAULT_PERMISSION,
-				'getStandorteIntern' => Api::DEFAULT_PERMISSION,
+	    array(
+		'index' => Api::DEFAULT_PERMISSION,
+		'getSprache' => Api::DEFAULT_PERMISSION,
+		'getSachaufwandtyp' => Api::DEFAULT_PERMISSION,
+		'getNations' => Api::DEFAULT_PERMISSION,
+		'getAusbildung' => Api::DEFAULT_PERMISSION,
+		'getStandorteIntern' => Api::DEFAULT_PERMISSION,
                 'getOrte' => Api::DEFAULT_PERMISSION,
                 'getGemeinden' => Api::DEFAULT_PERMISSION,
                 'getOrtschaften' => Api::DEFAULT_PERMISSION,
@@ -68,55 +68,67 @@ class Api extends Auth_Controller
                 'dvByPerson' => Api::DEFAULT_PERMISSION,
                 'vertragByDV' => Api::DEFAULT_PERMISSION,
                 'getCompanyByOrget'  => Api::DEFAULT_PERMISSION,
-				'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
-				'getAllFunctions' => Api::DEFAULT_PERMISSION,
-				'getContractFunctions' => Api::DEFAULT_PERMISSION,
-				'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
-				'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
+		'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
+		'getAllFunctions' => Api::DEFAULT_PERMISSION,
+		'getContractFunctions' => Api::DEFAULT_PERMISSION,
+		'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
+		'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
                 'getAllFunctions' => Api::DEFAULT_PERMISSION,
-				'saveVertrag' => Api::DEFAULT_PERMISSION,
-				'getCurrentVBs' => Api::DEFAULT_PERMISSION,
-				'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
-				'getAllVBs' => Api::DEFAULT_PERMISSION,
-				'storeToTmpStore' => Api::DEFAULT_PERMISSION,
-				'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
-				'getTmpStoreById' => Api::DEFAULT_PERMISSION,
-				'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
-				'getUnternehmen' => Api::DEFAULT_PERMISSION,
+		'saveVertrag' => Api::DEFAULT_PERMISSION,
+		'getCurrentVBs' => Api::DEFAULT_PERMISSION,
+		'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
+		'getAllVBs' => Api::DEFAULT_PERMISSION,
+		'storeToTmpStore' => Api::DEFAULT_PERMISSION,
+		'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
+		'getTmpStoreById' => Api::DEFAULT_PERMISSION,
+		'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
+		'getUnternehmen' => Api::DEFAULT_PERMISSION,
                 'getGehaltstypen' => Api::DEFAULT_PERMISSION,
-				'getVertragsarten' => Api::DEFAULT_PERMISSION,
+		'getVertragsarten' => Api::DEFAULT_PERMISSION,
                 'getVertragsbestandteiltypen' => Api::DEFAULT_PERMISSION,
                 'filterPerson' => Api::DEFAULT_PERMISSION,
                 'createEmployee' => Api::DEFAULT_PERMISSION,
                 'gbtByDV'  => Api::DEFAULT_PERMISSION,
                 'deleteDV'  => Api::DEFAULT_PERMISSION,
                 'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
-				'endDV'  => Api::DEFAULT_PERMISSION,
-				'saveKarenz'  => Api::DEFAULT_PERMISSION,
-				'getKarenztypen' => Api::DEFAULT_PERMISSION,
-				'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
-				'getFreitexttypen' => Api::DEFAULT_PERMISSION,
+		'endDV'  => Api::DEFAULT_PERMISSION,
+                'deactivateDV'  => Api::DEFAULT_PERMISSION,
+		'saveKarenz'  => Api::DEFAULT_PERMISSION,
+		'getKarenztypen' => Api::DEFAULT_PERMISSION,
+		'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
+		'getFreitexttypen' => Api::DEFAULT_PERMISSION,
                 'getVB' => Api::DEFAULT_PERMISSION,
                 'getGB' => Api::DEFAULT_PERMISSION,
                 'dvByID'=> Api::DEFAULT_PERMISSION,
-				'getStundensaetze' => Api::DEFAULT_PERMISSION,
-				'getStundensatztypen' => Api::DEFAULT_PERMISSION,
-				'updateStundensatz' => Api::DEFAULT_PERMISSION,
-				'deleteStundensatz' => Api::DEFAULT_PERMISSION,
+		'getStundensaetze' => Api::DEFAULT_PERMISSION,
+		'getStundensatztypen' => Api::DEFAULT_PERMISSION,
+		'updateStundensatz' => Api::DEFAULT_PERMISSION,
+		'deleteStundensatz' => Api::DEFAULT_PERMISSION,
                 'offTimeByPerson' => Api::DEFAULT_PERMISSION,
-			)
-		);
+                'timeRecordingByPerson' => Api::DEFAULT_PERMISSION,
+                'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
+                'getFristenListe' => Api::DEFAULT_PERMISSION,
+                'getPersonFristenListe' => Api::DEFAULT_PERMISSION,
+                'updateFristenListe' => Api::DEFAULT_PERMISSION,
+                'getFristenStatus' => Api::DEFAULT_PERMISSION,
+                'getFristenEreignisse' => Api::DEFAULT_PERMISSION,
+                'updateFristStatus' => Api::DEFAULT_PERMISSION,
+                'deleteFrist' => Api::DEFAULT_PERMISSION,
+                'upsertFrist' => Api::DEFAULT_PERMISSION,
+                'batchUpdateFristStatus' => Api::DEFAULT_PERMISSION
+	    )
+	);
 
-
-		// Loads authentication library and starts authenticationfetc
-		$this->load->library('AuthLib');
+	// Loads authentication library and starts authenticationfetc
+	$this->load->library('AuthLib');
         $this->load->library('vertragsbestandteil/VertragsbestandteilLib',
 			null, 'VertragsbestandteilLib');
         $this->load->library('vertragsbestandteil/GehaltsbestandteilLib',
 			null, 'GehaltsbestandteilLib');
         $this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib',
 			null, 'GehaltsabrechnungLib');
-
+        $this->load->library('extensions/FHC-Core-Personalverwaltung/fristen/FristenLib',
+			null, 'FristenLib');
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
         $this->load->model('person/Person_model','PersonModel');
@@ -141,14 +153,16 @@ class Api extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
-		$this->load->model('ressource/Funktion_model', 'FunktionModel');
+	$this->load->model('ressource/Funktion_model', 'FunktionModel');
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
-	    $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
-	    $this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+	$this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
+	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+        $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
+        $this->load->model('ressource/Frist_model', 'FristModel');
 
         // get CI for transaction management
         $this->CI = &get_instance();
@@ -157,76 +171,76 @@ class Api extends Auth_Controller
     function index()
     {
         $data = $this->ApiModel->fetch_all();
-        $this->outputJsonSuccess($data->result_array());       
+        $this->outputJsonSuccess($data->result_array());
     }
 
     function getSprache()
     {
         //$this->SpracheModel->addOrder("sprache");
-		$spracheRes = $this->SpracheModel->load();
+	$spracheRes = $this->SpracheModel->load();
 
-		if (isError($spracheRes))
-		{
-			$this->outputJsonError(getError($spracheRes));
-			exit;
-		}
+	if (isError($spracheRes))
+	{
+		$this->outputJsonError(getError($spracheRes));
+		exit;
+	}
 
         $this->outputJson($spracheRes);
     }
 
 
     function getSachaufwandtyp()
-    {    
+    {
         $this->SachaufwandtypModel->addSelect("sachaufwandtyp_kurzbz, bezeichnung, sort, aktiv");
-		$this->SachaufwandtypModel->addOrder("bezeichnung");
-		$sachaufwandTypRes = $this->SachaufwandtypModel->load();
+	$this->SachaufwandtypModel->addOrder("bezeichnung");
+	$sachaufwandTypRes = $this->SachaufwandtypModel->load();
 
-		if (isError($sachaufwandTypRes))
-		{
-			$this->outputJsonError(getError($sachaufwandTypRes));
-			exit;
-		}
+	if (isError($sachaufwandTypRes))
+	{
+		$this->outputJsonError(getError($sachaufwandTypRes));
+		exit;
+	}
 
-        $this->outputJson($sachaufwandTypRes); 
+        $this->outputJson($sachaufwandTypRes);
     }
 
     function getNations()
     {
         $language = getUserLanguage();
 
-		$nationTextFieldName = $language == 'German' ? 'langtext' : 'engltext';
+	$nationTextFieldName = $language == 'German' ? 'langtext' : 'engltext';
 
         $this->NationModel->addSelect("nation_code, $nationTextFieldName AS nation_text, sperre");
-		$this->NationModel->addOrder("nation_text");
-		$nationRes = $this->NationModel->load();
+	$this->NationModel->addOrder("nation_text");
+	$nationRes = $this->NationModel->load();
 
-		if (isError($nationRes))
-		{
-			$this->outputJsonError(getError($nationRes));
-			exit;
-		}
+	if (isError($nationRes))
+	{
+	    $this->outputJsonError(getError($nationRes));
+	    exit;
+	}
 
-        $this->outputJson($nationRes); 
+        $this->outputJson($nationRes);
     }
 
     function getAusbildung()
     {
         $this->AusbildungModel->addOrder("ausbildungcode");
-		$result = $this->AusbildungModel->load();
+	$result = $this->AusbildungModel->load();
 
-		if (isError($result))
-		{
-			$this->outputJsonError(getError($result));
-			exit;
-		}
+	if (isError($result))
+	{
+	    $this->outputJsonError(getError($result));
+	    exit;
+	}
 
-        $this->outputJson($result); 
+        $this->outputJson($result);
     }
 
     function getStandorteIntern()
     {
         $data = $this->ApiModel->getStandorteIntern();
-        $this->outputJson($data); 
+        $this->outputJson($data);
     }
 
     function getOrte()
@@ -242,10 +256,10 @@ class Api extends Auth_Controller
 
         if (!is_numeric($plz))
         {
-            $this->outputJsonError("plz '$plz' is not numeric!'");            
+            $this->outputJsonError("plz '$plz' is not numeric!'");
         } else {
             $data = $this->ApiModel->getGemeinden($plz);
-            $this->outputJson($data); 
+            $this->outputJson($data);
         }
     }
 
@@ -254,10 +268,10 @@ class Api extends Auth_Controller
         $plz = $this->input->get('plz', TRUE);
 
         if (!is_numeric($plz))
-            $this->outputJsonError("plz '$plz' is not numeric!'");     
+            $this->outputJsonError("plz '$plz' is not numeric!'");
 
         $data = $this->ApiModel->getOrtschaften($plz);
-        $this->outputJson($data); 
+        $this->outputJson($data);
     }
 
     // ---------------------------------------
@@ -273,7 +287,7 @@ class Api extends Auth_Controller
 
         $data = $this->SachaufwandModel->getByPersonID($person_id);
         $this->_remapData('sachaufwand_id',$data);
-        return $this->outputJson($data); 
+        return $this->outputJson($data);
     }
 
     function upsertPersonMaterialExpenses()
@@ -286,10 +300,10 @@ class Api extends Auth_Controller
                 show_error('sachaufwand_id is not numeric!');
 
             if (!isset($payload['sachaufwandtyp_kurzbz']) || (isset($payload['sachaufwandtyp_kurzbz']) && $payload['sachaufwandtyp_kurzbz'] == ''))
-                show_error('sachaufwandtyp_kurzbz is empty!');   
-            
+                show_error('sachaufwandtyp_kurzbz is empty!');
+
             if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
-                show_error('mitarbeiter_uid is empty!');    
+                show_error('mitarbeiter_uid is empty!');
 
             if ($payload['sachaufwand_id'] == 0)
             {
@@ -297,7 +311,7 @@ class Api extends Auth_Controller
             } else {
                 $result = $this->SachaufwandModel->updatePersonSachaufwand($payload);
             }
-            
+
             if (isSuccess($result))
 			    $this->outputJsonSuccess($result->retval);
 		    else
@@ -325,7 +339,7 @@ class Api extends Auth_Controller
 
         } else {
             $this->output->set_status_header('405');
-        }        
+        }
 
     }
 
@@ -344,13 +358,13 @@ class Api extends Auth_Controller
                 show_error('benutzerfunktion_id is not numeric!');
 
             if (!isset($payload['oe_kurzbz']) || (isset($payload['oe_kurzbz']) && $payload['oe_kurzbz'] == ''))
-                show_error('oe_kurzbz is empty!');   
-            
+                show_error('oe_kurzbz is empty!');
+
             if (!isset($payload['funktion_kurzbz']) || (isset($payload['funktion_kurzbz']) && $payload['funktion_kurzbz'] == ''))
                 show_error('funktion_kurzbz is empty!');
 
             if (!isset($payload['uid']) || (isset($payload['uid']) && $payload['uid'] == ''))
-                show_error('uid is empty!');    
+                show_error('uid is empty!');
 
             if ($payload['benutzerfunktion_id'] == 0)
             {
@@ -358,7 +372,7 @@ class Api extends Auth_Controller
             } else {
                 $result = $this->BenutzerfunktionModel->updateBenutzerfunktion($payload);
             }
-            
+
             if (isSuccess($result))
 			    $this->outputJsonSuccess($result->retval);
 		    else
@@ -386,7 +400,7 @@ class Api extends Auth_Controller
 
         } else {
             $this->output->set_status_header('405');
-        }        
+        }
 
     }
 
@@ -407,7 +421,7 @@ class Api extends Auth_Controller
     function getOrgHeads()
     {
         $data = $this->OrganisationseinheitModel->getHeads();
-        return $this->outputJson($data); 
+        return $this->outputJson($data);
     }
 
     function getOrgStructure()
@@ -415,7 +429,7 @@ class Api extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getOrgStructure($oe);
-        return $this->outputJson($data); 
+        return $this->outputJson($data);
     }
 
     function getOrgPersonen()
@@ -423,9 +437,9 @@ class Api extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getPersonen($oe);
-        return $this->outputJson($data); 
+        return $this->outputJson($data);
     }
-    
+
     // -----------------------------------------
     // contracts about to expire (bisverwendung)
     // -----------------------------------------
@@ -442,11 +456,11 @@ class Api extends Auth_Controller
 			show_error('month is not numeric!');
 
         $data = $this->ApiModel->getContractExpire($year, $month);
-        $this->outputJson($data); 
+        $this->outputJson($data);
     }
 
     function getContractNew()
-    {        
+    {
         $year = $this->input->get('year', TRUE);
 
         if (!is_numeric($year))
@@ -488,10 +502,9 @@ class Api extends Auth_Controller
 
         $data = $this->ApiModel->getCovidDate($person_id, $date);
         $this->outputJson($data);
-
     }
 
-    /** 
+    /**
      * Delete contract (DV). For testing only. Do not use in production!
      * */
     function deleteDV()
@@ -511,9 +524,8 @@ class Api extends Auth_Controller
         if ( $ret !== TRUE) {
             return $this->outputJsonError($ret);
         }
-        
+
         return $this->outputJsonSuccess(TRUE);
-        
     }
 
 
@@ -541,7 +553,6 @@ class Api extends Auth_Controller
 
         if (isSuccess($data))
         {
-
             /**
              * @var Gehaltsbestandteil_model
              */
@@ -556,13 +567,11 @@ class Api extends Auth_Controller
                     $this->outputJsonError("Error when getting salary");
                 }
             }
-            
+
             $this->outputJson($data);
         } else {
             $this->outputJsonError("Error when getting current DV");
         }
-        
-
     }
 
     function gbtByDV()
@@ -583,7 +592,7 @@ class Api extends Auth_Controller
         }
 
         // TODO add date filter
-        $gbtModel = $this->GBTModel;        
+        $gbtModel = $this->GBTModel;
         $gbt_data = $gbtModel->getCurrentGBTByDV($dv_id, $date);
 
         if (isSuccess($gbt_data))
@@ -592,7 +601,7 @@ class Api extends Auth_Controller
         } else {
             $this->outputJsonError("Error when getting salary");
         }
-        
+
     }
 
     private function gbtChartDataAbgerechnet($from_date, $to_date, $dv_id)
@@ -620,9 +629,9 @@ class Api extends Auth_Controller
                 if ($now < $value->getBisDateTime()) {
                     $hasFutureDate = true;
                 }
-            } 
+            }
             if ($value->getBis() != null) {
-                
+
                 $bisDatum = $value->getBisDateTime()->add(new DateInterval("P1D"));
 
                 if (!isset($data[$bisDatum->format("Y-m-d")])) {
@@ -632,7 +641,7 @@ class Api extends Auth_Controller
                         $hasFutureDate = true;
                     }
                 }
-            } 
+            }
         }
 
         if (!$hasFutureDate) {
@@ -679,37 +688,37 @@ class Api extends Auth_Controller
 
         /*$gbtModel = $this->GBTModel;
         $gbt_data = $gbtModel->getGBTChartDataByDV($dv_id);*/
-        
+
         $now = new DateTime();
-		if( version_compare(phpversion(), '7.1.0', 'lt') ) 
-		{
-			$now->setTime(0,0,0);
-		}
-		else 
-		{
-			$now->setTime(0,0,0,0);
-		}
-        
+	if( version_compare(phpversion(), '7.1.0', 'lt') )
+	{
+	    $now->setTime(0,0,0);
+	}
+	else
+	{
+	    $now->setTime(0,0,0,0);
+	}
+
         // fetch Gesamtgehalt
         $data = $this->gbtChartDataGesamt($now, $dv_id);
 
-        // loop dates and fetch 
+        // loop dates and fetch
         $keys = array_keys($data);
         $from_date = $keys[0];
         $to_date = end($keys);
-        
+
         $abgerechnet_data = $this->gbtChartDataAbgerechnet($from_date, $to_date, $dv_id);
-        
-        if(isError($abgerechnet_data)) 
-		{
-			$this->outputJsonError("error getting chart data");
+
+        if(isError($abgerechnet_data))
+	{
+	    $this->outputJsonError("error getting chart data");
             return;
-		}
-                
+	}
+
         $this->outputJson(array('gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
-        
+
     }
-    
+
 
     function getCourseHours()
     {
@@ -721,7 +730,7 @@ class Api extends Auth_Controller
             $this->outputJsonError("uid is missing!'");
             return;
         }
-        
+
         if ($semester == '')
         {
             $this->outputJsonError("semester is missing!'");
@@ -730,7 +739,6 @@ class Api extends Auth_Controller
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
         $this->outputJson($data);
-
     }
 
     // --------------------------------------
@@ -771,7 +779,7 @@ class Api extends Auth_Controller
 			show_error('person id is not numeric!');
 
         $data = $this->ApiModel->getPersonHeaderData($person_id);
-        return $this->outputJson($data); 
+        return $this->outputJson($data);
     }
 
     /**
@@ -793,9 +801,9 @@ class Api extends Auth_Controller
             {
                 $row->supervisor = $dataSupervisor->retval[0];
             }
-            
+
         }
-        
+
         return $this->outputJson($data);
     }
 
@@ -840,7 +848,7 @@ class Api extends Auth_Controller
               $thu_aspect_ratio = $maxwidth / $maxheight;
 
               // calc image dimensions
-              if ($src_width <= $maxwidth && $src_height <= $maxheight) 
+              if ($src_width <= $maxwidth && $src_height <= $maxheight)
               {
                   $thu_width  = $src_width;
                   $thu_height = $src_height;
@@ -853,21 +861,21 @@ class Api extends Auth_Controller
               }
 
               $imageScaled        =   ImageCreateTrueColor($thu_width,$thu_height);
-              imagecopyresampled($imageScaled,$imagecreated,0,0,0,0,$thu_width,$thu_height,$src_width,$src_height); 
+              imagecopyresampled($imageScaled,$imagecreated,0,0,0,0,$thu_width,$thu_height,$src_width,$src_height);
 
 
-              //if (!empty($imagecreated) && $imageScaled = imagescale($imagecreated, $thu_width, $thu_height)) 
+              //if (!empty($imagecreated) && $imageScaled = imagescale($imagecreated, $thu_width, $thu_height))
               if (!empty($imageScaled))
               {
                 ob_start();
-                
+
                 imagejpeg($imageScaled, NULL, $quality);
-                
+
                 $image = ob_get_contents();
                 ob_end_clean();
                 imagedestroy($imagecreated);
                 imagedestroy($imageScaled);
-                
+
                 if (!empty($image))
                 {
                     $scaledBase64 = base64_encode($image);
@@ -879,7 +887,7 @@ class Api extends Auth_Controller
                 }
 
               }
-                                        
+
         }  else {
             $this->output->set_status_header('405');
         }
@@ -908,7 +916,7 @@ class Api extends Auth_Controller
     }
 
     /**
-     * Get banking data of a person. 
+     * Get banking data of a person.
      * Query parameter: person_id
      */
     function personBankData()
@@ -920,8 +928,8 @@ class Api extends Auth_Controller
 
         $data = $this->BankverbindungModel->loadWhere(array('person_id' => $person_id));
         $this->_remapData('bankverbindung_id',$data);
-        
-        return $this->outputJson($data); 
+
+        return $this->outputJson($data);
     }
 
     /**
@@ -941,7 +949,7 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
             if (!isset($payload['iban']) || (isset($payload['iban']) && $payload['iban'] == ''))
-                show_error('iban is empty!');            
+                show_error('iban is empty!');
 
             if ($payload['bankverbindung_id'] == 0)
             {
@@ -949,7 +957,7 @@ class Api extends Auth_Controller
             } else {
                 $result = $this->ApiModel->updatePersonBankData($payload);
             }
-            
+
             if (isSuccess($result))
 			    $this->outputJsonSuccess($result->retval);
 		    else
@@ -977,7 +985,7 @@ class Api extends Auth_Controller
 
         } else {
             $this->output->set_status_header('405');
-        }        
+        }
 
     }
 
@@ -1009,7 +1017,7 @@ class Api extends Auth_Controller
                     return false;
                 }
         }
-        
+
         return true;
     }
 
@@ -1044,13 +1052,13 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
             $data = $this->ApiModel->getPersonBaseData($person_id);
-            $this->outputJson($data); 
+            $this->outputJson($data);
         } else {
             $this->output->set_status_header('405');
         }
     }
 
-    
+
 
     // update person data
     function updatePersonBaseData()
@@ -1067,7 +1075,7 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
             if (!isset($payload['nachname']) || (isset($payload['nachname']) && $payload['nachname'] == ''))
-                show_error('nachname is empty!');            
+                show_error('nachname is empty!');
 
             $result = $this->ApiModel->updatePersonBaseData($payload);
             if (isSuccess($result))
@@ -1085,7 +1093,7 @@ class Api extends Auth_Controller
             $uid = $this->input->get('uid', '');
             $kurzbz = $this->input->get('kurzbz', '');
 
-            if ($uid == '') 
+            if ($uid == '')
                 show_error('parameter uid missing');
 
             $kurzbzexists = $this->EmployeeModel->kurzbzExists($kurzbz, $uid);
@@ -1114,7 +1122,7 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
             $data = $this->ApiModel->getPersonEmployeeData($person_id);
-            $this->outputJson($data); 
+            $this->outputJson($data);
         } else {
             $this->output->set_status_header('405');
         }
@@ -1128,10 +1136,10 @@ class Api extends Auth_Controller
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
             {
-                $this->outputJsonError('person id is not numeric!'); 
+                $this->outputJsonError('person id is not numeric!');
                 exit();
             }
-                       
+
             //$result = $this->ApiModel->updatePersonEmployeeData($payload);
 
             $payload['updatevon'] = getAuthUID();
@@ -1172,7 +1180,7 @@ class Api extends Auth_Controller
 				$userData->aktiv = $aktiv;
 				$userData->updateaktivvon = getAuthUID();
 				$userData->updateaktivam = 'NOW()';
-			}            
+			}
             $userData->updatevon = getAuthUID();
             $userData->updateamum = 'NOW()';
             $this->BenutzerModel->update(array($payload['mitarbeiter_uid']), $userData);
@@ -1181,7 +1189,7 @@ class Api extends Auth_Controller
 
 
             if (isSuccess($result))
-            {                
+            {
 			    $this->outputJsonSuccess($result->retval);
             } else
 			    $this->outputJsonError('Error when updating employee data');
@@ -1200,9 +1208,9 @@ class Api extends Auth_Controller
 
             $data = $this->ApiModel->getPersonAddressData($person_id);
             $this->_remapData('adresse_id',$data);
-            $this->outputJson($data); 
+            $this->outputJson($data);
         } else if ($this->input->post()) {
-        
+
         } else {
             $this->output->set_status_header('405');
         }
@@ -1218,8 +1226,8 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
             if (!isset($payload['plz']) || (isset($payload['plz']) && $payload['plz'] == ''))
-                show_error('plz is empty!');  
-                
+                show_error('plz is empty!');
+
             if ($payload['adresse_id'] == 0)
             {
                 $result = $this->ApiModel->insertPersonAddressData($payload);
@@ -1234,7 +1242,7 @@ class Api extends Auth_Controller
         } else {
             $this->output->set_status_header('405');
         }
-        
+
     }
 
     function deletePersonAddressData()
@@ -1255,7 +1263,7 @@ class Api extends Auth_Controller
 
         } else {
             $this->output->set_status_header('405');
-        }        
+        }
 
     }
 
@@ -1274,7 +1282,7 @@ class Api extends Auth_Controller
 
 		    $this->KontaktModel->addOrder("kontakt_id");
 		    $data = $this->KontaktModel->loadWhere(array('person_id'=>$person_id, 'kontakttyp !=' => 'hidden'));
-           
+
             if (isSuccess($data))
             {
                 $this->_remapData('kontakt_id',$data);
@@ -1284,7 +1292,7 @@ class Api extends Auth_Controller
 
         } else {
             $this->output->set_status_header('405');
-        }   
+        }
     }
 
     function upsertPersonContactData()
@@ -1297,8 +1305,8 @@ class Api extends Auth_Controller
                 show_error('person id is not numeric!');
 
             if (!isset($payload['kontakt']) || (isset($payload['kontakt']) && $payload['kontakt'] == ''))
-                show_error('kontakt is empty!');  
-                
+                show_error('kontakt is empty!');
+
             if ($payload['kontakt_id'] == 0)
             {
                 $result = $this->ApiModel->insertPersonContactData($payload);
@@ -1313,7 +1321,7 @@ class Api extends Auth_Controller
         } else {
             $this->output->set_status_header('405');
         }
-        
+
     }
 
     function deletePersonContactData()
@@ -1334,7 +1342,7 @@ class Api extends Auth_Controller
 
         } else {
             $this->output->set_status_header('405');
-        }        
+        }
 
     }
 
@@ -1352,7 +1360,7 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJson($result); 
+        $this->outputJson($result);
     }
 
     //  ------------------------------------------
@@ -1370,9 +1378,9 @@ class Api extends Auth_Controller
 			exit;
 		}
 
-        $this->outputJson($result); 
+        $this->outputJson($result);
     }
-    
+
 
     private function _remapData($attribute, &$data) {
         $mappedData = new stdClass();
@@ -1412,7 +1420,7 @@ class Api extends Auth_Controller
         } else {
             $this->output->set_status_header('405');
         }
-        
+
     }
 
 
@@ -1424,12 +1432,12 @@ class Api extends Auth_Controller
 			show_error('person id is not numeric!');
 
         $data = $this->ApiModel->getFoto($person_id);
-        
+
         if ($data->retval[0]->foto == null)
             return $this->output->set_content_type('gif')->set_output(base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'));
             //$this->output->set_status_header('404');
 
-        return $this->output->set_content_type('jpeg')->set_output(base64_decode($data->retval[0]->foto));            
+        return $this->output->set_content_type('jpeg')->set_output(base64_decode($data->retval[0]->foto));
     }
 
     /**
@@ -1443,8 +1451,8 @@ class Api extends Auth_Controller
 			show_error('person id is not numeric!');
 
         $data = $this->ApiModel->getUID($person_id);
-        
-        return $this->outputJson($data);                   
+
+        return $this->outputJson($data);
     }
 
     /**
@@ -1471,7 +1479,40 @@ class Api extends Auth_Controller
             // filter by year
             $data = $this->ApiModel->getOffTimeList($person_uid, $year);
         }
-        
+
+        return $this->outputJson($data);
+    }
+
+    function timeRecordingByPerson()
+    {
+        $person_uid = $this->input->get('uid', TRUE);
+        $year = $this->input->get('year', TRUE);
+        $week = $this->input->get('week', TRUE);
+
+        if (!$person_uid)
+        {
+            $this->outputJsonError('invalid parameter person_uid');
+            exit;
+        }
+
+        if (!is_numeric($year))
+        {
+            $this->outputJsonError('invalid parameter year');
+            exit;
+        }
+
+        if (!is_numeric($week))
+        {
+            $this->outputJsonError('invalid parameter week');
+            exit;
+        }
+
+        $week_start = new DateTime();
+        $week_start->setISODate($year,$week);
+        $fromDate = $week_start->format('Y-m-d');
+        $toDate = $week_start->add(new DateInterval( "P6D" ))->format('Y-m-d');
+        $data = $this->ZeitaufzeichnungModel->getFullInterval($person_uid, $fromDate, $toDate);
+
         return $this->outputJson($data);
     }
 
@@ -1489,8 +1530,8 @@ class Api extends Auth_Controller
         }
 
         $data = $this->DVModel->getDVByPersonUID($person_uid);
-        
-        return $this->outputJson($data);   
+
+        return $this->outputJson($data);
     }
 
     function dvByID($dvid)
@@ -1508,7 +1549,7 @@ class Api extends Auth_Controller
 			$this->outputJson($result->retval[0]);
 		else
 			$this->outputJsonError('Error fetching DV');
-        
+
     }
 
     function getVB($vertragsbestandteil_id)
@@ -1523,7 +1564,7 @@ class Api extends Auth_Controller
         $data = $this->VertragsbestandteilLib->fetchVertragsbestandteil(
 			intval($vertragsbestandteil_id));
 
-        
+
         return $this->outputJson($data);
     }
 
@@ -1539,7 +1580,7 @@ class Api extends Auth_Controller
         $data = $this->GehaltsbestandteilLib->fetchGehaltsbestandteil(
 			intval($gehaltsbestandteil_id));
 
-        
+
         return $this->outputJson($data);
     }
 
@@ -1560,14 +1601,14 @@ class Api extends Auth_Controller
             $stichtag = time();
         }
 
-        $date = DateTime::createFromFormat( 'U', $stichtag); 
+        $date = DateTime::createFromFormat( 'U', $stichtag);
 		$date->setTimezone(new DateTimeZone('Europe/Vienna'));
         $datestring = $date->format("Y-m-d");
-		
+
         $data = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
 			intval($dv_id), $datestring);
 
-        
+
         return $this->outputJson($data);
     }
 
@@ -1609,7 +1650,7 @@ class Api extends Auth_Controller
                     $personJson = array_merge([], $payload);
                     unset($personJson['email']);
                     $result = $this->ApiModel->insertPersonBaseData($personJson);
-                    
+
 
                     if (isError($result))
                     {
@@ -1644,16 +1685,16 @@ class Api extends Auth_Controller
                         $this->outputJsonError('validation error');
                         return;
                     }
-                        
+
                     $person_id = $payload['person_id'];
 
                 }
-            
+
 
                 // generate UID and Personalnummer
                 $personalnummer = $this->ApiModel->generatePersonalnummer();
                 //$uid = sprintf('ma%05d',  $personalnummer - 10000);
-				$uid = generateMitarbeiterUID($payload['vorname'], $payload['nachname'], 
+				$uid = generateMitarbeiterUID($payload['vorname'], $payload['nachname'],
 					false, true, $personalnummer);
 
                 if ($uid === false)
@@ -1662,17 +1703,17 @@ class Api extends Auth_Controller
                     $this->outputJsonError('error generating UID for person');
                     return;
                 }
-				
+
                 // create benutzer
                 $result = $this->ApiModel->insertUser([ 'uid' => $uid, 'person_id' => $person_id ]);
-                if (isError($result)) 
+                if (isError($result))
                 {
                     $this->CI->db->trans_rollback();
                     $this->outputJsonError('error creating user for person');
                     return;
                 }
                 $uid = $result->retval;
-				
+
 				if (!defined('GENERATE_ALIAS_MITARBEITERIN') || GENERATE_ALIAS_MITARBEITERIN )
 				{
 					$aliasres = $this->BenutzerModel->generateAlias($uid);
@@ -1682,7 +1723,7 @@ class Api extends Auth_Controller
 						if($alias !== '')
 						{
 							$aliasupdres = $this->BenutzerModel->update(
-								array('uid' => $uid), 
+								array('uid' => $uid),
 								array('alias' => $alias)
 							);
 							if (isError($aliasupdres))
@@ -1695,7 +1736,7 @@ class Api extends Auth_Controller
 					}
 				}
 
-                
+
                 $employeeJson = [ 'mitarbeiter_uid' => $uid, 'personalnummer' => $personalnummer];
 
                 // generate abbreviated designation
@@ -1715,7 +1756,7 @@ class Api extends Auth_Controller
 
                 // create employee
                 $result = $this->ApiModel->insertEmployee($employeeJson);
-                if (isError($result)) 
+                if (isError($result))
                 {
                     $this->CI->db->trans_rollback();
                     $this->outputJsonError('error creating employee');
@@ -1732,15 +1773,15 @@ class Api extends Auth_Controller
                 $this->CI->db->trans_rollback();
                 $this->outputJsonError('Creating Employee failed.');
                 return;
-            }	
+            }
 
-            
+
             // return person_id and uid
             $this->outputJsonSuccess(['person_id' => $person_id, 'uid' => $uid]);
 
         } else {
             $this->output->set_status_header('405');
-        }  
+        }
     }
 
 
@@ -1783,20 +1824,20 @@ class Api extends Auth_Controller
                 {
                     $dvJson['bis'] = null;
                 }
-            
+
                 $this->apiModel->insertDV($dvJson);
-            
+
                 if (isError($result))
                 {
                     return error($result->msg, EXIT_ERROR);
                 }
 
                 $data = $this->DVModel->getDVByPersonUID($person_uid);
-        
-            return $this->outputJson($data);   
+
+            return $this->outputJson($data);
 
         } else {
-            $this->output->set_status_header('405'); 
+            $this->output->set_status_header('405');
         }
     }
 
@@ -1809,7 +1850,7 @@ class Api extends Auth_Controller
                 SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
                 WHERE oe_kurzbz=?
                 UNION ALL
-                SELECT o.oe_kurzbz, o.oe_parent_kurzbz 
+                SELECT o.oe_kurzbz, o.oe_parent_kurzbz
                 FROM   public.tbl_organisationseinheit AS o
                        INNER JOIN unternehmen u  ON u.oe_parent_kurzbz=o.oe_kurzbz
         )
@@ -1818,7 +1859,7 @@ class Api extends Auth_Controller
         WHERE oe_parent_kurzbz is null;
 EOSQL;
         $childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($oe_kurzbz));
-        if( hasData($childorgets) ) 
+        if( hasData($childorgets) )
         {
             $this->outputJson($childorgets);
             return;
@@ -1829,24 +1870,24 @@ EOSQL;
             return;
         }
     }
-   
+
 	/*
 	 * return list of child orgets for a given company orget_kurzbz
 	 * as key value list to be used in select or autocomplete
 	 */
-	public function getOrgetsForCompany($companyOrgetkurzbz=null) 
+	public function getOrgetsForCompany($companyOrgetkurzbz=null)
 	{
-		if( empty($companyOrgetkurzbz) ) 
+		if( empty($companyOrgetkurzbz) )
 		{
 			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
 			return;
 		}
-		
+
 		$sql = <<<EOSQL
-			SELECT 
-				oe.oe_kurzbz AS value, 
-				'[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) || 
-				'] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label 
+			SELECT
+				oe.oe_kurzbz AS value,
+				'[' || COALESCE(oet.bezeichnung, oet.organisationseinheittyp_kurzbz) ||
+				'] ' || COALESCE(oe.bezeichnung, oe.oe_kurzbz) AS label
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(
@@ -1859,15 +1900,15 @@ EOSQL;
 					SELECT oe_kurzbz
 					FROM oes
 					GROUP BY oe_kurzbz
-			) c 
-			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz 
-			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz 
+			) c
+			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz
+			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
 			ORDER BY oet.bezeichnung ASC, oe.bezeichnung ASC
-		
+
 EOSQL;
-			
+
 		$childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz));
-		if( hasData($childorgets) ) 
+		if( hasData($childorgets) )
 		{
 			$this->outputJson($childorgets);
 			return;
@@ -1877,26 +1918,26 @@ EOSQL;
 			$this->outputJsonError('no orgets found for parent oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
 		}
-	}    
+	}
 
 	/*
 	 * return list of all functions
 	 * as key value list to be used in select or autocomplete
-	 */	
-	public function getAllFunctions() 
+	 */
+	public function getAllFunctions()
 	{
 		$sql = <<<EOSQL
-			SELECT 
-				funktion_kurzbz AS value, beschreibung AS label 
-			FROM 
-				public.tbl_funktion 
-			WHERE 
-				aktiv = true 
+			SELECT
+				funktion_kurzbz AS value, beschreibung AS label
+			FROM
+				public.tbl_funktion
+			WHERE
+				aktiv = true
 			ORDER BY beschreibung ASC
 EOSQL;
-		
+
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) ) 
+		if( hasData($fkts) )
 		{
 			$this->outputJson($fkts);
 			return;
@@ -1905,14 +1946,14 @@ EOSQL;
 		{
 			$this->outputJsonError('no contract relevant funktionen found');
 			return;
-		}		
+		}
 	}
-	
+
 	/*
 	 * return list of contract relevant functions
 	 * as key value list to be used in select or autocomplete
-	 */	
-	public function getContractFunctions($mode='all') 
+	 */
+	public function getContractFunctions($mode='all')
 	{
 		$addwhere = '';
 		switch ($mode)
@@ -1928,20 +1969,20 @@ EOSQL;
 				$addwhere = '';
 				break;
 		}
-		
+
 		$sql = <<<EOSQL
-			SELECT 
-				funktion_kurzbz AS value, beschreibung AS label 
-			FROM 
-				public.tbl_funktion 
-			WHERE 
-				aktiv = true AND vertragsrelevant = true 
+			SELECT
+				funktion_kurzbz AS value, beschreibung AS label
+			FROM
+				public.tbl_funktion
+			WHERE
+				aktiv = true AND vertragsrelevant = true
 				{$addwhere}
 			ORDER BY beschreibung ASC
 EOSQL;
-		
+
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) ) 
+		if( hasData($fkts) )
 		{
 			$this->outputJson($fkts);
 			return;
@@ -1950,37 +1991,37 @@ EOSQL;
 		{
 			$this->outputJsonError('no contract relevant funktionen found');
 			return;
-		}		
+		}
 	}
-	
+
 	/*
 	 * return list of child orgets for a given company orget_kurzbz
 	 * as key value list to be used in select or autocomplete
 	 */
-	public function getCurrentFunctions($uid, $companyOrgetkurzbz) 
+	public function getCurrentFunctions($uid, $companyOrgetkurzbz)
 	{
 		if( empty($uid) )
 		{
 			$this->outputJsonError('Missing Parameter <uid>');
 		}
-		
+
 		if( empty($companyOrgetkurzbz) )
 		{
 			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
 		}
-		
+
 		$sql = <<<EOSQL
-			SELECT 
-				bf.benutzerfunktion_id AS value, f.beschreibung || ', ' 
-					|| oe.bezeichnung || ' [' || oet.bezeichnung || '], ' 
-					|| COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a') 
-					|| ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a') 
-					|| COALESCE(dvu.attachedtovb, '') AS label 
+			SELECT
+				bf.benutzerfunktion_id AS value, f.beschreibung || ', '
+					|| oe.bezeichnung || ' [' || oet.bezeichnung || '], '
+					|| COALESCE(to_char(bf.datum_von, 'dd.mm.YYYY'), 'n/a')
+					|| ' - ' || COALESCE(to_char(bf.datum_bis, 'dd.mm.YYYY'), 'n/a')
+					|| COALESCE(dvu.attachedtovb, '') AS label
 			FROM (
 					WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
 					(
 						SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
-						WHERE oe_kurzbz = ? 
+						WHERE oe_kurzbz = ?
 						UNION ALL
 						SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
 						WHERE o.oe_parent_kurzbz=oes.oe_kurzbz
@@ -1988,26 +2029,26 @@ EOSQL;
 					SELECT oe_kurzbz
 					FROM oes
 					GROUP BY oe_kurzbz
-			) c 
-			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz 
-			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz 
+			) c
+			JOIN public.tbl_organisationseinheit oe ON oe.oe_kurzbz = c.oe_kurzbz
+			JOIN public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
 			JOIN public.tbl_benutzerfunktion bf ON bf.oe_kurzbz = oe.oe_kurzbz
 			JOIN public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
 			LEFT JOIN (
-				SELECT 
-					benutzerfunktion_id, ' [DV]' AS attachedtovb 
-				FROM 
-					"hr"."tbl_vertragsbestandteil_funktion" 
+				SELECT
+					benutzerfunktion_id, ' [DV]' AS attachedtovb
+				FROM
+					"hr"."tbl_vertragsbestandteil_funktion"
 				GROUP BY
 					benutzerfunktion_id
-			) dvu ON dvu.benutzerfunktion_id = bf.benutzerfunktion_id 
-			WHERE bf.uid = ? 
+			) dvu ON dvu.benutzerfunktion_id = bf.benutzerfunktion_id
+			WHERE bf.uid = ?
 			ORDER BY f.beschreibung ASC
-		
+
 EOSQL;
-			
+
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz, $uid));
-		if( hasData($benutzerfunktionen) ) 
+		if( hasData($benutzerfunktionen) )
 		{
 			$this->outputJson($benutzerfunktionen);
 			return;
@@ -2016,62 +2057,62 @@ EOSQL;
 		{
 			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
-		}		
+		}
 	}
 
 	/*
-	 * return list of functions for a uid 
+	 * return list of functions for a uid
 	 * as objects to be used in as datasource
 	 */
-	public function getAllUserFunctions($uid) 
+	public function getAllUserFunctions($uid)
 	{
 		if( empty($uid) )
 		{
 			$this->outputJsonError('Missing Parameter <uid>');
 		}
-				
+
 		$sql = <<<EOSQL
-			SELECT 
-				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen , 
-				'[' || oet.bezeichnung || '] ' || oe.bezeichnung AS funktion_oebezeichnung, 
-				f.beschreibung AS funktion_beschreibung, 
-				bf.*, 
+			SELECT
+				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen ,
+				'[' || oet.bezeichnung || '] ' || oe.bezeichnung AS funktion_oebezeichnung,
+				f.beschreibung AS funktion_beschreibung,
+				bf.*,
 				fb.bezeichnung AS fachbereich_bezeichnung,
 			    CASE
-					WHEN 
+					WHEN
 						bf.datum_bis IS NOT NULL AND bf.datum_bis::date < now()::date
 					THEN
 						false
 					ELSE
 						true
 				END aktiv
-			FROM 
+			FROM
 				public.tbl_benutzerfunktion bf
-			JOIN 
+			JOIN
 				public.tbl_organisationseinheit oe ON oe.oe_kurzbz = bf.oe_kurzbz
-			JOIN 
+			JOIN
 				public.tbl_organisationseinheittyp oet ON oe.organisationseinheittyp_kurzbz = oet.organisationseinheittyp_kurzbz
-            JOIN 
+            JOIN
 				public.tbl_funktion f ON f.funktion_kurzbz = bf.funktion_kurzbz
-			LEFT JOIN 
-				hr.tbl_vertragsbestandteil_funktion vf ON vf.benutzerfunktion_id = bf.benutzerfunktion_id 
-			LEFT JOIN 
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_funktion vf ON vf.benutzerfunktion_id = bf.benutzerfunktion_id
+			LEFT JOIN
 				hr.tbl_vertragsbestandteil v ON vf.vertragsbestandteil_id = v.vertragsbestandteil_id
-			LEFT JOIN 
-				hr.tbl_dienstverhaeltnis dv ON v.dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
-			LEFT JOIN 
+			LEFT JOIN
+				hr.tbl_dienstverhaeltnis dv ON v.dienstverhaeltnis_id = dv.dienstverhaeltnis_id
+			LEFT JOIN
 				public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
 			LEFT JOIN
 				public.tbl_fachbereich fb ON fb.fachbereich_kurzbz = bf.fachbereich_kurzbz
-            WHERE 
-				bf.uid = ? 
-            ORDER BY 
+            WHERE
+				bf.uid = ?
+            ORDER BY
 				f.beschreibung, bf.datum_von ASC
-		
+
 EOSQL;
-			
+
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($uid));
-		if( hasData($benutzerfunktionen) ) 
+		if( hasData($benutzerfunktionen) )
 		{
 			$this->outputJson($benutzerfunktionen);
 			return;
@@ -2080,58 +2121,41 @@ EOSQL;
 		{
 			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid);
 			return;
-		}		
-	}	
-	
-	public function saveVertrag($mitarbeiter_uid, $dryrun=null) 
+		}
+	}
+
+	public function saveVertrag($mitarbeiter_uid, $dryrun=null)
 	{
 		$payload = $this->input->raw_input_stream;
 		$editor = getAuthUID();
 
 		$onlyvalidate = (strtolower($dryrun) === 'dryrun') ? true : false;
-		
+
 		$guihandler = GUIHandler::getInstance();
 		$guihandler->setEmployeeUID($mitarbeiter_uid)
 			->setEditorUID($editor);
 		$ret = $guihandler->handle($payload, $onlyvalidate);
-		
+
 		$this->outputJson(
 			array(
-				'data' => json_decode($ret), 
+				'data' => json_decode($ret),
 				'meta' => array(
-					'mitarbeiter_uid' => $mitarbeiter_uid, 
+					'mitarbeiter_uid' => $mitarbeiter_uid,
 					'payload' => json_decode($payload)
 				)
 			)
 		);
 		return;
 	}
-	
-	public function getCurrentVBs($dvid) 
+
+	public function getCurrentVBs($dvid)
 	{
 		$today = new DateTime('now', new DateTimeZone('Europe/Vienna'));
 		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
-			$dvid, 
-			$today->format('Y-m-d'), 
+			$dvid,
+			$today->format('Y-m-d'),
 			$this->VertragsbestandteilLib::DO_NOT_INCLUDE_FUTURE);
-		
-		$this->outputJson(
-			array(
-				'data' => $vbs,
-				'meta' => array()
-			)
-		);
-		return;
-	}
-	
-	public function getCurrentAndFutureVBs($dvid, $typ=null) 
-	{
-		$today = new DateTime('now', new DateTimeZone('Europe/Vienna'));
-		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
-			$dvid, 
-			$today->format('Y-m-d'), 
-			$this->VertragsbestandteilLib::INCLUDE_FUTURE);
-		
+
 		$this->outputJson(
 			array(
 				'data' => $vbs,
@@ -2141,10 +2165,14 @@ EOSQL;
 		return;
 	}
 
-	public function getAllVBs($dvid) 
+	public function getCurrentAndFutureVBs($dvid, $typ=null)
 	{
-		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dvid);
-		
+		$today = new DateTime('now', new DateTimeZone('Europe/Vienna'));
+		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
+			$dvid,
+			$today->format('Y-m-d'),
+			$this->VertragsbestandteilLib::INCLUDE_FUTURE);
+
 		$this->outputJson(
 			array(
 				'data' => $vbs,
@@ -2153,26 +2181,39 @@ EOSQL;
 		);
 		return;
 	}
-	
-	public function storeToTmpStore($tmpstoreid=null) 
+
+	public function getAllVBs($dvid)
+	{
+		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dvid);
+
+		$this->outputJson(
+			array(
+				'data' => $vbs,
+				'meta' => array()
+			)
+		);
+		return;
+	}
+
+	public function storeToTmpStore($tmpstoreid=null)
 	{
 		$payload = json_decode($this->input->raw_input_stream);
 		$editor = getAuthUID();
-		
+
 		$ret = null;
-		if( intval($tmpstoreid) > 0 ) 
+		if( intval($tmpstoreid) > 0 )
 		{
-			$ret = $this->TmpStoreModel->update($tmpstoreid, 
+			$ret = $this->TmpStoreModel->update($tmpstoreid,
 				array(
 					'typ' => $payload->typ,
 					'mitarbeiter_uid' => $payload->mitarbeiter_uid,
 					'formdata' => json_encode($payload->formdata),
 					'updatevon' => $editor,
-					'updateamum' => strftime('%Y-%m-%d %H:%M')				
+					'updateamum' => strftime('%Y-%m-%d %H:%M')
 				)
 			);
 		}
-		else 
+		else
 		{
 			$ret = $this->TmpStoreModel->insert(
 				array(
@@ -2186,10 +2227,10 @@ EOSQL;
 			$tmpstoreid = getData($ret);
 			$payload->tmpStoreId = $tmpstoreid;
 		}
-		
+
 		$this->outputJson(
 			array(
-				'data' => $payload, 
+				'data' => $payload,
 				'meta' => array(
 					'tmpstoreid' => $tmpstoreid,
 					'ret' => $ret
@@ -2198,8 +2239,8 @@ EOSQL;
 		);
 		return;
 	}
-	
-	public function listTmpStoreForMA($mitarbeiteruid) 
+
+	public function listTmpStoreForMA($mitarbeiteruid)
 	{
 		$storedentries = $this->TmpStoreModel->listTmpStoreForUid($mitarbeiteruid);
 		$data = array(
@@ -2207,64 +2248,64 @@ EOSQL;
 			'neuanlage' => array(),
 			'korrektur' => array()
 		);
-		
-		if( hasData($storedentries) ) 
+
+		if( hasData($storedentries) )
 		{
 			foreach (getData($storedentries) as $storedentry)
 			{
 				$data[$storedentry->typ][$storedentry->tmp_store_id] = $storedentry;
 			}
 		}
-		
+
 		$this->outputJson(
 			array(
-				'data' => $data, 
-				'meta' => array()
-			)
-		);
-		return;
-	}
-	
-	public function getTmpStoreById($tmpstoreid) 
-	{
-		$tmpstore = $this->TmpStoreModel->load($tmpstoreid);
-		
-		$data = array();
-		if( hasData($tmpstore) )
-		{
-			$data = getData($tmpstore)[0];
-			$data->formdata = json_decode($data->formdata);
-		}
-		
-		$this->outputJson(
-			array(
-				'data' => $data, 
+				'data' => $data,
 				'meta' => array()
 			)
 		);
 		return;
 	}
 
-	public function deleteFromTmpStore($tmpstoreid) 
+	public function getTmpStoreById($tmpstoreid)
 	{
-		$result = $this->TmpStoreModel->delete($tmpstoreid);
-		
+		$tmpstore = $this->TmpStoreModel->load($tmpstoreid);
+
+		$data = array();
+		if( hasData($tmpstore) )
+		{
+			$data = getData($tmpstore)[0];
+			$data->formdata = json_decode($data->formdata);
+		}
+
 		$this->outputJson(
 			array(
-				'data' => $result, 
+				'data' => $data,
 				'meta' => array()
 			)
 		);
 		return;
 	}
-	
+
+	public function deleteFromTmpStore($tmpstoreid)
+	{
+		$result = $this->TmpStoreModel->delete($tmpstoreid);
+
+		$this->outputJson(
+			array(
+				'data' => $result,
+				'meta' => array()
+			)
+		);
+		return;
+	}
+
 	public function getUnternehmen()
 	{
 		$this->OrganisationseinheitModel->resetQuery();
 		$this->OrganisationseinheitModel->addSelect('oe_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
 		$this->OrganisationseinheitModel->addOrder('bezeichnung', 'ASC');
 		$unternehmen = $this->OrganisationseinheitModel->loadWhere('oe_parent_kurzbz IS NULL');
-		if( hasData($unternehmen) ) 
+		if( hasData($unternehmen) )
 		{
 			$this->outputJson($unternehmen);
 			return;
@@ -2275,16 +2316,16 @@ EOSQL;
 			return;
 		}
 	}
-	
-    
+
+
     public function getGehaltstypen()
-	{		
+	{
 		$this->GehaltstypModel->resetQuery();
 		$this->GehaltstypModel->addSelect('gehaltstyp_kurzbz AS value, '
 			. 'bezeichnung AS label, NOT(aktiv) AS disabled, valorisierung');
 		$this->GehaltstypModel->addOrder('sort', 'ASC');
 		$gehaltstypen = $this->GehaltstypModel->load();
-		if( hasData($gehaltstypen) ) 
+		if( hasData($gehaltstypen) )
 		{
 			$this->outputJson($gehaltstypen);
 			return;
@@ -2297,12 +2338,12 @@ EOSQL;
 	}
 
 	public function getVertragsarten()
-	{		
+	{
 		$this->VertragsartModel->resetQuery();
 		$this->VertragsartModel->addSelect('vertragsart_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
 		$this->VertragsartModel->addOrder('sort', 'ASC');
 		$unternehmen = $this->VertragsartModel->loadWhere('dienstverhaeltnis = true');
-		if( hasData($unternehmen) ) 
+		if( hasData($unternehmen) )
 		{
 			$this->outputJson($unternehmen);
 			return;
@@ -2315,11 +2356,11 @@ EOSQL;
 	}
 
     public function getVertragsbestandteiltypen()
-	{		
+	{
 		$this->VertragsbestandteiltypModel->resetQuery();
 		$this->VertragsbestandteiltypModel->addSelect('vertragsbestandteiltyp_kurzbz AS value, bezeichnung AS label');
         $vbtypen = $this->VertragsbestandteiltypModel->load();
-		if( hasData($vbtypen) ) 
+		if( hasData($vbtypen) )
 		{
 			$this->outputJson($vbtypen);
 			return;
@@ -2330,7 +2371,7 @@ EOSQL;
 			return;
 		}
 	}
-	
+
     function endDV()
     {
         $payload = json_decode($this->input->raw_input_stream);
@@ -2341,24 +2382,52 @@ EOSQL;
             return;
         }
 
-		if( !$payload->gueltigkeit->data->gueltig_bis ) 
+		if( !$payload->gueltigkeit->data->gueltig_bis )
 		{
 			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
             return;
 		}
-		
+
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
         $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
 
         if ( $ret !== TRUE) {
             return $this->outputJsonError($ret);
         }
-        
+
         return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
-        
+
     }
-	
-	
+
+    /**
+     * same as endDV but also sets aktiv flag of benutzer to false
+     */
+    function deactivateDV()
+    {
+        $payload = json_decode($this->input->raw_input_stream);
+
+        if (!is_numeric($payload->dienstverhaeltnis_id))
+        {
+            $this->outputJsonError('invalid parameter dienstverhaeltnis_id');
+            return;
+        }
+
+		if( !$payload->gueltig_bis )
+		{
+			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+            return;
+		}
+
+        $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnis_id));
+        $ret = $this->VertragsbestandteilLib->deactivateDienstverhaeltnis($dv, $payload->gueltig_bis, true);
+
+        if ( $ret !== TRUE) {
+            return $this->outputJsonError($ret);
+        }
+
+        return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
+    }
+
     function saveKarenz()
     {
         $payload = json_decode($this->input->raw_input_stream);
@@ -2369,24 +2438,173 @@ EOSQL;
             return;
         }
 		// TODO implement
-/*		
+/*
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
         $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
 */
         if ( $ret !== TRUE) {
             return $this->outputJsonError($ret);
         }
-        
+
         return $this->outputJsonSuccess('Karenz gespeichert');
     }
-	
+    
+
+    public function getFristenListe()
+    {
+        $result = $this->FristenLib->getFristenListe();
+        return $this->outputJson($result);
+    }
+
+    public function getPersonFristenListe($uid)
+    {
+        $result = $this->FristenLib->getFristenListe($uid);
+        return $this->outputJson($result);
+    }
+
+    public function updateFristenListe()
+    {
+		$d = new DateTime();
+		$result = $this->FristenLib->updateFristen($d);
+        return $this->outputJson($result);
+    }
+
+    public function updateFristStatus()
+    {
+        $data = json_decode($this->input->raw_input_stream, true);
+
+        $data['updateamum'] = 'NOW()';
+		$data['updatevon'] = getAuthUID();
+        $frist_id = $data['frist_id'];
+		unset($data['frist_id']);
+        unset($data['datum']);
+        unset($data['ereignis_kurzbz']);
+    	$result = $this->FristModel->update(
+    		$frist_id,
+    		$data
+    	);
+
+		if (isError($result))
+			return $this->outputJsonError('Fehler beim Speichern von Friststatus');
+
+		$frist = $this->FristModel->load($result->retval);
+
+		if (hasData($frist))
+			$this->outputJsonSuccess($frist->retval);
+    }
+
+
+    /**
+     * update multiple deadlines at once
+     */
+    public function batchUpdateFristStatus()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['fristen']) && !is_array($payload['fristen']))
+                show_error('fristen does not seem to be an array!');
+
+            $result = $this->FristModel->batchUpdateStatus($payload['fristen'], $payload['status_kurzbz'], getAuthUID());
+
+            if ($result === true)
+                $this->outputJsonSuccess($result);
+            else
+                $this->outputJsonError('Error when updating deadlines');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
+
+    }
+
+    public function upsertFrist()
+    {
+        if($this->input->method() === 'post'){
+
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['frist_id']) && !is_numeric($payload['frist_id']))
+                show_error('frist_id is not numeric!');
+
+            if (!isset($payload['status_kurzbz']) || (isset($payload['status_kurzbz']) && $payload['status_kurzbz'] == ''))
+                show_error('status_kurzbz is empty!');
+
+            if (!isset($payload['ereignis_kurzbz']) || (isset($payload['ereignis_kurzbz']) && $payload['ereignis_kurzbz'] == ''))
+                show_error('status_kurzbz is empty!');
+
+            if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
+                show_error('mitarbeiter_uid is empty!');
+
+            if ($payload['frist_id'] == 0)
+            {
+                $payload['insertvon'] = getAuthUID();
+                $payload['parameter'] = '{}';
+                unset($payload['frist_id']);
+                $result = $this->FristModel->insert($payload);
+            } else {
+                $payload['updateamum'] = 'NOW()';
+		        $payload['updatevon'] = getAuthUID();
+                unset($payload['insertamum']);
+                unset($payload['insertvon']);
+                $result = $this->FristModel->update($payload['frist_id'], $payload);
+            }
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when updating deadline');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+
+
+
+
+    public function getFristenStatus()
+	{
+		$result = $this->FristenLib->getFristenStatus();
+		return $this->outputJson($result);
+	}
+
+    public function getFristenEreignisse()
+	{
+        $manuell = $this->input->get('manuell', FALSE);
+		$result = $this->FristenLib->getFristenEreignis($manuell);
+		return $this->outputJson($result);
+	}
+
+    public function deleteFrist()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['frist_id']) && !is_numeric($payload['frist_id']))
+                show_error('frist_id is not numeric!');
+
+            $result = $this->FristModel->delete($payload['frist_id']);
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when deleting frist');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
 	public function getKarenztypen()
-	{		
+	{
 		$this->KarenztypModel->resetQuery();
 		$this->KarenztypModel->addSelect('karenztyp_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
 		$this->KarenztypModel->addOrder('bezeichnung', 'ASC');
 		$rows = $this->KarenztypModel->load();
-		if( hasData($rows) ) 
+		if( hasData($rows) )
 		{
 			$this->outputJson($rows);
 			return;
@@ -2397,14 +2615,14 @@ EOSQL;
 			return;
 		}
 	}
-	
+
 	public function getTeilzeittypen()
-	{		
+	{
 		$this->TeilzeittypModel->resetQuery();
 		$this->TeilzeittypModel->addSelect('teilzeittyp_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
 		$this->TeilzeittypModel->addOrder('bezeichnung', 'ASC');
 		$rows = $this->TeilzeittypModel->load();
-		if( hasData($rows) ) 
+		if( hasData($rows) )
 		{
 			$this->outputJson($rows);
 			return;
@@ -2415,14 +2633,14 @@ EOSQL;
 			return;
 		}
 	}
-	
+
 	public function getFreitexttypen()
-	{		
+	{
 		$this->FreitexttypModel->resetQuery();
 		$this->FreitexttypModel->addSelect('freitexttyp_kurzbz AS value, bezeichnung AS label, \'false\'::boolean AS disabled');
 		$this->FreitexttypModel->addOrder('bezeichnung', 'ASC');
 		$rows = $this->FreitexttypModel->load();
-		if( hasData($rows) ) 
+		if( hasData($rows) )
 		{
 			$this->outputJson($rows);
 			return;
@@ -2433,7 +2651,7 @@ EOSQL;
 			return;
 		}
 	}
-	
+
 	public function getStundensaetze($uid = null)
 	{
 		$qry = "SELECT *
@@ -2441,12 +2659,12 @@ EOSQL;
 				JOIN hr.tbl_stundensatztyp USING (stundensatztyp)
 				WHERE uid = ?
 				ORDER BY gueltig_bis DESC NULLS LAST, gueltig_von DESC NULLS LAST";
-		
+
 		$data = $this->StundensatzModel->execReadOnlyQuery($qry, array($uid));
 		$this->_remapData('stundensatz_id',$data);
 		return $this->outputJson($data);
 	}
-	
+
 	public function getStundensatztypen()
 	{
 		$this->StundensatztypModel->addSelect('stundensatztyp, bezeichnung');
@@ -2463,12 +2681,12 @@ EOSQL;
 			return $this->outputJson($result);
 		}
 	}
-	
+
 	public function updateStundensatz()
 	{
-		
+
 		$data = json_decode($this->input->raw_input_stream, true);
-		
+
 		if ($data['stundensatz_id'] === 0)
 		{
 			if (isEmptyString($data['gueltig_bis']))
@@ -2476,7 +2694,7 @@ EOSQL;
 			unset($data['stundensatz_id']);
 			$data['insertamum'] = 'NOW()';
 			$data['insertvon'] = getAuthUID();
-			
+
 			$result = $this->StundensatzModel->insert($data);
 		}
 		else
@@ -2485,12 +2703,12 @@ EOSQL;
 				$data['gueltig_bis'] = null;
 			unset($data['bezeichnung']);
 			unset($data['aktiv']);
-			
-			
+
+
 			$stundensatz_id = $data['stundensatz_id'];
 			unset($data['stundensatz_id']);
-			
-			
+
+
 			$data['updateamum'] = 'NOW()';
 			$data['updatevon'] = getAuthUID();
 			$result = $this->StundensatzModel->update(
@@ -2498,33 +2716,38 @@ EOSQL;
 				$data
 			);
 		}
-		
+
 		if (isError($result))
 			return $this->outputJsonError('Fehler beim Speichern des Stundensatzes');
-		
+
 		$stundensatz = $this->StundensatzModel->load($result->retval);
-		
+
 		if (hasData($stundensatz))
 			$this->outputJsonSuccess($stundensatz->retval);
 	}
-	
+
 	public function deleteStundensatz()
 	{
 		$data = json_decode($this->input->raw_input_stream, true);
-		
+
 		$stundensatz = $this->StundensatzModel->load($data['stundensatz_id']);
 		if (hasData($stundensatz))
 		{
 			$result = $this->StundensatzModel->delete($data['stundensatz_id']);
-			
+
 			if (isError($result))
 				return $this->outputJsonError('Fehler beim Löschen des Stundensatzes');
 
 			return $this->outputJsonSuccess($result);
 		}
-		
-	
-		
-		
 	}
+
+    /**
+     *  get employees without a contract during the last 3 semesters
+     */
+    public function getEmployeesWithoutContract()
+    {
+        $data = $this->ApiModel->getEmployeesWithoutContract();
+        $this->outputJson($data);
+    }
 }

@@ -8,14 +8,21 @@ export const ContactData = {
 		EmailTelData,
     },
     props: {
-        editMode: { type: Boolean, required: true },
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        modelValue: { type: Object, default: () => ({}), required: false},
+        config: { type: Object, default: () => ({}), required: false},
+        editMode: { type: Boolean, required: false },
+        personID: { type: Number, required: false },
+        personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
     },
-    setup() {
+    setup( props ) {
 
         const { t } = usePhrasen();
+
+        const theModel = Vue.computed({ 
+            get: () => props.modelValue,
+            set: (value) => emit('update:modelValue', value),
+        });
 
         // tabs
         const items = ["address", "contact"];
@@ -35,6 +42,7 @@ export const ContactData = {
             isActive,
             setActive,
             t,
+            theModel,
         }
     },
     template: `
@@ -76,7 +84,7 @@ export const ContactData = {
                                 aria-labelledby="nav-home-tab"
                             >
                                 <!-- -->
-                                <address-data :personID="personID" editMode ></address-data>
+                                <address-data :personID="theModel.personID" ></address-data>
                                 <!-- -->
                             </div>
                             <div
@@ -87,7 +95,7 @@ export const ContactData = {
                                 aria-labelledby="nav-profile-tab"
                             >
                                 <!-- -->
-                                <email-tel-data :personID="personID" editMode></email-tel-data>
+                                <email-tel-data :personID="theModel.personID" ></email-tel-data>
                                 <!-- -->
                             </div>
                         </div>
@@ -101,3 +109,5 @@ export const ContactData = {
 `
 
 }
+
+export default ContactData;

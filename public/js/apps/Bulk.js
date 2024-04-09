@@ -1,37 +1,35 @@
+import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import pv21apifactory from "../api/vbform/api.js";
+import Phrasen from '../../../../js/plugin/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
+import {StaleEmployees} from '../components/bulk/StaleEmployees.js';
+
+Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 const pvApp = Vue.createApp(	{
 	components: {
 		searchbar,			
 		CoreNavigationCmpt,
+		StaleEmployees,
 	},
 	data() {
 		return 	{
-			isEditorOpen: false,
-			currentPersonID: null,	
-			currentOrg: '',
 			searchbaroptions: searchbaroptions,
 			searchfunction: searchfunction,
 			appSideMenuEntries: {},
 		}
 	},
 	methods: {		
-		closeEditorHandler() {
-			this.isEditorOpen=false;
-		},			
 		newSideMenuEntryHandler: function(payload) {
 			this.appSideMenuEntries = payload;
 		}
 	},
 });
 
-//pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(primevue.config.default);
-//pvApp.use(primevue.toastservice);
-
-
+pvApp.use(Phrasen);
 pvApp.mount('#wrapper');
 
 

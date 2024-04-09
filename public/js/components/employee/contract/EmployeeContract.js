@@ -246,7 +246,7 @@ export const EmployeeContract = {
             isFetching.value = true            
             try {
                 const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
-                emit('updateHeader');
+                theModel.value.updateHeader();
             } catch (error) {
                 console.log(error);
             } finally {
@@ -440,7 +440,7 @@ export const EmployeeContract = {
                     fetchVertrag(currentDVID.value, currentDate.value);
                     fetchGBT(currentDVID.value, currentDate.value);
                     fetchGBTChartData(currentDVID.value);
-                    emit('updateHeader');
+                    theModel.value.updateHeader();
                 }
             })
         }
