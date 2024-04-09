@@ -214,7 +214,6 @@ export const DeadlineIssueTable = {
           } finally {
               isFetching.value = false;
           }     
-
       }
 
       const onPersonSelect = (uid, person_id) => {

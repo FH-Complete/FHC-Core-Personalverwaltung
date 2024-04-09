@@ -228,3 +228,19 @@ html {
 .text-primary {
     color: #00649c !important;
 }
+
+.p-datatable .p-datatable-thead > tr > th {
+    padding: .5rem;
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+    padding: .5rem;
+}
+
+.contractscountcards .p-datatable-wrapper {
+    min-height: 530px;
+}
+
+#macombined .fhc-tabs .nav.nav-pills.flex-column {
+    min-width: 220px;
+}
