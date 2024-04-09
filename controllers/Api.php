@@ -2458,7 +2458,7 @@ EOSQL;
 
     public function getPersonFristenListe($uid)
     {
-	$all = boolval($this->input->get('all'));
+	$all = filter_var($this->input->get('all'), FILTER_VALIDATE_BOOLEAN);
         $result = $this->FristenLib->getFristenListe($uid, $all);
         return $this->outputJson($result);
     }

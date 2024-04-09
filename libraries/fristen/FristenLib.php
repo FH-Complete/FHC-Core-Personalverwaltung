@@ -131,7 +131,8 @@ class FristenLib
 
         if (!empty($uid))
         {
-            $WHERE = " AND m.mitarbeiter_uid=?";
+	    $WHERE .= empty($WHERE) ? '' : " AND "; 
+            $WHERE .= "m.mitarbeiter_uid=?";
             $param = array($uid);
         }
 
