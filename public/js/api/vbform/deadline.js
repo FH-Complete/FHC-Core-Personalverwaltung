@@ -1,8 +1,9 @@
 export default {
 
-  allByPerson: function(uid) {
+  allByPerson: function(uid, all) {
     let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/getPersonFristenListe/' + uid;
+            + '/extensions/FHC-Core-Personalverwaltung/api/getPersonFristenListe/' + uid 
+            + '?all=' + all;
     return axios.get(url);
   },
 
