@@ -506,8 +506,9 @@ export const DeadlineIssueTable = {
             setzen
           </button>
 
-          <select class="form-select form-select-sm" v-model="current_all" @change="handleAllChanged">
-              <option value="false">nur offene anzeigen</option>
+          <label for="filter_all" class="ms-5">Filter: </label>
+          <select id="filter_all" class="form-select form-select-sm" v-model="current_all" @change="handleAllChanged">
+              <option value="false">vergangene erledigte ausblenden</option>
               <option value="true">alle anzeigen</option>
           </select>
 
