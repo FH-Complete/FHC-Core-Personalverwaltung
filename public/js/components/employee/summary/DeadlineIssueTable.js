@@ -45,7 +45,7 @@ export const DeadlineIssueTable = {
         }
         try {
           isFristFetching.value = true;
-          const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value, current_all.value);
+          const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value, deadline_filter_all.value);
           fristen.value = res.data;			  
           isFristFetching.value = false;                        
         } catch (error) {
@@ -232,9 +232,9 @@ export const DeadlineIssueTable = {
       const fristenTable = ref(null);
       const modalTitel = ref('');
       const current_status_kurzbz = ref('');
-      const current_all = ref('false');
+      const deadline_filter_all = ref('false');
 
-      const handleAllChanged = () => {
+      const handleDeadlineFilterAllChanged = () => {
           fetchList();
       }
 
@@ -443,7 +443,7 @@ export const DeadlineIssueTable = {
                fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged, addDeadline,
                toastRef, createToastRef, deleteToastRef, dialogRef, isFetching, isFristFetching, updateStatus,
                fristenTable, tabulatorOptions, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel, 
-               current_status_kurzbz, current_all, handleAllChanged }
+               current_status_kurzbz, deadline_filter_all, handleDeadlineFilterAllChanged }
     },
   template: `
 
@@ -506,8 +506,9 @@ export const DeadlineIssueTable = {
             setzen
           </button>
 
-          <label for="filter_all" class="ms-5">Filter: </label>
-          <select id="filter_all" class="form-select form-select-sm" v-model="current_all" @change="handleAllChanged">
+          <label for="deadline_filter_all" class="ms-5">Filter: </label>
+          <select id="deadline_filter_all" class="form-select form-select-sm deadline_filter_all" 
+                v-model="deadline_filter_all" @change="handleDeadlineFilterAllChanged">
               <option value="false">vergangene erledigte ausblenden</option>
               <option value="true">alle anzeigen</option>
           </select>
