@@ -2371,14 +2371,27 @@ EOSQL;
             return;
         }
 
-		if( !$payload->gueltigkeit->data->gueltig_bis )
-		{
-			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+        if (empty($payload->dvendegrund_kurzbz))
+        {
+            $this->outputJsonError('Bitte einen Beendigungsgrund auswählen.');
             return;
-		}
+        }
+
+        if ($payload->dvendegrund_kurzbz === 'sonstige' && empty($payload->dvendegrund_anmerkung))
+        {
+            $this->outputJsonError('Bitte beim Beendigungsgrund "Sonstige" eine Anmerkung eingeben.');
+            return;
+        }
+
+	if( !$payload->gueltigkeit->data->gueltig_bis )
+	{
+	    $this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+            return;
+	}
 
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
-        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
+        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis,
+	    $payload->dvendegrund_kurzbz, $payload->dvendegrund_anmerkung);
 
         if ( $ret !== TRUE) {
             return $this->outputJsonError($ret);

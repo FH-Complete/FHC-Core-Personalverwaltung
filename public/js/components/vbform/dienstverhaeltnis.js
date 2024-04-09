@@ -37,14 +37,38 @@ export default {
     </div>
     <span v-else>&nbsp;</span>
   </div>
+  
+  <template v-if="this.store.mode === 'enddv'">
+  <div class="col-3">
+    <select v-model="dvendegrund_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <option
+        v-for="v in lists.dvendegruende"
+        :value="v.value"
+        :selected="isselected(v.value, this.dvendegrund_kurzbz)"
+        :disabled="v.disabled">
+        {{ v.label}}
+      </option>
+    </select>
+  </div>
+  <div class="col-3">
+    <textarea v-model="dvendegrund_anmerkung" 
+        class="form-control form-control-sm w-100"
+        placeholder="Anmerkung zum Beendigungsgrund..."
+    ></textarea>
+  </div>
+  <div class="col-6">&nbsp;</div>
+  </template>
   `,
   data: function() {
     return {
       'vertragsart_kurzbz': '',
       'checkoverlap': true,
+      'dvendegrund_kurzbz': '',
+      'dvendegrund_anmerkung': '',
       'lists': {
           'unternehmen': [],
-          'vertragsarten': []
+          'vertragsarten': [],
+          'dvendegruende': []
       },
       'store': store
     }
@@ -63,6 +87,7 @@ export default {
   created: function() {
     this.getUnternehmen();
     this.getVertragsarten();
+    this.getDvEndeGruende();
     this.setDataFromConfig();
   },
   methods: {
@@ -89,6 +114,16 @@ export default {
       });
       return this.lists.vertragsarten = vertragsarten;
     },
+    getDvEndeGruende: async function() {
+      const response = await Vue.$fhcapi.DV.getDvEndeGruende();
+      const dvendegruende = response.data.retval;
+      dvendegruende.unshift({
+        value: '',
+        label: 'Beendigungsgrund wählen',
+        disabled: true
+      });
+      return this.lists.dvendegruende = dvendegruende;
+    },
     isconfigured: function(field) {
       if( this.config === null ) {
           return false;
@@ -114,6 +149,8 @@ export default {
         dienstverhaeltnisid: this.config.dienstverhaeltnisid,
         unternehmen: this.store.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
+        dvendegrund_kurzbz: this.dvendegrund_kurzbz,
+        dvendegrund_anmerkung: this.dvendegrund_anmerkung,
         gueltigkeit: this.$refs.gueltigkeit.getPayload(),
         checkoverlap: this.checkoverlap
       }
