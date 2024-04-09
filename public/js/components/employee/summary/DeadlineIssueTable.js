@@ -45,7 +45,7 @@ export const DeadlineIssueTable = {
         }
         try {
           isFristFetching.value = true;
-          const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value);
+          const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value, current_all.value);
           fristen.value = res.data;			  
           isFristFetching.value = false;                        
         } catch (error) {
@@ -232,6 +232,11 @@ export const DeadlineIssueTable = {
       const fristenTable = ref(null);
       const modalTitel = ref('');
       const current_status_kurzbz = ref('');
+      const current_all = ref('false');
+
+      const handleAllChanged = () => {
+          fetchList();
+      }
 
       // Methods
 
@@ -437,7 +442,8 @@ export const DeadlineIssueTable = {
       return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, onTableCellEdited,
                fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged, addDeadline,
                toastRef, createToastRef, deleteToastRef, dialogRef, isFetching, isFristFetching, updateStatus,
-               fristenTable, tabulatorOptions, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel, current_status_kurzbz}
+               fristenTable, tabulatorOptions, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel, 
+               current_status_kurzbz, current_all, handleAllChanged }
     },
   template: `
 
@@ -498,7 +504,12 @@ export const DeadlineIssueTable = {
           <button type="button" class="btn  btn-primary btn-primary-sm me-2 text-nowrap" @click="updateStatus" :class="{'disabled':current_status_kurzbz==''}">
             <i class="fas fa-pencil"></i>
             setzen
-          </button> 
+          </button>
+
+          <select class="form-select form-select-sm" v-model="current_all" @change="handleAllChanged">
+              <option value="false">nur offene anzeigen</option>
+              <option value="true">alle anzeigen</option>
+          </select>
 
 				</div>
 			</template>

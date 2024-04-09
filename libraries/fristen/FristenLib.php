@@ -124,9 +124,9 @@ class FristenLib
     /**
      * get list of current deadlines
      */
-    public function getFristenListe($uid=null)
+    public function getFristenListe($uid=null, $all=false)
     {
-        $WHERE = "";
+        $WHERE = (!$all) ? "(status_kurzbz <> 'erledigt' OR f.datum>=now()::date)" : "";
         $param =  array();
 
         if (!empty($uid))
@@ -141,7 +141,7 @@ class FristenLib
                     left join public.tbl_mitarbeiter m using(mitarbeiter_uid)
                     left join public.tbl_benutzer b on(m.mitarbeiter_uid=b.uid)
                     left join public.tbl_person p on (b.person_id=p.person_id)
-                WHERE (status_kurzbz <> 'erledigt' OR f.datum>=now()::date) $WHERE
+                WHERE $WHERE
                 ORDER BY f.datum ASC";
 
 		$query = $this->_ci->db->query($sql, $param);
