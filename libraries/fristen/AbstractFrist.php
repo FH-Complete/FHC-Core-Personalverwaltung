@@ -6,17 +6,17 @@ abstract class AbstractFrist {
     private $_ci;
 
     /** @var string ENDE=deadline expires within timespan */
-    protected string $fristTyp = FristTyp::ENDE;
+    protected $fristTyp = FristTyp::ENDE;
     /** @var int timespan in months */
-    protected int $zeitraum = 2;
+    protected $zeitraum = 2;
     /** @var string ereignis id (needs to be set in sub class) */
-    protected string $ereignis_kurzbz = '';
+    protected $ereignis_kurzbz = '';
     /** @var string name of id column (needs to be set in sub class) */
-    protected string $id_colname = '';
+    protected $id_colname = '';
     /** @var  string optional filter */
-    protected string $vertragsbestandteiltyp_kurzbz = '';
+    protected $vertragsbestandteiltyp_kurzbz = '';
     /** @var string optional array for detail data  i.e. ['table_name' => 'hr.tbl_vertragsbestandteil_freitext', 'typ_colname' => 'freitexttyp_kurzbz', 'typ_kurzbz' => 'befristung'] */
-    protected array $detailbestandteil;
+    protected $detailbestandteil;
 
     public function __construct(string $typ = FristTyp::ENDE, int $zeitraum = 2)
 	{
