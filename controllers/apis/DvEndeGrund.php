@@ -28,7 +28,7 @@ class DvEndeGrund extends Auth_Controller
     {
 	$this->DvEndeGrundModel->resetQuery();
 	$this->DvEndeGrundModel->addSelect('dvendegrund_kurzbz AS value, bezeichnung AS label, NOT(aktiv) AS disabled');
-	$this->DvEndeGrundModel->addOrder('sort', 'ASC');
+	$this->DvEndeGrundModel->addOrder('sort, bezeichnung', 'ASC');
 	$dvendegruende = $this->DvEndeGrundModel->load();
 	if( hasData($dvendegruende) )
 	{
