@@ -283,7 +283,7 @@ export const EmployeeHeader = {
                 
                 <div class="ms-3 flex-fill d-flex flex-column" >
                     <div class="align-items-top">
-                        <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}</h2>
+                        <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}<span v-if="employee?.titelpost != null && employee?.titelpost != ''">, {{ employee?.titelpost }}</span></h2>
                         <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
     
                         <div v-if="employee?.abteilung && !isFetching" class="mb-1">
