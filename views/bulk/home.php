@@ -33,7 +33,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div id="chooser" class="w-100">
-      <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>				
+      <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>
     </div>
     <div class="navbar-nav">
       <div class="nav-item dropdown">
@@ -49,35 +49,36 @@
 
   <div class="container-fluid">
     <div class="row">
-        
-      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>      
+
+      <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="height:100%">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-          <h1 class="h2">MA ohne Lehrauftrag</h1>
+          <h1 class="h2">Mitarbeiter ohne Lehrauftrag</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
-                      
+
             <div class="btn-group me-2">
               <!--button type="button" class="btn btn-sm btn-outline-secondary" @click="expandAllHandler">Expand</button>
               <button type="button" class="btn btn-sm btn-outline-secondary" @click="collapseAllHandler">Collapse</button-->
             </div>
 
-            
+
           </div>
         </div>
-
-        <div class="mh-100 pb-5" >         
+		Die folgenden Personen haben seit mehr als 3 Semestern keinen Lehrauftrag und ein Dienstverhältnis als externe Lehrende.<br />
+		Durch das beenden des Dienstverhältnisses wird die Person auch deaktiviert.
+        <div class="mh-100 pb-5" >
           <!--+
-              | employees without a contract within the last 3 semesters  
+              | employees without a contract within the last 3 semesters
               +-->
           <stale-employees></stale-employees>
 
-        </div>    
-        
+        </div>
+
       </main>
     </div>
   </div>
-	
+
 </div>
 
 
@@ -96,7 +97,3 @@
 </body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
-
-
-
-
