@@ -97,7 +97,11 @@ class Api_model extends DB_Model
         AND bismelden = true
         AND personalnummer > 0
 		AND dv.bis is null
-        AND campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval
+		AND dv.von <= now() - '5 months'::interval
+		AND dv.vertragsart_kurzbz in('externerlehrender')
+        AND (campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval OR campus.vw_mitarbeiter.insertamum is null)
+
+		-- Kein Lehrauftrag in den letzten 3 Semestern
         AND NOT EXISTS(
             SELECT
                 1
@@ -130,7 +134,42 @@ class Api_model extends DB_Model
                     ORDER BY start DESC
                     LIMIT 3)
                 AND tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
-            )";
+            )
+
+			-- Kein Lehrauftrag in er Zukunft
+			AND NOT EXISTS(
+	            SELECT
+	                1
+	            FROM
+	                lehre.tbl_lehreinheitmitarbeiter
+	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+	            WHERE
+	                tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+	                AND tbl_lehreinheit.studiensemester_kurzbz IN(
+	                        SELECT
+	                            studiensemester_kurzbz
+	                        FROM
+	                            public.tbl_studiensemester
+	                        WHERE start >= now()
+	                        )
+	            UNION
+	            SELECT
+	                1
+	            FROM
+	                lehre.tbl_projektbetreuer
+	                JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+	            WHERE
+	                tbl_lehreinheit.studiensemester_kurzbz IN(SELECT
+	                        studiensemester_kurzbz
+	                    FROM
+	                        public.tbl_studiensemester
+	                    WHERE start >= now()
+	                    )
+	                AND tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+	            )
+
+			";
 
         return $this->execQuery($qry);
     }
@@ -952,7 +991,7 @@ class Api_model extends DB_Model
             $where = "p.nachname=? ";
         }
 
-        if (mb_strlen($surname) == 2) 
+        if (mb_strlen($surname) == 2)
         {
             $where = "p.nachname=? ";
         }
