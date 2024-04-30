@@ -16,6 +16,7 @@ class Valorisierung extends FHCAPI_Controller
 	    )
 	);
 	
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungAPI_model');
 	$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
     }
 
@@ -26,6 +27,7 @@ class Valorisierung extends FHCAPI_Controller
 	
     public function doValorisation($valorisationInstanzKurzbz=null)
     {
+/*	
 	$sumsalaryprevaloesi	= round(random_int(250000, 500000) / 100, 2);
 	$sumsalarypostvaloesi	= round($sumsalaryprevaloesi * (1 + (random_int(2, 9)/100)), 2);
 	$sumsalaryprevalma0080	= round(random_int(250000, 500000) / 100, 2);
@@ -57,6 +59,8 @@ class Valorisierung extends FHCAPI_Controller
 		"dienstverhaeltnis_id" => 154
 	    )
 	);
+ */
+	$data = getData($this->ValorisierungAPI_model->getDVsForValorisation());
 	$this->terminateWithSuccess($data);
 /*	
 	try
