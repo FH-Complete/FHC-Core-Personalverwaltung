@@ -98,11 +98,13 @@ export default {
     this.store.mitarbeiter_uid = this.mitarbeiter_uid;
   },
   watch: {
-    changedModeOrCurDV: function(oldval, newval) {
+    changedModeOrCurDV: function(newval, oldval) {
       this.resetTmpStoreHelper();
       this.resetStoreDV();
       if( oldval[0] === newval[0] ) {
+        this.$nextTick(() => {
           this.$refs['presetchooserRef'].selectmode();
+        });
       } else {
         this.store.setMode(this.mode);
       }
@@ -142,6 +144,8 @@ export default {
         preset.dv.data.dienstverhaeltnisid = preset.dv.data.dienstverhaeltnisid ?? this.curdv.dienstverhaeltnis_id;
         preset.dv.data.unternehmen = (preset.dv.data.unternehmen !== '') ? preset.dv.data.unternehmen : this.curdv.oe_kurzbz;
         preset.dv.data.vertragsart_kurzbz = preset.dv.data.vertragsart_kurzbz ?? this.curdv.vertragsart_kurzbz;
+        preset.dv.data.dvendegrund_kurzbz = preset.dv.data.dvendegrund_kurzbz ?? this.curdv.dvendegrund_kurzbz;
+        preset.dv.data.dvendegrund_anmerkung = preset.dv.data.dvendegrund_anmerkung ?? this.curdv.dvendegrund_anmerkung;
         preset.dv.data.gueltigkeit.data = {
             gueltig_ab: (preset.dv.data.gueltigkeit?.data?.gueltig_ab !== undefined) ? preset.dv.data.gueltigkeit.data.gueltig_ab : this.curdv.von,
             gueltig_bis: (preset.dv.data.gueltigkeit?.data?.gueltig_bis !== undefined) ? preset.dv.data.gueltigkeit.data.gueltig_bis : this.curdv.bis
@@ -279,6 +283,7 @@ export default {
       this.$refs['presetchooserRef'].resetSelectedPreset();
     },
     showModal: function() {
+        this.store.setMode(this.mode);
         this.$refs['modalRef'].show();
     },
     resetTmpStoreHelper: function() {

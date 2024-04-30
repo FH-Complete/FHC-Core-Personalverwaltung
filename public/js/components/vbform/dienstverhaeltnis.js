@@ -38,7 +38,7 @@ export default {
     <span v-else>&nbsp;</span>
   </div>
   
-  <template v-if="this.store.mode === 'enddv'">
+  <template v-if="(['enddv', 'korrektur']).includes(this.store.mode)">
   <div class="col-3">
     <select v-model="dvendegrund_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
@@ -120,7 +120,7 @@ export default {
       dvendegruende.unshift({
         value: '',
         label: 'Beendigungsgrund wählen',
-        disabled: true
+        disabled: false
       });
       return this.lists.dvendegruende = dvendegruende;
     },
@@ -139,6 +139,12 @@ export default {
       }
       if( this.config?.vertragsart_kurzbz !== undefined ) {
         this.vertragsart_kurzbz = this.config.vertragsart_kurzbz;
+      }
+      if( this.config?.dvendegrund_kurzbz !== undefined ) {
+        this.dvendegrund_kurzbz = this.config.dvendegrund_kurzbz;
+      }
+      if( this.config?.dvendegrund_anmerkung !== undefined ) {
+        this.dvendegrund_anmerkung = this.config.dvendegrund_anmerkung;
       }
       if( this.config?.checkoverlap !== undefined ) {
         this.checkoverlap = this.config.checkoverlap;

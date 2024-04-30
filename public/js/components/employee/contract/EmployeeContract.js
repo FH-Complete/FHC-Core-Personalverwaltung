@@ -369,6 +369,8 @@ export const EmployeeContract = {
                     dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
                     unternehmen: currentDV.value.oe_kurzbz,
                     vertragsart_kurzbz: currentDV.value.vertragsart_kurzbz,
+                    dvendegrund_kurzbz: currentDV.value.dvendegrund_kurzbz,
+                    dvendegrund_anmerkung: currentDV.value.dvendegrund_anmerkung,
                     gueltigkeit: {
                         guioptions: {
                            sharedstatemode: 'ignore',

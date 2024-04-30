@@ -69,7 +69,7 @@ export default {
       this.$emit('dvended', this.curdv);  
     },
     showModal: function() {
-        this.store.mode = 'enddv';
+        this.store.mode = 'korrektur';
         this.$refs['modalRef'].show();
     }
   },
