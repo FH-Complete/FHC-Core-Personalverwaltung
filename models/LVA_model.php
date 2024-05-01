@@ -65,7 +65,7 @@ class LVA_model extends DB_Model
                     lehrveranstaltung.lehrveranstaltung_id=lehreinheit.lehrveranstaltung_id AND 
                     lehreinheit.lehreinheit_id=lehreinheitgruppe.lehreinheit_id AND 
                     lehrveranstaltung.studiengang_kz=studiengang.studiengang_kz AND     
-                    lehreinheitmitarbeiter.mitarbeiter_uid='stolzenb'    
+                    lehreinheitmitarbeiter.mitarbeiter_uid=? 
             ) q
             GROUP BY studiensemester_kurzbz            
             ORDER BY substr(studiensemester_kurzbz,3) asc,substr(studiensemester_kurzbz,1,2) desc
