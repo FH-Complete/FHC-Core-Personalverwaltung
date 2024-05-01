@@ -40,6 +40,8 @@ class Api extends Auth_Controller
                 'getCovidState' => Api::DEFAULT_PERMISSION,
                 'getCurrentDV' => Api::DEFAULT_PERMISSION,
                 'getCourseHours' => Api::DEFAULT_PERMISSION,
+                'getAllCourseHours' => Api::DEFAULT_PERMISSION,
+                'getAllSupportHours' => Api::DEFAULT_PERMISSION,
                 'getReportData' => Api::DEFAULT_PERMISSION,
                 'personHeaderData' => Api::DEFAULT_PERMISSION,
                 'personAbteilung' => Api::DEFAULT_PERMISSION,
@@ -728,6 +730,34 @@ class Api extends Auth_Controller
         }
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
+        $this->outputJson($data);
+    }
+
+    function getAllCourseHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getAllCourseHours($uid);
+        $this->outputJson($data);
+    }
+
+    function getAllSupportHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getAllSupportHours($uid);
         $this->outputJson($data);
     }
 
