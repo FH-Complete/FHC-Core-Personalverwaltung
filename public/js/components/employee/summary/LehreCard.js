@@ -147,12 +147,7 @@ export const LehreCard = {
               response.retval.forEach(element => {
                 tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
             });
-              if (response.retval.length>0) {
-                chartOptions.series[0].data = tempData1;
-              } else {
-                chartOptions.series[0].data = null;
-              }
-			  			  
+                chartOptions.series[0].data = tempData1;			  			  
 			} catch (error) {
 			  console.log(error);
               isFetching.value = false;           
@@ -175,11 +170,7 @@ export const LehreCard = {
               response.retval.forEach(element => {
                 tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
             });
-              if (response.retval.length>0) {
                 chartOptions.series[1].data = tempData1;
-              } else {
-                chartOptions.series[1].data = null;
-              }
 			  			  
 			} catch (error) {
 			  console.log(error);
