@@ -21,7 +21,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		$this->sumvalsalaryfte = null;
 	}
 
-		public function checkIfApplicable()
+	public function checkIfApplicable()
 	{
 		return true;
 	}
@@ -36,15 +36,10 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	public function doValorisation()
 	{
-		echo 'Using ValorisationMethod: ' . __CLASS__ . "\n";
-		print_r($this->params);
-		
-		echo 'DV Beginndatum: ' . $this->dienstverhaeltnis->getVon() . "\n";
 		$this->fetchWochenstunden();
 		$this->scaleSumsalaryToFTE();
 		
 		$this->calcGehaltsbestandteilAnteile();
-		print_r($this->anteile);
 		
 		$this->valoriseSteps();
 		
@@ -58,7 +53,6 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'stunden' ) 
 			{
 				$this->wochenstunden = $vb->getWochenstunden();
-				echo "Wochenstunden: " . $vb->getWochenstunden() . "\n";
 			}
 		}		
 	}
@@ -82,13 +76,10 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		if( floatval($this->wochenstunden) < floatval('38.5') )
 		{
 			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval('38.5');
-			echo "PT salary: " . $this->sumvalsalary . " scaled to FTE salary: " . 
-				$this->sumvalsalaryfte . "\n";
 		}
 		else 
 		{
 			$this->sumvalsalaryfte = $this->sumvalsalary;
-			echo "FTE salary: " . $this->sumvalsalaryfte . "\n";
 		}
 	}
 	
@@ -120,7 +111,6 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 				$this->valorisation += $valscaled;
 			}
 		}
-		echo "Valorisation: " . $this->valorisation . "\n";
 	}
 	
 	protected function distributeValorisationToGehaltsbestandteile()
@@ -131,7 +121,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 			if( $gehaltsbestandteil->getValorisierung() ) 
 			{
 				$betrag_valorisiert = $this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] * $this->valorisation + $gehaltsbestandteil->getBetrag_valorisiert();
-				echo 'Betrag vorher: ' . $gehaltsbestandteil->getBetrag_valorisiert() . ' nachher: ' . $betrag_valorisiert . ' (' . round($betrag_valorisiert, 2) . ")\n"; 
+				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2)); 
  			}
 		}
 	}

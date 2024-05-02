@@ -34,18 +34,13 @@ class ValorisierungProzent extends AbstractValorisationMethod
 
 	public function doValorisation()
 	{
-		echo 'Using ValorisationMethod: ' . __CLASS__ . "\n";
-		print_r($this->params);
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			if( !$gehaltsbestandteil->getValorisierung() ) {
-				echo "Gehaltsbestandteil wird nicht valorisiert.\n";
-			}
-			else
+			if( $gehaltsbestandteil->getValorisierung() )
 			{
 				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() * (1 + $this->params->prozent / 100);
-				echo $gehaltsbestandteil->getBetrag_valorisiert() . ' wird valorisiert: ' . $betrag_valorisiert . "\n";
+				$gehaltsbestandteil->setBetrag_valorisiert($betrag_valorisiert);
  			}
 		}
 	}

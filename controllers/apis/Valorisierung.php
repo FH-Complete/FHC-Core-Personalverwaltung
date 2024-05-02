@@ -12,11 +12,13 @@ class Valorisierung extends FHCAPI_Controller
         parent::__construct(
 	    array(
 		'index' => self::DEFAULT_PERMISSION,
-		'doValorisation' => self::DEFAULT_PERMISSION
+		'doValorisation' => self::DEFAULT_PERMISSION,
+		'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION
 	    )
 	);
 	
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungAPI_model');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
 	$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
     }
 
@@ -24,54 +26,44 @@ class Valorisierung extends FHCAPI_Controller
     {
 	$this->terminateWithSuccess('not implemented');
     }
-	
-    public function doValorisation($valorisationInstanzKurzbz=null)
+
+    public function getValorisierungsInstanzen()
     {
-/*	
-	$sumsalaryprevaloesi	= round(random_int(250000, 500000) / 100, 2);
-	$sumsalarypostvaloesi	= round($sumsalaryprevaloesi * (1 + (random_int(2, 9)/100)), 2);
-	$sumsalaryprevalma0080	= round(random_int(250000, 500000) / 100, 2);
-	$sumsalarypostvalma0080 = round($sumsalaryprevalma0080 * (1 + (random_int(2, 9)/100)), 2);
+	$valinstanzen = $this->ValorisierungInstanz_model->getAllValorisierungInstanzen();
+	if( isError($valinstanzen) )
+	{
+	    $this->terminateWithError('Fehler beim Laden der ValorisierungsInstanzen');
+	}
+	else 
+	{
 	
-	$data = array(
-	    array(
-		"mitarbeiter" => "Andreas Österreicher",
-		"vertragsart" => "Echter DV",
-		"sumsalarypreval" => $sumsalaryprevaloesi,
-		"sumsalarypostval" => $sumsalarypostvaloesi,
-		"valorisierungmethode" => "ValorisierungFixbetrag",
-		"stdkst" => "Core-Entwicklung",
-		"diszplzuordnung" => "Systemmanagement",
-		"dvvon" => "2004-04-01",
-		"dvbis" => null,
-		"dienstverhaeltnis_id" => 137
-	    ),
-	    array(
-		"mitarbeiter" => "Bamberger Harald",
-		"vertragsart" => "Echter DV",
-		"sumsalarypreval" => $sumsalaryprevalma0080,
-		"sumsalarypostval" => $sumsalarypostvalma0080,
-		"valorisierungmethode" => "ValorisierungGestaffelt",
-		"stdkst" => "Web/App-Entwicklung",
-		"diszplzuordnung" => "Systemmanagement",
-		"dvvon" => "2021-05-17",
-		"dvbis" => null,
-		"dienstverhaeltnis_id" => 154
-	    )
-	);
- */
-	$data = getData($this->ValorisierungAPI_model->getDVsForValorisation());
-	$this->terminateWithSuccess($data);
-/*	
+	    $this->terminateWithSuccess(getData($valinstanzen));
+	}
+    }
+    
+    public function doValorisation($valorisationInstanzKurzbz)
+    {
 	try
 	{
 	    $valinstanz = $this->ValorisierungLib->findValorisierungInstanz($valorisationInstanzKurzbz);
-	    $this->terminateWithSuccess($valinstanz);
 	}
 	catch (Exception $ex)
 	{
-	    $this->terminateWithError($ex->getMessage());
+	    $this->terminateWithError('ValorisierungsInstanz ' . $valorisationInstanzKurzbz . ' nicht gefunden.');
 	}
- */	
+	$result = $this->ValorisierungAPI_model->getDVsForValorisation($valinstanz->valorisierungsdatum);
+	if( hasData($result) )
+	{
+	    $dvsdata = getData($result);
+	    foreach($dvsdata as &$dvdata)
+	    {
+		$this->ValorisierungLib->doValorisation($valinstanz, $dvdata);
+	    }
+	    $this->terminateWithSuccess($dvsdata);
+	}
+	else 
+	{
+	    $this->terminateWithError('Fehler beim Laden der zu valorisierenden Dientsverhältnisse.');
+	}	
     }
 }

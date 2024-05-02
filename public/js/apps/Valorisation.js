@@ -22,8 +22,23 @@ const valApp = Vue.createApp(	{
             valorisierungsinstanz_kurzbz: '',
             ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root + 
                     FHC_JS_DATA_STORAGE_OBJECT.ci_router + 
-                    '/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/doValorisation'
+                    '/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/doValorisation',
+            lists: {
+                valorisierungsinstanzen: []
+            }
         };
+    },
+    created: function() {
+        const res = Vue.$fhcapi.Valorisierung.getValorisierungsInstanzen()
+                .then((response) => {
+            const valinstanzen = response.data.data;
+            valinstanzen.unshift({
+                value: '',
+                label: 'Valorisierungsinstanz wählen...',
+                disabled: true
+            });
+            this.lists.valorisierungsinstanzen = valinstanzen;
+        });      
     },
     methods: {		
         newSideMenuEntryHandler: function(payload) {
@@ -32,8 +47,13 @@ const valApp = Vue.createApp(	{
         doValorisation: function() {
             console.log('do Valorisation');
             console.log(this.valorisierungsinstanz_kurzbz);
+            if( this.valorisierungsinstanz_kurzbz === '' ) {
+                this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
+                return;
+            }
             this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-            const res = Vue.$fhcapi.Valorisierung.doValorisation().then((response) => {
+            const res = Vue.$fhcapi.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
+                    .then((response) => {
                 console.log(response.data.data);
                 this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
                 this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();               
@@ -46,6 +66,7 @@ const valApp = Vue.createApp(	{
         },
         tabulatorOptions: function() {
             return {
+                    height: '75vh',
                     // Unique ID
                     index: 'dienstverhaeltnis_id',
 
@@ -58,15 +79,16 @@ const valApp = Vue.createApp(	{
                     // Column definitions
                     columns: [
                     {title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
-                    {title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
                     {title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number'},
                     {title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number'},
                     {title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
                     {title: 'Standard-Kostenstelle', field: 'stdkst', headerFilter: true},
                     {title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
-                    {title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center'},
-                    {title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center'},
-                    {title: 'DVId', field: 'dienstverhaeltnis_id', visible: false}
+                    {title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},                    
+                    {title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
+                    {title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},                    
+                    {title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true},
+                    {title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true}
                 ]
             };
         },
@@ -150,11 +172,12 @@ const valApp = Vue.createApp(	{
 			<template #actions>				
 			 	<div class="d-flex gap-2 align-items-baseline">
 					<select v-model="valorisierungsinstanz_kurzbz" class="form-select" aria-label="ValorisierungsInstanz">
-	  					<option value="" disabled>Valorisierungsinstanz wählen...</option>
-						<option value="Valorisierung-2024-Variante01">Valorisierung-2024-Variante01</option>
-					  	<option value="Valorisierung-2024-Variante02">Valorisierung-2024-Variante02</option>
-					  	<option value="Valorisierung-2023-Variante01">Valorisierung-2023-Variante01</option>
-                                                <option value="Valorisierung-2023-Variante02">Valorisierung-2023-Variante02</option>
+                                            <option
+                                              v-for="vi in lists.valorisierungsinstanzen"
+                                              :value="vi.value"
+                                              :disabled="vi.disabled">
+                                              {{ vi.label }}
+                                            </option>
 					</select>
 				</div>
                                 <button class="btn btn-primary" @click="doValorisation">Valorisieren</button>

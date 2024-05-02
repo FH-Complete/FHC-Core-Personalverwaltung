@@ -12,7 +12,7 @@ require_once 'ValorisierungGestaffelt.php';
  */
 class ValorisationFactory
 {
-	const VALORISATION_PROZENT		= 'ValorisierungProzent';
+	const VALORISATION_PROZENT	= 'ValorisierungProzent';
 	const VALORISATION_FIXBETRAG	= 'ValorisierungFixBetrag';
 	const VALORISATION_STAGGERED	= 'ValorisierungGestaffelt';
 	

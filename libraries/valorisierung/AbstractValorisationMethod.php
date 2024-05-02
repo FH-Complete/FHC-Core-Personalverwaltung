@@ -30,7 +30,7 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		$this->params = $params;
 	}
 	
-	protected function calcSummeGehaltsbestandteile($mode=self::ALLE_GBS)
+	public function calcSummeGehaltsbestandteile($mode=self::ALLE_GBS)
 	{
 		$sumsalary = 0;
 		foreach( $this->gehaltsbestandteile as $gehaltsbestandteil ) 
