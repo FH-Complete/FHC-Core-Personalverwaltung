@@ -4,6 +4,7 @@ import {searchbaroptions, searchfunction } from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import {OrgViewer} from '../components/organisation/OrgViewer.js';
+import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
 	components: {	
@@ -52,6 +53,7 @@ const pvApp = Vue.createApp(	{
 
 //pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(primevue.config.default);
+pvApp.use(Phrasen);
 //pvApp.use(primevue.toastservice);
 
 

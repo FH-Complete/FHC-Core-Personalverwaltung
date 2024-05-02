@@ -1,6 +1,7 @@
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
+import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
 	components: {
@@ -30,6 +31,7 @@ const pvApp = Vue.createApp(	{
 });
 
 pvApp.use(primevue.config.default);
+pvApp.use(Phrasen);
 //pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 //pvApp.use(primevue.toastservice);
 

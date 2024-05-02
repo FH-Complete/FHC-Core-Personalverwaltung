@@ -99,7 +99,7 @@ class Api_model extends DB_Model
 		AND dv.bis is null
 		AND dv.von <= now() - '5 months'::interval
 		AND dv.vertragsart_kurzbz in('externerlehrender')
-        AND campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval
+        AND (campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval OR campus.vw_mitarbeiter.insertamum is null)
 
 		-- Kein Lehrauftrag in den letzten 3 Semestern
         AND NOT EXISTS(
