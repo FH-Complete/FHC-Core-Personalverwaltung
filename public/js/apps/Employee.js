@@ -66,6 +66,7 @@ const pvApp = Vue.createApp({
 		const gehaltstypen = Vue.ref([]);
 		const hourlyratetypes = Vue.ref([]);
 		const unternehmen = Vue.ref([]);
+		const beendigungsgruende = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
@@ -133,6 +134,9 @@ const pvApp = Vue.createApp({
 		fetchUnternehmen().then((r) => {
 			unternehmen.value = r;
 		})
+		fetchBeendigungsgruende().then((r) => {
+			beendigungsgruende.value = r;
+		})
 
 		Vue.provide("sprache",sprache);
 		Vue.provide("nations",nations);
@@ -150,6 +154,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("freitexttypen",freitexttypen);
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
+		Vue.provide('beendigungsgruende',beendigungsgruende);
 	}
 }).use(router);
 
@@ -242,6 +247,12 @@ const fetchHourlyratetypes = async () => {
 const fetchUnternehmen = async () => {
 	const res = await CoreRESTClient.get(
 		'extensions/FHC-Core-Personalverwaltung/api/getUnternehmen');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchBeendigungsgruende = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/apis/DvEndeGrund/getDvEndeGruende');
 	return CoreRESTClient.getData(res.data);
 }
 

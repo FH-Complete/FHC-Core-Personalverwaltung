@@ -74,7 +74,7 @@ export const EmailTelData = {
                 kontakttyp: 'email', 
                 anmerkung: '',  
                 kontakt: '',    
-                zustellung: false, 
+                zustellung: true, 
                 updateamum: '',
                 updatevon: '',  
                 insertamum: '', 
