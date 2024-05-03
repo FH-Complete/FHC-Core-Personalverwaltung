@@ -57,13 +57,11 @@ class LVA_model extends DB_Model
                 SELECT lehreinheitmitarbeiter.mitarbeiter_uid,lehreinheitmitarbeiter.lehreinheit_id,lehrveranstaltung.lehrveranstaltung_id, lehreinheit.studiensemester_kurzbz,
                    lehrveranstaltung.studiengang_kz,lehreinheitmitarbeiter.semesterstunden,lehreinheitmitarbeiter.stundensatz,lehreinheitmitarbeiter.faktor 
                 FROM lehre.tbl_lehreinheitmitarbeiter as lehreinheitmitarbeiter, 
-                    lehre.tbl_lehreinheit as lehreinheit, 
                     lehre.tbl_lehrveranstaltung as lehrveranstaltung, 
                     lehre.tbl_lehreinheitgruppe as lehreinheitgruppe, 
                     public.tbl_studiengang as studiengang 
                 WHERE lehreinheit.lehreinheit_id=lehreinheitmitarbeiter.lehreinheit_id AND 
                     lehrveranstaltung.lehrveranstaltung_id=lehreinheit.lehrveranstaltung_id AND 
-                    lehreinheit.lehreinheit_id=lehreinheitgruppe.lehreinheit_id AND 
                     lehrveranstaltung.studiengang_kz=studiengang.studiengang_kz AND     
                     lehreinheitmitarbeiter.mitarbeiter_uid=? 
             ) q
