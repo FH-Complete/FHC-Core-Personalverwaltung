@@ -4,6 +4,8 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class FixangestelltJob extends JOB_Controller
 {
+	const UPDATE_VON = 'fixangestelltjob';
+
 	private $_ci; // Code igniter instance
 
 	public function __construct()
@@ -80,7 +82,10 @@ class FixangestelltJob extends JOB_Controller
 			foreach ($dvs as $dv)
 			{
 				// update wrong fixangestellt value
-				$result = $this->_ci->MitarbeiterModel->update($dv->mitarbeiter_uid, array('fixangestellt' => !$dv->fixangestellt));
+				$result = $this->_ci->MitarbeiterModel->update(
+					$dv->mitarbeiter_uid,
+					array('fixangestellt' => !$dv->fixangestellt, 'updateamum' => strftime('%Y-%m-%d %H:%M'), 'updatevon' => self::UPDATE_VON)
+				);
 
 				if (isError($result))
 					$this->logError(getError($result));
