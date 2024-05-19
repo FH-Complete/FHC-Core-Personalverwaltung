@@ -62,7 +62,13 @@ class SalaryRange extends Auth_Controller
 
 	function getAll()
 	{
-        $rows = $this->SalaryRangeModel->getAll();
+		$von = $this->input->get('von', null);
+		$bis = $this->input->get('bis', null);
+		if ($von == null || $bis == null) {
+        	$rows = $this->SalaryRangeModel->getAll();
+		} else {
+			$rows = $this->SalaryRangeModel->getAllByDateRange($von, $bis);
+		}
 		if( hasData($rows) )
 		{
 			$this->outputJson($rows);

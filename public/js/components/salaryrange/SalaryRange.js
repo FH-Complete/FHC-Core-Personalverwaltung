@@ -6,6 +6,7 @@ import { BetragDialog } from './BetragDialog.js';
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
 import { Toast } from '../Toast.js';
 
+
 export const SalaryRange = {
     components: {
         "datepicker": VueDatePicker,
@@ -38,7 +39,38 @@ export const SalaryRange = {
         const tableRef = ref(null); // reference to your table element
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
-        
+
+
+        const startOfYear = () => {
+            const cleanDate = new Date(currentDate.value);
+            const _date = new Date(currentDate.value);
+            _date.setFullYear(cleanDate.getFullYear(), 0, 1);
+            _date.setHours(0, 0, 0, 0);
+            return _date;
+        }
+
+        const endOfYear = () => {
+            const _date = new Date(currentDate.value);
+            const year = _date.getFullYear();
+            _date.setFullYear(year + 1, 0, 0);
+            _date.setHours(23, 59, 59, 999);
+            return _date;
+        }
+
+        const startOfMonth = () => {
+            const _date = new Date(currentDate.value);
+            _date.setDate(1);
+            _date.setHours(0, 0, 0, 0);
+            return _date;
+        }
+        const endOfMonth = () => {
+            const _date = new Date(currentDate.value);
+            const month = _date.getMonth();
+            _date.setFullYear(_date.getFullYear(), month + 1, 0);
+            _date.setHours(23, 59, 59, 999);
+            return _date;
+        }
+
         const formatDateISO = (ds) => {
             let padNum = (n) => {
                 if (n<10) return '0' + n;
@@ -58,15 +90,39 @@ export const SalaryRange = {
         }
 
         const currentDate = ref(formatDateISO(new Date()));
+        const filterDate = ref();
+
+        const presetDates = ref([
+            { label: 'Heute', value: [new Date(), new Date()] },
+            {
+              label: 'Heute (Slot)',
+              value: [new Date(), new Date()],
+              slot: 'preset-date-range-button'
+            },
+            { label: 'Aktuelles Monat', value: [startOfMonth(new Date()), endOfMonth(new Date())] },            
+            { label: 'Aktuelles Jahr', value: [startOfYear(new Date()), endOfYear(new Date())] },
+          ]);
 
         const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
+
+        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+        const filterDateHandler = (d) => {            
+            console.log('filter date set: ', d);
+            if (d == null) {
+                filterDate.value = null;
+            } else {
+                filterDate.value = d; //truncateDate(new Date(d));
+            }
+            fetchData()
+        }
 
         const fetchData = async () => {
             
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.SalaryRange.getAll();         
+              const res = await Vue.$fhcapi.SalaryRange.getAll(filterDate.value);         
               if (res.data.error !==1) {
                 salaryRangeList.value = res.data.retval;
               } else {
@@ -243,7 +299,10 @@ export const SalaryRange = {
             }
         }
 
-        return { t, isFetching, tableRef, tabulator, currentDate, modalRef, confirmDeleteRef, deleteToastRef, createToastRef, updateToastRef, currentBetrag, addSalaryRange, betragDialogRef, cancelHandler, formatDateGerman, progressValue }
+        return { t, isFetching, tableRef, tabulator, currentDate, presetDates, filterDate, 
+            formatDateISO, filterDateHandler, modalRef, confirmDeleteRef, deleteToastRef, 
+            createToastRef, updateToastRef, currentBetrag, addSalaryRange, betragDialogRef, 
+            cancelHandler, formatDateGerman, progressValue, startOfMonth, startOfYear, endOfMonth, endOfYear }
 
     },
     template: `    
@@ -274,8 +333,35 @@ export const SalaryRange = {
         </div>
        
         <div class="flex-grow-1 d-flex flex-column" style="width:100%"  >
-            <div class="d-grid d-md-flex align-items-start pt-2 pb-3">
-                <button type="button" class="btn btn-sm btn-primary me-3" @click="addSalaryRange()"><i class="fa fa-plus"></i> hinzufügen</button>
+            <div class="d-flex">
+                <div class="me-auto">
+                    <button type="button" class="btn btn-sm btn-primary me-3" @click="addSalaryRange()"><i class="fa fa-plus"></i> hinzufügen</button>
+                </div>
+                <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
+                    <datepicker id="filter" :modelValue="filterDate" 
+                        @update:model-value="filterDateHandler"
+                        v-bind:enable-time-picker="false"   
+                        :clearable="true"                                 
+                        range :preset-dates="presetDates"
+                        auto-apply 
+                        locale="de"
+                        format="dd.MM.yyyy"
+                        model-type="yyyy-MM-dd"
+                        input-class-name="dp-custom-input"
+                        style="max-width:240px;min-width:240px" >
+                        
+                        <template #preset-date-range-button="{ label, value, presetDate }">
+                            <span 
+                                role="button"
+                                :tabindex="0"
+                                @click="presetDate(value)"
+                                @keyup.enter.prevent="presetDate(value)"
+                                @keyup.space.prevent="presetDate(value)">
+                            {{ label }}
+                            </span>
+                        </template>
+                    </datepicker>
+                </div>
             </div>
             <!-- TABULATOR -->
             <div ref="tableRef" class="fhc-tabulator" style="height:300px"></div>
