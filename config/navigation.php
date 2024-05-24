@@ -9,6 +9,12 @@ $config['navigation_header']['*']['Personen']['children']['PV21'] = array(
 );
 
 $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
+	'DashboardRestricted' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Home'),
+		'description' => 'Home (restricted)',
+		'icon' => 'home',
+		'requiredPermissions' => 'assistenz:r'
+	),
 	'Dashboard' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Home'),
 		'description' => 'Home',

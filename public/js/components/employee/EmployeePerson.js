@@ -37,6 +37,7 @@ export const EmployeePerson = {
 
         theModel.personID = props.id
         theModel.personUID = props.uid
+        theModel.restricted = props.restricted
 
         return { t, theModel, path }
 

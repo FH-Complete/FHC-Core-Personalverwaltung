@@ -1,6 +1,7 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/vbform/api.js";
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
+import {default as EmployeeHomeRestricted} from "../components/employee/EmployeeHomeRestricted.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
 import {EmployeeSummary } from "../components/employee/summary/EmployeeSummary.js";
@@ -25,13 +26,40 @@ const router = VueRouter.createRouter(
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
 				children: [					
-					{ path: '', component: EmployeePerson, name: 'person' },
-					{ path: 'contract', component: EmployeeContract },
-					{ path: 'contract/:dienstverhaeltnis_id', component: EmployeeContract },
+					{ path: '', 
+					  component: EmployeePerson, 
+					  name: 'person',
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: false })  },
+					{ path: 'contract', 
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: false }) },
+					{ path: 'contract/:dienstverhaeltnis_id', 
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id, restricted: false })		
+					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
 					{ path: 'document', component: EmployeeDocument, name: 'document' },
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
+				]
+		    },
+			// restricted views
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/restricted/Employees`, component: EmployeeHomeRestricted }, 
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/restricted/Employees/:id/:uid`, component: EmployeeHomeRestricted,
+				children: [					
+					{ path: '', 
+					  component: EmployeePerson, 
+					  name: 'personRestricted', 
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: true }) 
+					},
+					{ path: 'contract', 
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: true })
+					},
+					{ path: 'contract/:dienstverhaeltnis_id', 
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: true })
+					},					
 				]
 		    },
 		],
