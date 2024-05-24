@@ -205,7 +205,7 @@ export const searchbaroptionsRestricted = {
             defaultaction: {
                 type: "link",
                 action: (data) => {
-                    return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/restricted/Employees/${data.person_id}/${data.uid}/summary`;
+                    return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/restricted/Employees/${data.person_id}/${data.uid}`;
                 }
             },
             childactions: [
