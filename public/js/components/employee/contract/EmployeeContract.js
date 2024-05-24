@@ -321,7 +321,7 @@ export const EmployeeContract = {
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
             let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
                     + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                    + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
+                    + '/extensions/FHC-Core-Personalverwaltung/' + (props.restricted?'restricted/':'') + 'Employees/' 
                     + props.id + '/' + props.uid 
                     + '/contract/' + currentDV.value.dienstverhaeltnis_id;
             router.push( url );
