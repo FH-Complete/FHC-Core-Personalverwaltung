@@ -84,9 +84,10 @@
 
 
 
-</script>
-
 <script>
+
+var CIS_ROOT = '<?php echo CIS_ROOT ?>';
+
 (function () {
   'use strict'
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

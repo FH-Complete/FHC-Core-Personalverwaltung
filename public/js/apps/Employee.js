@@ -178,6 +178,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("freitexttypen",freitexttypen);
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
+		Vue.provide("cisRoot", CIS_ROOT)
 	}
 }).use(router);
 
