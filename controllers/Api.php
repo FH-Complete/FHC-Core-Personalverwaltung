@@ -51,7 +51,7 @@ class Api extends Auth_Controller
                 'deletePersonBankData' => Api::DEFAULT_PERMISSION,
                 'upsertPersonJobFunction'  => Api::DEFAULT_PERMISSION,
                 'deletePersonJobFunction'  => Api::DEFAULT_PERMISSION,
-                'personBaseData' => Api::DEFAULT_PERMISSION,
+                'personBaseData' => [Api::DEFAULT_PERMISSION, self::RESTRICTED_PERMISSION],
                 'updatePersonBaseData' => Api::DEFAULT_PERMISSION,
                 'personEmployeeKurzbzExists' => Api::DEFAULT_PERMISSION,
                 'personEmployeeData' => Api::DEFAULT_PERMISSION,

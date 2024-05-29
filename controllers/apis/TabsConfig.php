@@ -101,6 +101,11 @@ class TabsConfig extends FHCAPI_Controller
 				'title' => $this->p->t('person', 'kontaktdaten'),
 				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/ContactData.js',
 				'config' => null
+			),
+			'betriebsmittel' => array(
+				'title' => $this->p->t('person', 'betriebsmittel'),
+				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BetriebsmittelWrapper.js',
+				'config' => null
 			)
 		);
 
