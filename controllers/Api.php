@@ -11,6 +11,7 @@ class Api extends Auth_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
+    const RESTRICTED_PERMISSION = 'assistenz:r';
     // code igniter
     protected $CI;
 

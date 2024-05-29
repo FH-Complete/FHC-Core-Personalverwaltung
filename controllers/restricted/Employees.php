@@ -12,7 +12,7 @@ class Employees extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct(array(
-			'index'=> Employees::DEFAULT_PERMISSION	)
+			'index'=> Self::DEFAULT_PERMISSION	)
 		);
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
 		
