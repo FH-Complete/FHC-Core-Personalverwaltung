@@ -288,8 +288,8 @@ export const EmployeeContract = {
             (newVal) => {
                 if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
-                fetchGBT(newVal, currentDate.value);
                 if (!props.restricted) {
+                    fetchGBT(newVal, currentDate.value);                
                     fetchGBTChartData(newVal);
                 }
             }
@@ -307,8 +307,8 @@ export const EmployeeContract = {
             (newDate) => {
                 console.log('watch newDate=', newDate)
                 fetchVertrag(currentDVID.value, newDate);
-                fetchGBT(currentDVID.value, newDate)
                 if (!props.restricted) {
+                    fetchGBT(currentDVID.value, newDate)                
                     fetchGBTChartData(currentDVID.value);
                 }
             }
