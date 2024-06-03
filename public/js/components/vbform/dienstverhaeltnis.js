@@ -141,10 +141,12 @@ export default {
         this.vertragsart_kurzbz = this.config.vertragsart_kurzbz;
       }
       if( this.config?.dvendegrund_kurzbz !== undefined ) {
-        this.dvendegrund_kurzbz = this.config.dvendegrund_kurzbz;
+        this.dvendegrund_kurzbz = (this.config.dvendegrund_kurzbz === null) 
+            ? '' : this.config.dvendegrund_kurzbz;
       }
       if( this.config?.dvendegrund_anmerkung !== undefined ) {
-        this.dvendegrund_anmerkung = this.config.dvendegrund_anmerkung;
+        this.dvendegrund_anmerkung = (this.config.dvendegrund_anmerkung === null) 
+            ? '' : this.config.dvendegrund_anmerkung;
       }
       if( this.config?.checkoverlap !== undefined ) {
         this.checkoverlap = this.config.checkoverlap;
@@ -155,8 +157,8 @@ export default {
         dienstverhaeltnisid: this.config.dienstverhaeltnisid,
         unternehmen: this.store.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
-        dvendegrund_kurzbz: this.dvendegrund_kurzbz,
-        dvendegrund_anmerkung: this.dvendegrund_anmerkung,
+        dvendegrund_kurzbz: (this.dvendegrund_kurzbz === '') ? null : this.dvendegrund_kurzbz,
+        dvendegrund_anmerkung: (this.dvendegrund_anmerkung === '') ? null : this.dvendegrund_anmerkung,
         gueltigkeit: this.$refs.gueltigkeit.getPayload(),
         checkoverlap: this.checkoverlap
       }
