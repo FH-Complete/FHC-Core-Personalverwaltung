@@ -4,7 +4,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use CI3_Events as Events;
 
-class TabsConfig extends Auth_Controller
+class TabsConfig extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -78,6 +78,6 @@ class TabsConfig extends Auth_Controller
 			return $result;
 		});
 
-		$this->outputJsonSuccess($result);
+		$this->terminateWithSuccess($result);
     }
 }
