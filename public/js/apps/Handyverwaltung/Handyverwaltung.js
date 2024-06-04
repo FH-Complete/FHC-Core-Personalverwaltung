@@ -28,6 +28,7 @@ import {EmailTelData} from '../../components/employee/contact/EmailTelData.js';
 import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebsmittel.js";
 
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
+import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -44,6 +45,31 @@ const handyVerwaltungApp = Vue.createApp({
                 CoreVerticalsplitCmpt,
                 EmailTelData,
                 Betriebsmittel
+	},
+    setup() {
+
+		// init shared data
+
+        const fetchHelper = (fetchFunction) => {
+            let temp = Vue.ref([])
+            fetchFunction().then( r => temp.value = r )
+            return temp
+        }
+
+		const sprache = fetchHelper(typeDefinition.fetchSprache);
+		const nations = fetchHelper(typeDefinition.fetchNations);
+		const standorte = fetchHelper(typeDefinition.fetchStandorteIntern);
+		const orte = fetchHelper(typeDefinition.fetchOrte);
+		const kontakttyp = fetchHelper(typeDefinition.fetchKontakttyp);
+		const adressentyp = fetchHelper(typeDefinition.fetchAdressentyp);
+
+		Vue.provide("sprache",sprache);
+		Vue.provide("nations",nations);
+		Vue.provide("standorte",standorte);
+		Vue.provide("orte",orte);
+		Vue.provide("kontakttyp",kontakttyp);
+		Vue.provide("adressentyp",adressentyp);
+		Vue.provide("cisRoot", CIS_ROOT)
 	},
 	methods: {
             personselected: function() {
@@ -179,4 +205,5 @@ const handyVerwaltungApp = Vue.createApp({
 });
 
 handyVerwaltungApp.use(Phrasen).mount('#main');
+handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 

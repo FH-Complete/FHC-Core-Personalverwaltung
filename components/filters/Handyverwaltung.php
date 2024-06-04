@@ -38,10 +38,3 @@
 		',
 		'requiredPermissions' => 'assistenz'
 	);
-
-	/*
-
-"filter_id","app","dataset_name","filter_kurzbz","person_id","description","sort","default_filter","filter","oe_kurzbz","statistik_kurzbz"
-"618","personalverwaltung","handyverwaltung","ma4handyverwaltung","\N","{""MA Handyverwaltung""}","1","t","{""name"": ""MA Handyverwaltung"", ""columns"": [{""name"": ""PersonId""}, {""name"": ""Vorname""}, {""name"": ""Nachname""}, {""name"": ""Alias""}, {""name"": ""Aktiv""}, {""name"": ""Raum""}, {""name"": ""Geschlecht""}, {""name"": ""Standardkostenstelle""}], ""filters"": [{""name"": ""Nachname"", ""option"": """", ""condition"": """", ""operation"": """"}]}","\N","\N"
-
-	 */

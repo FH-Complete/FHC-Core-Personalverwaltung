@@ -24,5 +24,19 @@
 
 	<div id="main"></div>
 
+	<script>
+
+		var FHC_JS_CONFIG = { domain: '<?php echo DOMAIN; ?>'};
+		var CIS_ROOT = '<?php echo CIS_ROOT ?>';
+
+		(function () {
+			'use strict'
+			var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+			tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+				new bootstrap.Tooltip(tooltipTriggerEl)
+			})
+		})()
+	</script>
+
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
 
