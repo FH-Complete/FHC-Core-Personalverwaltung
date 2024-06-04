@@ -46,7 +46,84 @@ const handyVerwaltungApp = Vue.createApp({
                 Betriebsmittel
 	},
 	methods: {
+            personselected: function() {
+                alert('personselected');
+            }
 	},
+        computed: {
+            employeesTabulatorEvents: function() {
+		const employeesTabulatorEvents = [
+			{
+				event: "rowClick",
+				handler: this.personselected
+			},
+                        {
+                                event: "dataFiltered",
+                                handler: function(filters, rows) {
+                                    var el = document.getElementById("search_count");
+                                    el.innerHTML = rows.length;
+                                }
+                        },
+                        {
+                                event: "dataLoaded",
+                                handler: function(data) {
+                                    var el = document.getElementById("total_count");
+                                    el.innerHTML = data.length;
+                                }
+                        }
+		];
+                return employeesTabulatorEvents;
+            },            
+            employeesTabulatorOptions: function() {
+                const sexformatter = function(cell, formatterParams, onRendered) {
+			var value = cell.getValue();
+			if( value === 'm') {
+				return 'männlich';
+			} else if( value === 'w' ) {
+				return 'weiblich';
+			} else if( value === 'x' ) {
+				return 'divers';
+			} else if( value === 'u' ) {
+				return 'unbekannt';
+			} else {
+				return value;
+			}
+		};
+                
+		const employeesTabulatorOptions = {
+			height: "100%",
+			layout: 'fitColumns',
+                        persistenceID: 'handyverwaltung_20240604_01',
+                        footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
+			columns: [
+				{title: "UID", field: "UID", headerFilter: true},
+				{title: "Person ID", field: "PersonId", headerFilter: true},
+				{title: "Personalnummer", field: "Personalnummer", headerFilter: true},
+				{title: "Vorname", field: "Vorname", headerFilter: true},
+				{title: "Nachname", field: "Nachname", headerFilter: true},
+				{title: "TitelPre", field: "TitelPre", headerFilter: true},
+				{title: "TitelPost", field: "TitelPost", headerFilter: true},
+				{title: "Alias", field: "Alias", headerFilter: true},
+				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
+				{title: "Aktiv", field: "Aktiv", hozAlign: "center", formatter:"tickCross", formatterParams: {
+						tickElement: '<i class="fas fa-check text-success"></i>',
+						crossElement: '<i class="fas fa-times text-danger"></i>'
+					},
+					headerFilter:"tickCross", headerFilterParams: {
+						"tristate":true,elementAttributes:{"value":"true"}
+					}, headerFilterEmptyCheck:function(value){return value === null}},
+				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
+				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
+				{title: "Geschlecht", field: "Geschlecht", formatter:sexformatter, headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, autocomplete: true, sort: "asc"}},
+				{title: "Durchwahl", field: "Durchwahl", headerFilter: true},
+				{title: "Standardkostenstelle", field: "Standardkostenstelle", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
+				{title: "Disziplinäre Zuordnung", field: "Disziplinäre Zuordnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "OE Key", field: "OE Key", headerFilter: true},
+			]
+		};
+                return employeesTabulatorOptions;
+            }
+        },
         template: `
 		<!-- Navigation component -->
 		<core-navigation-cmpt></core-navigation-cmpt>
@@ -56,6 +133,16 @@ const handyVerwaltungApp = Vue.createApp({
                             <template #top>
                                 <p><label for="personid">personid</label><input id="personid" v-model="personid"></p>
                                 <p><label for="personuid">personuid</label><input id="personuid" v-model="personuid"></p>
+    
+                            <!-- Filter component -->
+                            <core-filter-cmpt
+                            filter-type="Handyverwaltung"
+                                :sideMenu="false"
+                                :tabulator-options="employeesTabulatorOptions"
+                                :tabulator-events="employeesTabulatorEvents"
+                                :new-btn-show="false">
+                            </core-filter-cmpt>
+    
                             </template>
     
                             <template #bottom>
