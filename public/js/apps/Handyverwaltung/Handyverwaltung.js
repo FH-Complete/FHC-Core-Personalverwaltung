@@ -72,8 +72,11 @@ const handyVerwaltungApp = Vue.createApp({
 		Vue.provide("cisRoot", CIS_ROOT)
 	},
 	methods: {
-            personselected: function() {
-                alert('personselected');
+            // Tabulator handler for the rowClick event
+            personselected: function(e, row) { 
+                console.log('personselected', row)
+                this.personid = row.getData().PersonId
+                this.personuid = row.getData().UID;
             }
 	},
         computed: {
@@ -157,9 +160,7 @@ const handyVerwaltungApp = Vue.createApp({
 		<div id="content">
 			<core-verticalsplit-cmpt>
                             <template #top>
-                                <p><label for="personid">personid</label><input id="personid" v-model="personid"></p>
-                                <p><label for="personuid">personuid</label><input id="personuid" v-model="personuid"></p>
-    
+                              
                             <!-- Filter component -->
                             <core-filter-cmpt
                             filter-type="Handyverwaltung"
