@@ -15,7 +15,7 @@ export const JobFunction = {
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
         config: { type: Object, default: () => ({}), required: false},
-        editMode: { type: Boolean, required: false },
+        readonlyMode: { type: Boolean, required: false, default: false },
         personID: { type: Number, required: false },
         personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
@@ -27,7 +27,9 @@ export const JobFunction = {
 
         const { t } = usePhrasen();
 
-        const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        //const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        const currentPersonID = Vue.computed(() => { return props.personID });
+        const currentPersonUID = Vue.computed(() => { return props.personUID });
 
         const dialogRef = Vue.ref();
 
@@ -73,9 +75,15 @@ export const JobFunction = {
             // fetch data and map them for easier access
             try {
                 const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
-                let rawList = response.data.retval;
-                tableData.value = response.data.retval;
-                jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
+                if(response.data.error === 1) {
+                    let rawList = [];
+                    tableData.value = [];
+                    jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
+                } else {
+                    let rawList = response.data.retval;
+                    tableData.value = response.data.retval;
+                    jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
+                }
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -137,6 +145,9 @@ export const JobFunction = {
             }
 
             const dvFormatter = (cell) => {
+                if( props.readonlyMode === true ) {
+                    return (cell.getValue() != null) ? cell.getValue() : '';
+                }
                 const url = fullPath + route.params.id + '/' + route.params.uid + '/contract/' + cell.getRow().getData().dienstverhaeltnis_id;
                 return cell.getValue() != null ? `<a href="${url}">` + cell.getValue() + '</a>' : '';
             }
@@ -183,9 +194,12 @@ export const JobFunction = {
                 { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
                 { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },                
                 { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
-                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true }
+                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} }
               ];
+
+            if( props.readonlyMode === false) {
+                columnsDef.push({ title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true });
+            }
 
             let tabulatorOptions = {
 				height: "100%",
@@ -442,7 +456,7 @@ export const JobFunction = {
          }
     },
     template: `
-    <div class="row">
+    <div class="row" v-if="readonlyMode === false">
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
@@ -464,7 +478,7 @@ export const JobFunction = {
                 </div>
 
                 <div class="card-body">
-                    <div class="d-grid d-md-flex justify-content-between pt-2 pb-3">
+                    <div class="d-grid d-md-flex justify-content-between pt-2 pb-3" v-if="readonlyMode === false">
                         <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
                             <i class="fa fa-plus"></i> {{ t('person','funktion') }}
                         </button>
@@ -484,7 +498,7 @@ export const JobFunction = {
             
 
     <!-- detail modal -->
-    <Modal :title="t('person','funktion')" ref="modalRef">
+    <Modal :title="t('person','funktion')" ref="modalRef" v-if="readonlyMode === false">
         <template #body>
             <form class="row g-3" ref="jobFunctionFrm">
                             
@@ -581,13 +595,13 @@ export const JobFunction = {
 
     </Modal>
 
-    <ModalDialog :title="t('global','warnung')" ref="dialogRef">
+    <ModalDialog :title="t('global','warnung')" ref="dialogRef" v-if="readonlyMode === false">
       <template #body>
         {{ t('person','funktionNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 
-    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef" v-if="readonlyMode === false">
         <template #body>
             {{ t('person','funktion') }} '{{ currentValue?.funktion_kurzbz }} ({{ currentValue?.datum_von }}-{{ currentValue?.datum_bis }})' {{ t('person', 'wirklichLoeschen') }}?
         </template>

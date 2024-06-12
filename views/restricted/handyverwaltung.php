@@ -17,7 +17,12 @@
 		    'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
 		    'public/css/components/verticalsplit.css'
 		],
-		'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Handyverwaltung/Handyverwaltung.js')
+		'customJSs' => [
+		    'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
+		],
+		'customJSModules' => array(
+		    'public/extensions/FHC-Core-Personalverwaltung/js/apps/Handyverwaltung/Handyverwaltung.js'
+		)
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);

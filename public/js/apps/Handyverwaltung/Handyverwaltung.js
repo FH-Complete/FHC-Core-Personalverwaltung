@@ -27,6 +27,8 @@ import CoreVerticalsplitCmpt from '../../../../../js/components/verticalsplit/ve
 import {EmailTelData} from '../../components/employee/contact/EmailTelData.js';
 import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebsmittel.js";
 
+import JobFunction from "../../components/employee/JobFunction.js";
+
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
 
@@ -44,7 +46,8 @@ const handyVerwaltungApp = Vue.createApp({
 		CoreFilterCmpt,
                 CoreVerticalsplitCmpt,
                 EmailTelData,
-                Betriebsmittel
+                Betriebsmittel,
+                JobFunction
 	},
     setup() {
 
@@ -169,6 +172,10 @@ const handyVerwaltungApp = Vue.createApp({
                             </template>
     
                             <template #bottom>
+                                <div>
+                                    <JobFunction :readonlyMode="true" :personID="personid" :personUID="personuid"></JobFunction>
+                                </div>
+
                                 <div class="row pt-md-4">      
                                      <div class="col">
                                          <div class="card">
