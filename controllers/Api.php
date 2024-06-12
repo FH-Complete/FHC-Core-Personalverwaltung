@@ -2069,7 +2069,8 @@ EOSQL;
 
 		$sql = <<<EOSQL
 			SELECT
-				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen ,
+				dv.dienstverhaeltnis_id, 
+				un.bezeichnung || ' (' || TO_CHAR(dv.von, 'DD.MM.YYYY') || CASE WHEN dv.bis IS NOT NULL THEN ' - ' || TO_CHAR(dv.bis, 'DD.MM.YYYY') ELSE '' END || ')' AS dienstverhaeltnis_unternehmen ,
 				'[' || oet.bezeichnung || '] ' || oe.bezeichnung AS funktion_oebezeichnung,
 				f.beschreibung AS funktion_beschreibung,
 				bf.*,
