@@ -13,8 +13,9 @@
 			'ui' => array('bitteEintragWaehlen')
 		),
 		'customCSSs' => [
-		    'public/css/components/verticalsplit.css',
-		    'public/css/components/vue-datepicker.css'
+		    'public/css/components/vue-datepicker.css',
+		    'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
+		    'public/css/components/verticalsplit.css'
 		],
 		'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Handyverwaltung/Handyverwaltung.js')
 	);
@@ -27,7 +28,7 @@
 	<script>
 
 		var FHC_JS_CONFIG = { domain: '<?php echo DOMAIN; ?>'};
-		var CIS_ROOT = '<?php echo CIS_ROOT ?>';
+		var CIS_ROOT = '<?php echo APP_ROOT ?>';
 
 		(function () {
 			'use strict'

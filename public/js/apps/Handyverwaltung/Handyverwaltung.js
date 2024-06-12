@@ -77,6 +77,10 @@ const handyVerwaltungApp = Vue.createApp({
                 console.log('personselected', row)
                 this.personid = row.getData().PersonId
                 this.personuid = row.getData().UID;
+                
+                if( this.$refs['vsplit'].isCollapsed() !== false ) {
+                    this.$refs['vsplit'].showBoth();
+                }
             }
 	},
         computed: {
@@ -127,27 +131,19 @@ const handyVerwaltungApp = Vue.createApp({
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
 				{title: "Person ID", field: "PersonId", headerFilter: true},
-				{title: "Personalnummer", field: "Personalnummer", headerFilter: true},
 				{title: "Vorname", field: "Vorname", headerFilter: true},
 				{title: "Nachname", field: "Nachname", headerFilter: true},
-				{title: "TitelPre", field: "TitelPre", headerFilter: true},
-				{title: "TitelPost", field: "TitelPost", headerFilter: true},
-				{title: "Alias", field: "Alias", headerFilter: true},
-				{title: "Geburtsdatum", field: "Geburtsdatum", headerFilter: true},
-				{title: "Aktiv", field: "Aktiv", hozAlign: "center", formatter:"tickCross", formatterParams: {
-						tickElement: '<i class="fas fa-check text-success"></i>',
-						crossElement: '<i class="fas fa-times text-danger"></i>'
-					},
-					headerFilter:"tickCross", headerFilterParams: {
-						"tristate":true,elementAttributes:{"value":"true"}
-					}, headerFilterEmptyCheck:function(value){return value === null}},
-				{title: "Fixangestellt", field: "Fixangestellt", headerFilter: true},
-				{title: "Raum", field: "Raum", headerFilter: "list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"}},
-				{title: "Geschlecht", field: "Geschlecht", formatter:sexformatter, headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, autocomplete: true, sort: "asc"}},
-				{title: "Durchwahl", field: "Durchwahl", headerFilter: true},
+				{title: "EMail", field: "EMail", headerFilter: true},
+				{title: "Unternehmen", field: "Unternehmen", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
+				{title: "Vertragsart", field: "Vertragsart", headerFilter: false},
+				{title: "DV_von", field: "DV_von", headerFilter: true},
+				{title: "DV_bis", field: "DV_bis", headerFilter: true},
+				{title: "Wochenstunden", field: "Wochenstunden", headerFilter: true},
+				{title: "WS_von", field: "WS_von", headerFilter: true},
+				{title: "WS_bis", field: "WS_bis", headerFilter: true},
 				{title: "Standardkostenstelle", field: "Standardkostenstelle", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
 				{title: "Disziplinäre Zuordnung", field: "Disziplinäre Zuordnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
-				{title: "OE Key", field: "OE Key", headerFilter: true},
+				{title: "Dienstverhaeltnis ID", field: "DienstverhaeltnisId", headerFilter: true},
 			]
 		};
                 return employeesTabulatorOptions;
@@ -158,18 +154,18 @@ const handyVerwaltungApp = Vue.createApp({
 		<core-navigation-cmpt></core-navigation-cmpt>
 
 		<div id="content">
-			<core-verticalsplit-cmpt>
+			<core-verticalsplit-cmpt ref="vsplit">
                             <template #top>
-                              
-                            <!-- Filter component -->
-                            <core-filter-cmpt
-                            filter-type="Handyverwaltung"
-                                :sideMenu="false"
-                                :tabulator-options="employeesTabulatorOptions"
-                                :tabulator-events="employeesTabulatorEvents"
-                                :new-btn-show="false">
-                            </core-filter-cmpt>
-    
+                                <div class="d-flex flex-column" style="height: 100%;">
+                                    <!-- Filter component -->
+                                    <core-filter-cmpt
+                                        filter-type="Handyverwaltung"
+                                        :sideMenu="false"
+                                        :tabulator-options="employeesTabulatorOptions"
+                                        :tabulator-events="employeesTabulatorEvents"
+                                        :new-btn-show="false">
+                                    </core-filter-cmpt>
+                                </div>
                             </template>
     
                             <template #bottom>
