@@ -26,24 +26,33 @@
 		    LEFT JOIN (
 			    SELECT
 				    bf.uid,oe_kurzbz,oe_parent_kurzbz,public.tbl_organisationseinheit.bezeichnung,
-				    organisationseinheittyp_kurzbz, oet.bezeichnung AS oetypbezeichnung
+				    organisationseinheittyp_kurzbz, oet.bezeichnung AS oetypbezeichnung, vb.dienstverhaeltnis_id
 			    FROM 
 				    public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit using(oe_kurzbz)
 			    JOIN 
 				    public.tbl_organisationseinheittyp oet USING(organisationseinheittyp_kurzbz)
+				JOIN
+					hr.tbl_vertragsbestandteil_funktion vbf ON bf.benutzerfunktion_id = vbf.benutzerfunktion_id
+				JOIN
+					hr.tbl_vertragsbestandteil vb ON vbf.vertragsbestandteil_id = vb.vertragsbestandteil_id
 			    WHERE 
 				    funktion_kurzbz=\'oezuordnung\' and datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
-			    ) oe USING(uid)
+			    ) oe ON b.uid = oe.uid AND d.dienstverhaeltnis_id = oe.dienstverhaeltnis_id
 		    LEFT JOIN (
 			    SELECT 
-				    bf.uid,oe_kurzbz,public.tbl_organisationseinheit.bezeichnung, kstt.bezeichnung AS ksttypbezeichnung
+				    bf.uid,oe_kurzbz,public.tbl_organisationseinheit.bezeichnung, kstt.bezeichnung AS ksttypbezeichnung, 
+				    vb.dienstverhaeltnis_id
 			    FROM 
 				    public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit using(oe_kurzbz)
 			    JOIN 
 				    public.tbl_organisationseinheittyp kstt USING(organisationseinheittyp_kurzbz)
+				JOIN
+					hr.tbl_vertragsbestandteil_funktion vbf ON bf.benutzerfunktion_id = vbf.benutzerfunktion_id
+				JOIN
+					hr.tbl_vertragsbestandteil vb ON vbf.vertragsbestandteil_id = vb.vertragsbestandteil_id
 			    WHERE 
 				    funktion_kurzbz=\'kstzuordnung\' and datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
-			    ) kst USING(uid)
+			    ) kst ON b.uid = kst.uid AND d.dienstverhaeltnis_id = kst.dienstverhaeltnis_id
 		    LEFT JOIN (
 			    SELECT 
 				    vb.dienstverhaeltnis_id, vb.von, vb.bis, wochenstunden 
@@ -55,7 +64,7 @@
 				    (vb.von >= NOW()::date OR COALESCE(vb.bis, \'2100-12-31\'::date) > NOW()::date) 
 			    ORDER BY 
 				    vb.von ASC
-		    ) ws USING(dienstverhaeltnis_id)
+		    ) ws ON ws.dienstverhaeltnis_id = d.dienstverhaeltnis_id
 		    WHERE 
 			    d.vertragsart_kurzbz = \'echterdv\' AND (d.von >= NOW()::date OR COALESCE(d.bis, \'2100-12-31\'::date) > NOW()::date)
 		    ORDER BY
