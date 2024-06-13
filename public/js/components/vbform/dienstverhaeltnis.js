@@ -29,7 +29,7 @@ export default {
   <div class="col-1">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
   <div class="col-1">
-    <div v-if="this.store.mode === 'korrektur'" class="form-check">
+    <div v-if="this.store.mode === 'korrektur' && showdvcheckoverlap === true" class="form-check">
       <input v-model="checkoverlap" class="form-check-input" type="checkbox" id="dvcheckoverlap">
       <label class="form-check-label" for="dvcheckoverlap">
         parallele DVs prüfen
@@ -38,7 +38,7 @@ export default {
     <span v-else>&nbsp;</span>
   </div>
   
-  <template v-if="(['enddv', 'korrektur']).includes(this.store.mode)">
+  <template v-if="this.store.mode === 'korrektur'">
   <div class="col-3">
     <select v-model="dvendegrund_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
@@ -59,6 +59,13 @@ export default {
   <div class="col-6">&nbsp;</div>
   </template>
   `,
+  props: {
+    showdvcheckoverlap: {
+        type: Boolean,
+        default: true,
+        required: false
+    }
+  },
   data: function() {
     return {
       'vertragsart_kurzbz': '',
