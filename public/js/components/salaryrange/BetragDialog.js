@@ -213,7 +213,7 @@ export const BetragDialog = {
             validInput, validDatum, validBezeichnung, frmState, okHandler, hasChanged }
     },
     template: `
-    <Modal :title="t('salaryrange','gehaltsband')" ref="modalRef">
+    <Modal :title="t('gehaltsband','gehaltsband')" ref="modalRef">
         <template #body>
             <form class="row g-3" v-if="currentValue != null"  ref="salaryRangeDataFrm" id="salaryRangeDataFrm">
                         
@@ -232,7 +232,7 @@ export const BetragDialog = {
                 <div class="col-md-6"></div>
 
                 <div class="col-md-3">
-                    <label for="von" class="required form-label">{{ t('salaryrange','gueltig_von') }}</label>
+                    <label for="von" class="required form-label">{{ t('gehaltsband','gueltig_von') }}</label>
                     <datepicker id="von" 
                         :teleport="true" 
                         @blur="frmState.vonBlurred = true" 
@@ -247,7 +247,7 @@ export const BetragDialog = {
                 </div> 
                 
                 <div class="col-md-3">
-                    <label for="bis" class="form-label">{{ t('salaryrange','gueltig_bis') }}</label>
+                    <label for="bis" class="form-label">{{ t('gehaltsband','gueltig_bis') }}</label>
                     <datepicker id="bis" 
                         :teleport="true" 
                         @blur="frmState.bisBlurred = true"                         
@@ -263,7 +263,7 @@ export const BetragDialog = {
                 <div class="col-md-6"></div>
 
                 <div class="col-md-3">
-                    <label for="betrag_von" class="required form-label">{{ t('salaryrange','betrag_von') }}</label>
+                    <label for="betrag_von" class="required form-label">{{ t('gehaltsband','betrag_von') }}</label>
                     <input type="number" 
                         class="form-control form-control-sm" :class="{ 'is-invalid': !validInput(currentValue.betrag_von) && frmState.betragVonBlurred}"  
                         id="betrag_von" maxlength="256" min="0" step="0.01"
@@ -272,7 +272,7 @@ export const BetragDialog = {
                 </div>
 
                 <div class="col-md-3">
-                    <label for="betrag_bis" class="required form-label">{{ t('salaryrange','betrag_bis') }}</label>
+                    <label for="betrag_bis" class="required form-label">{{ t('gehaltsband','betrag_bis') }}</label>
                     <input type="number" 
                         class="form-control form-control-sm" :class="{ 'is-invalid': !validInput(currentValue.betrag_bis) && frmState.betragBisBlurred}"  
                         id="betrag_bis" maxlength="256" min="0" step="0.01"
