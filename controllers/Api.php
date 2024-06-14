@@ -40,6 +40,8 @@ class Api extends Auth_Controller
                 'getCovidState' => Api::DEFAULT_PERMISSION,
                 'getCurrentDV' => Api::DEFAULT_PERMISSION,
                 'getCourseHours' => Api::DEFAULT_PERMISSION,
+                'getAllCourseHours' => Api::DEFAULT_PERMISSION,
+                'getAllSupportHours' => Api::DEFAULT_PERMISSION,
                 'getReportData' => Api::DEFAULT_PERMISSION,
                 'personHeaderData' => Api::DEFAULT_PERMISSION,
                 'personAbteilung' => Api::DEFAULT_PERMISSION,
@@ -739,6 +741,34 @@ class Api extends Auth_Controller
         }
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
+        $this->outputJson($data);
+    }
+
+    function getAllCourseHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getAllCourseHours($uid);
+        $this->outputJson($data);
+    }
+
+    function getAllSupportHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getAllSupportHours($uid);
         $this->outputJson($data);
     }
 
@@ -2388,14 +2418,27 @@ EOSQL;
             return;
         }
 
-		if( !$payload->gueltigkeit->data->gueltig_bis )
-		{
-			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+        if (empty($payload->dvendegrund_kurzbz))
+        {
+            $this->outputJsonError('Bitte einen Beendigungsgrund auswählen.');
             return;
-		}
+        }
+
+        if ($payload->dvendegrund_kurzbz === 'sonstige' && empty($payload->dvendegrund_anmerkung))
+        {
+            $this->outputJsonError('Bitte beim Beendigungsgrund "Sonstige" eine Anmerkung eingeben.');
+            return;
+        }
+
+	if( !$payload->gueltigkeit->data->gueltig_bis )
+	{
+	    $this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+            return;
+	}
 
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
-        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
+        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis,
+	    $payload->dvendegrund_kurzbz, $payload->dvendegrund_anmerkung);
 
         if ( $ret !== TRUE) {
             return $this->outputJsonError($ret);

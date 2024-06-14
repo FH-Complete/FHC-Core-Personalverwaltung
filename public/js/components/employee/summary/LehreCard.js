@@ -9,7 +9,7 @@ export const LehreCard = {
         
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
-        const title = Vue.ref("Lehre");
+        const title = Vue.ref("Lehre/Betreuung");
         const currentDate = Vue.ref(null);
         const currentUID = Vue.toRefs(props).uid  
 
@@ -56,25 +56,121 @@ export const LehreCard = {
                 currentSemester.value = 'WS'+ currentSemester.value.substring(2)
             }
         }
+
+        const chartOptions = Vue.reactive({
+            lang: {
+                thousandsSep: '.'
+            },
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: ''
+            },
+            series: [{
+                    name: 'Lehre',
+                    data: [],
+                    color: '#6fcd98',
+                    step: 'left' // or 'center' or 'right'
+                },
+                {
+                    name: 'Betreuung',
+                    data: [],
+                    color: '#cd6fca',
+                    step: 'left' // or 'center' or 'right'
+                }, 
+            ],
+            xAxis: {
+                type: 'category',                
+                labels: {                  
+                  rotation: 90
+                },
+                /*tickPositioner: function() {
+                  return dates.value.map(function(date) {
+                    return Date.parse(date);
+                  });
+                }*/
+            },
+            tooltip: {
+                pointFormat: '<b>{point.y:,.2f}</b>',
+                
+            },
+            yAxis: {
+                //min: 0,
+                title: {
+                    text: 'Semesterstunden'
+                }
+            },
+            credits: {
+                enabled: false
+              },
+                      
+        })
+
+        // fetch chart data
+        const fetchAllCourseHours = async (dv_id, date) => {
+            isFetching.value = true
+            try {
+                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                gbtChartData.value = res.data;
+                let tempData1 = [], tempData2 = [];
+                // chartOptions.series[0].data.length = 0;
+                Object.keys(res.data.gesamt).forEach(element => {
+                   tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                });
+                res.data.abgerechnet.forEach(element => {
+                    tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
+                });
+                chartOptions.series[0].data = tempData1;
+                chartOptions.series[1].data = tempData2;
+            } catch (error) {
+                console.log(error)                
+            } finally {
+                isFetching.value = false
+            }
+           
+        }
         
         const fetchCourseHours = async () => {
             if (currentUID.value == null || currentDate.value == null) {
                 return;
             }
 			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;  
-              
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getCourseHours?uid=${currentUID.value}&semester=${currentSemester.value}`;
+			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getAllCourseHours?uid=${currentUID.value}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();
-              isFetching.value = false;              
+              isFetching.value = false;         
+              let tempData1 = [], tempData2 = [];     
 			  console.log(response.retval);	  
-              if (response.retval.length>0) {
-                courseData.value = response.retval[0];
-              } else {
-                courseData.value = null;
-              }
+              response.retval.forEach(element => {
+                tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
+            });
+                chartOptions.series[0].data = tempData1;			  			  
+			} catch (error) {
+			  console.log(error);
+              isFetching.value = false;           
+			}		
+		}
+
+        const fetchSupportHours = async () => {
+            if (currentUID.value == null || currentDate.value == null) {
+                return;
+            }
+			try {
+			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getAllSupportHours?uid=${currentUID.value}`;
+              isFetching.value = true;
+			  const res = await fetch(url)
+			  let response = await res.json();
+              isFetching.value = false;         
+              let tempData1 = [], tempData2 = [];     
+			  console.log(response.retval);	  
+              response.retval.forEach(element => {
+                tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
+            });
+                chartOptions.series[1].data = tempData1;
 			  			  
 			} catch (error) {
 			  console.log(error);
@@ -91,6 +187,7 @@ export const LehreCard = {
 			currentUID,
 			() => {
 				fetchCourseHours();
+                fetchSupportHours();
 			}
 		)
 
@@ -98,35 +195,26 @@ export const LehreCard = {
             currentSemester,
             () => {
                 fetchCourseHours();
+                fetchSupportHours();
             }
         )
       
         return {
-            courseData, isFetching, formatDate, currentSemester, title, currentUID, currentDate, incSemester, decSemester,
+            courseData, isFetching, formatDate, currentSemester, title, currentUID, currentDate, incSemester, decSemester, chartOptions,
         }
      },
      template: `
      <div class="card">
         <div class="card-header d-flex align-items-baseline">
-                <h5 class="mb-0 flex-grow-1">{{ title }}</h5>
-                <div>
-                <button type="button" class="btn btn-sm btn-primary me-2" @click="decSemester()"><i class="fa fa-minus"></i></button>
-                <span class="text-muted">{{ currentSemester }}</span>
-                <button type="button" class="btn btn-sm btn-primary ms-2" @click="incSemester()"><i class="fa fa-plus"></i></button>
-                </div>
-            </div>
-            <div class="card-body" style="text-align:center">
-            <div v-if="isFetching" class="spinner-border" role="status">
-                 <span class="visually-hidden">Loading...</span>
-            </div>     
-            <div v-if="!isFetching && courseData!=null">
-                {{ courseData.semesterstunden?.toLocaleString("de-DE", { useGrouping: true, } ) }} 
-                <span v-if="courseData.semesterstunden !== null && courseData.semesterstunden >= 0">Std/Sem</span>
-                <span v-else>-</span>
-            </div>
-            
-            
+            <h5 class="mb-0 flex-grow-1">{{ title }}</h5>               
         </div>
+        <div class="card-body" style="text-align:center">
+                <div style="width:100%;height:100%;overflow:auto">
+                    <figure>
+                        <highcharts class="chart" :options="chartOptions"></highcharts>
+                    </figure>
+                </div>
+        </div><!-- card-body -->
      </div>
      
      `
