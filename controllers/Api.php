@@ -119,6 +119,7 @@ class Api extends Auth_Controller
 	    )
 	);
 
+	$this->load->config('extensions/FHC-Core-Personalverwaltung/pvdefaults');
 	// Loads authentication library and starts authenticationfetc
 	$this->load->library('AuthLib');
         $this->load->library('vertragsbestandteil/VertragsbestandteilLib',
@@ -1741,6 +1742,11 @@ class Api extends Auth_Controller
 
                 // generate abbreviated designation
                 $kurzbzRes = $this->EmployeeModel->generateKurzbzHelper($payload['vorname'], $payload['nachname']);
+		$defaultstandort = $this->config->item('PV_DEFAULT_STANDORT_ID');
+		if($defaultstandort !== null)
+		{
+		    $employeeJson['standort_id'] = $defaultstandort;
+		}
                 if (!isError($kurzbzRes))
                 {
                     $genKurzbz = getData($kurzbzRes);
