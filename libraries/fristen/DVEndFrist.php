@@ -22,7 +22,6 @@ class DVEndFrist extends AbstractFrist {
         $parameter[$this->id_colname] = $rowdata->dienstverhaeltnis_id;
 
         $fristEreignis = [];
-        $fristEreignis['insertvon'] = getAuthUID();
         $fristEreignis['ereignis_kurzbz'] = $this->ereignis_kurzbz;
         $fristEreignis['mitarbeiter_uid'] = $rowdata->mitarbeiter_uid;
         $fristEreignis['datum'] = $rowdata->bis;
