@@ -13,6 +13,7 @@ import Issue from "./issue.js";
 import Common from "./common.js";
 import Stundensatz from "./stundensatz.js";
 import Zeit from "./zeit.js";
+import Deadline from "./deadline.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -30,4 +31,5 @@ export default {
     "Common": Common,
     "Stundensatz": Stundensatz,
     "Zeit": Zeit,
+    "Deadline": Deadline,
 };
