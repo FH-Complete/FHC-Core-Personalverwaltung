@@ -35,6 +35,9 @@ export const DeadlineIssueTable = {
       
       const fetchList = async () => {
         try {
+          if( tabulator.value !== null ) {
+            tabulator.value.dataLoader.alertLoader();
+          }
           isFetching.value = true;
           const res = await Vue.$fhcapi.Deadline.all();
           fristen.value = res.data;		          	  
@@ -67,7 +70,11 @@ export const DeadlineIssueTable = {
         }
           console.log(error);
           isFetching.value = false;           
-        }		
+        } finally {
+            if( tabulator.value !== null ) {
+                tabulator.value.dataLoader.clearAlert();
+            }
+        }
       }
 
       const fetchFristStatus = async () => {
