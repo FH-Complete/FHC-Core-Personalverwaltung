@@ -25,7 +25,6 @@ class KarenzBeginFrist extends AbstractFrist {
         $parameter[$this->id_colname] = $rowdata->vertragsbestandteil_id;
 
         $fristEreignis = [];
-        $fristEreignis['insertvon'] = getAuthUID();
         $fristEreignis['ereignis_kurzbz'] = $this->ereignis_kurzbz;
         $fristEreignis['mitarbeiter_uid'] = $rowdata->mitarbeiter_uid;
         $fristEreignis['datum'] = $rowdata->von;
