@@ -7,6 +7,7 @@
 		'vue3' => true,
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
+		'primevue3' => true,
 		'tabulator5' => true,
 		'phrases' => array(
 			'global' => array('mailAnXversandt'),

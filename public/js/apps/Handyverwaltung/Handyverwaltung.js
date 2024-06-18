@@ -28,6 +28,7 @@ import {EmailTelData} from '../../components/employee/contact/EmailTelData.js';
 import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebsmittel.js";
 
 import JobFunction from "../../components/employee/JobFunction.js";
+import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
 
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
@@ -37,7 +38,7 @@ Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 const handyVerwaltungApp = Vue.createApp({
 	data: function() {
 		return {
-                    personid: -1,
+                    personid: null,
                     personuid: 'keine'
 		};
 	},
@@ -47,7 +48,8 @@ const handyVerwaltungApp = Vue.createApp({
                 CoreVerticalsplitCmpt,
                 EmailTelData,
                 Betriebsmittel,
-                JobFunction
+                JobFunction,
+                EmployeeHeader,
 	},
     setup() {
 
@@ -172,11 +174,14 @@ const handyVerwaltungApp = Vue.createApp({
                             </template>
     
                             <template #bottom>
-                                <div>
+
+                                <EmployeeHeader v-if="personid!=null" ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" restricted ></EmployeeHeader> 
+
+                                <div v-if="personid!=null">
                                     <JobFunction :readonlyMode="true" :personID="personid" :personUID="personuid"></JobFunction>
                                 </div>
 
-                                <div class="row pt-md-4">      
+                                <div class="row pt-md-4" v-if="personid!=null">      
                                      <div class="col">
                                          <div class="card">
                                             <div class="card-header">
@@ -189,7 +194,7 @@ const handyVerwaltungApp = Vue.createApp({
                                      </div>
                                 </div>                                
     
-                                <div class="row pt-md-4">      
+                                <div class="row pt-md-4" v-if="personid!=null">      
                                      <div class="col">
                                          <div class="card">
                                             <div class="card-header">
@@ -208,6 +213,7 @@ const handyVerwaltungApp = Vue.createApp({
 `
 });
 
+handyVerwaltungApp.use(primevue.config.default);
 handyVerwaltungApp.use(Phrasen).mount('#main');
 handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 

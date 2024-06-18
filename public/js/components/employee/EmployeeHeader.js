@@ -14,16 +14,17 @@ export const EmployeeHeader = {
     props: {
         personID: Number,
         personUID: String,
+        restricted: Boolean,
     },
     expose: ['refresh'],
     emits: ['personSelected'],
     setup(props, { emit }) {
 
-        const route = VueRouter.useRoute();
-        const router = VueRouter.useRouter();
+        /* const route = VueRouter.useRoute();
+        const router = VueRouter.useRouter(); */
         const { watch, ref, onMounted } = Vue; 
-        const currentPersonID = ref(props.personID);
-        const currentPersonUID  = ref(props.personUID);
+        const currentPersonID = Vue.computed(() => { return props.personID });
+        const currentPersonUID = Vue.computed(() => { return props.personUID });
 
         const employee = ref();
         const fileInput = ref();
@@ -33,7 +34,7 @@ export const EmployeeHeader = {
         const isFetchingName = ref(false);
         const isFetchingIssues = ref(false);
         
-        const currentDate = ref(null);        
+       //const currentDate = ref(null);        
 
         const openissuescount = ref();
 
@@ -87,32 +88,29 @@ export const EmployeeHeader = {
             }
         };
 
-        watch(
-            () => route.params.uid,
-            (newVal) => {   
-                currentPersonID.value = route.params.id;
-                currentPersonUID.value = newVal;           
-                if (currentPersonID.value!=null) {
-                    fetchHeaderData(route.params.id, newVal);
-                    fetchOpenIssuesCount(route.params.id);
-                } else {
-                    previewImage.value = null;
-                    fileInput.value.value = null;
-                }
-            }
-        )
+        Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
+            if (currentPersonID.value!=null) {
+                fetchHeaderData(id, uid);
+                fetchOpenIssuesCount(id);
+            } else {
+                previewImage.value = null;
+                fileInput.value.value = null;
+            }                   
+        });
 
-        watch(
+        /* watch(
             currentDate,
             (newVal) => {
                 console.log('header date changed: ', newVal);
             }
-        )
+        ) */
 
         onMounted(() => {
-            currentDate.value = route.query.d || new Date();
-            fetchHeaderData(props.personID, props.personUID);
-            fetchOpenIssuesCount(props.personID);
+            //currentDate.value = route.query.d || new Date();
+            if (props.personID, props.personUID) {
+                fetchHeaderData(props.personID, props.personUID);
+                fetchOpenIssuesCount(props.personID);
+            }
         })
 
         // Toast 
@@ -195,18 +193,16 @@ export const EmployeeHeader = {
         }
 
         const redirect = (person_id, uid) => {
-            console.log('person_id', person_id);
-            let date = route.query.d;
-            emit('personSelected', { person_id, uid, date });
+            emit('personSelected', { person_id, uid });
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
           }
 
-        const setDateHandler = (e) => {
+        /* const setDateHandler = (e) => {
             console.log('setDateHandler', e.target.value);
             let url = route.path + '?d=' + e.target.value;
             currentDate.value = e.target.value;
             router.push(url);
-        }
+        } */
 
         const refresh = () => {
             console.log('refresh called')
@@ -234,12 +230,12 @@ export const EmployeeHeader = {
             isFetchingIssues,
             currentPersonID,
             currentPersonUID,
-            currentDate,
+            // currentDate,
             formatDate,
-            setDateHandler,
+            //setDateHandler,
             checkPerson,
             refresh,
-            openissuescount
+            openissuescount,
         }
     },
     template: `
@@ -258,7 +254,7 @@ export const EmployeeHeader = {
             
                 <div class="fotocontainer" v-if="!isFetchingName">
                     <img v-if="employee?.foto" class="rounded" style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
-                    <div v-if="employee?.foto" class="fotobutton">
+                    <div v-if="employee?.foto" class="fotobutton" v-if="!restricted">
                         <div class="d-grid gap-2 d-md-flex ">
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
                                     <i class="fa fa-xmark"></i>
@@ -272,7 +268,7 @@ export const EmployeeHeader = {
 
                 <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
                     <svg  class="bd-placeholder-img rounded" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
-                    <div class="fotobutton-visible" v-if="!isFetchingName">
+                    <div class="fotobutton-visible" v-if="!restricted && !isFetchingName">
                         <div class="d-grid gap-2 d-md-flex ">                      
                             <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
                                 <i class="fa fa-pen"></i>
@@ -289,7 +285,9 @@ export const EmployeeHeader = {
                         <div v-if="employee?.abteilung && !isFetching" class="mb-1">
                             <template v-for="(item, index) in employee?.abteilung">
                                 <strong class="text-muted">{{ item?.organisationseinheittyp_kurzbz }}</strong> {{ item?.bezeichnung }} |
-                                <strong class="text-muted">Vorgesetzte*r </strong> <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
+                                <strong class="text-muted">Vorgesetzte*r </strong> 
+                                <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)" v-if="!restricted">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
+                                <span v-else>{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</span>
                                 <br v-if="index < employee?.abteilung?.length - 1" />
                             </template>    
                             </div>  
@@ -306,7 +304,7 @@ export const EmployeeHeader = {
                         </div>  
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
                     </div>
-                    <EmployeeStatus></EmployeeStatus>
+                    <EmployeeStatus v-if="!restricted" ></EmployeeStatus>
                    
                 </div>
              
@@ -314,7 +312,7 @@ export const EmployeeHeader = {
             
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
-                    <div class="px-2">
+                    <div class="px-2" v-if="!restricted">
                         <h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
                         <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6> 
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6> 
