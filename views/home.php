@@ -6,7 +6,8 @@
 			'bootstrap5' => true,
 			'fontawesome6' => true,
       'axios027' => true,
-			'restclient' => true,      
+			'restclient' => true,
+      'tabulator5' => true,
       'vue3' => true,
       'primevue3' => true,
 			'navigationcomponent' => true, 
@@ -22,7 +23,7 @@
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/IssuesCountCard.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
                       ],
       'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'),
        
