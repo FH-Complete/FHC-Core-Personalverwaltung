@@ -75,7 +75,9 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
         $this->getJSONDataInt($this->data['dienstverhaeltnisid'], $decodedData, 'dienstverhaeltnisid');
         $this->getJSONData($this->data['unternehmen'], $decodedData, 'unternehmen');
         $this->getJSONData($this->data['vertragsart_kurzbz'], $decodedData, 'vertragsart_kurzbz');
-		$this->getJSONDataBool($this->data['checkoverlap'], $decodedData, 'checkoverlap');
+	$this->getJSONData($this->data['dvendegrund_kurzbz'], $decodedData, 'dvendegrund_kurzbz');
+	$this->getJSONData($this->data['dvendegrund_anmerkung'], $decodedData, 'dvendegrund_anmerkung');
+	$this->getJSONDataBool($this->data['checkoverlap'], $decodedData, 'checkoverlap');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
@@ -99,6 +101,14 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$this->dv->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
 			$this->dv->setOe_kurzbz($this->data['unternehmen']);
 			$this->dv->setVertragsart_kurzbz($this->data['vertragsart_kurzbz']);
+			if( array_key_exists('dvendegrund_kurzbz', $this->data) )
+			{			    
+			    $this->dv->setDvendegrund_kurzbz($this->data['dvendegrund_kurzbz']);
+			}
+			if( array_key_exists('dvendegrund_anmerkung', $this->data) )
+			{			    
+			    $this->dv->setDvendegrund_anmerkung($this->data['dvendegrund_anmerkung']);
+			}
 			$this->dv->setCheckoverlap($this->data['checkoverlap']);
 			$this->dv->setUpdatevon($editorUID);
 		}
@@ -111,6 +121,14 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
 			$data->oe_kurzbz = $this->data['unternehmen'];
 			$data->vertragsart_kurzbz = $this->data['vertragsart_kurzbz'];
+			if( array_key_exists('dvendegrund_kurzbz', $this->data) )
+			{			    
+			    $data->dvendegrund_kurzbz = $this->data['dvendegrund_kurzbz'];
+			}
+			if( array_key_exists('dvendegrund_anmerkung', $this->data) )
+			{			    
+			    $data->dvendegrund_anmerkung = $this->data['dvendegrund_anmerkung'];
+			}
 			$data->checkoverlap = $this->data['checkoverlap'];
 			$data->insertvon = $editorUID;
 			$data->insertamum = $now->format(DateTime::ATOM);
