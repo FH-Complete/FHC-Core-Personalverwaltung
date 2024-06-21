@@ -11,29 +11,29 @@ class IssueChecker extends Auth_Controller
 	const EXTENSIONS_FOLDER = 'extensions';
 	const ISSUE_RESOLVERS_FOLDER = 'issues/resolvers';
 	const CHECK_ISSUE_RESOLVED_METHOD_NAME = 'checkIfIssueIsResolved';
-	
+
 	protected $personid;
 	protected $_app;
 	protected $_extensionName;
 	protected $_codeLibMappings;
-	
+
 	protected $infos;
 	protected $errors;
 	protected $debug;
 
 
 	public function __construct() {
-        
+
         parent::__construct(
 			array(
 				'checkPerson' => self::DEFAULT_PERMISSION,
 				'countPersonOpenIssues' => self::DEFAULT_PERMISSION
 			)
 		);
-		
+
 		$this->_app = 'personalverwaltung';
 		$this->_extensionName = 'FHC-Core-Personalverwaltung';
-				
+
 		// set fehler codes which can be resolved by the job
 		// structure: fehlercode => class (library) name for resolving
 		$this->_codeLibMappings = array(
@@ -41,6 +41,7 @@ class IssueChecker extends Auth_Controller
 			'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0002' => 'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0002',
 			'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0003' => 'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0003',
 			'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0004' => 'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0004',
+			'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0005' => 'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0005',
 			'PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0001' => 'PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0001',
 			'PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0002' => 'PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0002',
 			'PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0003' => 'PERSONALVERWALTUNG_VERTRAGSBESTANDTEIL_0003',
@@ -54,23 +55,23 @@ class IssueChecker extends Auth_Controller
 			'PERSONALVERWALTUNG_FUNKTION_0001' => 'PERSONALVERWALTUNG_FUNKTION_0001',
 			'PERSONALVERWALTUNG_FUNKTION_0002' => 'PERSONALVERWALTUNG_FUNKTION_0002'
 		);
-		
+
 		$this->debug = array();
 		$this->errors = array();
 		$this->infos = array();
-		
+
 		$this->load->model('system/Issue_model', 'IssueModel');
 		$this->load->model('person/Person_model', 'PersonModel');
-		
+
 		$this->load->library('IssuesLib', null, 'IssuesLib');
-		$this->load->library('issues/PlausicheckProducerLib', 
+		$this->load->library('issues/PlausicheckProducerLib',
 			array(
-				'app' => $this->_app, 
+				'app' => $this->_app,
 				'extensionName' => $this->_extensionName
-			), 
+			),
 			'PlausicheckProducerLib'
 		);
-		$this->load->library('extensions/FHC-Core-Personalverwaltung/issues/PlausicheckDefinitionLib', 
+		$this->load->library('extensions/FHC-Core-Personalverwaltung/issues/PlausicheckDefinitionLib',
 			null, 'PlausicheckDefinitionLib');
 	}
 
@@ -80,43 +81,43 @@ class IssueChecker extends Auth_Controller
 
 		$persres = $this->PersonModel->load($this->personid);
 		$openissues = null;
-		if(hasData($persres)) 
+		if(hasData($persres))
 		{
-			if( $this->input->method(TRUE) === 'POST' ) 
+			if( $this->input->method(TRUE) === 'POST' )
 			{
 				$this->produceIssues();
 				$this->resolveIssues();
 				$this->produceIssues();
 			}
-			else 
+			else
 			{
 				$this->errors[] = 'Not called via POST so Plausichecks were not executed.';
-			}		
+			}
 			$openissues = $this->countOpenIssues();
 		}
-		else 
+		else
 		{
 			$this->errors[] = 'Person with id ' . $this->personid . ' not found.';
-		}		
-		
+		}
+
 		$data = array(
-			'personid' => $this->personid, 
+			'personid' => $this->personid,
 			'openissues' => $openissues
 		);
-		
+
 		$meta = array(
 			'errors' => $this->errors,
 			'infos' => $this->infos
 		);
-		if(self::DEBUG) 
+		if(self::DEBUG)
 		{
 			$meta['mapping'] = $this->PlausicheckDefinitionLib->getFehlerLibMappings();
 			$meta['debug'] = $this->debug;
 		}
-		
+
 		$this->outputJson(
 			array(
-				'data' => $data, 
+				'data' => $data,
 				'meta' => $meta
 			)
 		);
@@ -128,7 +129,7 @@ class IssueChecker extends Auth_Controller
 		$this->personid = intval($personid);
 		$persres = $this->PersonModel->load($this->personid);
 		$openissues = null;
-		if(hasData($persres)) 
+		if(hasData($persres))
 		{
 			$openissues = $this->countOpenIssues();
 		}
@@ -138,29 +139,29 @@ class IssueChecker extends Auth_Controller
 		}
 
 		$data = array(
-			'personid' => $this->personid, 
+			'personid' => $this->personid,
 			'openissues' => $openissues
 		);
-		
+
 		$meta = array(
 			'errors' => $this->errors,
 			'infos' => $this->infos
 		);
-		if(self::DEBUG) 
+		if(self::DEBUG)
 		{
 			$meta['mapping'] = $this->PlausicheckDefinitionLib->getFehlerLibMappings();
 			$meta['debug'] = $this->debug;
 		}
-		
+
 		$this->outputJson(
 			array(
-				'data' => $data, 
+				'data' => $data,
 				'meta' => $meta
 			)
 		);
 		return;
-	}	
-	
+	}
+
 	protected function produceIssues()
 	{
 		foreach ( $this->PlausicheckDefinitionLib->getFehlerLibMappings() as $fehler_kurzbz => $libName)
@@ -172,12 +173,12 @@ class IssueChecker extends Auth_Controller
 					'person_id' => $this->personid
 				)
 			);
-			
-			if(self::DEBUG) 
+
+			if(self::DEBUG)
 			{
 				$this->debug[$fehler_kurzbz] = $plausicheckRes;
 			}
-			
+
 			if (hasData($plausicheckRes))
 			{
 				$plausicheckData = getData($plausicheckRes);
@@ -202,8 +203,8 @@ class IssueChecker extends Auth_Controller
 			}
 		}
 	}
-	
-	protected function countOpenIssues() 
+
+	protected function countOpenIssues()
 	{
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
@@ -217,15 +218,15 @@ class IssueChecker extends Auth_Controller
 			$this->errors[] = getError($openIssuesRes);
 			return null;
 		}
-		
+
 		$issues = getData($openIssuesRes);
-		$issuescount = (is_array($issues) || $issues instanceof Countable) 
-					 ? count($issues) 
+		$issuescount = (is_array($issues) || $issues instanceof Countable)
+					 ? count($issues)
 					 : 0;
 		return $issuescount;
 	}
-	
-	protected function resolveIssues() 
+
+	protected function resolveIssues()
 	{
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
