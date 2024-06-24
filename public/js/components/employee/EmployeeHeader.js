@@ -254,7 +254,7 @@ export const EmployeeHeader = {
             
                 <div class="fotocontainer" v-if="!isFetchingName">
                     <img v-if="employee?.foto" class="rounded" style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
-                    <div v-if="employee?.foto" class="fotobutton" v-if="!restricted">
+                    <div v-if="employee?.foto && !restricted" class="fotobutton" >
                         <div class="d-grid gap-2 d-md-flex ">
                                 <button type="button" class="btn btn-outline-dark btn-sm" @click="showDeleteModal">
                                     <i class="fa fa-xmark"></i>
