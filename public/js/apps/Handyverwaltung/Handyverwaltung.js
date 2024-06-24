@@ -29,9 +29,11 @@ import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebs
 
 import JobFunction from "../../components/employee/JobFunction.js";
 import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
+import { EmployeeContractInfo } from "../../components/employee/contract/EmployeeContractInfo.js";
 
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
+import karenz from "../../api/vbform/karenz.js";
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -50,6 +52,7 @@ const handyVerwaltungApp = Vue.createApp({
                 Betriebsmittel,
                 JobFunction,
                 EmployeeHeader,
+                EmployeeContractInfo,                
 	},
     setup() {
 
@@ -67,6 +70,8 @@ const handyVerwaltungApp = Vue.createApp({
 		const orte = fetchHelper(typeDefinition.fetchOrte);
 		const kontakttyp = fetchHelper(typeDefinition.fetchKontakttyp);
 		const adressentyp = fetchHelper(typeDefinition.fetchAdressentyp);
+        const vertragsarten = fetchHelper(typeDefinition.fetchVertragsarten);
+        const karenztypen = fetchHelper(typeDefinition.fetchKarenztypen)
 
 		Vue.provide("sprache",sprache);
 		Vue.provide("nations",nations);
@@ -75,6 +80,8 @@ const handyVerwaltungApp = Vue.createApp({
 		Vue.provide("kontakttyp",kontakttyp);
 		Vue.provide("adressentyp",adressentyp);
 		Vue.provide("cisRoot", CIS_ROOT)
+        Vue.provide("vertragsarten", vertragsarten)
+        Vue.provide("karenztypen", karenztypen)
 	},
 	methods: {
             // Tabulator handler for the rowClick event
@@ -176,6 +183,8 @@ const handyVerwaltungApp = Vue.createApp({
                             <template #bottom>
 
                                 <EmployeeHeader v-if="personid!=null" ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" restricted ></EmployeeHeader> 
+
+                                <EmployeeContractInfo v-if="personid!=null" ref="contractInfoRef"  :personID="personid" :personUID="personuid" />
 
                                 <div v-if="personid!=null">
                                     <JobFunction :readonlyMode="true" :personID="personid" :personUID="personuid"></JobFunction>

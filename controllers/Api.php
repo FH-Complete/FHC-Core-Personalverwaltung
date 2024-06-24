@@ -109,6 +109,7 @@ class Api extends Auth_Controller
                 'timeRecordingByPerson' => Api::DEFAULT_PERMISSION,
                 'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
                 'getFristenListe' => Api::DEFAULT_PERMISSION,
+        'dvInfoByPerson' => Api::DEFAULT_PERMISSION,
 	    )
 	);
 
@@ -1601,6 +1602,55 @@ class Api extends Auth_Controller
 
 
         return $this->outputJson($data);
+    }
+
+    // DV short info
+    function dvInfoByPerson()
+    {
+        $person_uid = $this->input->get('uid', TRUE);
+
+        if (!$person_uid)
+        {
+            $this->outputJsonError('invalid parameter person_uid');
+            exit;
+        }
+
+        $dvData = $this->DVModel->getDVByPersonUID($person_uid);
+
+        if (isError($dvData)) {
+            $this->outputJsonError('error fetching dv: '.$dvData->retval);
+            return;
+        }
+        
+        
+        $dvList = array();
+        if (is_array($dvData->retval) && count($dvData->retval) > 0) {
+            $dvList = $dvData->retval;
+        } else {
+            $this->outputJsonError('no DV found');
+            return;
+        }
+
+        //$date = DateTime::createFromFormat( 'U', $stichtag);
+        $date = new DateTimeImmutable( 'now', new DateTimeZone('Europe/Vienna'));
+		//$date->setTimezone(new DateTimeZone('Europe/Vienna'));
+        $datestring = $date->format("Y-m-d");
+
+        $retval = array();
+        foreach ($dvList as $value) {
+            $dbData = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
+                intval($value->dienstverhaeltnis_id), $datestring);
+    
+            // remove secret data
+            $dbDataFiltered = array_filter($dbData, function($v) {
+                return $v->getVertragsbestandteiltyp_kurzbz() == 'stunden' ||
+                    $v->getVertragsbestandteiltyp_kurzbz() == 'karenz';
+            });
+
+            $retval[] = array('dv' => $value, 'vb' => $dbDataFiltered);            
+        }          
+
+        return $this->outputJsonSuccess(array("dvList" => $retval ));
     }
 
     // ----------------------------------------
