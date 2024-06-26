@@ -1642,10 +1642,10 @@ class Api extends Auth_Controller
                 intval($value->dienstverhaeltnis_id), $datestring);
     
             // remove secret data
-            $dbDataFiltered = array_filter($dbData, function($v) {
+            $dbDataFiltered = array_values(array_filter($dbData, function($v) {
                 return $v->getVertragsbestandteiltyp_kurzbz() == 'stunden' ||
                     $v->getVertragsbestandteiltyp_kurzbz() == 'karenz';
-            });
+            }));
 
             $retval[] = array('dv' => $value, 'vb' => $dbDataFiltered);            
         }          
