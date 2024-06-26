@@ -1615,7 +1615,12 @@ class Api extends Auth_Controller
             exit;
         }
 
-        $dvData = $this->DVModel->getDVByPersonUID($person_uid);
+        //$date = DateTime::createFromFormat( 'U', $stichtag);
+        $date = new DateTimeImmutable( 'now', new DateTimeZone('Europe/Vienna'));
+		//$date->setTimezone(new DateTimeZone('Europe/Vienna'));
+        $datestring = $date->format("Y-m-d");
+
+        $dvData = $this->DVModel->getDVByPersonUID($person_uid, null, $datestring);
 
         if (isError($dvData)) {
             $this->outputJsonError('error fetching dv: '.$dvData->retval);
@@ -1630,11 +1635,6 @@ class Api extends Auth_Controller
             $this->outputJsonError('no DV found');
             return;
         }
-
-        //$date = DateTime::createFromFormat( 'U', $stichtag);
-        $date = new DateTimeImmutable( 'now', new DateTimeZone('Europe/Vienna'));
-		//$date->setTimezone(new DateTimeZone('Europe/Vienna'));
-        $datestring = $date->format("Y-m-d");
 
         $retval = array();
         foreach ($dvList as $value) {

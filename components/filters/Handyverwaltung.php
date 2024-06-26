@@ -7,7 +7,7 @@
 		    SELECT 
 			    b.uid AS "UID", p.person_id AS "PersonId",
 			    p.vorname AS "Vorname", p.nachname AS "Nachname",
-			    b.alias || \'@' . DOMAIN . '\' AS "EMail", u.bezeichnung AS "Unternehmen",
+			    COALESCE(b.alias, b.uid) || \'@' . DOMAIN . '\' AS "EMail", u.bezeichnung AS "Unternehmen",
 			    va.bezeichnung AS "Vertragsart", d.von AS "DV_von", d.bis AS "DV_bis",
 			    ws.wochenstunden AS "Wochenstunden", ws.von AS "WS_von", ws.bis AS "WS_bis",
 			    \'[\' || kst.ksttypbezeichnung || \'] \' || kst.bezeichnung as "Standardkostenstelle",
