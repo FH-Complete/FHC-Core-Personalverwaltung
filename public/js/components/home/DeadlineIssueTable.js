@@ -1,8 +1,8 @@
 import { Toast } from "../Toast.js";
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 
-export const DeadlineIssueTable = {    
+export const DeadlineIssueTable = {
   components: {
     Toast,
   },
@@ -24,15 +24,15 @@ export const DeadlineIssueTable = {
       const dateFormatter = (cell) => {
         return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
       }
-      
+
       const selectedData = Vue.ref([]);
-      
+
       const redirect = (issue_id) => {
         console.log('issue_id', person_id);
         emit('issueSelected', person_id);
         // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
-      }   
-      
+      }
+
       const fetchList = async () => {
         try {
           if( tabulator.value !== null ) {
@@ -40,8 +40,8 @@ export const DeadlineIssueTable = {
           }
           isFetching.value = true;
           const res = await Vue.$fhcapi.Deadline.all();
-          fristen.value = res.data;		          	  
-          isFetching.value = false;                        
+          fristen.value = res.data;
+          isFetching.value = false;
         } catch (error) {const columnsDef = [
           { title: 'Ereignis', field: "ereignis_bezeichnung", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
           { title: 'MitarbeiterIn', field: "nachname", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
@@ -49,27 +49,27 @@ export const DeadlineIssueTable = {
           { title: 'To Do', field: "bezeichnung", hozAlign: "right", width: 140, headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
           { title: 'Status', field: "status_bezeichnung", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
         ];
-  
+
         function customHeaderFilter(headerValue, rowValue, rowData, filterParams){
           //headerValue - the value of the header filter element
           //rowValue - the value of the column in this row
           //rowData - the data for the row being filtered
           //filterParams - params object passed to the headerFilterFuncParams property
-      
+
           const validDate = function(d){
               return d instanceof Date && isFinite(d);
           }
-  
+
           const date1 = new Date(rowValue);
           date1.setHours(0,0,0,0);
           let [day, month, year] = headerValue.split('.')
           if (year < 1000) return true;  // prevents dates like 17.5.2
           const date2 = new Date(+year, +month - 1, +day);
-          
+
           return  !(validDate(date2)) || ((date2 - date1) == 0); //must return a boolean, true if it passes the filter.
         }
           console.log(error);
-          isFetching.value = false;           
+          isFetching.value = false;
         } finally {
             if( tabulator.value !== null ) {
                 tabulator.value.dataLoader.clearAlert();
@@ -81,27 +81,27 @@ export const DeadlineIssueTable = {
         try {
             isFetching.value = true;
             const res = await Vue.$fhcapi.Deadline.getFristenStatus();
-            fristStatus.value = res.data;			  
-            isFetching.value = false;                        
+            fristStatus.value = res.data;
+            isFetching.value = false;
         } catch (error) {
             console.log(error);
-            isFetching.value = false;           
-        }	
+            isFetching.value = false;
+        }
       }
 
       const updateDeadlines = async () => {
         try {
           isFetching.value = true;
           const res = await Vue.$fhcapi.Deadline.updateFristenListe();
-          isFetching.value = false;              
-          fetchList();		            
+          isFetching.value = false;
+          fetchList();
           showRefreshToast();
         } catch (error) {
           console.log(error);
-          isFetching.value = false;           
-        }		
+          isFetching.value = false;
+        }
       }
-  
+
       Vue.onMounted(async () => {
           fetchFristStatus();
           await fetchList();
@@ -111,7 +111,7 @@ export const DeadlineIssueTable = {
             const person_id = cell.getRow().getData().person_id;
             const uid = cell.getRow().getData().mitarbeiter_uid;
             const maName = cell.getRow().getData().ma_name;
-            const protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+            const protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const url = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}/summary`;
 
             return cell.getValue() != null ? `<a href="${url}">${maName}</a>` : '';
@@ -121,7 +121,7 @@ export const DeadlineIssueTable = {
           const rowFormatter = (row) => {
             let data = row.getData();
             let now = new Date(new Date().setHours(0, 0, 0, 0));
-        
+
             if(data.status_kurzbz == "erledigt"){
                 //row.getElement().childNodes[5].style.backgroundColor = "#0080004d"
                 row.getElement().childNodes[5].style.color = "#198754"
@@ -149,14 +149,14 @@ export const DeadlineIssueTable = {
             { title: 'MitarbeiterIn', field: "ma_name", formatter: maFormatter, hozAlign: "left", headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
             { title: 'Deadline', field: "datum", hozAlign: "center", headerFilter:true,formatter: dateFormatter, headerFilterFunc:customHeaderFilter },
             { title: 'To Do', field: "bezeichnung", hozAlign: "right", width: 140, headerFilter:true, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-            { title: 'Status', field: "status_bezeichnung", hozAlign: "center", width: 140, sorter:"string", 
+            { title: 'Status', field: "status_bezeichnung", hozAlign: "center", width: 140, sorter:"string",
                 headerFilter:"list",
                 headerFilterParams: {valuesLookup:() => fristStatus.value.map((element) => ({label: element.bezeichnung, value: element.status_kurzbz })) },
             },
-          ];    
+          ];
 
           let tabulatorOptions = {
-            maxHeight:"400px", 
+            maxHeight:"400px",
             layout: "fitColumns",
             movableColumns: true,
             reactiveData: true,
@@ -165,7 +165,7 @@ export const DeadlineIssueTable = {
             footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
             rowFormatter: rowFormatter,
           };
-    
+
           tabulator.value = new Tabulator(
             tableRef.value,
             tabulatorOptions
@@ -186,45 +186,45 @@ export const DeadlineIssueTable = {
           Vue.watch(fristen, (newVal, oldVal) => {
               console.log('fristenList changed');
               tabulator.value?.setData(fristen.value);
-          }, {deep: true})          
-    
+          }, {deep: true})
+
           function customHeaderFilter(headerValue, rowValue, rowData, filterParams){
             //headerValue - the value of the header filter element
             //rowValue - the value of the column in this row
             //rowData - the data for the row being filtered
             //filterParams - params object passed to the headerFilterFuncParams property
-        
+
             const validDate = function(d){
                 return d instanceof Date && isFinite(d);
             }
-    
+
             const date1 = new Date(rowValue);
             date1.setHours(0,0,0,0);
             let [day, month, year] = headerValue.split('.')
             if (year < 1000) return true;  // prevents dates like 17.5.2
             const date2 = new Date(+year, +month - 1, +day);
-            
+
             return  !(validDate(date2)) || ((date2 - date1) == 0); //must return a boolean, true if it passes the filter.
           }
       })
 
-      const updateStatus = async () => {          
+      const updateStatus = async () => {
           let fristen = selectedData.value.map((element) => parseInt(element.frist_id))
-          console.log('fristen', fristen) 
+          console.log('fristen', fristen)
           try  {
             isFetching.value = true
-            const res = await Vue.$fhcapi.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);    
+            const res = await Vue.$fhcapi.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);
             fetchList();
-            showToast();     
+            showToast();
           } catch (error) {
-              console.log(error);                
+              console.log(error);
           } finally {
               isFetching.value = false;
-          }     
+          }
       }
 
       const onPersonSelect = (uid, person_id) => {
-        let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+        let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}/summary`;
       }
 
@@ -236,7 +236,7 @@ export const DeadlineIssueTable = {
         }
       }
 
-      // Toast 
+      // Toast
       const updateStatusToastRef = Vue.ref()
       const refreshDeadlinesToastRef = Vue.ref()
 
@@ -248,7 +248,7 @@ export const DeadlineIssueTable = {
         refreshDeadlinesToastRef.value.show()
       }
 
-      return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef, isFetching, fristStatus, current_status_kurzbz, 
+      return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef, isFetching, fristStatus, current_status_kurzbz,
         updateStatus, updateStatusToastRef, refreshDeadlinesToastRef, t, selectedData }
     },
   template: `
@@ -266,15 +266,15 @@ export const DeadlineIssueTable = {
     </div>
 
     <div id="master" class="d-flex flex-column  pt-4 pb-1 mb-1">
-                        
+
       <div class="me-auto">
-        <h4 class="h4">Termine & Fristen<span v-if="fristen != null  && fristen.length > 0"> ({{ fristen.length }})</span>           
-        </h4>   
-        
-        
+        <h4 class="h4">Termine & Fristen<span v-if="fristen != null  && fristen.length > 0"> ({{ fristen.length }})</span>
+        </h4>
+
+
       </div>
 
-      <div class="d-flex align-items-start flex-column">        
+      <div class="d-flex align-items-start flex-column">
         <div class="d-grid d-sm-flex gap-2 mb-2 mt-4 flex-nowrap align-items-center">
           <button type="button" class="btn btn-sm btn-primary " @click="updateDeadlines"><i class="fas fa-sync"></i></button>
           <div style="flex-shrink: 0">Mit {{ selectedData.length }} ausgewählten: </div>
@@ -287,7 +287,7 @@ export const DeadlineIssueTable = {
           <button type="button" class="btn btn-sm btn-primary me-2 text-nowrap" @click="updateStatus" :class="{'disabled':current_status_kurzbz==''}">
             <i class="fas fa-pencil"></i>
             setzen
-          </button> 
+          </button>
         </div>
       </div>
   </div>
@@ -298,6 +298,6 @@ export const DeadlineIssueTable = {
 
   </div>
   <div v-if="fristen != null && fristen.length == 0 && !isFetching" >0 Datensätze vorhanden.</div>
-  
+
   `
 }
