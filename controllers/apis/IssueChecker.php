@@ -58,24 +58,26 @@ class IssueChecker extends Auth_Controller
 
 		$this->load->library('IssuesLib', null, 'IssuesLib');
 		$this->load->library(
+			'extensions/FHC-Core-Personalverwaltung/issues/PlausicheckDefinitionLib',
+			null,
+			'PlausicheckDefinitionLib'
+		);
+		$this->load->library(
 			'issues/PlausicheckProducerLib',
 			array(
 				'app' => $this->_app,
-				'extensionName' => $this->_extensionName
+				'extensionName' => $this->_extensionName,
+				'fehlerLibMappings' => $this->PlausicheckDefinitionLib->getFehlerLibMappings()
 			),
 			'PlausicheckProducerLib'
 		);
 		$this->load->library(
 			'issues/PlausicheckResolverLib',
 			array(
-				'extensionName' => $this->_extensionName
+				'extensionName' => $this->_extensionName,
+				'codeLibMappings' => $this->_codeLibMappings
 			),
 			'PlausicheckResolverLib'
-		);
-		$this->load->library(
-			'extensions/FHC-Core-Personalverwaltung/issues/PlausicheckDefinitionLib',
-			null,
-			'PlausicheckDefinitionLib'
 		);
 	}
 
@@ -169,7 +171,6 @@ class IssueChecker extends Auth_Controller
 	protected function produceIssues()
 	{
 		$result = $this->PlausicheckProducerLib->producePlausicheckIssues(
-			$this->PlausicheckDefinitionLib->getFehlerLibMappings(),
 			array('person_id' => $this->personid)
 		);
 
@@ -214,7 +215,7 @@ class IssueChecker extends Auth_Controller
 		{
 			$openIssues = getData($openIssuesRes);
 
-			$result = $this->PlausicheckResolverLib->resolvePlausicheckIssues($this->_codeLibMappings, $openIssues);
+			$result = $this->PlausicheckResolverLib->resolvePlausicheckIssues($openIssues);
 
 			// log if error, or log info if inserted new issue
 			if (isset($result->errors))
