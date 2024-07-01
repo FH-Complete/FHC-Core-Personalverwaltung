@@ -8,20 +8,45 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 {
 	const ALLE_GBS = false;
 	const NUR_ZU_VALORISIERENDE_GBS = true;
-	
+
+	protected $ci; // code igniter instance
 	protected $dienstverhaeltnis;
 	protected $vertragsbestandteile;
 	protected $gehaltsbestandteile;
 	protected $params;
-	
+
 	public function __construct()
 	{
+		// get ci instance
+		$this->ci =& get_instance();
+
+		// load config
+		$this->ci->load->config('extensions/FHC-Core-Personalverwaltung/valorisierung');
+
 		$this->dienstverhaeltnis = null;
 		$this->vertragsbestandteile = null;
 		$this->gehaltsbestandteile = null;
 		$this->params = null;
 	}
-	
+
+	public function checkParams()
+	{
+		if (!isset($params->kriterien) || !is_object($params->kriterien))
+		{
+			throw new Exception('Kriterien parameter missing or wrong type');
+		}
+
+		if (!isset($params->valorisierung) || !is_object($params->valorisierung))
+		{
+			throw new Exception('Valorisierung parameter missing or wrong type');
+		}
+
+		//~ if( !isset($this->params->mingehalt) || !is_numeric($this->params->mingehalt) )
+		//~ {>
+			//~ throw new Exception('Parameter mingehalt missing or not numeric');
+		//~ }
+	}
+
 	public function initialize($dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params)
 	{
 		$this->dienstverhaeltnis = $dienstverhaeltnis;
@@ -29,13 +54,37 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		$this->gehaltsbestandteile = $gehaltsbestandteile;
 		$this->params = $params;
 	}
-	
+
+	public function checkIfApplicable()
+	{
+		$sumsalary = $this->calcSummeGehaltsbestandteile();
+
+		$kriterien = $this->params->kriterien;
+
+		if( isset($kriterien->mingehalt) && $sumsalary < $kriterien->mingehalt )
+		{
+			return false;
+		}
+
+		if( isset($kriterien->maxgehalt) && $sumsalary > $kriterien->maxgehalt )
+		{
+			return false;
+		}
+
+		if( isset($kriterien->stichtag) && new DateTime($this->dienstverhaeltnis->getVon()) > new DateTime($kriterien->stichtag) )
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	public function calcSummeGehaltsbestandteile($mode=self::ALLE_GBS)
 	{
 		$sumsalary = 0;
-		foreach( $this->gehaltsbestandteile as $gehaltsbestandteil ) 
+		foreach( $this->gehaltsbestandteile as $gehaltsbestandteil )
 		{
-			if( ($mode === self::NUR_ZU_VALORISIERENDE_GBS) 
+			if( ($mode === self::NUR_ZU_VALORISIERENDE_GBS)
 				&& !$gehaltsbestandteil->getValorisierung() )
 			{
 				continue;

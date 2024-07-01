@@ -6,30 +6,11 @@
  */
 class ValorisierungFixBetrag extends AbstractValorisationMethod
 {
-	public function checkIfApplicable()
-	{
-		$sumsalary = $this->calcSummeGehaltsbestandteile();
-		
-		if( $sumsalary > $this->params->minsalary )
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
 	public function checkParams()
 	{
-		if( !isset($this->params->fixbetrag) || !is_numeric($this->params->fixbetrag) )
+		if( !isset($this->params->valorisierung->fixbetrag) || !is_numeric($this->params->valorisierung->fixbetrag) )
 		{
 			throw new Exception('Parameter fixbetrag missing or not numeric');
-		}
-		
-		if( !isset($this->params->minsalary) || !is_numeric($this->params->minsalary) )
-		{
-			throw new Exception('Parameter minsalary missing or not numeric');
 		}
 	}
 
@@ -42,7 +23,7 @@ class ValorisierungFixBetrag extends AbstractValorisationMethod
 			if( $gehaltsbestandteil->getValorisierung() )
 			{
 				$fraction = $gehaltsbestandteil->getBetrag_valorisiert() / $sumsalary;
-				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() + ($this->params->fixbetrag * $fraction);
+				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() + ($this->params->valorisierung->fixbetrag * $fraction);
 				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
  			}
 		}

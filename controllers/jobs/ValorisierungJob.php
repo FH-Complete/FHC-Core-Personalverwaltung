@@ -4,9 +4,9 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class ValorisierungJob extends JOB_Controller
 {
-	
+
 	private $_ci; // Code igniter instance
-	
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -24,28 +24,28 @@ class ValorisierungJob extends JOB_Controller
 
 	public function do($valorisierung_kurzbz, $dienstverhaeltnis_id=null)
 	{
-		if( !$valorisierung_kurzbz ) 
+		if( !$valorisierung_kurzbz )
 		{
 			echo "missing parameter valorisierung_kurzbz\n";
 		}
-		
+
 		echo "ValorisierungKurzbz: " . $valorisierung_kurzbz . "\n";
 		echo "DienstverhaeltnisId: " . $dienstverhaeltnis_id . "\n";
-		
+
 		$valinstanz = $this->ValorisierungInstanz_model->loadValorisierungInstanzByKurzbz($valorisierung_kurzbz);
 		if( is_null($valinstanz) )
 		{
 			die('Valorisierung Instanz ' . $valorisierung_kurzbz . ' not found.' . "\n");
 		}
-		
+
 		$dienstverhaeltnis = $this->VertragsbestandteilLib->fetchDienstverhaeltnis($dienstverhaeltnis_id);
-		$vertragsbestandteile = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dienstverhaeltnis_id, 
+		$vertragsbestandteile = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dienstverhaeltnis_id,
 			$valinstanz->valorisierungsdatum, false);
-		$gehaltsbestandteile = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, 
+		$gehaltsbestandteile = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id,
 			$valinstanz->valorisierungsdatum, false);
-		
+
 		$valinstanzmethoden = $this->ValorisierungInstanzMethod_model->loadValorisierungInstanzByKurzbz($valinstanz->valorisierung_instanz_id);
-		
+
 		$usedvalinstances = array();
 		foreach ($valinstanzmethoden as $valinstanzmethod)
 		{
@@ -59,17 +59,15 @@ class ValorisierungJob extends JOB_Controller
 			}
 		}
 
-		if(count($usedvalinstances) < 1) 
-		{
-			throw Exception('ERROR: no Valorisation Method applicable.');
-		}
-		
-		if(count($usedvalinstances) > 1) 
+		if(count($usedvalinstances) > 1)
 		{
 			throw Exception('ERROR: more than one Valorisation Method applicable.');
 		}
-		
-		$usedvalinstanz = $usedvalinstances[0];
-		$usedvalinstanz->doValorisation();
+
+		if(count($usedvalinstances) == 1)
+		{
+			$usedvalinstanz = $usedvalinstances[0];
+			$usedvalinstanz->doValorisation();
+		}
 	}
 }

@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_methode (
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_methode TO vilesci;
 
-INSERT INTO hr.tbl_valorisierung_methode (valorisierung_methode_kurzbz, beschreibung) VALUES 
-    ('ValorisierungProzent', 'Valorisierung um einen Prozentsatz'), 
+INSERT INTO hr.tbl_valorisierung_methode (valorisierung_methode_kurzbz, beschreibung) VALUES
+    ('ValorisierungProzent', 'Valorisierung um einen Prozentsatz'),
     ('ValorisierungFixBetrag', 'Valorisierung um einen fixen Betrag'),
     ('ValorisierungGestaffelt', 'mehrere Stufen mit unterschiedlichen Prozentwerten')
 ON CONFLICT(valorisierung_methode_kurzbz) DO NOTHING;
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz (
     valorisierungsdatum date NOT NULL,
     valorisierung_kurzbz character varying(128) NOT NULL,
     beschreibung text,
-    dryrun boolean DEFAULT true NOT NULL,
+    ausgewaehlt boolean DEFAULT false NOT NULL, -- beschlossen
     CONSTRAINT tbl_valorisierung_instanz_pkey PRIMARY KEY (valorisierung_instanz_id)
 );
 
@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz_methode (
     valorisierung_methode_kurzbz character varying(32) NOT NULL,
     beschreibung text,
     valorisierung_methode_parameter jsonb NOT NULL,
-    CONSTRAINT tbl_valorisierung_instanz_methode_pkey PRIMARY KEY (valorisierung_instanz_id, valorisierung_methode_kurzbz), 
-    CONSTRAINT tbl_valorisierung_instanz_methode_fk1 FOREIGN KEY (valorisierung_instanz_id) REFERENCES hr.tbl_valorisierung_instanz(valorisierung_instanz_id) ON UPDATE CASCADE ON DELETE RESTRICT, 
+    CONSTRAINT tbl_valorisierung_instanz_methode_pkey PRIMARY KEY (valorisierung_instanz_id, valorisierung_methode_kurzbz),
+    CONSTRAINT tbl_valorisierung_instanz_methode_fk1 FOREIGN KEY (valorisierung_instanz_id) REFERENCES hr.tbl_valorisierung_instanz(valorisierung_instanz_id) ON UPDATE CASCADE ON DELETE RESTRICT,
     CONSTRAINT tbl_valorisierung_instanz_methode_fk2 FOREIGN KEY (valorisierung_methode_kurzbz) REFERENCES hr.tbl_valorisierung_methode(valorisierung_methode_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT
 );
 

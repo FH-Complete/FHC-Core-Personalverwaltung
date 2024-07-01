@@ -6,29 +6,16 @@
  */
 class ValorisierungProzent extends AbstractValorisationMethod
 {
-	public function checkIfApplicable()
-	{
-		$sumsalary = $this->calcSummeGehaltsbestandteile();
-		if( $sumsalary <= $this->params->maxsalary )
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
 	public function checkParams()
 	{
-		if( !isset($this->params->prozent) || !is_numeric($this->params->prozent) )
+		if( !isset($this->params->valorisierung->prozent) || !is_numeric($this->params->valorisierung->prozent) )
 		{
 			throw new Exception('Parameter prozent missing or not numeric');
 		}
-		
-		if( !isset($this->params->maxsalary) || !is_numeric($this->params->maxsalary) )
+
+		if( !isset($this->params->kriterien->maxgehalt) || !is_numeric($this->params->kriterien->maxgehalt) )
 		{
-			throw new Exception('Parameter maxsalary missing or not numeric');
+			throw new Exception('Parameter maxgehalt missing or not numeric');
 		}
 	}
 
@@ -39,7 +26,7 @@ class ValorisierungProzent extends AbstractValorisationMethod
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
 			if( $gehaltsbestandteil->getValorisierung() )
 			{
-				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() * (1 + $this->params->prozent / 100);
+				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() * (1 + $this->params->valorisierung->prozent / 100);
 				$gehaltsbestandteil->setBetrag_valorisiert($betrag_valorisiert);
  			}
 		}

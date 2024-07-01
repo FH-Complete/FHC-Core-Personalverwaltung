@@ -19,18 +19,14 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		$this->wochenstunden = null;
 		$this->sumvalsalary = null;
 		$this->sumvalsalaryfte = null;
-	}
-
-	public function checkIfApplicable()
-	{
-		return true;
+		$this->fulltimehours = $this->ci->config->item('VAL_FULLTIME_HOURS');
 	}
 
 	public function checkParams()
 	{
-		if( !isset($this->params->steps) || !is_array($this->params->steps) )
+		if( !isset($this->params->valorisierung->stufen) || !is_array($this->params->valorisierung->stufen) )
 		{
-			throw new Exception('Parameter steps missing or not an array');
+			throw new Exception('Parameter stufen missing or not an array');
 		}
 	}
 
@@ -38,90 +34,92 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 	{
 		$this->fetchWochenstunden();
 		$this->scaleSumsalaryToFTE();
-		
+
 		$this->calcGehaltsbestandteilAnteile();
-		
+
 		$this->valoriseSteps();
-		
+
 		$this->distributeValorisationToGehaltsbestandteile();
 	}
-	
+
 	protected function fetchWochenstunden()
 	{
-		foreach($this->vertragsbestandteile as $vb) 
+		foreach($this->vertragsbestandteile as $vb)
 		{
-			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'stunden' ) 
+			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'stunden' )
 			{
 				$this->wochenstunden = $vb->getWochenstunden();
 			}
-		}		
+		}
 	}
-	
+
 	protected function calcGehaltsbestandteilAnteile()
 	{
 		$sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_GBS);
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			if( $gehaltsbestandteil->getValorisierung() ) 
+			if( $gehaltsbestandteil->getValorisierung() )
 			{
 				$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert() / $sumvalsalary;
  			}
-		}		
+		}
 	}
-	
+
 	protected function scaleSumsalaryToFTE()
 	{
 		$this->sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_GBS);
-		if( floatval($this->wochenstunden) < floatval('38.5') )
+		if( floatval($this->wochenstunden) < floatval($this->fulltimehours) )
 		{
-			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval('38.5');
+			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval($this->fulltimehours);
 		}
-		else 
+		else
 		{
 			$this->sumvalsalaryfte = $this->sumvalsalary;
 		}
 	}
-	
+
 	protected function valoriseSteps()
 	{
 		$scalefactor_fte2pt = 1;
-		if( $this->wochenstunden < floatval('38.5') )
+		if( $this->wochenstunden < floatval($this->fulltimehours) )
 		{
-			$scalefactor_fte2pt = 1 / floatval('38.5') * floatval($this->wochenstunden);
+			$scalefactor_fte2pt = 1 / floatval($this->fulltimehours) * floatval($this->wochenstunden);
 		}
-		
+
 		$this->valorisation = 0;
-		foreach($this->params->steps as $idx => $step) 
+		foreach($this->params->valorisierung->stufen as $idx => $step)
 		{
-			if( $this->sumvalsalaryfte > $step->lowerbound )
+			if( $this->sumvalsalaryfte > $step->untergrenze )
 			{
-				if( $step->upperbound !== NULL && $this->sumvalsalaryfte > $step->upperbound )
+				if( $step->obergrenze !== NULL && $this->sumvalsalaryfte > $step->obergrenze )
 				{
-					$stepsum = $step->upperbound - $step->lowerbound;
+					$stepsum = $step->obergrenze - $step->untergrenze;
 				}
 				else
 				{
-					$stepsum = $this->sumvalsalaryfte - $step->lowerbound;
+					$stepsum = $this->sumvalsalaryfte - $step->untergrenze;
 				}
-				
-				$valstep = $stepsum * ($step->percent / 100);
+
+				$valstep = $stepsum * ($step->prozent / 100);
 				$valscaled = $valstep * $scalefactor_fte2pt;
 				echo "Step " . $idx . ": valfte: " . $valstep . " valtz: " . $valscaled . "\n";
 				$this->valorisation += $valscaled;
 			}
 		}
 	}
-	
+
 	protected function distributeValorisationToGehaltsbestandteile()
 	{
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			if( $gehaltsbestandteil->getValorisierung() ) 
+			if( $gehaltsbestandteil->getValorisierung() )
 			{
-				$betrag_valorisiert = $this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] * $this->valorisation + $gehaltsbestandteil->getBetrag_valorisiert();
-				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2)); 
+				$betrag_valorisiert =
+					$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] * $this->valorisation
+					+ $gehaltsbestandteil->getBetrag_valorisiert();
+				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
  			}
 		}
 	}
