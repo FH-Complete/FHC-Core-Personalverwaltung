@@ -17,9 +17,13 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz (
     valorisierungsdatum date NOT NULL,
     valorisierung_kurzbz character varying(128) NOT NULL,
     beschreibung text,
-    ausgewaehlt boolean DEFAULT false NOT NULL, -- beschlossen
+    ausgewaehlt boolean DEFAULT false NOT NULL,
+    updatevon character varying(32),
+    updateamum timestamp without time zone,
     CONSTRAINT tbl_valorisierung_instanz_pkey PRIMARY KEY (valorisierung_instanz_id)
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS tbl_valorisierung_instanz_unique_idx ON hr.tbl_valorisierung_instanz (ausgewaehlt, valorisierungsdatum) WHERE (ausgewaehlt = TRUE);
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_instanz TO vilesci;
 GRANT SELECT,UPDATE ON SEQUENCE hr.tbl_valorisierung_instanz_valorisierung_instanz_id_seq TO vilesci;
@@ -37,11 +41,14 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz_methode (
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_instanz_methode TO vilesci;
 
 CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_historie (
-    valorisierung_historie_id bigint NOT NULL,
+    valorisierung_historie_id serial NOT NULL,
     gehaltsbestandteil_id integer NOT NULL,
-    valorisierungsdatum numeric NOT NULL,
+    valorisierungsdatum date NOT NULL,
     betrag_valorisiert numeric(8,2) NOT NULL,
+    insertvon character varying(32),
+    insertamum timestamp without time zone DEFAULT now(),
     CONSTRAINT tbl_valorisierung_historie_pkey PRIMARY KEY (valorisierung_historie_id)
 );
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_historie TO vilesci;
+GRANT SELECT,UPDATE ON SEQUENCE hr.tbl_valorisierung_historie_valorisierung_historie_id_seq TO vilesci;
