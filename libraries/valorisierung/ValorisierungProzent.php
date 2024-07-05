@@ -8,6 +8,7 @@ class ValorisierungProzent extends AbstractValorisationMethod
 {
 	public function checkParams()
 	{
+		parent::checkParams();
 		if( !isset($this->params->valorisierung->prozent) || !is_numeric($this->params->valorisierung->prozent) )
 		{
 			throw new Exception('Parameter prozent missing or not numeric');

@@ -35,17 +35,16 @@ const valApp = Vue.createApp(	{
 		getValorisierungsInstanzen: function() {
 			const res = Vue.$fhcapi.Valorisierung.getValorisierungsInstanzen()
 					.then((response) => {
-				const valinstanzen = response.data.data;
-				console.log("INSTANZEN");
-				console.log(valinstanzen);
-				valinstanzen.unshift({
-					value: '',
-					label: 'Valorisierungsinstanz wählen...',
-					disabled: true
-				});
-				this.lists.valorisierungsinstanzen = valinstanzen;
-				this.valorisierungsinstanz_kurzbz = '';
-			});
+						const valinstanzen = response.data.data;
+						valinstanzen.unshift({
+							value: '',
+							label: 'Valorisierungsinstanz wählen...',
+							disabled: true
+						});
+						this.lists.valorisierungsinstanzen = valinstanzen;
+						this.valorisierungsinstanz_kurzbz = '';
+					})
+					.catch(this.handleErrors);
 		},
 		newSideMenuEntryHandler: function(payload) {
 				this.appSideMenuEntries = payload;
@@ -57,11 +56,11 @@ const valApp = Vue.createApp(	{
 			}
 			this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
 			const res = Vue.$fhcapi.Valorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz)
-					.then((response) => {
-				console.log(response.data.data);
-				this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
-				this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
-			});
+				.then((response) => {
+					this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
+					this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
+				})
+				.catch(this.handleErrors);
 		},
 		doValorisation: function() {
 			if( this.valorisierungsinstanz_kurzbz === '' ) {
@@ -70,12 +69,22 @@ const valApp = Vue.createApp(	{
 			}
 			this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
 			const res = Vue.$fhcapi.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
-					.then((response) => {
-				console.log(response.data.data);
-				this.$refs.valorisationTabulator.tabulator.setData([]);
-				this.getValorisierungsInstanzen();
-				this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
-			});
+				.then((response) => {
+					this.$refs.valorisationTabulator.tabulator.setData([]);
+					this.getValorisierungsInstanzen();
+					this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
+				})
+				.catch(this.handleErrors);
+		},
+		handleErrors: function(response) {
+			if (response.hasOwnProperty('response') && response.response?.data?.errors) {
+				for (let error of response.response.data.errors) {
+					this.$fhcAlert.handleSystemError(error);
+				}
+			}
+			else {
+				this.$fhcAlert.handleSystemError(response);
+			}
 		}
 	},
 	computed: {
@@ -198,7 +207,7 @@ const valApp = Vue.createApp(	{
 						</select>
 					</div>
 					<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
-					<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
+					<button class="btn btn-primary ms-5" @click="doValorisation">Valorisierung final übernehmen</button>
 				</template>
 			</core-filter-cmpt>
 		</div>

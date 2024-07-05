@@ -8,6 +8,7 @@ class ValorisierungFixBetrag extends AbstractValorisationMethod
 {
 	public function checkParams()
 	{
+		parent::checkParams();
 		if( !isset($this->params->valorisierung->fixbetrag) || !is_numeric($this->params->valorisierung->fixbetrag) )
 		{
 			throw new Exception('Parameter fixbetrag missing or not numeric');

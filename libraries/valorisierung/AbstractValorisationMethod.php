@@ -31,12 +31,12 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 
 	public function checkParams()
 	{
-		if (!isset($params->kriterien) || !is_object($params->kriterien))
+		if (!isset($this->params->kriterien) || !is_object($this->params->kriterien))
 		{
 			throw new Exception('Kriterien parameter missing or wrong type');
 		}
 
-		if (!isset($params->valorisierung) || !is_object($params->valorisierung))
+		if (!isset($this->params->valorisierung) || !is_object($this->params->valorisierung))
 		{
 			throw new Exception('Valorisierung parameter missing or wrong type');
 		}

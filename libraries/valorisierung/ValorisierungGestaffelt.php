@@ -24,6 +24,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	public function checkParams()
 	{
+		parent::checkParams();
 		if( !isset($this->params->valorisierung->stufen) || !is_array($this->params->valorisierung->stufen) )
 		{
 			throw new Exception('Parameter stufen missing or not an array');
