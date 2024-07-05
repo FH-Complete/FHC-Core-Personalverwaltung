@@ -14,7 +14,7 @@ class ValorisierungFixBetrag extends AbstractValorisationMethod
 		}
 	}
 
-	public function doValorisation()
+	public function calculateValorisation()
 	{
 		$sumsalary = $this->calcSummeGehaltsbestandteile(AbstractValorisationMethod::NUR_ZU_VALORISIERENDE_GBS);
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)

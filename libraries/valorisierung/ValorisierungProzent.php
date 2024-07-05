@@ -12,14 +12,9 @@ class ValorisierungProzent extends AbstractValorisationMethod
 		{
 			throw new Exception('Parameter prozent missing or not numeric');
 		}
-
-		if( !isset($this->params->kriterien->maxgehalt) || !is_numeric($this->params->kriterien->maxgehalt) )
-		{
-			throw new Exception('Parameter maxgehalt missing or not numeric');
-		}
 	}
 
-	public function doValorisation()
+	public function calculateValorisation()
 	{
 		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
 		{

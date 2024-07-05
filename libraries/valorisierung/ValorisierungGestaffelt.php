@@ -30,7 +30,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		}
 	}
 
-	public function doValorisation()
+	public function calculateValorisation()
 	{
 		$this->fetchWochenstunden();
 		$this->scaleSumsalaryToFTE();
@@ -69,7 +69,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 	protected function scaleSumsalaryToFTE()
 	{
 		$this->sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_GBS);
-		if( floatval($this->wochenstunden) < floatval($this->fulltimehours) )
+		if( floatval($this->wochenstunden) < floatval($this->fulltimehours) && $this->wochenstunden > 0 && floatval($this->fulltimehours) > 0 )
 		{
 			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval($this->fulltimehours);
 		}
@@ -82,7 +82,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 	protected function valoriseSteps()
 	{
 		$scalefactor_fte2pt = 1;
-		if( $this->wochenstunden < floatval($this->fulltimehours) )
+		if( $this->wochenstunden < floatval($this->fulltimehours) && $this->wochenstunden > 0 && floatval($this->fulltimehours) > 0 )
 		{
 			$scalefactor_fte2pt = 1 / floatval($this->fulltimehours) * floatval($this->wochenstunden);
 		}

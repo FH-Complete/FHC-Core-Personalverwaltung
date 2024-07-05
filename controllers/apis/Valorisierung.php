@@ -6,30 +6,29 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Valorisierung extends FHCAPI_Controller
 {
 
-    const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 
-    public function __construct() {
+	public function __construct() {
 		parent::__construct(
 			array(
-			'index' => self::DEFAULT_PERMISSION,
-			'doValorisation' => self::DEFAULT_PERMISSION,
-			'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION
+				'index' => self::DEFAULT_PERMISSION,
+				'calculateValorisation' => self::DEFAULT_PERMISSION,
+				'doValorisation' => self::DEFAULT_PERMISSION.'w',
+				'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION
 			)
 		);
 
-		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungAPI_model');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
-		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
-    }
+	}
 
-    public function index()
-    {
+	public function index()
+	{
 		$this->terminateWithSuccess('not implemented');
-    }
+	}
 
-    public function getValorisierungsInstanzen()
-    {
-		$valinstanzen = $this->ValorisierungInstanz_model->getAllValorisierungInstanzen();
+	public function getValorisierungsInstanzen()
+	{
+		$valinstanzen = $this->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzen();
 		if( isError($valinstanzen) )
 		{
 			$this->terminateWithError('Fehler beim Laden der ValorisierungsInstanzen');
@@ -37,33 +36,33 @@ class Valorisierung extends FHCAPI_Controller
 		else
 		{
 
-			$this->terminateWithSuccess(getData($valinstanzen));
+			$this->terminateWithSuccess(getData($valinstanzen) ?? []);
 		}
-    }
+	}
 
-    public function doValorisation($valorisationInstanzKurzbz)
-    {
-		try
-		{
-			$valinstanz = $this->ValorisierungLib->findValorisierungInstanz($valorisationInstanzKurzbz);
-		}
-		catch (Exception $ex)
-		{
-			$this->terminateWithError('ValorisierungsInstanz ' . $valorisationInstanzKurzbz . ' nicht gefunden.');
-		}
-		$result = $this->ValorisierungAPI_model->getDVsForValorisation($valinstanz->valorisierungsdatum);
-		if( hasData($result) )
-		{
-			$dvsdata = getData($result);
-			foreach($dvsdata as &$dvdata)
-			{
-			$this->ValorisierungLib->doValorisation($valinstanz, $dvdata);
-			}
-			$this->terminateWithSuccess($dvsdata);
-		}
-		else
-		{
-			$this->terminateWithError('Fehler beim Laden der zu valorisierenden Dientsverhältnisse.');
-		}
-    }
+	public function calculateValorisation()
+	{
+		$data = json_decode($this->input->raw_input_stream, true);
+
+		$this->load->library(
+			'extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib',
+			['valorisierung_kurzbz' => $data['varolisierunginstanz_kurzbz']],
+			'ValorisierungLib'
+		);
+
+		$this->terminateWithSuccess($this->ValorisierungLib->calculateAllValorisation());
+	}
+
+	public function doValorisation()
+	{
+		$data = json_decode($this->input->raw_input_stream, true);
+
+		$this->load->library(
+			'extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib',
+			['valorisierung_kurzbz' => $data['varolisierunginstanz_kurzbz']],
+			'ValorisierungLib'
+		);
+
+		$this->terminateWithSuccess($this->ValorisierungLib->doAllValorisation());
+	}
 }

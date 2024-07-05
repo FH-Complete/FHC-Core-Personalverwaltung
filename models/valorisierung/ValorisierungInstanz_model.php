@@ -8,10 +8,10 @@ class ValorisierungInstanz_model extends DB_Model
     {
 	    parent::__construct();
 	    $this->dbTable = 'hr.tbl_valorisierung_instanz';
-	    $this->pk = 'valorisierung_instanz_id';		
+	    $this->pk = 'valorisierung_instanz_id';
     }
 
-    public function getValorisierungInstanzForDatum($valorisierungsdatum) 
+    public function getValorisierungInstanzForDatum($valorisierungsdatum)
     {
 	    $res = $this->loadWhere('valorisierungsdatum = ' . $this->escape($valorisierungsdatum));
 	    if( hasData($res) ) {
@@ -30,7 +30,7 @@ class ValorisierungInstanz_model extends DB_Model
 	    return null;
     }
 
-    public function getValorisierungInstanzForDienstverhaeltnis($dienstverhaeltnis_id) 
+    public function getValorisierungInstanzForDienstverhaeltnis($dienstverhaeltnis_id)
     {
 	    $this->addFrom($this->dbTable, 'vi');
 	    $this->addSelect('vi.*');
@@ -40,11 +40,27 @@ class ValorisierungInstanz_model extends DB_Model
 		    return (getData($res))[0];
 	    }
     }
-    
-    public function getAllValorisierungInstanzen()
+
+    public function getNonSelectedValorisierungInstanzen()
     {
-	$this->addSelect('valorisierung_kurzbz AS value, valorisierung_kurzbz || \' (\' || valorisierungsdatum || \')\' AS label, \'false\'::boolean AS disabled');
-	$this->addOrder('valorisierungsdatum', 'DESC');
-	return $this->load();
+		$qry = '
+			SELECT
+				valorisierung_kurzbz AS value, valorisierung_kurzbz || \' (\' || valorisierungsdatum || \')\' AS label, \'false\'::boolean AS disabled
+			FROM
+				hr.tbl_valorisierung_instanz vi
+			WHERE
+				ausgewaehlt = FALSE
+				AND NOT EXISTS (
+					SELECT 1
+					FROM
+						hr.tbl_valorisierung_instanz
+					WHERE
+						ausgewaehlt
+						AND valorisierungsdatum = vi.valorisierungsdatum
+				)
+			ORDER BY
+				valorisierungsdatum DESC';
+
+		return $this->execQuery($qry);
     }
-}    
+}

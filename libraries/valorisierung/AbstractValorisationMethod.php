@@ -40,11 +40,6 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		{
 			throw new Exception('Valorisierung parameter missing or wrong type');
 		}
-
-		//~ if( !isset($this->params->mingehalt) || !is_numeric($this->params->mingehalt) )
-		//~ {>
-			//~ throw new Exception('Parameter mingehalt missing or not numeric');
-		//~ }
 	}
 
 	public function initialize($dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params)
@@ -92,5 +87,25 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 			$sumsalary += $gehaltsbestandteil->getBetrag_valorisiert();
 		}
 		return $sumsalary;
+	}
+
+	/**
+	 *
+	 * @param
+	 * @return object success or error
+	 */
+	public function getBetraegeValorisiertForEachGehaltsbestandteil()
+	{
+		$betraege = [];
+		foreach( $this->gehaltsbestandteile as $gehaltsbestandteil )
+		{
+			if( !$gehaltsbestandteil->getValorisierung() )
+			{
+				continue;
+			}
+			$betraege[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert();
+		}
+		//error_log(print_r($betraege, true));
+		return $betraege;
 	}
 }
