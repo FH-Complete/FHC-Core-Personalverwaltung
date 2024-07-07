@@ -45,7 +45,8 @@ class ValorisierungInstanz_model extends DB_Model
     {
 		$qry = '
 			SELECT
-				valorisierung_kurzbz AS value, valorisierung_kurzbz || \' (\' || valorisierungsdatum || \')\' AS label, \'false\'::boolean AS disabled
+				valorisierung_kurzbz AS value, valorisierung_kurzbz || \' (\' || valorisierungsdatum || \')\' AS label,
+				\'false\'::boolean AS disabled, valorisierungsdatum
 			FROM
 				hr.tbl_valorisierung_instanz vi
 			WHERE
@@ -59,7 +60,7 @@ class ValorisierungInstanz_model extends DB_Model
 						AND valorisierungsdatum = vi.valorisierungsdatum
 				)
 			ORDER BY
-				valorisierungsdatum DESC';
+				valorisierungsdatum DESC, valorisierung_kurzbz, valorisierung_instanz_id';
 
 		return $this->execQuery($qry);
     }

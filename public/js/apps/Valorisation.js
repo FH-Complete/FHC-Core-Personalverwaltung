@@ -19,13 +19,12 @@ const valApp = Vue.createApp(	{
 			searchbaroptions: searchbaroptions,
 			searchfunction: searchfunction,
 			appSideMenuEntries: {},
+			alleValorisierungsinstanzen: [],
 			valorisierungsinstanz_kurzbz: '',
+			valorisierungsdatum: '',
 			ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-					'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation',
-			lists: {
-				valorisierungsinstanzen: []
-			}
+					'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation'
 		};
 	},
 	created: function() {
@@ -35,14 +34,8 @@ const valApp = Vue.createApp(	{
 		getValorisierungsInstanzen: function() {
 			const res = Vue.$fhcapi.Valorisierung.getValorisierungsInstanzen()
 					.then((response) => {
-						const valinstanzen = response.data.data;
-						valinstanzen.unshift({
-							value: '',
-							label: 'Valorisierungsinstanz wählen...',
-							disabled: true
-						});
-						this.lists.valorisierungsinstanzen = valinstanzen;
-						this.valorisierungsinstanz_kurzbz = '';
+						this.alleValorisierungsinstanzen = response.data.data;
+						this.valorisierungsdatum = '';
 					})
 					.catch(this.handleErrors);
 		},
@@ -75,6 +68,10 @@ const valApp = Vue.createApp(	{
 					this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 				})
 				.catch(this.handleErrors);
+		},
+		datumChanged: function() {
+			// set Valorisierungsinstanz to first in list when datum is changed
+			this.valorisierungsinstanz_kurzbz = this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum)[0].value;
 		},
 		handleErrors: function(response) {
 			if (response.hasOwnProperty('response') && response.response?.data?.errors) {
@@ -147,7 +144,23 @@ const valApp = Vue.createApp(	{
 					}
 				}
 			];
+		},
+		valorisierungsdates: function() {
+			let dates = this.alleValorisierungsinstanzen
+				.map(vi => vi.valorisierungsdatum) // get only dates
+				.filter((value, index, array) => array.indexOf(value) === index && value != '') // filter unique
+				.map(date => ({value: date, label: date})); // transform to object
+			dates.unshift({ // add default label
+				value: '',
+				label: 'Datum wählen...',
+				disabled: true
+			});
+			return dates;
+		},
+		datumValorisierungsinstanzen: function() {
+			return this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum);
 		}
+
 	},
 	template: `
 
@@ -197,17 +210,24 @@ const valApp = Vue.createApp(	{
 							:tabulator-events="tabulatorEvents">
 				<template #actions>
 					<div class="d-flex gap-2 align-items-baseline mb-4">
-						<select v-model="valorisierungsinstanz_kurzbz" class="form-select" aria-label="ValorisierungsInstanz">
+						<select v-model="valorisierungsdatum" class="form-select w-auto" aria-label="ValorisierungsDatum" @change="datumChanged">
 							<option
-								v-for="vi in lists.valorisierungsinstanzen"
-								:value="vi.value"
-								:disabled="vi.disabled">
+								v-for="vd in valorisierungsdates"
+								:value="vd.value"
+								:disabled="vd.disabled">
+								{{ vd.label }}
+							</option>
+						</select>
+						<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz" v-show="valorisierungsdatum != ''">
+							<option
+								v-for="vi in datumValorisierungsinstanzen"
+								:value="vi.value">
 								{{ vi.label }}
 							</option>
 						</select>
 					</div>
 					<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
-					<button class="btn btn-primary ms-5" @click="doValorisation">Valorisierung final übernehmen</button>
+					<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
 				</template>
 			</core-filter-cmpt>
 		</div>
