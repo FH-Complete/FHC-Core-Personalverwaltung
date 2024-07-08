@@ -29,7 +29,7 @@ export default {
   <div class="col-1">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
   <div class="col-1">
-    <div v-if="this.store.mode === 'korrektur'" class="form-check">
+    <div v-if="this.store.mode === 'korrektur' && showdvcheckoverlap === true" class="form-check">
       <input v-model="checkoverlap" class="form-check-input" type="checkbox" id="dvcheckoverlap">
       <label class="form-check-label" for="dvcheckoverlap">
         parallele DVs prüfen
@@ -38,7 +38,7 @@ export default {
     <span v-else>&nbsp;</span>
   </div>
   
-  <template v-if="(['enddv', 'korrektur']).includes(this.store.mode)">
+  <template v-if="this.store.mode === 'korrektur'">
   <div class="col-3">
     <select v-model="dvendegrund_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
       <option
@@ -59,6 +59,13 @@ export default {
   <div class="col-6">&nbsp;</div>
   </template>
   `,
+  props: {
+    showdvcheckoverlap: {
+        type: Boolean,
+        default: true,
+        required: false
+    }
+  },
   data: function() {
     return {
       'vertragsart_kurzbz': '',
@@ -141,10 +148,12 @@ export default {
         this.vertragsart_kurzbz = this.config.vertragsart_kurzbz;
       }
       if( this.config?.dvendegrund_kurzbz !== undefined ) {
-        this.dvendegrund_kurzbz = this.config.dvendegrund_kurzbz;
+        this.dvendegrund_kurzbz = (this.config.dvendegrund_kurzbz === null) 
+            ? '' : this.config.dvendegrund_kurzbz;
       }
       if( this.config?.dvendegrund_anmerkung !== undefined ) {
-        this.dvendegrund_anmerkung = this.config.dvendegrund_anmerkung;
+        this.dvendegrund_anmerkung = (this.config.dvendegrund_anmerkung === null) 
+            ? '' : this.config.dvendegrund_anmerkung;
       }
       if( this.config?.checkoverlap !== undefined ) {
         this.checkoverlap = this.config.checkoverlap;
@@ -155,8 +164,8 @@ export default {
         dienstverhaeltnisid: this.config.dienstverhaeltnisid,
         unternehmen: this.store.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
-        dvendegrund_kurzbz: this.dvendegrund_kurzbz,
-        dvendegrund_anmerkung: this.dvendegrund_anmerkung,
+        dvendegrund_kurzbz: (this.dvendegrund_kurzbz === '') ? null : this.dvendegrund_kurzbz,
+        dvendegrund_anmerkung: (this.dvendegrund_anmerkung === '') ? null : this.dvendegrund_anmerkung,
         gueltigkeit: this.$refs.gueltigkeit.getPayload(),
         checkoverlap: this.checkoverlap
       }

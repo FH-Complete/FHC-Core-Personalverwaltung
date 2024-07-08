@@ -1,4 +1,5 @@
 export const EmployeeStatus = {
+    expose: ['refresh'],
     setup() {
 
         const { watch, ref, reactive, computed, onMounted, inject } = Vue;
@@ -122,7 +123,11 @@ export const EmployeeStatus = {
           }
         )
 
-        return {statusList};
+        const refresh = () => {
+          fetchData(currentPersonUID.value);
+        }
+
+        return {statusList, refresh};
     },
     template: `
     <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2 mt-auto" >

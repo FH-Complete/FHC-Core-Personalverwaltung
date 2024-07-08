@@ -247,7 +247,7 @@ export const EmployeeContract = {
             isFetching.value = true            
             try {
                 const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
-                theModel.value.updateHeader();
+                emit('updateHeader');
             } catch (error) {
                 console.log(error);
             } finally {
@@ -443,13 +443,14 @@ export const EmployeeContract = {
                     fetchVertrag(currentDVID.value, currentDate.value);
                     fetchGBT(currentDVID.value, currentDate.value);
                     fetchGBTChartData(currentDVID.value);
-                    theModel.value.updateHeader();
+                    emit('updateHeader');
                 }
             })
         }
 
         const handleDvEnded = async () => {
             fetchData(route.params.uid);
+            emit('updateHeader');
         }
 
         const handleDvDeleted = () => {
@@ -460,7 +461,7 @@ export const EmployeeContract = {
                 + route.params.id + '/' + route.params.uid
                 + '/contract';
             router.push( url ).then(() => {
-                router.go(0)
+                router.go(0);
             });
         }
         

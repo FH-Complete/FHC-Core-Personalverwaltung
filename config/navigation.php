@@ -33,6 +33,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'icon' => 'percent',
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	),
+	'Gehaltsbaender' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/SalaryRange'),
+		'description' => 'Gehaltsbänder',
+		'icon' => 'money-bill-wave',
+		'requiredPermissions' => 'basis/mitarbeiter:r'
+	),
 	'Berichte' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Reports'),
 		'description' => 'Berichte',

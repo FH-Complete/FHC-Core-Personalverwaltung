@@ -28,6 +28,7 @@ export const EmployeeHeader = {
         const employee = ref();
         const fileInput = ref();
         const previewImage = ref();
+        const statusRef = ref();
 
         const isFetching = ref(false);        
         const isFetchingName = ref(false);
@@ -211,6 +212,7 @@ export const EmployeeHeader = {
         const refresh = () => {
             console.log('refresh called')
             fetchHeaderData(props.personID, props.personUID)
+            statusRef.value.refresh()
         }
         
 
@@ -222,6 +224,7 @@ export const EmployeeHeader = {
             confirmDeleteRef,
             pickFile,
             okHandler,
+            statusRef,
             toastRef,toastDeleteRef,
             redirect,
             FHC_JS_CONFIG,
@@ -306,7 +309,7 @@ export const EmployeeHeader = {
                         </div>  
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
                     </div>
-                    <EmployeeStatus></EmployeeStatus>
+                    <EmployeeStatus ref="statusRef"></EmployeeStatus>
                    
                 </div>
              

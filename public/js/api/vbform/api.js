@@ -14,6 +14,7 @@ import Common from "./common.js";
 import Stundensatz from "./stundensatz.js";
 import Zeit from "./zeit.js";
 import Deadline from "./deadline.js";
+import SalaryRange from "./salaryrange.js";
 import Valorisierung from "./valorisierung.js";
 
 export default {
@@ -33,5 +34,6 @@ export default {
     "Stundensatz": Stundensatz,
     "Zeit": Zeit,
     "Deadline": Deadline,
+    "SalaryRange": SalaryRange,
     "Valorisierung": Valorisierung
 };

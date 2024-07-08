@@ -44,6 +44,9 @@ export const DeadlineIssueTable = {
           return;
         }
         try {
+          if( fristenTable.value?.tabulator !== null ) {
+            fristenTable.value.tabulator.dataLoader.alertLoader();
+          }
           isFristFetching.value = true;
           const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value, deadline_filter_all.value);
           fristen.value = res.data;			  
@@ -51,6 +54,10 @@ export const DeadlineIssueTable = {
         } catch (error) {
           console.log(error);
           isFristFetching.value = false;           
+        } finally {
+            if( fristenTable.value?.tabulator !== null ) {
+                fristenTable.value.tabulator.dataLoader.clearAlert();
+            }
         }		
       }
 
@@ -148,7 +155,6 @@ export const DeadlineIssueTable = {
       onMounted(() => {
         fetchFristStatus()
         fetchFristEreignisse()
-        fetchList()
       })
 
       const onPersonSelect = (uid, person_id) => {
@@ -407,10 +413,24 @@ export const DeadlineIssueTable = {
         //}
       })
 
+      const tabulatorEvents = Vue.computed(() => [
+        {
+            event: 'cellEdited',
+            handler: onTableCellEdited
+        },
+        {
+            event: 'tableBuilt',
+            handler: () => {
+                fetchList();
+            }
+        }
+      ]);
 
       Vue.watch(fristen, (newVal, oldVal) => {
         console.log('fristenList changed');
-        fristenTable.value?.tabulator.setData(fristen.value);
+        if( fristenTable.value?.tabulator !== null ) {
+            fristenTable.value.tabulator.setData(fristen.value);
+        }
       }, {deep: true})
 
     /*   Vue.watch(fristStatusList, (newVal, oldVal) => {
@@ -442,7 +462,7 @@ export const DeadlineIssueTable = {
       return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, onTableCellEdited,
                fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged, addDeadline,
                toastRef, createToastRef, deleteToastRef, dialogRef, isFetching, isFristFetching, updateStatus,
-               fristenTable, tabulatorOptions, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel, 
+               fristenTable, tabulatorOptions, tabulatorEvents, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel,
                current_status_kurzbz, deadline_filter_all, handleDeadlineFilterAllChanged }
     },
   template: `
@@ -485,9 +505,7 @@ export const DeadlineIssueTable = {
 			table-only
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
-      :tabulator-events="[
-        {event: 'cellEdited', handler: onTableCellEdited},        
-      ]"
+                        :tabulator-events="tabulatorEvents"
 			new-btn-label="Termin/Frist"
 			new-btn-show
 			new-btn-class="btn-primary"

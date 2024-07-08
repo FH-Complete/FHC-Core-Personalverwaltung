@@ -101,11 +101,11 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$this->dv->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
 			$this->dv->setOe_kurzbz($this->data['unternehmen']);
 			$this->dv->setVertragsart_kurzbz($this->data['vertragsart_kurzbz']);
-			if( isset($this->data['dvendegrund_kurzbz']) )
+			if( array_key_exists('dvendegrund_kurzbz', $this->data) )
 			{			    
 			    $this->dv->setDvendegrund_kurzbz($this->data['dvendegrund_kurzbz']);
 			}
-			if( isset($this->data['dvendegrund_anmerkung']) )
+			if( array_key_exists('dvendegrund_anmerkung', $this->data) )
 			{			    
 			    $this->dv->setDvendegrund_anmerkung($this->data['dvendegrund_anmerkung']);
 			}
@@ -121,11 +121,11 @@ class GUIDienstverhaeltnis extends AbstractBestandteil implements JsonSerializab
 			$data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
 			$data->oe_kurzbz = $this->data['unternehmen'];
 			$data->vertragsart_kurzbz = $this->data['vertragsart_kurzbz'];
-			if( isset($this->data['dvendegrund_kurzbz']) )
+			if( array_key_exists('dvendegrund_kurzbz', $this->data) )
 			{			    
 			    $data->dvendegrund_kurzbz = $this->data['dvendegrund_kurzbz'];
 			}
-			if( isset($this->data['dvendegrund_anmerkung']) )
+			if( array_key_exists('dvendegrund_anmerkung', $this->data) )
 			{			    
 			    $data->dvendegrund_anmerkung = $this->data['dvendegrund_anmerkung'];
 			}
