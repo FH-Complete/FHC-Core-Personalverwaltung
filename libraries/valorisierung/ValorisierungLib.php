@@ -121,7 +121,8 @@ class ValorisierungLib
 					'valorisierungsdatum' => $this->_valorisierungInstanz->valorisierungsdatum,
 					'betrag_valorisiert' => $betrag_valorisiert,
 					'insertvon' => getAuthUID()
-				]
+				],
+				$this->_ci->ValorisierungHistorie_model->getEncryptedColumns()
 			);
 		}
 

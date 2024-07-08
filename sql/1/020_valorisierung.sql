@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_historie (
     valorisierung_historie_id serial NOT NULL,
     gehaltsbestandteil_id integer NOT NULL,
     valorisierungsdatum date NOT NULL,
-    betrag_valorisiert numeric(8,2) NOT NULL,
+    betrag_valorisiert bytea NOT NULL,
     insertvon character varying(32),
     insertamum timestamp without time zone DEFAULT now(),
     CONSTRAINT tbl_valorisierung_historie_pkey PRIMARY KEY (valorisierung_historie_id)
