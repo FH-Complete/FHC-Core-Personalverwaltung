@@ -35,7 +35,6 @@ class Valorisierung extends FHCAPI_Controller
 		}
 		else
 		{
-
 			$this->terminateWithSuccess(getData($valinstanzen) ?? []);
 		}
 	}

@@ -105,7 +105,6 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 			}
 			$betraege[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert();
 		}
-		//error_log(print_r($betraege, true));
 		return $betraege;
 	}
 }

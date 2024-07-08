@@ -23,7 +23,7 @@ class ValorisierungProzent extends AbstractValorisationMethod
 			if( $gehaltsbestandteil->getValorisierung() )
 			{
 				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() * (1 + $this->params->valorisierung->prozent / 100);
-				$gehaltsbestandteil->setBetrag_valorisiert($betrag_valorisiert);
+				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
  			}
 		}
 	}
