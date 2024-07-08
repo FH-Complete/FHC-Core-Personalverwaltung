@@ -9,10 +9,10 @@ export default {
     <Modal :title="'Dienstverhältnis beenden'" :noscroll="true" ref="modalRef" 
            :class="'vbformModal'" id="endDvModal">
         <template #body>
-            <infos :infos="(infos !== undefined) ? infos : []"></infos>
-            <errors :errors="(errors !== undefined) ? errors : []"></errors>
+            <infos v-show="store.showmsgs" :infos="(infos !== undefined) ? infos : []"></infos>
+            <errors v-show="store.showmsgs" :errors="(errors !== undefined) ? errors : []"></errors>
             <div class="row g-2 py-2 border-bottom mb-3">
-                <dienstverhaeltnis ref="dienstverhaeltnisRef" :config="curdv"></dienstverhaeltnis>
+                <dienstverhaeltnis ref="dienstverhaeltnisRef" :config="curdv" :showdvcheckoverlap="false"></dienstverhaeltnis>
             </div>
         </template>
         <template #footer>
@@ -21,7 +21,10 @@ export default {
                   <button class="btn btn-secondary btn-sm float-end" @click="cancel">Abbrechen</button>
               </div>
                <div class="btn-group" role="group" aria-label="First group">
-                  <button class="btn btn-primary btn-sm float-end" @click="enddv">Dienstverhältnis beenden</button>
+                <button class="btn btn-primary btn-sm float-end" @click="enddv">
+                  <span v-show="spinners.saving" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Dienstverhältnis beenden
+                </button>
               </div>
           </div>
         </template>
@@ -34,7 +37,10 @@ export default {
     return {
       store: store, 
       infos: [],
-      errors: []
+      errors: [],
+      spinners: {
+        saving: false
+      }
     };
   },
   emits: [
@@ -48,11 +54,17 @@ export default {
   },
   methods: {
     enddv: function() {
+      this.spinners.saving = true;
+      this.store.showmsgs = false;
       const payload = this.$refs['dienstverhaeltnisRef'].getPayload();
       
       Vue.$fhcapi.DV.endDV(payload)
       .then((response) => {
         this.handleDVEnded(response.data);
+      })
+      .finally(() => {
+          this.spinners.saving = false;
+          this.store.showmsgs = true;
       });
     },
     cancel: function() {
@@ -69,6 +81,7 @@ export default {
       this.$emit('dvended', this.curdv);  
     },
     showModal: function() {
+        this.store.mode = 'korrektur';
         this.$refs['modalRef'].show();
     }
   },
