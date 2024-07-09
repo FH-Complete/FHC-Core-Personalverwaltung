@@ -9,17 +9,17 @@ class ValorisierungInstanzMethod_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'hr.tbl_valorisierung_instanz_methode';
 		$this->hasSequence = false;
-		$this->pk = array('valorisierung_instanz_id', 'valorisierung_method_kurzbz');		
+		$this->pk = array('valorisierung_instanz_id', 'valorisierung_method_kurzbz');
 	}
 
-	public function getValorisierungInstanzForDatum($valorisierungsdatum) 
+	public function getValorisierungInstanzForDatum($valorisierungsdatum)
 	{
 		$res = $this->loadWhere('valorisierungsdatum = ' . $this->escape($valorisierungsdatum));
 		if( hasData($res) ) {
 			return getData($res);
 		}
 	}
-	
+
 	public function loadValorisierungInstanzByKurzbz($valorisierung_instanz_id)
 	{
 		$res = $this->loadWhere('valorisierung_instanz_id = ' . $this->escape($valorisierung_instanz_id));
@@ -30,4 +30,4 @@ class ValorisierungInstanzMethod_model extends DB_Model
 		}
 		return array();
 	}
-}    
+}
