@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz (
     ausgewaehlt boolean DEFAULT false NOT NULL,
     updatevon character varying(32),
     updateamum timestamp without time zone,
-    CONSTRAINT tbl_valorisierung_instanz_pkey PRIMARY KEY (valorisierung_instanz_id)
+    CONSTRAINT tbl_valorisierung_instanz_pkey PRIMARY KEY (valorisierung_instanz_id),
+    UNIQUE(valorisierung_kurzbz)
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS tbl_valorisierung_instanz_unique_idx ON hr.tbl_valorisierung_instanz (ausgewaehlt, valorisierungsdatum) WHERE (ausgewaehlt = TRUE);
