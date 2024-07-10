@@ -5,6 +5,7 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import {CoreFilterCmpt} from "../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
+import { Modal } from '../components/Modal.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -12,7 +13,8 @@ const valApp = Vue.createApp(	{
 	components: {
 		searchbar,
 		CoreNavigationCmpt,
-		CoreFilterCmpt
+		CoreFilterCmpt,
+		Modal
 	},
 	data() {
 		return 	{
@@ -20,6 +22,7 @@ const valApp = Vue.createApp(	{
 			searchfunction: searchfunction,
 			appSideMenuEntries: {},
 			alleValorisierungsinstanzen: [],
+			valorisierungInfoData: [],
 			valorisierungsinstanz_kurzbz: '',
 			valorisierungsdatum: '',
 			ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
@@ -66,6 +69,18 @@ const valApp = Vue.createApp(	{
 					this.$refs.valorisationTabulator.tabulator.setData([]);
 					this.getValorisierungsInstanzen();
 					this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
+				})
+				.catch(this.handleErrors);
+		},
+		getValorisationInfo: function() {
+			if( this.valorisierungsinstanz_kurzbz === '' ) {
+				this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
+				return;
+			}
+			const res = Vue.$fhcapi.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
+				.then((response) => {
+					this.valorisierungInfoData = response.data.data;
+					this.$refs.infoModalRef.show();
 				})
 				.catch(this.handleErrors);
 		},
@@ -159,8 +174,36 @@ const valApp = Vue.createApp(	{
 		},
 		datumValorisierungsinstanzen: function() {
 			return this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum);
-		}
+		},
+		valorisierungInfo: function() {
+			let valorisierungInfoObj = {};
+			for (let infoData of this.valorisierungInfoData) {
 
+				let valorisierungMethode =
+				{
+					"valorisierung_methode_kurzbz": infoData.valorisierung_methode_kurzbz,
+					"valorisierung_methode_beschreibung": infoData.valorisierung_methode_beschreibung,
+					"valorisierung_methode_parameter": infoData.valorisierung_methode_parameter
+				};
+
+				if (valorisierungInfoObj.hasOwnProperty("methoden"))
+				{
+					valorisierungInfoObj.methoden.push(valorisierungMethode);
+				}
+				else
+				{
+					valorisierungInfoObj =
+					{
+						"valorisierung_kurzbz": infoData.valorisierung_kurzbz,
+						"valorisierungsdatum": infoData.valorisierungsdatum,
+						"valorisierung_instanz_beschreibung": infoData.valorisierung_instanz_beschreibung,
+						"methoden": [valorisierungMethode]
+					}
+				}
+			}
+
+			return valorisierungInfoObj;
+		}
 	},
 	template: `
 
@@ -218,13 +261,20 @@ const valApp = Vue.createApp(	{
 								{{ vd.label }}
 							</option>
 						</select>
-						<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz" v-show="valorisierungsdatum != ''">
-							<option
-								v-for="vi in datumValorisierungsinstanzen"
-								:value="vi.value">
-								{{ vi.label }}
-							</option>
-						</select>
+						<div v-show="valorisierungsdatum != ''">
+							<div class="input-group mb-3">
+							<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz">
+								<option
+									v-for="vi in datumValorisierungsinstanzen"
+									:value="vi.value">
+									{{ vi.label }}
+								</option>
+							</select>
+							<button class="btn btn-outline-secondary" type="button" @click="getValorisationInfo">
+								<i class="fa fa-info"></i>
+							</button>
+							</div>
+						</div>
 					</div>
 					<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
 					<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
@@ -236,6 +286,40 @@ const valApp = Vue.createApp(	{
 
 	</div>
 	</div>
+	<!-- detail modal -->
+	<Modal :title="'Valorisierung Information'" ref="infoModalRef">
+		<template #body>
+			<table class="table table-bordered">
+				<tbody>
+					<tr>
+						<th>Bezeichnung</th>
+						<td>{{valorisierungInfo.valorisierung_kurzbz}}</td>
+					</tr>
+					<tr>
+						<th>Beschreibung</th>
+						<td>{{valorisierungInfo.valorisierung_instanz_beschreibung}}</td>
+					</tr>
+					<tr>
+						<th>Datum</th>
+						<td>{{valorisierungInfo.valorisierungsdatum}}</td>
+					</tr>
+					<tr>
+						<th>Methoden</th>
+						<td>
+							<span v-for="(methode, index) in valorisierungInfo.methoden">
+								<span v-if="index > 0">
+									<br><br>
+								</span>
+								<b>{{methode.valorisierung_methode_kurzbz}}</b><br>
+								Beschreibung: {{methode.valorisierung_methode_beschreibung}}<br>
+								Parameter: {{methode.valorisierung_methode_parameter}}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+	</Modal>
 	`
 });
 

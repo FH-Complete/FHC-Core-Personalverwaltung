@@ -14,7 +14,8 @@ class Valorisierung extends FHCAPI_Controller
 				'index' => self::DEFAULT_PERMISSION,
 				'calculateValorisation' => self::DEFAULT_PERMISSION,
 				'doValorisation' => self::DEFAULT_PERMISSION.'w',
-				'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION
+				'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION,
+				'getValorisationInfo' => self::DEFAULT_PERMISSION
 			)
 		);
 
@@ -45,7 +46,7 @@ class Valorisierung extends FHCAPI_Controller
 
 		$this->load->library(
 			'extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib',
-			['valorisierung_kurzbz' => $data['varolisierunginstanz_kurzbz']],
+			['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']],
 			'ValorisierungLib'
 		);
 
@@ -58,10 +59,33 @@ class Valorisierung extends FHCAPI_Controller
 
 		$this->load->library(
 			'extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib',
-			['valorisierung_kurzbz' => $data['varolisierunginstanz_kurzbz']],
+			['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']],
 			'ValorisierungLib'
 		);
 
 		$this->terminateWithSuccess($this->ValorisierungLib->doAllValorisation());
+	}
+
+	/**
+	 *
+	 * @param
+	 * @return object success or error
+	 */
+	public function getValorisationInfo()
+	{
+		$valorisierung_kurzbz = $this->input->get('valorisierunginstanz_kurzbz');
+		error_log(print_r($valorisierung_kurzbz, true));
+
+		if (!isset($valorisierung_kurzbz)) $this->terminateWithError('Parameter Valorisierunginstanz Kurzbz fehlt');
+
+		$valInstanzInfo = $this->ValorisierungInstanz_model->getValorsierungInstanzInfo($valorisierung_kurzbz);
+		if( isError($valInstanzInfo) )
+		{
+			$this->terminateWithError('Fehler beim Laden der ValorisierungsInstanzinfo');
+		}
+		else
+		{
+			$this->terminateWithSuccess(getData($valInstanzInfo) ?? []);
+		}
 	}
 }
