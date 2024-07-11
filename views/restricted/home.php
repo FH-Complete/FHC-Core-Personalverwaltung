@@ -6,8 +6,7 @@
 			'bootstrap5' => true,
 			'fontawesome6' => true,
       'axios027' => true,
-			'restclient' => true,
-      'tabulator5' => true,
+			'restclient' => true,      
       'vue3' => true,
       'primevue3' => true,
 			'navigationcomponent' => true, 
@@ -23,9 +22,9 @@
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/IssuesCountCard.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
+                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
                       ],
-      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'),
+      'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/HomeRestricted.js'),
        
       // VUE APP build:      
 			// 'vueSFCs' => [[
@@ -43,18 +42,9 @@
 		<span class="navbar-toggler-icon"></span>
 	</button>
   <div id="chooser" class="w-100">
-    <searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction"></searchbar>				
+    <searchbar :searchoptions="searchbaroptionsRestricted" :searchfunction="searchfunction"></searchbar>				
   </div>
-	<div class="navbar-nav">
-		<div class="nav-item dropdown">
-		  <a class="nav-link dropdown-toggle px-3" data-bs-toggle="dropdown" href="#" id="navbarDropdownMenuLink">Häufige Funktionen</a>
-      <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-      </ul>
-		</div>
-	</div>
+	
 </header>
 
 <div class="container-fluid">
@@ -65,53 +55,16 @@
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
-        <h1 class="h2">Dashboard</h1>
-        <!--div class="btn-toolbar mb-2 mb-md-0">
-          <div class="btn-group me-2">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-          </div>
-          <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-            <span data-feather="calendar"></span>
-            This week
-          </button>
-        </div-->
+        
       </div>
 
       <div class="row">
 
-        <div class="col">
-          <contract-count-card ></contract-count-card>
-        </div>          
-
-        <div class="col">
-          <contract-count-card show-new></contract-count-card>
-        </div>
-
-        <div class="col">
-          <issues-count-card></issues-count-card>
-        </div>
-
-        <div class="col">
-          <birthday-count-card></birthday-count-card>
-        </div>
+       
 
       </div>
 
-      <div class="row">
-          <deadline-issue-table></deadline-issue-table>
-      </div>
-
-      <!--div class="d-flex bd-highlight">
-        <div class="p-2 flex-fill bd-highlight">
-          <h3>Verträge neu ({{ contractDataNew.length }})</h3>
-          <contract-new :columns="['personalnummer','name','beginn','ende']" :data="contractDataNew"></contract-new>
-        </div>
-        <div class="p-2 flex-fill bd-highlight">
-          <h3>Verträge auslaufend ({{ contractDataExpiring.length }})</h3>
-          <contract-expiring :columns="['personalnummer','name','beginn','ende']" :data="contractDataExpiring"></contract-expiring>
-        </div>
-      </div-->
+     
       
     </main>
   </div>
@@ -132,6 +85,9 @@
 
 
 <script>
+
+var CIS_ROOT = '<?php echo CIS_ROOT ?>';
+
 (function () {
   'use strict'
   var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

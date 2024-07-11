@@ -5,6 +5,7 @@ class IssueChecker extends Auth_Controller
 {
 	const DEBUG = false;
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+	const RESTRICTED_PERMISSION = 'assistenz:r';
 
 	const CI_PATH = 'application';
 	const CI_LIBRARY_FOLDER = 'libraries';
@@ -27,7 +28,7 @@ class IssueChecker extends Auth_Controller
         parent::__construct(
 			array(
 				'checkPerson' => self::DEFAULT_PERMISSION,
-				'countPersonOpenIssues' => self::DEFAULT_PERMISSION
+				'countPersonOpenIssues' => [self::DEFAULT_PERMISSION, self::RESTRICTED_PERMISSION]
 			)
 		);
 		

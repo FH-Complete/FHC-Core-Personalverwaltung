@@ -11,6 +11,7 @@ class Api extends Auth_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
+    const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
     // code igniter
     protected $CI;
 
@@ -19,18 +20,18 @@ class Api extends Auth_Controller
         parent::__construct(
 	    array(
 		'index' => Api::DEFAULT_PERMISSION,
-		'getSprache' => Api::DEFAULT_PERMISSION,
-		'getSachaufwandtyp' => Api::DEFAULT_PERMISSION,
-		'getNations' => Api::DEFAULT_PERMISSION,
-		'getAusbildung' => Api::DEFAULT_PERMISSION,
-		'getStandorteIntern' => Api::DEFAULT_PERMISSION,
-                'getOrte' => Api::DEFAULT_PERMISSION,
-                'getGemeinden' => Api::DEFAULT_PERMISSION,
+		'getSprache' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getSachaufwandtyp' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getNations' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getAusbildung' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getStandorteIntern' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'getOrte' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'getGemeinden' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'getOrtschaften' => Api::DEFAULT_PERMISSION,
                 'personMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'upsertPersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
                 'deletePersonMaterialExpenses' => Api::DEFAULT_PERMISSION,
-                'getVertragsartAll' => Api::DEFAULT_PERMISSION,
+                'getVertragsartAll' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'getOrgHeads' => Api::DEFAULT_PERMISSION,
                 'getOrgStructure' => Api::DEFAULT_PERMISSION,
                 'getOrgPersonen' => Api::DEFAULT_PERMISSION,
@@ -43,8 +44,8 @@ class Api extends Auth_Controller
                 'getAllCourseHours' => Api::DEFAULT_PERMISSION,
                 'getAllSupportHours' => Api::DEFAULT_PERMISSION,
                 'getReportData' => Api::DEFAULT_PERMISSION,
-                'personHeaderData' => Api::DEFAULT_PERMISSION,
-                'personAbteilung' => Api::DEFAULT_PERMISSION,
+                'personHeaderData' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'personAbteilung' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'uploadPersonEmployeeFoto' => Api::DEFAULT_PERMISSION,
                 'deletePersonEmployeeFoto' => Api::DEFAULT_PERMISSION,
                 'personBankData' => Api::DEFAULT_PERMISSION,
@@ -52,7 +53,7 @@ class Api extends Auth_Controller
                 'deletePersonBankData' => Api::DEFAULT_PERMISSION,
                 'upsertPersonJobFunction'  => Api::DEFAULT_PERMISSION,
                 'deletePersonJobFunction'  => Api::DEFAULT_PERMISSION,
-                'personBaseData' => Api::DEFAULT_PERMISSION,
+                'personBaseData' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'updatePersonBaseData' => Api::DEFAULT_PERMISSION,
                 'personEmployeeKurzbzExists' => Api::DEFAULT_PERMISSION,
                 'personEmployeeData' => Api::DEFAULT_PERMISSION,
@@ -60,56 +61,57 @@ class Api extends Auth_Controller
                 'personAddressData' => Api::DEFAULT_PERMISSION,
                 'upsertPersonAddressData' => Api::DEFAULT_PERMISSION,
                 'deletePersonAddressData' => Api::DEFAULT_PERMISSION,
-                'personContactData' => Api::DEFAULT_PERMISSION,
-                'upsertPersonContactData' => Api::DEFAULT_PERMISSION,
-                'deletePersonContactData' => Api::DEFAULT_PERMISSION,
-                'getKontakttyp' => Api::DEFAULT_PERMISSION,
+                'personContactData' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'upsertPersonContactData' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'deletePersonContactData' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'getKontakttyp' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'foto' => Api::DEFAULT_PERMISSION,
-                'uidByPerson' => Api::DEFAULT_PERMISSION,
-                'getAdressentyp' => Api::DEFAULT_PERMISSION,
-                'dvByPerson' => Api::DEFAULT_PERMISSION,
-                'vertragByDV' => Api::DEFAULT_PERMISSION,
-                'getCompanyByOrget'  => Api::DEFAULT_PERMISSION,
+                'uidByPerson' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'getAdressentyp' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'dvByPerson' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'vertragByDV' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'getCompanyByOrget'  => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
 		'getOrgetsForCompany' => Api::DEFAULT_PERMISSION,
 		'getAllFunctions' => Api::DEFAULT_PERMISSION,
 		'getContractFunctions' => Api::DEFAULT_PERMISSION,
 		'getCurrentFunctions' => Api::DEFAULT_PERMISSION,
-		'getAllUserFunctions' => Api::DEFAULT_PERMISSION,
+		'getAllUserFunctions' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'getAllFunctions' => Api::DEFAULT_PERMISSION,
 		'saveVertrag' => Api::DEFAULT_PERMISSION,
-		'getCurrentVBs' => Api::DEFAULT_PERMISSION,
+		'getCurrentVBs' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
 		'getCurrentAndFutureVBs' => Api::DEFAULT_PERMISSION,
 		'getAllVBs' => Api::DEFAULT_PERMISSION,
 		'storeToTmpStore' => Api::DEFAULT_PERMISSION,
 		'listTmpStoreForMA' => Api::DEFAULT_PERMISSION,
 		'getTmpStoreById' => Api::DEFAULT_PERMISSION,
 		'deleteFromTmpStore' => Api::DEFAULT_PERMISSION,
-		'getUnternehmen' => Api::DEFAULT_PERMISSION,
-                'getGehaltstypen' => Api::DEFAULT_PERMISSION,
-		'getVertragsarten' => Api::DEFAULT_PERMISSION,
-                'getVertragsbestandteiltypen' => Api::DEFAULT_PERMISSION,
-                'filterPerson' => Api::DEFAULT_PERMISSION,
-                'createEmployee' => Api::DEFAULT_PERMISSION,
-                'gbtByDV'  => Api::DEFAULT_PERMISSION,
-                'deleteDV'  => Api::DEFAULT_PERMISSION,
-                'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
+		'getUnternehmen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+        'getGehaltstypen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getVertragsarten' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+        'getVertragsbestandteiltypen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+        'filterPerson' => Api::DEFAULT_PERMISSION,
+        'createEmployee' => Api::DEFAULT_PERMISSION,
+        'gbtByDV'  => Api::DEFAULT_PERMISSION,
+        'deleteDV'  => Api::DEFAULT_PERMISSION,
+        'gbtChartDataByDV' => Api::DEFAULT_PERMISSION,
 		'endDV'  => Api::DEFAULT_PERMISSION,
-                'deactivateDV'  => Api::DEFAULT_PERMISSION,
+        'deactivateDV'  => Api::DEFAULT_PERMISSION,
 		'saveKarenz'  => Api::DEFAULT_PERMISSION,
-		'getKarenztypen' => Api::DEFAULT_PERMISSION,
-		'getTeilzeittypen' => Api::DEFAULT_PERMISSION,
-		'getFreitexttypen' => Api::DEFAULT_PERMISSION,
+		'getKarenztypen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getTeilzeittypen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getFreitexttypen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'getVB' => Api::DEFAULT_PERMISSION,
                 'getGB' => Api::DEFAULT_PERMISSION,
                 'dvByID'=> Api::DEFAULT_PERMISSION,
 		'getStundensaetze' => Api::DEFAULT_PERMISSION,
-		'getStundensatztypen' => Api::DEFAULT_PERMISSION,
+		'getStundensatztypen' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
 		'updateStundensatz' => Api::DEFAULT_PERMISSION,
 		'deleteStundensatz' => Api::DEFAULT_PERMISSION,
                 'offTimeByPerson' => Api::DEFAULT_PERMISSION,
                 'timeRecordingByPerson' => Api::DEFAULT_PERMISSION,
                 'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
                 'getFristenListe' => Api::DEFAULT_PERMISSION,
+        'dvInfoByPerson' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'getPersonFristenListe' => Api::DEFAULT_PERMISSION,
                 'updateFristenListe' => Api::DEFAULT_PERMISSION,
                 'getFristenStatus' => Api::DEFAULT_PERMISSION,
@@ -1643,6 +1645,55 @@ class Api extends Auth_Controller
         return $this->outputJson($data);
     }
 
+    // DV short info
+    function dvInfoByPerson()
+    {
+        $person_uid = $this->input->get('uid', TRUE);
+
+        if (!$person_uid)
+        {
+            $this->outputJsonError('invalid parameter person_uid');
+            exit;
+        }
+
+        //$date = DateTime::createFromFormat( 'U', $stichtag);
+        $date = new DateTimeImmutable( 'now', new DateTimeZone('Europe/Vienna'));
+		//$date->setTimezone(new DateTimeZone('Europe/Vienna'));
+        $datestring = $date->format("Y-m-d");
+
+        $dvData = $this->DVModel->getDVByPersonUID($person_uid, null, $datestring);
+
+        if (isError($dvData)) {
+            $this->outputJsonError('error fetching dv: '.$dvData->retval);
+            return;
+        }
+        
+        
+        $dvList = array();
+        if (is_array($dvData->retval) && count($dvData->retval) > 0) {
+            $dvList = $dvData->retval;
+        } else {
+            $this->outputJsonError('no DV found');
+            return;
+        }
+
+        $retval = array();
+        foreach ($dvList as $value) {
+            $dbData = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
+                intval($value->dienstverhaeltnis_id), $datestring);
+    
+            // remove secret data
+            $dbDataFiltered = array_values(array_filter($dbData, function($v) {
+                return $v->getVertragsbestandteiltyp_kurzbz() == 'stunden' ||
+                    $v->getVertragsbestandteiltyp_kurzbz() == 'karenz';
+            }));
+
+            $retval[] = array('dv' => $value, 'vb' => $dbDataFiltered);            
+        }          
+
+        return $this->outputJsonSuccess(array("dvList" => $retval ));
+    }
+
     // ----------------------------------------
     // Employee
     // ----------------------------------------
@@ -2109,7 +2160,8 @@ EOSQL;
 
 		$sql = <<<EOSQL
 			SELECT
-				dv.dienstverhaeltnis_id, un.bezeichnung AS dienstverhaeltnis_unternehmen ,
+				dv.dienstverhaeltnis_id, 
+				un.bezeichnung || ' (' || TO_CHAR(dv.von, 'DD.MM.YYYY') || CASE WHEN dv.bis IS NOT NULL THEN ' - ' || TO_CHAR(dv.bis, 'DD.MM.YYYY') ELSE '' END || ')' AS dienstverhaeltnis_unternehmen ,
 				'[' || oet.bezeichnung || '] ' || oe.bezeichnung AS funktion_oebezeichnung,
 				f.beschreibung AS funktion_beschreibung,
 				bf.*,
