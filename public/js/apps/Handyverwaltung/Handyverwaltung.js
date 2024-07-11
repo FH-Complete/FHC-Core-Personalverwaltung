@@ -210,7 +210,7 @@ const handyVerwaltungApp = Vue.createApp({
                                                 <div class="h5 mb-0"><h5>{{ $p.t('ui', 'betriebsmittel') }}</h5></div>        
                                             </div>
                                             <div class="card-body">
-                                                <Betriebsmittel :person_id="personid" :uid="personuid" />
+                                                <Betriebsmittel :endpoint="$fhcApi.factory.betriebsmittel.person" type-id="person_id" :id="personid" :uid="personuid" />
                                             </div>
                                          </div>
                                      </div>
