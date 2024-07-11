@@ -53,7 +53,7 @@ export const JobFunction = {
 
 
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-        const route = VueRouter.useRoute();
+        const route = ( props.readonlyMode !== true ) ? VueRouter.useRoute() : null;
 
         const convertArrayToObject = (array, key) => {
             const initialValue = {};
