@@ -13,7 +13,7 @@ $config['navigation_header']['*']['Personen']['children']['Handyverwaltung'] = a
 	'sort' => 26,
 	'description' => 'Handyverwaltung',
 	'expand' => false,
-	'requiredPermissions' => 'extension/pv21_handyverwaltung:r'
+	'requiredPermissions' => array('extension/pv21_handyverwaltung:r', 'basis/mitarbeiter:r')
 );
 
 $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/restricted/*'] = array(
@@ -21,7 +21,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/restricted/*'
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Handyverwaltung'),
 		'description' => 'Handyverwaltung',
 		'icon' => 'home',
-		'requiredPermissions' => 'extension/pv21_handyverwaltung:r'
+		'requiredPermissions' => array('extension/pv21_handyverwaltung:r', 'basis/mitarbeiter:r')
 	)
 );
 
