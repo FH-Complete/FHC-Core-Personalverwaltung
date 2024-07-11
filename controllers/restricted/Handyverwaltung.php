@@ -14,7 +14,7 @@ class Handyverwaltung extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => 'extension/pv21_handyverwaltung:rw'
+				'index' => array('extension/pv21_handyverwaltung:rw', 'admin:rw')
 			)
 		);
 	}

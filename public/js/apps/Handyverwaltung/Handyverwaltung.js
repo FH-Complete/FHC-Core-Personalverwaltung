@@ -87,7 +87,7 @@ const handyVerwaltungApp = Vue.createApp({
             // Tabulator handler for the rowClick event
             personselected: function(e, row) { 
                 console.log('personselected', row)
-                this.personid = row.getData().PersonId
+                this.personid = row.getData().PersonId;
                 this.personuid = row.getData().UID;
                 
                 if( this.$refs['vsplit'].isCollapsed() !== false ) {
