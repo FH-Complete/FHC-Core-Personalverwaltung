@@ -41,6 +41,8 @@ class Api extends Auth_Controller
                 'getCovidState' => Api::DEFAULT_PERMISSION,
                 'getCurrentDV' => Api::DEFAULT_PERMISSION,
                 'getCourseHours' => Api::DEFAULT_PERMISSION,
+                'getAllCourseHours' => Api::DEFAULT_PERMISSION,
+                'getAllSupportHours' => Api::DEFAULT_PERMISSION,
                 'getReportData' => Api::DEFAULT_PERMISSION,
                 'personHeaderData' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
                 'personAbteilung' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
@@ -110,6 +112,14 @@ class Api extends Auth_Controller
                 'getEmployeesWithoutContract' => Api::DEFAULT_PERMISSION,
                 'getFristenListe' => Api::DEFAULT_PERMISSION,
         'dvInfoByPerson' => [Api::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+                'getPersonFristenListe' => Api::DEFAULT_PERMISSION,
+                'updateFristenListe' => Api::DEFAULT_PERMISSION,
+                'getFristenStatus' => Api::DEFAULT_PERMISSION,
+                'getFristenEreignisse' => Api::DEFAULT_PERMISSION,
+                'updateFristStatus' => Api::DEFAULT_PERMISSION,
+                'deleteFrist' => Api::DEFAULT_PERMISSION,
+                'upsertFrist' => Api::DEFAULT_PERMISSION,
+                'batchUpdateFristStatus' => Api::DEFAULT_PERMISSION
 	    )
 	);
 
@@ -122,6 +132,8 @@ class Api extends Auth_Controller
 			null, 'GehaltsbestandteilLib');
         $this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib',
 			null, 'GehaltsabrechnungLib');
+        $this->load->library('extensions/FHC-Core-Personalverwaltung/fristen/FristenLib',
+			null, 'FristenLib');
 
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
         $this->load->model('person/Person_model','PersonModel');
@@ -155,6 +167,7 @@ class Api extends Auth_Controller
 	$this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
 	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
         $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
+        $this->load->model('ressource/Frist_model', 'FristModel');
 
         // get CI for transaction management
         $this->CI = &get_instance();
@@ -730,6 +743,34 @@ class Api extends Auth_Controller
         }
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
+        $this->outputJson($data);
+    }
+
+    function getAllCourseHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getAllCourseHours($uid);
+        $this->outputJson($data);
+    }
+
+    function getAllSupportHours()
+    {
+        $uid = $this->input->get('uid', TRUE);
+
+        if ($uid == '')
+        {
+            $this->outputJsonError("uid is missing!'");
+            return;
+        }
+
+        $data = $this->LVAModel->getAllSupportHours($uid);
         $this->outputJson($data);
     }
 
@@ -2429,14 +2470,27 @@ EOSQL;
             return;
         }
 
-		if( !$payload->gueltigkeit->data->gueltig_bis )
-		{
-			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+        if (empty($payload->dvendegrund_kurzbz))
+        {
+            $this->outputJsonError('Bitte einen Beendigungsgrund auswählen.');
             return;
-		}
+        }
+
+        if ($payload->dvendegrund_kurzbz === 'sonstige' && empty($payload->dvendegrund_anmerkung))
+        {
+            $this->outputJsonError('Bitte beim Beendigungsgrund "Sonstige" eine Anmerkung eingeben.');
+            return;
+        }
+
+	if( !$payload->gueltigkeit->data->gueltig_bis )
+	{
+	    $this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+            return;
+	}
 
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnisid));
-        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
+        $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis,
+	    $payload->dvendegrund_kurzbz, $payload->dvendegrund_anmerkung);
 
         if ( $ret !== TRUE) {
             return $this->outputJsonError($ret);
@@ -2495,26 +2549,155 @@ EOSQL;
 
         return $this->outputJsonSuccess('Karenz gespeichert');
     }
+    
 
     public function getFristenListe()
     {
-        $sql = "SELECT f.*,status.bezeichnung status_bezeichnung,ereignis.bezeichnung ereignis_bezeichnung,p.vorname,p.nachname,p.person_id,
-                verantwortlich_p.vorname verantwortlich_vorname, verantwortlich_p.nachname verantwortlich_nachname, verantwortlich_p.person_id verantwortlich_person_id
-                FROM hr.tbl_frist f JOIN hr.tbl_frist_status status using(status_kurzbz) 
-                    join hr.tbl_frist_ereignis ereignis using(ereignis_kurzbz) 
-                    left join public.tbl_mitarbeiter m using(mitarbeiter_uid)                     
-                    left join public.tbl_benutzer b on(m.mitarbeiter_uid=b.uid) 
-                    left join public.tbl_person p on (b.person_id=p.person_id)
-                    left join public.tbl_benutzer verantwortlich_b on(f.verantwortlich_uid=verantwortlich_b.uid) 
-                    left join public.tbl_person verantwortlich_p on (verantwortlich_b.person_id=verantwortlich_p.person_id)
-                ORDER BY f.datum ASC";
+        $result = $this->FristenLib->getFristenListe();
+        return $this->outputJson($result);
+    }
 
-      //  $sql="select frist_id,mitarbeiter_uid,ereignis_kurzbz,bezeichnung,datum,status_kurzbz,parameter,insertvon,insertamum,updatevon,updateamum from hr.tbl_frist";
+    public function getPersonFristenListe($uid)
+    {
+	$all = filter_var($this->input->get('all'), FILTER_VALIDATE_BOOLEAN);
+        $result = $this->FristenLib->getFristenListe($uid, $all);
+        return $this->outputJson($result);
+    }
 
-		$query = $this->CI->db->query($sql, array());
-        $result = $query->result();
-//		$this->_remapData('frist_id',$result);
+    public function updateFristenListe()
+    {
+		$d = new DateTime();
+		$result = $this->FristenLib->updateFristen($d);
+        return $this->outputJson($result);
+    }
+
+    public function updateFristStatus()
+    {
+        $data = json_decode($this->input->raw_input_stream, true);
+
+        $data['updateamum'] = 'NOW()';
+		$data['updatevon'] = getAuthUID();
+        $frist_id = $data['frist_id'];
+		unset($data['frist_id']);
+        unset($data['datum']);
+        unset($data['ereignis_kurzbz']);
+    	$result = $this->FristModel->update(
+    		$frist_id,
+    		$data
+    	);
+
+		if (isError($result))
+			return $this->outputJsonError('Fehler beim Speichern von Friststatus');
+
+		$frist = $this->FristModel->load($result->retval);
+
+		if (hasData($frist))
+			$this->outputJsonSuccess($frist->retval);
+    }
+
+
+    /**
+     * update multiple deadlines at once
+     */
+    public function batchUpdateFristStatus()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['fristen']) && !is_array($payload['fristen']))
+                show_error('fristen does not seem to be an array!');
+
+            $result = $this->FristModel->batchUpdateStatus($payload['fristen'], $payload['status_kurzbz'], getAuthUID());
+
+            if ($result === true)
+                $this->outputJsonSuccess($result);
+            else
+                $this->outputJsonError('Error when updating deadlines');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
+
+    }
+
+    public function upsertFrist()
+    {
+        if($this->input->method() === 'post'){
+
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['frist_id']) && !is_numeric($payload['frist_id']))
+                show_error('frist_id is not numeric!');
+
+            if (!isset($payload['status_kurzbz']) || (isset($payload['status_kurzbz']) && $payload['status_kurzbz'] == ''))
+                show_error('status_kurzbz is empty!');
+
+            if (!isset($payload['ereignis_kurzbz']) || (isset($payload['ereignis_kurzbz']) && $payload['ereignis_kurzbz'] == ''))
+                show_error('status_kurzbz is empty!');
+
+            if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
+                show_error('mitarbeiter_uid is empty!');
+
+            if ($payload['frist_id'] == 0)
+            {
+                $payload['insertvon'] = getAuthUID();
+                $payload['parameter'] = '{}';
+                unset($payload['frist_id']);
+                $result = $this->FristModel->insert($payload);
+            } else {
+                $payload['updateamum'] = 'NOW()';
+		        $payload['updatevon'] = getAuthUID();
+                unset($payload['insertamum']);
+                unset($payload['insertvon']);
+                $result = $this->FristModel->update($payload['frist_id'], $payload);
+            }
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when updating deadline');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+
+
+
+
+    public function getFristenStatus()
+	{
+		$result = $this->FristenLib->getFristenStatus();
 		return $this->outputJson($result);
+	}
+
+    public function getFristenEreignisse()
+	{
+        $manuell = $this->input->get('manuell', FALSE);
+		$result = $this->FristenLib->getFristenEreignis($manuell);
+		return $this->outputJson($result);
+	}
+
+    public function deleteFrist()
+    {
+        if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['frist_id']) && !is_numeric($payload['frist_id']))
+                show_error('frist_id is not numeric!');
+
+            $result = $this->FristModel->delete($payload['frist_id']);
+
+            if (isSuccess($result))
+			    $this->outputJsonSuccess($result->retval);
+		    else
+			    $this->outputJsonError('Error when deleting frist');
+
+        } else {
+            $this->output->set_status_header('405');
+        }
     }
 
 	public function getKarenztypen()

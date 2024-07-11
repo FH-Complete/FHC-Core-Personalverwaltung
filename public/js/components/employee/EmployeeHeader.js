@@ -29,6 +29,7 @@ export const EmployeeHeader = {
         const employee = ref();
         const fileInput = ref();
         const previewImage = ref();
+        const statusRef = ref();
 
         const isFetching = ref(false);        
         const isFetchingName = ref(false);
@@ -207,6 +208,7 @@ export const EmployeeHeader = {
         const refresh = () => {
             console.log('refresh called')
             fetchHeaderData(props.personID, props.personUID)
+            statusRef.value.refresh()
         }
         
 
@@ -218,6 +220,7 @@ export const EmployeeHeader = {
             confirmDeleteRef,
             pickFile,
             okHandler,
+            statusRef,
             toastRef,toastDeleteRef,
             redirect,
             FHC_JS_CONFIG,
@@ -279,7 +282,7 @@ export const EmployeeHeader = {
                 
                 <div class="ms-3 flex-fill d-flex flex-column" >
                     <div class="align-items-top">
-                        <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}</h2>
+                        <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}<span v-if="employee?.titelpost != null && employee?.titelpost != ''">, {{ employee?.titelpost }}</span></h2>
                         <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
     
                         <div v-if="employee?.abteilung && !isFetching" class="mb-1">
@@ -304,7 +307,7 @@ export const EmployeeHeader = {
                         </div>  
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
                     </div>
-                    <EmployeeStatus v-if="!restricted" ></EmployeeStatus>
+                    <EmployeeStatus v-if="!restricted" ref="statusRef"></EmployeeStatus>
                    
                 </div>
              

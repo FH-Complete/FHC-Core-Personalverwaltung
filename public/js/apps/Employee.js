@@ -95,6 +95,7 @@ const pvApp = Vue.createApp({
 		const gehaltstypen = Vue.ref([]);
 		const hourlyratetypes = Vue.ref([]);
 		const unternehmen = Vue.ref([]);
+		const beendigungsgruende = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
@@ -161,6 +162,9 @@ const pvApp = Vue.createApp({
 		typeDefinition.fetchUnternehmen().then((r) => {
 			unternehmen.value = r;
 		})
+		fetchBeendigungsgruende().then((r) => {
+			beendigungsgruende.value = r;
+		})
 
 		Vue.provide("sprache",sprache);
 		Vue.provide("nations",nations);
@@ -179,8 +183,107 @@ const pvApp = Vue.createApp({
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
 		Vue.provide("cisRoot", CIS_ROOT)
+		Vue.provide('beendigungsgruende',beendigungsgruende);
 	}
 }).use(router);
+
+
+
+const fetchNations = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getNations');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchSachaufwandTyp = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchKontakttyp = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getKontakttyp');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchAdressentyp = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getAdressentyp');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchSprache = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getSprache');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchAusbildung = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getAusbildung');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchStandorteIntern = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchOrte = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getOrte');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchKarenztypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getKarenztypen');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchGehaltstypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getGehaltstypen');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchVertragsarten = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getVertragsarten');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchVertragsbestandteiltypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getVertragsbestandteiltypen');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchTeilzeittypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getTeilzeittypen');
+	return CoreRESTClient.getData(res.data);
+}
+const fetchFreitexttypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getFreitexttypen');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchHourlyratetypes = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getStundensatztypen');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchUnternehmen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/getUnternehmen');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchBeendigungsgruende = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/apis/DvEndeGrund/getDvEndeGruende');
+	return CoreRESTClient.getData(res.data);
+}
 
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});

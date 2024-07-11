@@ -5,12 +5,20 @@ abstract class AbstractFrist {
 
     private $_ci;
 
-    /** @var FristTyp ENDE=deadline expires within timespan */
-    protected FristTyp $fristTyp = FristTyp::ENDE;
+    /** @var string ENDE=deadline expires within timespan */
+    protected $fristTyp = FristTyp::ENDE;
     /** @var int timespan in months */
-    protected int $zeitraum = 2;
+    protected $zeitraum = 2;
+    /** @var string ereignis id (needs to be set in sub class) */
+    protected $ereignis_kurzbz = '';
+    /** @var string name of id column (needs to be set in sub class) */
+    protected $id_colname = '';
+    /** @var  string optional filter */
+    protected $vertragsbestandteiltyp_kurzbz = '';
+    /** @var string optional array for detail data  i.e. ['table_name' => 'hr.tbl_vertragsbestandteil_freitext', 'typ_colname' => 'freitexttyp_kurzbz', 'typ_kurzbz' => 'befristung'] */
+    protected $detailbestandteil;
 
-    public function __construct(fristTyp $typ = FristTyp::ENDE, int $zeitraum = 2)
+    public function __construct(string $typ = FristTyp::ENDE, int $zeitraum = 2)
 	{
         $this->_ci =& get_instance();
         $this->fristTyp = $typ;
@@ -18,29 +26,60 @@ abstract class AbstractFrist {
     }
 
     /**
-     * query data from db. Depending on the type fo fristTyp it returns all records
+     * query data from db. Depending on the type of fristTyp it returns all records
      * that expire within timespan or that are about to start within the timespan.
      */
-    public function getDataByTable(string $dbTable)
+    public function getDataByTable(string $dbTable, DateTime $date)
     {
         $colname = "bis";
         if ($this->fristTyp == FristTyp::BEGINN) {
             $colname = "von";
         }
-        $qry = "select dv.* from $dbTable where $colname between now()::date and (now()::date + interval '? months')::date";
+        $d = $date->format('Y-m-d');
+        //$qry = "select * from $dbTable where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date";
+
         $dbModel = new DB_Model();
-        $result = $dbModel->execReadOnlyQuery($qry, [$this->zeitraum]);
+
+        $hasDetailConfig = isset($this->detailbestandteil['table_name']) && !isEmptyString($this->detailbestandteil['table_name']);
+
+        // query DV
+        $qry = "
+            WITH frist AS (select frist_id,ereignis_kurzbz, parameter from hr.tbl_frist where ereignis_kurzbz=".$dbModel->escape($this->ereignis_kurzbz).")
+            select d.*, frist.frist_id 
+            from $dbTable d  left join frist on (d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
+            where $colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null";
+
+        if (!isEmptyString($this->vertragsbestandteiltyp_kurzbz) && !$hasDetailConfig)
+        {
+            // query Vertragsbestandteil
+            $qry = "
+            WITH frist AS (select frist_id,ereignis_kurzbz, parameter from hr.tbl_frist where ereignis_kurzbz=".$dbModel->escape($this->ereignis_kurzbz).")
+            select dv.mitarbeiter_uid,d.*, frist.frist_id 
+            from hr.tbl_dienstverhaeltnis dv join $dbTable d using(dienstverhaeltnis_id) left join frist on (d.dienstverhaeltnis_id = (frist.parameter->>'dienstverhaeltnis_id')::integer  and d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
+            where d.$colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null
+            and vertragsbestandteiltyp_kurzbz=".$dbModel->escape($this->vertragsbestandteiltyp_kurzbz);
+        } else if (!isEmptyString($this->vertragsbestandteiltyp_kurzbz) && $hasDetailConfig)
+        {
+            // query Vertragsbestandteil with detail table 
+            $qry = "
+            WITH frist AS (select frist_id,ereignis_kurzbz, parameter from hr.tbl_frist where ereignis_kurzbz=".$dbModel->escape($this->ereignis_kurzbz).")
+            select dv.mitarbeiter_uid,d.*, frist.frist_id 
+            from hr.tbl_dienstverhaeltnis dv join $dbTable d using(dienstverhaeltnis_id) join ".$this->detailbestandteil['table_name']." using(vertragsbestandteil_id) left join frist on (d.dienstverhaeltnis_id = (frist.parameter->>'dienstverhaeltnis_id')::integer  and d.".$this->id_colname." = (frist.parameter->>".$dbModel->escape($this->id_colname).")::integer)
+            where d.$colname between '$d'::date and ('$d'::date + interval '".$this->zeitraum." months')::date and frist.frist_id is null
+            and vertragsbestandteiltyp_kurzbz=".$dbModel->escape($this->vertragsbestandteiltyp_kurzbz)." 
+            and ".$this->detailbestandteil['table_name'].'.'.$this->detailbestandteil['typ_colname']."=".$dbModel->escape($this->detailbestandteil['typ_kurzbz']);
+        }
+
+        $result = $dbModel->execReadOnlyQuery($qry);
 
 		if (isError($result)) return $result;
-
-		if (!hasData($result)) return error("Keine Datensätze gefunden!");
-
+		
 		return $result;
     }
 
-    public function exists(string $ereignisKurzbz, string $paramName, int $paramValue)
+    public function exists($rowData)
     {
-
+        return false;
     }
 
     
@@ -49,21 +88,21 @@ abstract class AbstractFrist {
     /**
      * Get the value of fristTyp
      *
-     * @return FristTyp
+     * @return string
      */
-    public function getFristTyp(): FristTyp
+    public function getFristTyp(): string
     {
-        return $this->fristTyp;
+        return $this->fristTyp; 
     }
 
     /**
      * Set the value of fristTyp
      *
-     * @param FristTyp $fristTyp
+     * @param string $fristTyp
      *
      * @return self
      */
-    public function setFristTyp(FristTyp $fristTyp): self
+    public function setFristTyp(string $fristTyp): self
     {
         $this->fristTyp = $fristTyp;
 

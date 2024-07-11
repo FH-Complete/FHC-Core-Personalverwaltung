@@ -84,6 +84,7 @@ export const EmployeeContract = {
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
         const freitexttypen = inject('freitexttypen');
+        const beendigungsgruende = inject('beendigungsgruende');
 
         const readonly = ref(false);
 
@@ -249,7 +250,7 @@ export const EmployeeContract = {
             isFetching.value = true            
             try {
                 const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
-                theModel.value.updateHeader();
+                emit('updateHeader');
             } catch (error) {
                 console.log(error);
             } finally {
@@ -375,6 +376,8 @@ export const EmployeeContract = {
                     dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
                     unternehmen: currentDV.value.oe_kurzbz,
                     vertragsart_kurzbz: currentDV.value.vertragsart_kurzbz,
+                    dvendegrund_kurzbz: currentDV.value.dvendegrund_kurzbz,
+                    dvendegrund_anmerkung: currentDV.value.dvendegrund_anmerkung,
                     gueltigkeit: {
                         guioptions: {
                            sharedstatemode: 'ignore',
@@ -447,13 +450,14 @@ export const EmployeeContract = {
                     fetchVertrag(currentDVID.value, currentDate.value);
                     fetchGBT(currentDVID.value, currentDate.value);
                     fetchGBTChartData(currentDVID.value);
-                    theModel.value.updateHeader();
+                    emit('updateHeader');
                 }
             })
         }
 
         const handleDvEnded = async () => {
-            fetchData(props.uid);
+            fetchData(route.params.uid);
+            emit('updateHeader');
         }
 
         const handleDvDeleted = () => {
@@ -464,7 +468,7 @@ export const EmployeeContract = {
                 + props.id + '/' + props.uid
                 + '/contract';
             router.push( url ).then(() => {
-                router.go(0)
+                router.go(0);
             });
         }
         
@@ -592,7 +596,12 @@ export const EmployeeContract = {
         const formatFreitexttyp = (item) => {
             let va = freitexttypen.value.find(kt => kt.value == item);
             return va != undefined ? va.label : item;
-          }
+        }
+
+        const formatBeendigungsgrund = (item) => {
+            let va = beendigungsgruende.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
 
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
@@ -603,7 +612,7 @@ export const EmployeeContract = {
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
+            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted,
         }
     },
@@ -725,14 +734,27 @@ export const EmployeeContract = {
                                         <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV?.bis)" >
                                     </div>
 
-                                    <div class="col-md-4">
-                                    <!--
+                                    <!--div class="col-md-4">
                                         <label  class="form-label" >Befristet</label>
                                         <div class="col-sm-8">
                                             <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" disabled >                                            
                                         </div>
-                                    -->
+                                    </div-->
+
+                                    <!-- DV Beendigungsgrund -->
+                                    <div class="col-md-4" v-if="currentDV?.dvendegrund_kurzbz != null">
+                                        <label  class="form-label" >Beendigungsgrund</label>
+                                        <input readonly class="form-control-sm form-control-plaintext" type="text" id="dvendegrundKurzbz" :value="formatBeendigungsgrund(currentDV?.dvendegrund_kurzbz)"  >
                                     </div>
+                                    <div class="col-md-4"  v-else></div>
+
+                                    <div class="col-md-8" v-if="currentDV?.dvendegrund_kurzbz != null">
+                                        <label  class="form-label" >Anmerkung</label>
+                                        <textarea class="form-control-sm form-control-plaintext" readonly >{{ currentDV?.dvendegrund_anmerkung }} </textarea>
+                                    </div>
+                                    <div class="col-md-8"  v-else></div>
+
+                                    <div class="col-md-4"></div>
 
                                     <!-- Befristung -->
                                     <template v-for="(item, index) in currentVBS.befristung"  >
