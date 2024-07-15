@@ -5,7 +5,7 @@ class IssueChecker extends Auth_Controller
 {
 	const DEBUG = false;
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
-	const RESTRICTED_PERMISSION = 'assistenz:r';
+	const RESTRICTED_PERMISSION = 'extension/pv21_handyverwaltung:r';
 
 	const CI_PATH = 'application';
 	const CI_LIBRARY_FOLDER = 'libraries';
