@@ -22,7 +22,6 @@ export const EmployeePerson = {
     props: {
         id: Number,
         uid: String,
-        restricted: Boolean,
     },
     emits: ['updateHeader'],
     setup(props, { emit }) {
@@ -30,10 +29,6 @@ export const EmployeePerson = {
         const { t } = usePhrasen();
         const theModel = Vue.reactive({personID: null, personUID: null,editmode: true, updateHeader: () => emit('updateHeader')});
         const path = Vue.ref("/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/Stammdaten")
-
-        if (props.restricted) {
-            path.value = "/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/StammdatenRestricted"; 
-        }
 
         theModel.personID = props.id
         theModel.personUID = props.uid

@@ -8,7 +8,6 @@ class TabsConfig extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
-	const RESTRICTED_PERMISSION = 'assistenz:r';
     // code igniter 
     protected $CI;
 
@@ -17,8 +16,7 @@ class TabsConfig extends FHCAPI_Controller
         parent::__construct(
 			array(
 				'index' => Self::DEFAULT_PERMISSION,
-				'Stammdaten' => self::DEFAULT_PERMISSION,
-				'StammdatenRestricted' => self::RESTRICTED_PERMISSION
+				'Stammdaten' => self::DEFAULT_PERMISSION
 			)
 		);
 
@@ -72,39 +70,6 @@ class TabsConfig extends FHCAPI_Controller
 			'jobfunction' => array(
 				'title' => $this->p->t('person', 'funktionen'),
 				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/JobFunction.js',
-				'config' => null
-			)
-		);
-
-		Events::trigger('pv21_conf_stammdaten', function & () use (&$result) {
-			return $result;
-		});
-
-		$this->terminateWithSuccess($result);
-    }
-
-	function StammdatenRestricted()
-    {
-			
-		$result = array(
-			'base' => array(
-				'title' => $this->p->t('global', 'stammdaten'),
-				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BaseData.js',
-				'config' => null
-			),
-			'employee' => array(
-				'title' => $this->p->t('person', 'mitarbeiterdaten'),
-				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeData.js',
-				'config' => null
-			),
-			'contact' => array(
-				'title' => $this->p->t('person', 'kontaktdaten'),
-				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/contact/ContactData.js',
-				'config' => null
-			),
-			'betriebsmittel' => array(
-				'title' => $this->p->t('person', 'betriebsmittel'),
-				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/BetriebsmittelWrapper.js',
 				'config' => null
 			)
 		);

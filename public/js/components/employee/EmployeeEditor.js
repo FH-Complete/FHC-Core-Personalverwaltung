@@ -1,21 +1,18 @@
 import { EmployeePerson } from './EmployeePerson.js';
 import { EmployeeHeader } from './EmployeeHeader.js';
 import { EmployeeNav } from './EmployeeNav.js';
-import { EmployeeNavRestricted } from './EmployeeNavRestricted.js';
 
 export default {
     components: {
         EmployeePerson,
         EmployeeHeader,
         EmployeeNav,
-        EmployeeNavRestricted,
     },
     props: {
         personid: Number,
         personuid: String,
         open: Boolean,
         isNew:  Boolean,
-        restricted: Boolean,
     },
     emits: ['personSelected'],
     setup( props, {emit }) {
@@ -61,12 +58,11 @@ export default {
 			}
 		)
 
-        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate, employeeHeaderRef, updateHeaderHandler, }
+        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate, employeeHeaderRef, updateHeaderHandler }
     },
     template: `    
         <EmployeeHeader ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" @person-selected="redirect"   ></EmployeeHeader> 
-        <EmployeeNav  v-if="!restricted" :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
-        <EmployeeNavRestricted  v-if="restricted" :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNavRestricted> 
+        <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
         <router-view @updateHeader="updateHeaderHandler"></router-view>       
     `
 }
