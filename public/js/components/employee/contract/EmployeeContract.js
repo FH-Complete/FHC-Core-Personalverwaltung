@@ -647,7 +647,6 @@ export const EmployeeContract = {
                             </DropDownButton>
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
                         </div>
-                        <div class="me-auto" v-else></div>
 
                         <div class="d-flex align-items-end flex-column">  
                             <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
