@@ -24,7 +24,6 @@ export const EmployeeContract = {
     props: {
         id: Number,
         uid: String,
-        restricted: Boolean,
         dienstverhaeltnis_id: {type: Number, required: false},
     },
     emits: ['updateHeader'],
@@ -289,10 +288,8 @@ export const EmployeeContract = {
             (newVal) => {
                 if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
-                if (!props.restricted) {
-                    fetchGBT(newVal, currentDate.value);                
-                    fetchGBTChartData(newVal);
-                }
+                fetchGBT(newVal, currentDate.value);
+                fetchGBTChartData(newVal);
             }
         )
         watch(
@@ -308,10 +305,8 @@ export const EmployeeContract = {
             (newDate) => {
                 console.log('watch newDate=', newDate)
                 fetchVertrag(currentDVID.value, newDate);
-                if (!props.restricted) {
-                    fetchGBT(currentDVID.value, newDate)                
-                    fetchGBTChartData(currentDVID.value);
-                }
+                fetchGBT(currentDVID.value, newDate)
+                fetchGBTChartData(currentDVID.value);
             }
         )
 
@@ -322,7 +317,7 @@ export const EmployeeContract = {
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
             let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
                     + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                    + '/extensions/FHC-Core-Personalverwaltung/' + (props.restricted?'restricted/':'') + 'Employees/' 
+                    + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
                     + props.id + '/' + props.uid 
                     + '/contract/' + currentDV.value.dienstverhaeltnis_id;
             router.push( url );
@@ -640,7 +635,7 @@ export const EmployeeContract = {
                         <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
                     </div>
                     <div class="d-flex">
-                        <div class="me-auto" v-if="!restricted">
+                        <div class="me-auto">
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <DropDownButton class="me-2" :links="[{action:linkToLehrtaetigkeitsbestaetigungODT,text:'Lehrtätigkeitsbestätigung (odt)'},{action:linkToLehrtaetigkeitsbestaetigungPDF,text:'Lehrtätigkeitsbestätigung (pdf)'}]">
@@ -1030,7 +1025,7 @@ export const EmployeeContract = {
                         </div><!-- card -->
                         
                         <!-- Bruttomonatsgehalt  -->
-                        <div class="card mt-3" v-if="!restricted">
+                        <div class="card mt-3">
                             <div class="card-header">
                                 <h5 class="mb-0">Bruttomonatsgehalt</h5>
                             </div>
@@ -1079,7 +1074,7 @@ export const EmployeeContract = {
                         </div> <!-- card -->
                         
                         <!-- Gehalt -->
-                        <div class="card mt-3"  v-if="!restricted">
+                        <div class="card mt-3">
                             <div class="card-header">
                                 <h5 class="mb-0">Gehalt</h5>
                             </div>

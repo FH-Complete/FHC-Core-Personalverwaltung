@@ -29,13 +29,13 @@ const router = VueRouter.createRouter(
 					{ path: '', 
 					  component: EmployeePerson, 
 					  name: 'person',
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: false })  },
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid })  },
 					{ path: 'contract', 
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, restricted: false }) },
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
 					{ path: 'contract/:dienstverhaeltnis_id', 
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id, restricted: false })		
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })		
 					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
