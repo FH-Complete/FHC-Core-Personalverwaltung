@@ -46,7 +46,6 @@
 <script>
 
 var FHC_JS_CONFIG = { domain: '<?php echo DOMAIN; ?>'};
-var CIS_ROOT = '<?php echo CIS_ROOT ?>';
 
 (function () {
   'use strict'
