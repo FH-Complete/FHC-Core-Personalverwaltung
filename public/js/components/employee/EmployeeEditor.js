@@ -13,7 +13,6 @@ export default {
         personuid: String,
         open: Boolean,
         isNew:  Boolean,
-        restricted: Boolean,
     },
     emits: ['personSelected'],
     setup( props, {emit }) {
@@ -59,11 +58,11 @@ export default {
 			}
 		)
 
-        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate, employeeHeaderRef, updateHeaderHandler, }
+        return { redirect, dateChanged, currentPersonID, currentPersonUID, currentDate, employeeHeaderRef, updateHeaderHandler }
     },
     template: `    
         <EmployeeHeader ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" @person-selected="redirect"   ></EmployeeHeader> 
-        <EmployeeNav :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
+        <EmployeeNav   :personID="currentPersonID" :personUID="currentPersonUID"  ></EmployeeNav> 
         <router-view @updateHeader="updateHeaderHandler"></router-view>       
     `
 }
