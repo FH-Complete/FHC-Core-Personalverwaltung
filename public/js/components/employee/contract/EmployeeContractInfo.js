@@ -113,7 +113,7 @@ export const EmployeeContractInfo = {
                                             <td>{{ formatVertragsart(item.dv.vertragsart_kurzbz) }}</td>
                                             <td>{{ formatDate(item.dv.von) }} -  {{ formatDate(item.dv.bis) }}</td>
                                             <td><span v-if="getVBStunden(item.vb) != null">{{ formatNumber(getVBStunden(item.vb).wochenstunden) }} ( {{ formatDate(getVBStunden(item.vb).von) }} - {{ formatDate(getVBStunden(item.vb).bis) }})</span><span v-else>-</span></td>
-                                            <td><span v-if="getVBKarenz(item.vb) != null"> formatKarenztyp(getVBKarenz(item.vb).karenztyp_kurzbz) {{ getVBKarenz(item.vb).von }} - {{ getVBKarenz(item.vb).bis }}</span><span v-else>-</span></td></tr>
+                                            <td><span v-if="getVBKarenz(item.vb) != null">{{ formatKarenztyp(getVBKarenz(item.vb).karenztyp_kurzbz) }} {{ getVBKarenz(item.vb).von }} - {{ getVBKarenz(item.vb).bis }}</span><span v-else>-</span></td></tr>
                                      </tbody>
                                  </table>
                             </div>
