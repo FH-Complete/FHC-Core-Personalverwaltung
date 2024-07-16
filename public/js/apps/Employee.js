@@ -10,6 +10,7 @@ import { EmployeeDocument } from "../components/employee/document/EmployeeDocume
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
+import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -25,9 +26,17 @@ const router = VueRouter.createRouter(
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
 				children: [					
-					{ path: '', component: EmployeePerson, name: 'person' },
-					{ path: 'contract', component: EmployeeContract },
-					{ path: 'contract/:dienstverhaeltnis_id', component: EmployeeContract },
+					{ path: '', 
+					  component: EmployeePerson, 
+					  name: 'person',
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid })  },
+					{ path: 'contract', 
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
+					{ path: 'contract/:dienstverhaeltnis_id', 
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })		
+					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
 					{ path: 'document', component: EmployeeDocument, name: 'document' },
@@ -70,68 +79,67 @@ const pvApp = Vue.createApp({
 
 		const currentDate = Vue.ref('2022-03-04');
 
-		fetchSprache().then((r) => {
+		typeDefinition.fetchSprache().then((r) => {
 			sprache.value = r;
 		})
 
-		fetchNations().then((r) => {
+		typeDefinition.fetchNations().then((r) => {
 			nations.value = r;
 		})
 
-		fetchAusbildung().then((r) => {
+		typeDefinition.fetchAusbildung().then((r) => {
 			ausbildung.value = r;
 		})
 
-		fetchOrte().then((r) => {
+		typeDefinition.fetchOrte().then((r) => {
 			orte.value = r;
 		})
 
-		fetchStandorteIntern().then((r) => {
+		typeDefinition.fetchStandorteIntern().then((r) => {
 			standorte.value = r;
 		})
 
-
-		fetchKontakttyp().then((r) => {
+		typeDefinition.fetchKontakttyp().then((r) => {
 			kontakttyp.value = r;
 		})
 
-		fetchAdressentyp().then((r) => {
+		typeDefinition.fetchAdressentyp().then((r) => {
 			adressentyp.value = r;
 		})
 
-		fetchSachaufwandTyp().then((r) => {
+		typeDefinition.fetchSachaufwandTyp().then((r) => {
 			sachaufwandtyp.value = r;
 		})
 
-		fetchKarenztypen().then((r) => {
+		typeDefinition.fetchKarenztypen().then((r) => {
 			karenztypen.value = r;
 		})
 
-		fetchTeilzeittypen().then((r) => {
+		typeDefinition.fetchTeilzeittypen().then((r) => {
 			teilzeittypen.value = r;
 		})
 
-		fetchVertragsarten().then((r) => {
+		typeDefinition.fetchVertragsarten().then((r) => {
 			vertragsarten.value = r;
 		})
 
-		fetchGehaltstypen().then((r) => {
+		typeDefinition.fetchGehaltstypen().then((r) => {
 			gehaltstypen.value = r;
 		})
 
-		fetchVertragsbestandteiltypen().then((r) => {
+		typeDefinition.fetchVertragsbestandteiltypen().then((r) => {
 			vertragsbestandteiltypen.value = r;
 		})
 
-		fetchFreitexttypen().then((r) => {
+		typeDefinition.fetchFreitexttypen().then((r) => {
 			freitexttypen.value = r;
 		})
 
-		fetchHourlyratetypes().then((r) => {
+		typeDefinition.fetchHourlyratetypes().then((r) => {
 			hourlyratetypes.value = r;
 		})
 
-		fetchUnternehmen().then((r) => {
+		typeDefinition.fetchUnternehmen().then((r) => {
 			unternehmen.value = r;
 		})
 		fetchBeendigungsgruende().then((r) => {

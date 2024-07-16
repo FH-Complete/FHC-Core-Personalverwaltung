@@ -10,7 +10,6 @@ export const AddressData = {
         Toast,
     },
     props: {
-        editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
         writePermission: { type: Boolean, required: false },
     },  

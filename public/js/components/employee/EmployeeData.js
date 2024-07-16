@@ -11,7 +11,6 @@ export const EmployeeData= {
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
         config: { type: Object, default: () => ({}), required: false},
-        editMode: { type: Boolean, required: false },
         personID: { type: Number, required: false },
         personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
@@ -230,6 +229,7 @@ export const EmployeeData= {
             standorte,
             orte,
             validKurzbz,
+            theModel,
 
             save,
             toggleMode,  
@@ -258,7 +258,7 @@ export const EmployeeData= {
                         <div class="h5"><h5>{{ t('person','mitarbeiterdaten') }}</h5></div>        
                     </div>
                     <div class="card-body">
-                        <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                        <div class="d-grid gap-2 d-md-flex justify-content-end " v-if="!theModel.restricted">
                                 <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
                                     <i class="fa fa-pen"></i>
                                 </button>
