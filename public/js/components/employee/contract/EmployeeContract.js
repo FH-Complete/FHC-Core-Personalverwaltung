@@ -22,10 +22,12 @@ export const EmployeeContract = {
         Toast,
     },
     props: {
-         
+        id: Number,
+        uid: String,
+        dienstverhaeltnis_id: {type: Number, required: false},
     },
     emits: ['updateHeader'],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
 
         const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
@@ -171,9 +173,9 @@ export const EmployeeContract = {
                 dvList.value = res.data.retval;          
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
-                    if (route.params.dienstverhaeltnis_id != undefined) {
-                        currentDVID.value = route.params.dienstverhaeltnis_id;
-                        currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == route.params.dienstverhaeltnis_id);
+                    if (props.dienstverhaeltnis_id != undefined) {
+                        currentDVID.value = props.dienstverhaeltnis_id;
+                        currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == props.dienstverhaeltnis_id);
                     } else {
                         currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
                         currentDV.value = dvList.value[0];
@@ -274,9 +276,9 @@ export const EmployeeContract = {
             return currentDate.value.getTime() == now.value.getTime()
         })
         
-        fetchData(route.params.uid);
+        fetchData(props.uid);
         watch(
-            () => route.params.uid,
+            () => props.uid,
             (newVal) => {
                 fetchData(newVal);
             }
@@ -291,10 +293,10 @@ export const EmployeeContract = {
             }
         )
         watch(
-            () => route.params.dienstverhaeltnis_id,
+            () => props.dienstverhaeltnis_id,
             (newVal) => {
-                currentDVID.value = route.params.dienstverhaeltnis_id;
-                currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == route.params.dienstverhaeltnis_id);
+                currentDVID.value = props.dienstverhaeltnis_id;
+                currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == props.dienstverhaeltnis_id);
             }
         )
 
@@ -316,7 +318,7 @@ export const EmployeeContract = {
             let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
                     + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
                     + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
-                    + route.params.id + '/' + route.params.uid 
+                    + props.id + '/' + props.uid 
                     + '/contract/' + currentDV.value.dienstverhaeltnis_id;
             router.push( url );
         }
@@ -437,7 +439,7 @@ export const EmployeeContract = {
         }
         
         const handleDvSaved = async () => {
-            fetchData(route.params.uid).then(() => {
+            fetchData(props.uid).then(() => {
                 // data might have changed but currentDVID is still the same -> fetch updated data
                 if (currentDVID != null && currentDVID.value > 0) {
                     fetchVertrag(currentDVID.value, currentDate.value);
@@ -458,7 +460,7 @@ export const EmployeeContract = {
             let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
                 + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                 + '/extensions/FHC-Core-Personalverwaltung/Employees/'
-                + route.params.id + '/' + route.params.uid
+                + props.id + '/' + props.uid
                 + '/contract';
             router.push( url ).then(() => {
                 router.go(0);
@@ -552,11 +554,11 @@ export const EmployeeContract = {
         const dvDeleteHandler = () => {
             console.log('dvDeleteHandler link clicked', currentDVID);
             deleteDV(currentDVID.value).then(async () => {
-                fetchData(route.params.uid)
+                fetchData(props.uid)
                 let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
                     + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                     + '/extensions/FHC-Core-Personalverwaltung/Employees/'
-                    + route.params.id + '/' + route.params.uid
+                    + props.id + '/' + props.uid
                     + '/contract';
                 await router.push( url )
             });
@@ -1099,7 +1101,7 @@ export const EmployeeContract = {
         :title="'Dienstverhältnis'" 
         :mode="vbformmode" 
         :curdv="vbformDV"
-        :mitarbeiter_uid="route.params.uid"
+        :mitarbeiter_uid="uid"
         @dvsaved="handleDvSaved">
     </vbform_wrapper>
 
