@@ -56,12 +56,12 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 
 		$kriterien = $this->params->kriterien;
 
-		if( isset($kriterien->mingehalt) && $sumsalary < $kriterien->mingehalt )
+		if( isset($kriterien->mingehalt) && $sumsalary > $kriterien->mingehalt )
 		{
 			return false;
 		}
 
-		if( isset($kriterien->maxgehalt) && $sumsalary > $kriterien->maxgehalt )
+		if( isset($kriterien->maxgehalt) && $sumsalary <= $kriterien->maxgehalt )
 		{
 			return false;
 		}
