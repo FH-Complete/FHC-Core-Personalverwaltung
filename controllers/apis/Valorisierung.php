@@ -74,7 +74,6 @@ class Valorisierung extends FHCAPI_Controller
 	public function getValorisationInfo()
 	{
 		$valorisierung_kurzbz = $this->input->get('valorisierunginstanz_kurzbz');
-		error_log(print_r($valorisierung_kurzbz, true));
 
 		if (!isset($valorisierung_kurzbz)) $this->terminateWithError('Parameter Valorisierunginstanz Kurzbz fehlt');
 

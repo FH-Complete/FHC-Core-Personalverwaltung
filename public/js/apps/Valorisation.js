@@ -24,6 +24,7 @@ const valApp = Vue.createApp(	{
 			alleValorisierungsinstanzen: [],
 			valorisierungInfoData: [],
 			valorisierungsinstanz_kurzbz: '',
+			valorisierung_oe_kurzbz: '',
 			valorisierungsdatum: '',
 			ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -36,11 +37,15 @@ const valApp = Vue.createApp(	{
 	methods: {
 		getValorisierungsInstanzen: function() {
 			const res = Vue.$fhcapi.Valorisierung.getValorisierungsInstanzen()
-					.then((response) => {
-						this.alleValorisierungsinstanzen = response.data.data;
-						this.valorisierungsdatum = '';
-					})
-					.catch(this.handleErrors);
+				.then((response) => {
+					this.alleValorisierungsinstanzen = response.data.data;
+					this.valorisierungsdatum = '';
+					if (this.alleValorisierungsinstanzen.length > 0)
+						this.valorisierung_oe_kurzbz = this.alleValorisierungsinstanzen[0].oe_kurzbz;
+					else
+						this.valorisierung_oe_kurzbz = '';
+				})
+				.catch(this.handleErrors);
 		},
 		newSideMenuEntryHandler: function(payload) {
 				this.appSideMenuEntries = payload;
@@ -84,9 +89,16 @@ const valApp = Vue.createApp(	{
 				})
 				.catch(this.handleErrors);
 		},
+		oeChanged: function() {
+			// reset Valorisierungdatum for correct dropdown display
+			this.valorisierungsdatum = '';
+		},
 		datumChanged: function() {
+			let valInstanzen = this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum && vi.oe_kurzbz == this.valorisierung_oe_kurzbz);
+
 			// set Valorisierungsinstanz to first in list when datum is changed
-			this.valorisierungsinstanz_kurzbz = this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum)[0].value;
+			if (valInstanzen.length > 0)
+				this.valorisierungsinstanz_kurzbz = valInstanzen[0].value;
 		},
 		handleErrors: function(response) {
 			if (response.hasOwnProperty('response') && response.response?.data?.errors) {
@@ -160,20 +172,45 @@ const valApp = Vue.createApp(	{
 				}
 			];
 		},
-		valorisierungsdates: function() {
+		valorisierungsOrganisationseinheiten: function() {
+			let oes = [...new Map(
+				this.alleValorisierungsinstanzen
+					.map(vi => ({value: vi.oe_kurzbz, label: vi.oe_bezeichnung})) // get only oes
+					.map(vi => [vi['value'], vi]) // filter unique
+			).values()];
+
+			oes.unshift({ // add default label
+				value: '',
+				label: 'Organisationseinheit wählen...',
+				disabled: true
+			});
+
+			let idx = oes.findIndex(vi => vi.value === null);
+
+			// set label for null value
+			if (typeof idx !== 'undefined' && idx >= 0) oes[idx].label = '-- Nicht angegeben --';
+
+			return oes;
+		},
+		valorisierungsDates: function() {
 			let dates = this.alleValorisierungsinstanzen
+				.filter((value, index, array) => value.oe_kurzbz == this.valorisierung_oe_kurzbz) // filter unique
 				.map(vi => vi.valorisierungsdatum) // get only dates
 				.filter((value, index, array) => array.indexOf(value) === index && value != '') // filter unique
 				.map(date => ({value: date, label: date})); // transform to object
+
 			dates.unshift({ // add default label
 				value: '',
 				label: 'Datum wählen...',
 				disabled: true
 			});
+
 			return dates;
 		},
 		datumValorisierungsinstanzen: function() {
-			return this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum);
+			return this.alleValorisierungsinstanzen.filter(
+				vi => vi.oe_kurzbz == this.valorisierung_oe_kurzbz && vi.valorisierungsdatum == this.valorisierungsdatum
+			);
 		},
 		valorisierungInfo: function() {
 			let valorisierungInfoObj = {};
@@ -195,6 +232,7 @@ const valApp = Vue.createApp(	{
 					valorisierungInfoObj =
 					{
 						"valorisierung_kurzbz": infoData.valorisierung_kurzbz,
+						"valorisierung_oe_bezeichnung": infoData.oe_bezeichnung,
 						"valorisierungsdatum": infoData.valorisierungsdatum,
 						"valorisierung_instanz_beschreibung": infoData.valorisierung_instanz_beschreibung,
 						"methoden": [valorisierungMethode]
@@ -253,9 +291,17 @@ const valApp = Vue.createApp(	{
 							:tabulator-events="tabulatorEvents">
 				<template #actions>
 					<div class="d-flex gap-2 align-items-baseline mb-4">
+						<select v-model="valorisierung_oe_kurzbz" class="form-select w-auto" aria-label="ValorisierungsOe" @change="oeChanged">
+							<option
+								v-for="vo in valorisierungsOrganisationseinheiten"
+								:value="vo.value"
+								:disabled="vo.disabled">
+								{{ vo.label }}
+							</option>
+						</select>
 						<select v-model="valorisierungsdatum" class="form-select w-auto" aria-label="ValorisierungsDatum" @change="datumChanged">
 							<option
-								v-for="vd in valorisierungsdates"
+								v-for="vd in valorisierungsDates"
 								:value="vd.value"
 								:disabled="vd.disabled">
 								{{ vd.label }}
@@ -266,7 +312,8 @@ const valApp = Vue.createApp(	{
 							<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz">
 								<option
 									v-for="vi in datumValorisierungsinstanzen"
-									:value="vi.value">
+									:value="vi.value"
+									:disabled="vi.disabled">
 									{{ vi.label }}
 								</option>
 							</select>
@@ -298,6 +345,10 @@ const valApp = Vue.createApp(	{
 					<tr>
 						<th>Beschreibung</th>
 						<td>{{valorisierungInfo.valorisierung_instanz_beschreibung}}</td>
+					</tr>
+					<tr>
+						<th>Unternehmen/Organisationseinheit</th>
+						<td>{{valorisierungInfo.valorisierung_oe_bezeichnung}}</td>
 					</tr>
 					<tr>
 						<th>Datum</th>

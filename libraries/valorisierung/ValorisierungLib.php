@@ -127,9 +127,9 @@ class ValorisierungLib
 		}
 
 		// before commiting, checking if another Valorisierung is not applied already (e.g. by another thread)
-		$this->_ci->ValorisierungInstanz_model->addSelect('1');
-		if(hasData($this->_ci->ValorisierungInstanz_model->loadWhere(
-			['valorisierungsdatum' => $this->_valorisierungInstanz->valorisierungsdatum, 'ausgewaehlt' => true]
+		if(!hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzen(
+			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->oe_kurzbz
 		)))
 		{
 			throw new Exception("Valorisation already applied");
@@ -185,7 +185,10 @@ class ValorisierungLib
 		$dvsdata = [];
 
 		// get all Dienstverhältnisse applicable for valorisation
-		$result = $this->_ci->ValorisierungAPI_model->getDVsForValorisation($this->_valorisierungInstanz->valorisierungsdatum);
+		$result = $this->_ci->ValorisierungAPI_model->getDVsForValorisation(
+			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->oe_kurzbz
+		);
 
 		if(isError($result))
 		{

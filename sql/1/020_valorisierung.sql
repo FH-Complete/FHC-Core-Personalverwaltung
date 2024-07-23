@@ -14,6 +14,7 @@ ON CONFLICT(valorisierung_methode_kurzbz) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz (
     valorisierung_instanz_id serial NOT NULL,
+    oe_kurzbz character varying(32),
     valorisierungsdatum date NOT NULL,
     valorisierung_kurzbz character varying(128) NOT NULL,
     beschreibung text,
@@ -21,10 +22,11 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_instanz (
     updatevon character varying(32),
     updateamum timestamp without time zone,
     CONSTRAINT tbl_valorisierung_instanz_pkey PRIMARY KEY (valorisierung_instanz_id),
+    CONSTRAINT tbl_valorisierung_instanz_fk1 FOREIGN KEY (oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz) ON UPDATE CASCADE ON DELETE RESTRICT,
     UNIQUE(valorisierung_kurzbz)
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS tbl_valorisierung_instanz_unique_idx ON hr.tbl_valorisierung_instanz (ausgewaehlt, valorisierungsdatum) WHERE (ausgewaehlt = TRUE);
+CREATE UNIQUE INDEX IF NOT EXISTS tbl_valorisierung_instanz_unique_idx ON hr.tbl_valorisierung_instanz (ausgewaehlt, valorisierungsdatum, oe_kurzbz) WHERE (ausgewaehlt = TRUE);
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_instanz TO vilesci;
 GRANT SELECT,UPDATE ON SEQUENCE hr.tbl_valorisierung_instanz_valorisierung_instanz_id_seq TO vilesci;
