@@ -84,6 +84,7 @@ export const EmployeeContract = {
         const vertragsarten = inject('vertragsarten');
         const freitexttypen = inject('freitexttypen');
         const beendigungsgruende = inject('beendigungsgruende');
+        const teilzeittypen = inject('teilzeittypen');
 
         const readonly = ref(false);
 
@@ -598,6 +599,11 @@ export const EmployeeContract = {
             return va != undefined ? va.label : item;
         }
 
+        const formatTeilzeittyp = (item) => {
+            let va = teilzeittypen.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         return {
@@ -608,7 +614,7 @@ export const EmployeeContract = {
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
-            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted,
+            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp
         }
     },
     template: `
@@ -818,7 +824,7 @@ export const EmployeeContract = {
                                         <div class="col-md-4">
                                             <label for="dvTeilzeittyp" class="form-label">Teilzeittyp</label>
                                             <div class="col-sm-12">
-                                                <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp">
+                                                <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp" :value="formatTeilzeittyp(item.teilzeittyp_kurzbz)">
                                             </div>                                        
                                         </div>
     
