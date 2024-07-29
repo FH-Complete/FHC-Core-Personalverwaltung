@@ -125,7 +125,7 @@ const valApp = Vue.createApp(	{
 					// This is the default option and can be omitted.
 					layout: 'fitDataStretch',
 
-					footerElement: '<div><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p>&sum; nach Valorisierung: <span id="sumpostval"></span></p><p>Differenz: <span id="valdifferenz"></span></p></div>',
+					footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p>&sum; nach Valorisierung: <span id="sumpostval"></span></p><p>Differenz: <span id="valdifferenz"></span></p></div>',
 
 					// Column definitions
 					columns: [
@@ -135,6 +135,7 @@ const valApp = Vue.createApp(	{
 					{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
 					{title: 'Standard-Kostenstelle', field: 'stdkst', headerFilter: true},
 					{title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
+                                        {title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true},
 					{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 					{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 					{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
@@ -154,6 +155,7 @@ const valApp = Vue.createApp(	{
 				{
 					"event": "dataFiltered",
 					"handler": function(filters, rows) {
+                                                var elfiltered = document.getElementById("filteredrows_count");
 						var elsumpreval = document.getElementById("sumpreval");
 						var elsumpostval = document.getElementById("sumpostval");
 						var elvaldifferenz = document.getElementById("valdifferenz");
@@ -165,11 +167,19 @@ const valApp = Vue.createApp(	{
 							sumpostval += row.getData().sumsalarypostval;
 						}
 
-						elsumpreval.innerHTML = sumpreval.toFixed(2).replace('.', ',');
+                                                elfiltered.innerHTML = rows.length;
+                                                elsumpreval.innerHTML = sumpreval.toFixed(2).replace('.', ',');
 						elsumpostval.innerHTML = sumpostval.toFixed(2).replace('.', ',');
 						elvaldifferenz.innerHTML = (sumpostval - sumpreval).toFixed(2).replace('.', ',');
 					}
-				}
+				},
+                                {
+                                        event: "dataLoaded",
+                                        handler: function(data) {
+                                            var el = document.getElementById("totalrows_count");
+                                            el.innerHTML = (false !== data) ? data.length : 0;
+                                        }
+                                }
 			];
 		},
 		valorisierungsOrganisationseinheiten: function() {

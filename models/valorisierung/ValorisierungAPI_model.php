@@ -11,6 +11,7 @@ SELECT
 	NULL AS valorisierungmethode,
 	kstzuordnung.kst AS stdkst,
 	oezuordnung.oe AS diszplzuordnung,
+	oep.path AS oe_pfad,
 	dv.dienstverhaeltnis_id,
 	va.bezeichnung AS vertragsart,
 	oe.bezeichnung AS unternehmen,
@@ -48,7 +49,8 @@ LEFT JOIN (
 ) kstzuordnung USING(dienstverhaeltnis_id)
 LEFT JOIN (
 	SELECT
-		vb.dienstverhaeltnis_id, STRING_AGG(oe.bezeichnung, ', ') AS oe
+		vb.dienstverhaeltnis_id, STRING_AGG(oe.bezeichnung, ', ') AS oe, 
+		STRING_AGG(oe.oe_kurzbz, ', ') AS oe_kurzbz
 	FROM
 		hr.tbl_vertragsbestandteil vb
 	JOIN
@@ -66,6 +68,8 @@ LEFT JOIN (
 	GROUP BY
 		vb.dienstverhaeltnis_id
 ) oezuordnung USING(dienstverhaeltnis_id)
+LEFT JOIN
+	public.vw_oe_path oep ON oep.oe_kurzbz = oezuordnung.oe_kurzbz
 WHERE
 	dv.vertragsart_kurzbz = 'echterdv'
 	AND
