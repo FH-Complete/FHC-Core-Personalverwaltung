@@ -19,5 +19,32 @@ class ValorisierungHistorie_model extends DB_Model implements IEncryption
 				DB_Model::CRYPT_PASSWORD_NAME => 'ENCRYPTIONKEYGEHALT'
 			)
 		);
-    }
+	}
+
+	public function getValorisierungHistorieByDv($dienstverhaeltnisIdArr)
+	{
+		$params = [$dienstverhaeltnisIdArr];
+
+		$qry = '
+			SELECT
+				gehaltsbestandteil_id, valorisierungsdatum, betrag_valorisiert AS betr_valorisiert_decrypted
+			FROM
+				hr.tbl_valorisierung_historie h
+			WHERE EXISTS
+			(
+				SELECT 1
+				FROM
+					hr.tbl_dienstverhaeltnis
+					JOIN hr.tbl_gehaltsbestandteil USING (dienstverhaeltnis_id)
+				WHERE
+					gehaltsbestandteil_id = h.gehaltsbestandteil_id
+					AND dienstverhaeltnis_id IN ?
+			)';
+
+		return $this->execQuery(
+			$qry,
+			$params,
+			$this->getEncryptedColumns()
+		);
+	}
 }

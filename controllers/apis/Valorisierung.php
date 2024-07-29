@@ -20,6 +20,7 @@ class Valorisierung extends FHCAPI_Controller
 		);
 
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
+		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
 	}
 
 	public function index()
@@ -44,11 +45,7 @@ class Valorisierung extends FHCAPI_Controller
 	{
 		$data = json_decode($this->input->raw_input_stream, true);
 
-		$this->load->library(
-			'extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib',
-			['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']],
-			'ValorisierungLib'
-		);
+		$this->ValorisierungLib->initialize(['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']]);
 
 		$this->terminateWithSuccess($this->ValorisierungLib->calculateAllValorisation());
 	}
@@ -57,11 +54,7 @@ class Valorisierung extends FHCAPI_Controller
 	{
 		$data = json_decode($this->input->raw_input_stream, true);
 
-		$this->load->library(
-			'extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib',
-			['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']],
-			'ValorisierungLib'
-		);
+		$this->ValorisierungLib->initialize(['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']]);
 
 		$this->terminateWithSuccess($this->ValorisierungLib->doAllValorisation());
 	}

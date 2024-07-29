@@ -41,6 +41,41 @@ class ValorisierungInstanz_model extends DB_Model
 		}
 	}
 
+	public function getValorisierungInstanzenByDienstverhaeltnis($dienstverhaeltnis_id, $ausgewaehlt = null)
+	{
+		$params = [$dienstverhaeltnis_id];
+
+		$qry = '
+			SELECT
+				valorisierungsdatum, valorisierung_kurzbz, oe_kurzbz, ausgewaehlt
+			FROM
+				hr.tbl_valorisierung_instanz vi
+			WHERE
+			(
+				vi.oe_kurzbz IS NULL
+				OR EXISTS (
+					SELECT 1
+					FROM
+						hr.tbl_dienstverhaeltnis
+					WHERE
+						dienstverhaeltnis_id = ?
+						AND oe_kurzbz = vi.oe_kurzbz
+				)
+			)';
+
+		if (isset($ausgewaehlt) && is_bool($ausgewaehlt))
+		{
+			$qry .= ' AND ausgewaehlt = ?';
+			$params[] = $ausgewaehlt;
+		}
+
+		$qry .=
+			' ORDER BY
+				valorisierungsdatum, valorisierung_kurzbz, valorisierung_instanz_id';
+
+		return $this->execQuery($qry, $params);
+	}
+
 	public function getNonSelectedValorisierungInstanzen($valorisierungsdatum = null, $oe_kurzbz = null)
 	{
 		$params = [];
@@ -78,7 +113,7 @@ class ValorisierungInstanz_model extends DB_Model
 
 		$qry .=
 			' ORDER BY
-				oe_kurzbz DESC NULLS LAST, valorisierungsdatum DESC, valorisierung_kurzbz, valorisierung_instanz_id';
+				oe_kurzbz NULLS LAST, valorisierungsdatum, valorisierung_kurzbz, valorisierung_instanz_id';
 
 		return $this->execQuery($qry, $params);
 	}

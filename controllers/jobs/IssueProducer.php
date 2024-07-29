@@ -24,6 +24,7 @@ class IssueProducer extends PlausiIssueProducer_Controller
 			'ueberlappendeVertragsbestandteile' => 'UeberlappendeVertragsbestandteile',
 			'ueberlappendeFreitextVertragsbestandteile' => 'UeberlappendeFreitextVertragsbestandteile',
 			'vertragsbestandteilOhneZusatztabelle' => 'VertragsbestandteilOhneZusatztabelle',
+			'valorisierungsBetragAbweichendVonBerechnung' => 'ValorisierungsBetragAbweichendVonBerechnung',
 			'vertragsbestandteilFalscheZusatztabelle' => 'VertragsbestandteilFalscheZusatztabelle',
 			'grundgehaltKeinemStundenVertragsbestandteilZugewiesen' => 'GrundgehaltKeinemStundenVertragsbestandteilZugewiesen',
 			'gehaltsbestandteilNichtImVertragsbestandteilDatumsbereich' => 'GehaltsbestandteilNichtImVertragsbestandteilDatumsbereich',
