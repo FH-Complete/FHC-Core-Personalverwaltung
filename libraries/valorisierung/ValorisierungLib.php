@@ -264,5 +264,13 @@ class ValorisierungLib
 			// store calculated valorisation to apply and finalize selected valorisation later
 			$this->_calculatedValorisation += $usedvalinstanz->getBetraegeValorisiertForEachGehaltsbestandteil();
 		}
+		else
+		{
+		    $noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
+		    $noval->initialize($dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, null);
+		    $dvdata->valorisierungmethode = 'keine Valorisierung';
+		    $dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
+		    $dvdata->sumsalarypostval = $dvdata->sumsalarypreval;
+		}
 	}
 }

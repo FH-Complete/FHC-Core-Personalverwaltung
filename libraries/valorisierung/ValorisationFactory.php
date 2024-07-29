@@ -1,6 +1,7 @@
 <?php
 require_once 'IValorisationMethod.php';
 require_once 'AbstractValorisationMethod.php';
+require_once 'ValorisierungKeine.php';
 require_once 'ValorisierungProzent.php';
 require_once 'ValorisierungFixBetrag.php';
 require_once 'ValorisierungGestaffelt.php';
@@ -12,6 +13,7 @@ require_once 'ValorisierungGestaffelt.php';
  */
 class ValorisationFactory
 {
+	const VALORISATION_KEINE	= 'ValorisierungKeine';
 	const VALORISATION_PROZENT	= 'ValorisierungProzent';
 	const VALORISATION_FIXBETRAG	= 'ValorisierungFixBetrag';
 	const VALORISATION_STAGGERED	= 'ValorisierungGestaffelt';
@@ -20,6 +22,10 @@ class ValorisationFactory
 		$instance = null;
 		switch ($method)
 		{
+			case self::VALORISATION_KEINE:
+				$instance = new ValorisierungKeine();
+				break;
+
 			case self::VALORISATION_PROZENT:
 				$instance = new ValorisierungProzent();
 				break;
