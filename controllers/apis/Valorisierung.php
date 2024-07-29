@@ -5,7 +5,6 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Valorisierung extends FHCAPI_Controller
 {
-
 	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 
 	public function __construct() {
@@ -30,7 +29,7 @@ class Valorisierung extends FHCAPI_Controller
 
 	public function getValorisierungsInstanzen()
 	{
-		$valinstanzen = $this->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzen();
+		$valinstanzen = $this->ValorisierungInstanz_model->getAllNonSelectedValorisierungInstanzen();
 		if( isError($valinstanzen) )
 		{
 			$this->terminateWithError('Fehler beim Laden der ValorisierungsInstanzen');

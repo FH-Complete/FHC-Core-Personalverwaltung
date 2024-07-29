@@ -100,12 +100,20 @@ class ValorisierungLib
 		}
 
 		// before commiting, checking if another Valorisierung is not applied already (e.g. by another thread)
-		if(!hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzen(
+		if(!hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzenForDate(
 			$this->_valorisierungInstanz->valorisierungsdatum,
 			$this->_valorisierungInstanz->oe_kurzbz
 		)))
 		{
 			throw new Exception("Valorisation already applied");
+		}
+
+		if(hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzenBeforeDate(
+			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->oe_kurzbz
+		)))
+		{
+			throw new Exception("There are previous, non-applied Valorisations");
 		}
 
 		// mark Valorisierung Instanz as "selected" with valorised amount

@@ -76,7 +76,42 @@ class ValorisierungInstanz_model extends DB_Model
 		return $this->execQuery($qry, $params);
 	}
 
-	public function getNonSelectedValorisierungInstanzen($valorisierungsdatum = null, $oe_kurzbz = null)
+	public function getAllNonSelectedValorisierungInstanzen()
+	{
+		return $this->_getNonSelectedValorisierungInstanzen();
+	}
+
+	public function getNonSelectedValorisierungInstanzenForDate($valorisierungsdatum = null, $oe_kurzbz = null)
+	{
+		return $this->_getNonSelectedValorisierungInstanzen($valorisierungsdatum, $oe_kurzbz);
+	}
+
+	public function getNonSelectedValorisierungInstanzenBeforeDate($valorisierungsdatum = null, $oe_kurzbz = null)
+	{
+		return $this->_getNonSelectedValorisierungInstanzen(null, $oe_kurzbz, $valorisierungsdatum);
+	}
+
+	public function getValorsierungInstanzInfo($valorisierung_kurzbz)
+	{
+		$qry = '
+			SELECT
+				valorisierung_kurzbz, valorisierung_methode_kurzbz, valorisierungsdatum, oe_kurzbz, oe.bezeichnung AS oe_bezeichnung,
+				vi.beschreibung AS valorisierung_instanz_beschreibung, vim.beschreibung AS valorisierung_methode_beschreibung,
+				vim.valorisierung_methode_parameter
+			FROM
+				-- disclaimer: any references to open source editor programs are purely coincidental
+				hr.tbl_valorisierung_instanz vi
+				LEFT JOIN hr.tbl_valorisierung_instanz_methode vim USING (valorisierung_instanz_id)
+				LEFT JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
+			WHERE
+				valorisierung_kurzbz = ?
+			ORDER BY
+				valorisierung_instanz_id';
+
+		return $this->execQuery($qry, ['valorisierung_kurzbz' => $valorisierung_kurzbz]);
+	}
+
+	private function _getNonSelectedValorisierungInstanzen($valorisierungsdatum = null, $oe_kurzbz = null, $maxValorisierungsdatum = null)
 	{
 		$params = [];
 
@@ -111,30 +146,16 @@ class ValorisierungInstanz_model extends DB_Model
 			$params[] = $oe_kurzbz;
 		}
 
+		if (isset($maxValorisierungsdatum))
+		{
+			$qry .= ' AND vi.valorisierungsdatum::date < ?::date';
+			$params[] = $maxValorisierungsdatum;
+		}
+
 		$qry .=
 			' ORDER BY
-				oe_kurzbz NULLS LAST, valorisierungsdatum, valorisierung_kurzbz, valorisierung_instanz_id';
+				oe_kurzbz DESC NULLS LAST, valorisierungsdatum, valorisierung_kurzbz, valorisierung_instanz_id';
 
 		return $this->execQuery($qry, $params);
-	}
-
-	public function getValorsierungInstanzInfo($valorisierung_kurzbz)
-	{
-		$qry = '
-			SELECT
-				valorisierung_kurzbz, valorisierung_methode_kurzbz, valorisierungsdatum, oe_kurzbz, oe.bezeichnung AS oe_bezeichnung,
-				vi.beschreibung AS valorisierung_instanz_beschreibung, vim.beschreibung AS valorisierung_methode_beschreibung,
-				vim.valorisierung_methode_parameter
-			FROM
-				-- disclaimer: any references to open source editor programs are purely coincidental
-				hr.tbl_valorisierung_instanz vi
-				LEFT JOIN hr.tbl_valorisierung_instanz_methode vim USING (valorisierung_instanz_id)
-				LEFT JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
-			WHERE
-				valorisierung_kurzbz = ?
-			ORDER BY
-				valorisierung_instanz_id';
-
-		return $this->execQuery($qry, ['valorisierung_kurzbz' => $valorisierung_kurzbz]);
 	}
 }
