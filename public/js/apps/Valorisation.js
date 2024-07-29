@@ -5,6 +5,7 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import {CoreFilterCmpt} from "../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
+import { Modal } from '../components/Modal.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -12,7 +13,8 @@ const valApp = Vue.createApp(	{
 	components: {
 		searchbar,
 		CoreNavigationCmpt,
-		CoreFilterCmpt
+		CoreFilterCmpt,
+		Modal
 	},
 	data() {
 		return 	{
@@ -20,7 +22,9 @@ const valApp = Vue.createApp(	{
 			searchfunction: searchfunction,
 			appSideMenuEntries: {},
 			alleValorisierungsinstanzen: [],
+			valorisierungInfoData: [],
 			valorisierungsinstanz_kurzbz: '',
+			valorisierung_oe_kurzbz: '',
 			valorisierungsdatum: '',
 			ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
@@ -33,11 +37,15 @@ const valApp = Vue.createApp(	{
 	methods: {
 		getValorisierungsInstanzen: function() {
 			const res = Vue.$fhcapi.Valorisierung.getValorisierungsInstanzen()
-					.then((response) => {
-						this.alleValorisierungsinstanzen = response.data.data;
-						this.valorisierungsdatum = '';
-					})
-					.catch(this.handleErrors);
+				.then((response) => {
+					this.alleValorisierungsinstanzen = response.data.data;
+					this.valorisierungsdatum = '';
+					if (this.alleValorisierungsinstanzen.length > 0)
+						this.valorisierung_oe_kurzbz = this.alleValorisierungsinstanzen[0].oe_kurzbz;
+					else
+						this.valorisierung_oe_kurzbz = '';
+				})
+				.catch(this.handleErrors);
 		},
 		newSideMenuEntryHandler: function(payload) {
 				this.appSideMenuEntries = payload;
@@ -69,9 +77,28 @@ const valApp = Vue.createApp(	{
 				})
 				.catch(this.handleErrors);
 		},
+		getValorisationInfo: function() {
+			if( this.valorisierungsinstanz_kurzbz === '' ) {
+				this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
+				return;
+			}
+			const res = Vue.$fhcapi.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
+				.then((response) => {
+					this.valorisierungInfoData = response.data.data;
+					this.$refs.infoModalRef.show();
+				})
+				.catch(this.handleErrors);
+		},
+		oeChanged: function() {
+			// reset Valorisierungdatum for correct dropdown display
+			this.valorisierungsdatum = '';
+		},
 		datumChanged: function() {
+			let valInstanzen = this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum && vi.oe_kurzbz == this.valorisierung_oe_kurzbz);
+
 			// set Valorisierungsinstanz to first in list when datum is changed
-			this.valorisierungsinstanz_kurzbz = this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum)[0].value;
+			if (valInstanzen.length > 0)
+				this.valorisierungsinstanz_kurzbz = valInstanzen[0].value;
 		},
 		handleErrors: function(response) {
 			if (response.hasOwnProperty('response') && response.response?.data?.errors) {
@@ -98,7 +125,7 @@ const valApp = Vue.createApp(	{
 					// This is the default option and can be omitted.
 					layout: 'fitDataStretch',
 
-					footerElement: '<div><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p>&sum; nach Valorisierung: <span id="sumpostval"></span></p><p>Differenz: <span id="valdifferenz"></span></p></div>',
+					footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p>&sum; nach Valorisierung: <span id="sumpostval"></span></p><p>Differenz: <span id="valdifferenz"></span></p></div>',
 
 					// Column definitions
 					columns: [
@@ -108,6 +135,7 @@ const valApp = Vue.createApp(	{
 					{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
 					{title: 'Standard-Kostenstelle', field: 'stdkst', headerFilter: true},
 					{title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
+                                        {title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true},
 					{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 					{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 					{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
@@ -127,6 +155,7 @@ const valApp = Vue.createApp(	{
 				{
 					"event": "dataFiltered",
 					"handler": function(filters, rows) {
+                                                var elfiltered = document.getElementById("filteredrows_count");
 						var elsumpreval = document.getElementById("sumpreval");
 						var elsumpostval = document.getElementById("sumpostval");
 						var elvaldifferenz = document.getElementById("valdifferenz");
@@ -138,29 +167,91 @@ const valApp = Vue.createApp(	{
 							sumpostval += row.getData().sumsalarypostval;
 						}
 
-						elsumpreval.innerHTML = sumpreval.toFixed(2).replace('.', ',');
+                                                elfiltered.innerHTML = rows.length;
+                                                elsumpreval.innerHTML = sumpreval.toFixed(2).replace('.', ',');
 						elsumpostval.innerHTML = sumpostval.toFixed(2).replace('.', ',');
 						elvaldifferenz.innerHTML = (sumpostval - sumpreval).toFixed(2).replace('.', ',');
 					}
-				}
+				},
+                                {
+                                        event: "dataLoaded",
+                                        handler: function(data) {
+                                            var el = document.getElementById("totalrows_count");
+                                            el.innerHTML = (false !== data) ? data.length : 0;
+                                        }
+                                }
 			];
 		},
-		valorisierungsdates: function() {
+		valorisierungsOrganisationseinheiten: function() {
+			let oes = [...new Map(
+				this.alleValorisierungsinstanzen
+					.map(vi => ({value: vi.oe_kurzbz, label: vi.oe_bezeichnung})) // get only oes
+					.map(vi => [vi['value'], vi]) // filter unique
+			).values()];
+
+			oes.unshift({ // add default label
+				value: '',
+				label: 'Organisationseinheit wählen...',
+				disabled: true
+			});
+
+			let idx = oes.findIndex(vi => vi.value === null);
+
+			// set label for null value
+			if (typeof idx !== 'undefined' && idx >= 0) oes[idx].label = '-- Nicht angegeben --';
+
+			return oes;
+		},
+		valorisierungsDates: function() {
 			let dates = this.alleValorisierungsinstanzen
+				.filter((value, index, array) => value.oe_kurzbz == this.valorisierung_oe_kurzbz) // filter unique
 				.map(vi => vi.valorisierungsdatum) // get only dates
 				.filter((value, index, array) => array.indexOf(value) === index && value != '') // filter unique
 				.map(date => ({value: date, label: date})); // transform to object
+
 			dates.unshift({ // add default label
 				value: '',
 				label: 'Datum wählen...',
 				disabled: true
 			});
+
 			return dates;
 		},
 		datumValorisierungsinstanzen: function() {
-			return this.alleValorisierungsinstanzen.filter(vi => vi.valorisierungsdatum == this.valorisierungsdatum);
-		}
+			return this.alleValorisierungsinstanzen.filter(
+				vi => vi.oe_kurzbz == this.valorisierung_oe_kurzbz && vi.valorisierungsdatum == this.valorisierungsdatum
+			);
+		},
+		valorisierungInfo: function() {
+			let valorisierungInfoObj = {};
+			for (let infoData of this.valorisierungInfoData) {
 
+				let valorisierungMethode =
+				{
+					"valorisierung_methode_kurzbz": infoData.valorisierung_methode_kurzbz,
+					"valorisierung_methode_beschreibung": infoData.valorisierung_methode_beschreibung,
+					"valorisierung_methode_parameter": infoData.valorisierung_methode_parameter
+				};
+
+				if (valorisierungInfoObj.hasOwnProperty("methoden"))
+				{
+					valorisierungInfoObj.methoden.push(valorisierungMethode);
+				}
+				else
+				{
+					valorisierungInfoObj =
+					{
+						"valorisierung_kurzbz": infoData.valorisierung_kurzbz,
+						"valorisierung_oe_bezeichnung": infoData.oe_bezeichnung,
+						"valorisierungsdatum": infoData.valorisierungsdatum,
+						"valorisierung_instanz_beschreibung": infoData.valorisierung_instanz_beschreibung,
+						"methoden": [valorisierungMethode]
+					}
+				}
+			}
+
+			return valorisierungInfoObj;
+		}
 	},
 	template: `
 
@@ -210,21 +301,37 @@ const valApp = Vue.createApp(	{
 							:tabulator-events="tabulatorEvents">
 				<template #actions>
 					<div class="d-flex gap-2 align-items-baseline mb-4">
+						<select v-model="valorisierung_oe_kurzbz" class="form-select w-auto" aria-label="ValorisierungsOe" @change="oeChanged">
+							<option
+								v-for="vo in valorisierungsOrganisationseinheiten"
+								:value="vo.value"
+								:disabled="vo.disabled">
+								{{ vo.label }}
+							</option>
+						</select>
 						<select v-model="valorisierungsdatum" class="form-select w-auto" aria-label="ValorisierungsDatum" @change="datumChanged">
 							<option
-								v-for="vd in valorisierungsdates"
+								v-for="vd in valorisierungsDates"
 								:value="vd.value"
 								:disabled="vd.disabled">
 								{{ vd.label }}
 							</option>
 						</select>
-						<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz" v-show="valorisierungsdatum != ''">
-							<option
-								v-for="vi in datumValorisierungsinstanzen"
-								:value="vi.value">
-								{{ vi.label }}
-							</option>
-						</select>
+						<div v-show="valorisierungsdatum != ''">
+							<div class="input-group mb-3">
+							<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz">
+								<option
+									v-for="vi in datumValorisierungsinstanzen"
+									:value="vi.value"
+									:disabled="vi.disabled">
+									{{ vi.label }}
+								</option>
+							</select>
+							<button class="btn btn-outline-secondary" type="button" @click="getValorisationInfo">
+								<i class="fa fa-info"></i>
+							</button>
+							</div>
+						</div>
 					</div>
 					<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
 					<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
@@ -236,6 +343,44 @@ const valApp = Vue.createApp(	{
 
 	</div>
 	</div>
+	<!-- detail modal -->
+	<Modal :title="'Valorisierung Information'" ref="infoModalRef">
+		<template #body>
+			<table class="table table-bordered">
+				<tbody>
+					<tr>
+						<th>Bezeichnung</th>
+						<td>{{valorisierungInfo.valorisierung_kurzbz}}</td>
+					</tr>
+					<tr>
+						<th>Beschreibung</th>
+						<td>{{valorisierungInfo.valorisierung_instanz_beschreibung}}</td>
+					</tr>
+					<tr>
+						<th>Unternehmen/Organisationseinheit</th>
+						<td>{{valorisierungInfo.valorisierung_oe_bezeichnung}}</td>
+					</tr>
+					<tr>
+						<th>Datum</th>
+						<td>{{valorisierungInfo.valorisierungsdatum}}</td>
+					</tr>
+					<tr>
+						<th>Methoden</th>
+						<td>
+							<span v-for="(methode, index) in valorisierungInfo.methoden">
+								<span v-if="index > 0">
+									<br><br>
+								</span>
+								<b>{{methode.valorisierung_methode_kurzbz}}</b><br>
+								Beschreibung: {{methode.valorisierung_methode_beschreibung}}<br>
+								Parameter: {{methode.valorisierung_methode_parameter}}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+	</Modal>
 	`
 });
 
