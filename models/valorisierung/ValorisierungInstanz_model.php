@@ -81,12 +81,12 @@ class ValorisierungInstanz_model extends DB_Model
 		return $this->_getNonSelectedValorisierungInstanzen();
 	}
 
-	public function getNonSelectedValorisierungInstanzenForDate($valorisierungsdatum = null, $oe_kurzbz = null)
+	public function getNonSelectedValorisierungInstanzenForDate($valorisierungsdatum, $oe_kurzbz = null)
 	{
 		return $this->_getNonSelectedValorisierungInstanzen($valorisierungsdatum, $oe_kurzbz);
 	}
 
-	public function getNonSelectedValorisierungInstanzenBeforeDate($valorisierungsdatum = null, $oe_kurzbz = null)
+	public function getNonSelectedValorisierungInstanzenBeforeDate($valorisierungsdatum, $oe_kurzbz = null)
 	{
 		return $this->_getNonSelectedValorisierungInstanzen(null, $oe_kurzbz, $valorisierungsdatum);
 	}
