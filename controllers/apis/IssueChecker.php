@@ -50,6 +50,12 @@ class IssueChecker extends Auth_Controller
 			'PERSONALVERWALTUNG_FUNKTION_0002' => 'PERSONALVERWALTUNG_FUNKTION_0002'
 		);
 
+		// fehler which are resolved by the job the same way as they are produced
+		// structure: fehlercode => class (library) name for resolving in "plausichecks" folder
+		$this->_codeProducerLibMappings = array(
+			'PERSONALVERWALTUNG_GEHALT_0005' => 'ValorisierungsBetragAbweichendVonBerechnung',
+		);
+
 		$this->debug = array();
 		$this->errors = array();
 		$this->infos = array();
@@ -76,7 +82,8 @@ class IssueChecker extends Auth_Controller
 			'issues/PlausicheckResolverLib',
 			array(
 				'extensionName' => $this->_extensionName,
-				'codeLibMappings' => $this->_codeLibMappings
+				'codeLibMappings' => $this->_codeLibMappings,
+				'codeProducerLibMappings' => $this->_codeProducerLibMappings
 			),
 			'PlausicheckResolverLib'
 		);
@@ -186,7 +193,7 @@ class IssueChecker extends Auth_Controller
 	{
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
-			array_keys($this->_codeLibMappings),
+			array_keys(array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings)),
 			$this->personid
 		);
 
@@ -208,7 +215,7 @@ class IssueChecker extends Auth_Controller
 	{
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
-			array_keys($this->_codeLibMappings),
+			array_keys(array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings)),
 			$this->personid
 		);
 

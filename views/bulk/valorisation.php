@@ -2,7 +2,7 @@
 $this->load->view(
     'templates/FHC-Header',
     array(
-	'title' => 'Personalverwaltung',
+	'title' => 'Valorisierung',
 	'bootstrap5' => true,
 	'fontawesome6' => true,
 	'tabulator5' => true,
@@ -27,7 +27,7 @@ $this->load->view(
 );
 ?>
 
-<div id="wrapper"></div>
+<div id="wrapper"><router-view></router-view></div>
 
 <script>
 (function () {

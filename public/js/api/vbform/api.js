@@ -16,6 +16,7 @@ import Zeit from "./zeit.js";
 import Deadline from "./deadline.js";
 import SalaryRange from "./salaryrange.js";
 import Valorisierung from "./valorisierung.js";
+import ValorisierungCheck from "./valorisierungcheck.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -35,5 +36,6 @@ export default {
     "Zeit": Zeit,
     "Deadline": Deadline,
     "SalaryRange": SalaryRange,
-    "Valorisierung": Valorisierung
+    "Valorisierung": Valorisierung,
+    "ValorisierungCheck": ValorisierungCheck
 };

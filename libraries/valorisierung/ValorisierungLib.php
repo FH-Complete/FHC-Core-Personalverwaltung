@@ -18,7 +18,7 @@ class ValorisierungLib
 	{
 		$this->_ci =& get_instance();
 
-		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', null, 'GehaltsbestandteilModel');
+		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanzMethod_model');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungAPI_model');
@@ -59,81 +59,26 @@ class ValorisierungLib
 		return $this->_doValorisationForAllDv($storeCalculatedValorisation = true);
 	}
 
-	public function calculateValorisationForDvId($dienstverhaeltnis_id)
+	public function calculateValorisationForDvId($dienstverhaeltnis_id, $fetchDvData = false)
 	{
+		if ($fetchDvData === true) $this->setDvDataForValorisation($this->fetchDvDataForValorisation($dienstverhaeltnis_id));
 		$dvdata = new StdClass();
 		$dvdata->dienstverhaeltnis_id = $dienstverhaeltnis_id;
 		$this->_calculateValorisation($dvdata);
 	}
 
-	/**
-	 *
-	 * @param
-	 * @return object success or error
-	 */
-	public function storeCalculatedValorisation()
+	public function redoAllValorisationForDvId($dienstverhaeltnis_id)
 	{
-		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungHistorie_model');
+		$instanzen = $this->_ci->ValorisierungInstanz_model->getValorisierungInstanzenByDienstverhaeltnis($dienstverhaeltnis_id, $ausgewaehlt = true);
 
-		// start transaction
-		$this->_ci->db->trans_begin();
+		if (!hasData($instanzen)) return;
 
-		foreach ($this->_calculatedValorisation as $gehaltsbestandteil_id => $betrag_valorisiert)
+		foreach (getData($instanzen) as $instanz)
 		{
-			// update the Gehaltsbestandteil with valorised amount
-			$this->_ci->GehaltsbestandteilModel->update(
-				['gehaltsbestandteil_id' => $gehaltsbestandteil_id],
-				['betrag_valorisiert' => $betrag_valorisiert, 'updateamum' => 'NOW()', 'updatevon' => getAuthUID()],
-				$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
-			);
-
-			// write Valorisierung history
-			$this->_ci->ValorisierungHistorie_model->insert(
-				[
-					'gehaltsbestandteil_id' => $gehaltsbestandteil_id,
-					'valorisierungsdatum' => $this->_valorisierungInstanz->valorisierungsdatum,
-					'betrag_valorisiert' => $betrag_valorisiert,
-					'insertvon' => getAuthUID()
-				],
-				$this->_ci->ValorisierungHistorie_model->getEncryptedColumns()
-			);
+			$this->initialize(['valorisierung_kurzbz' => $instanz->valorisierung_kurzbz]);
+			$this->calculateValorisationForDvId($dienstverhaeltnis_id, $fetchDvData = true);
+			$this->_storeCalculatedValorisation($markSelected = false);
 		}
-
-		// before commiting, checking if another Valorisierung is not applied already (e.g. by another thread)
-		if(!hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzenForDate(
-			$this->_valorisierungInstanz->valorisierungsdatum,
-			$this->_valorisierungInstanz->oe_kurzbz
-		)))
-		{
-			throw new Exception("Valorisation already applied");
-		}
-
-		if(hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzenBeforeDate(
-			$this->_valorisierungInstanz->valorisierungsdatum,
-			$this->_valorisierungInstanz->oe_kurzbz
-		)))
-		{
-			throw new Exception("There are previous, non-applied Valorisations");
-		}
-
-		// mark Valorisierung Instanz as "selected" with valorised amount
-		$this->_ci->ValorisierungInstanz_model->update(
-			['valorisierung_instanz_id' => $this->_valorisierungInstanz->valorisierung_instanz_id],
-			['ausgewaehlt' => true, 'updateamum' => 'NOW()', 'updatevon' => getAuthUID()]
-		);
-
-		// Transaction complete!
-		$this->_ci->db->trans_complete();
-
-		// rollback if something failed
-		if($this->_ci->db->trans_status() === false)
-		{
-			$this->_ci->db->trans_rollback();
-			throw new Exception("Valorisation transaction failed");
-		}
-
-		// commit transaction
-		$this->_ci->db->trans_commit();
 	}
 
 	public function setDvDataForValorisation($dvData)
@@ -226,7 +171,7 @@ class ValorisierungLib
 		}
 
 		// if necessary, store calculated valorisation as "final"
-		if($storeCalculatedValorisation === true) $this->storeCalculatedValorisation();
+		if($storeCalculatedValorisation === true) $this->_storeCalculatedValorisation();
 
 		return $dvsdata;
 	}
@@ -280,5 +225,80 @@ class ValorisierungLib
 		    $dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
 		    $dvdata->sumsalarypostval = $dvdata->sumsalarypreval;
 		}
+	}
+
+		/**
+	 *
+	 * @param
+	 * @return object success or error
+	 */
+	private function _storeCalculatedValorisation($markSelected = true)
+	{
+		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungHistorie_model');
+
+		// start transaction
+		$this->_ci->db->trans_begin();
+
+		foreach ($this->_calculatedValorisation as $gehaltsbestandteil_id => $betrag_valorisiert)
+		{
+			// update the Gehaltsbestandteil with valorised amount
+			$this->_ci->GehaltsbestandteilModel->update(
+				['gehaltsbestandteil_id' => $gehaltsbestandteil_id],
+				['betrag_valorisiert' => $betrag_valorisiert, 'updateamum' => 'NOW()', 'updatevon' => getAuthUID()],
+				$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
+			);
+
+			// delete Valorisierung history if needed
+
+			// write Valorisierung history
+			$this->_ci->ValorisierungHistorie_model->insert(
+				[
+					'gehaltsbestandteil_id' => $gehaltsbestandteil_id,
+					'valorisierungsdatum' => $this->_valorisierungInstanz->valorisierungsdatum,
+					'betrag_valorisiert' => $betrag_valorisiert,
+					'insertvon' => getAuthUID()
+				],
+				$this->_ci->ValorisierungHistorie_model->getEncryptedColumns()
+			);
+		}
+
+		// before commiting, checking if another Valorisierung is not applied already (e.g. by another thread)
+		if(!hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzenForDate(
+			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->oe_kurzbz
+		)) && $markSelected === true)
+		{
+			throw new Exception("Valorisation already applied");
+		}
+
+		if(hasData($this->_ci->ValorisierungInstanz_model->getNonSelectedValorisierungInstanzenBeforeDate(
+			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->oe_kurzbz
+		)))
+		{
+			throw new Exception("There are previous, non-applied Valorisations");
+		}
+
+		if ($markSelected === true)
+		{
+			// mark Valorisierung Instanz as "selected"
+			$this->_ci->ValorisierungInstanz_model->update(
+				['valorisierung_instanz_id' => $this->_valorisierungInstanz->valorisierung_instanz_id],
+				['ausgewaehlt' => true, 'updateamum' => 'NOW()', 'updatevon' => getAuthUID()]
+			);
+		}
+
+		// Transaction complete!
+		$this->_ci->db->trans_complete();
+
+		// rollback if something failed
+		if($this->_ci->db->trans_status() === false)
+		{
+			$this->_ci->db->trans_rollback();
+			throw new Exception("Valorisation transaction failed");
+		}
+
+		// commit transaction
+		$this->_ci->db->trans_commit();
 	}
 }

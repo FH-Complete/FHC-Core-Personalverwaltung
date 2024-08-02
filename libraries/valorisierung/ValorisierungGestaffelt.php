@@ -104,7 +104,7 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 				$valstep = $stepsum * ($step->prozent / 100);
 				$valscaled = $valstep * $scalefactor_fte2pt;
-				echo "Step " . $idx . ": valfte: " . $valstep . " valtz: " . $valscaled . "\n";
+				//echo "Step " . $idx . ": valfte: " . $valstep . " valtz: " . $valscaled . "\n";
 				$this->valorisation += $valscaled;
 			}
 		}
