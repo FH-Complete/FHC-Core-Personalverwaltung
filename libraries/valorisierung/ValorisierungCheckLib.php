@@ -37,7 +37,6 @@ class ValorisierungCheckLib
 			$instanzenData = getData($instanzen);
 			$prevBetraegeValorisiert = [];
 
-			$first = true;
 			foreach ($instanzenData as $instanz)
 			{
 				// library for the current Instanz
@@ -52,17 +51,18 @@ class ValorisierungCheckLib
 				{
 					$gehaltsbestandteil_id = $gehaltsbestandteil->getGehaltsbestandteil_id();
 
-					// initialise
-					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['valorisierung_kurzbz']
-						= $instanz->valorisierung_kurzbz;
-
 					// first calculation
-					if ($first)
+					if (!isset($valorisationData[$gehaltsbestandteil_id]['valorisation_methods']))
 					{
 						// save previous betrag valorisiert for later comparison
 						$valorisationData[$gehaltsbestandteil_id]['final_betrag_valorisiert']  = $gehaltsbestandteil->getBetrag_valorisiert();
 						// start with Grundbetrag, not betrag valorisiert
-						$gehaltsbestandteil->setBetrag_valorisiert($gehaltsbestandteil->getGrundbetrag());
+						$grundbetrag = $gehaltsbestandteil->getGrundbetrag();
+						$gehaltsbestandteil->setBetrag_valorisiert($grundbetrag);
+						// set Grundbetrag
+						$valorisationData[$gehaltsbestandteil_id]['grundbetrag'] = $grundbetrag;
+						// initialise valorisation methods
+						$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'] = null;
 					}
 					else // all other calculations: set previously calculated betrag_valorisiert
 					{
@@ -86,7 +86,6 @@ class ValorisierungCheckLib
 					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['calculated_betrag_valorisiert']
 						= $betrag_valorisiert;
 				}
-				$first = false;
 			}
 
 			// get history data
@@ -103,7 +102,6 @@ class ValorisierungCheckLib
 			}
 		}
 
-		error_log(print_r($valorisationData, true));
 		return $valorisationData;
 	}
 
@@ -127,7 +125,7 @@ class ValorisierungCheckLib
 				JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
 				JOIN public.tbl_benutzer ben ON dv.mitarbeiter_uid = ben.uid
 				JOIN public.tbl_person pers USING (person_id)
-				LEFT JOIN hr.tbl_gehaltsbestandteil gb ON dv.dienstverhaeltnis_id = gb.dienstverhaeltnis_id AND gb.valorisierung
+				LEFT JOIN hr.tbl_gehaltsbestandteil gb ON dv.dienstverhaeltnis_id = gb.dienstverhaeltnis_id
 				LEFT JOIN hr.tbl_gehaltstyp gt USING (gehaltstyp_kurzbz)
 			WHERE
 				dv.dienstverhaeltnis_id = ?
@@ -166,6 +164,8 @@ class ValorisierungCheckLib
 
 		foreach ($valorisationData as $geh_id => $dataArr)
 		{
+			if (isEmptyArray($dataArr['valorisation_methods'])) continue;
+
 			foreach ($dataArr['valorisation_methods'] as $valorisierungsdatum => $valorisierungsData)
 			{
 				// if there are differences between history and calculation
@@ -194,10 +194,16 @@ class ValorisierungCheckLib
 		$invalidGehaltsbestandteile = [];
 		$valorisationData = $this->getValorisationDataForCheck($dienstverhaeltnisIdArr);
 
-
 		foreach ($valorisationData as $geh_id => $dataArr)
 		{
+			if (isEmptyArray($dataArr['valorisation_methods']))
+			{
+				if ($dataArr['final_betrag_valorisiert'] != $dataArr['grundbetrag']) $invalidGehaltsbestandteile[] = $geh_id;
+				continue;
+			}
+
 			$lastValorisierung = $dataArr['valorisation_methods'][max(array_keys($dataArr['valorisation_methods']))];
+
 			if ($dataArr['final_betrag_valorisiert'] != $lastValorisierung['historie_betrag_valorisiert']
 				|| $dataArr['final_betrag_valorisiert'] != $lastValorisierung['calculated_betrag_valorisiert'])
 				$invalidGehaltsbestandteile[] = $geh_id;
@@ -214,7 +220,7 @@ class ValorisierungCheckLib
 			$ausgewaehlt = true
 		);
 
-		$gehaltsbestandteil_id_arr = [];
+		$gehaltsbestandteilArr = [];
 		$errors = [];
 
 		if (hasData($instanzen))
@@ -242,17 +248,16 @@ class ValorisierungCheckLib
 
 					if (isError($deleteRes)) $errors[] = getError($deleteRes);
 
-					if (!in_array($gehaltsbestandteil_id, $gehaltsbestandteil_id_arr)) $gehaltsbestandteil_id_arr[] = $gehaltsbestandteil_id;
+					$gehaltsbestandteilArr[$gehaltsbestandteil_id] = $gehaltsbestandteil->getGrundbetrag();
 				}
-
 			}
 
-			foreach ($gehaltsbestandteil_id_arr as $gehaltsbestandteil_id)
+			foreach ($gehaltsbestandteilArr as $gehaltsbestandteil_id => $grundbetrag)
 			{
 				// reset Gehalt to Grundbetrag
 				$updateRes = $this->_ci->GehaltsbestandteilModel->update(
 					['gehaltsbestandteil_id' => $gehaltsbestandteil_id],
-					['betrag_valorisiert' => $gehaltsbestandteil->getGrundbetrag()],
+					['betrag_valorisiert' => $grundbetrag],
 					$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
 				);
 

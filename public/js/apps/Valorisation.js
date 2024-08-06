@@ -19,7 +19,7 @@ const router = VueRouter.createRouter(
 		history: VueRouter.createWebHistory(),
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation`, component: ValorisationSelection },
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck }
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: true}
 		],
 	}
 );

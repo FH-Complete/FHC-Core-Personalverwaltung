@@ -53,7 +53,6 @@ class ValorisierungInstanz_model extends DB_Model
 				hr.tbl_valorisierung_instanz vi
 			WHERE
 			(
-				-- vi.oe_kurzbz IS NULL
 				EXISTS (
 					SELECT 1
 					FROM

@@ -70,9 +70,16 @@ export const ValorisationCheck = {
 			{
 				let va = this.valorisierungCheckData[gehaltsbestandteil_id]['valorisation_methods'];
 
-				// get last calculated amount
-				let latestDate = Object.keys(va).reduce((a, b) => va[a] > va[b] ? a : b);
-				valorisations[gehaltsbestandteil_id] = va[latestDate].calculated_betrag_valorisiert;
+				if (va == null)
+				{
+					valorisations[gehaltsbestandteil_id] = this.valorisierungCheckData[gehaltsbestandteil_id]['grundbetrag'];
+				}
+				else
+				{
+					// get last calculated amount
+					let latestDate = Object.keys(va).reduce((a, b) => va[a] > va[b] ? a : b);
+					valorisations[gehaltsbestandteil_id] = va[latestDate].calculated_betrag_valorisiert;
+				}
 			}
 
 			return valorisations;
@@ -171,7 +178,7 @@ export const ValorisationCheck = {
 		</div>
 
 		<div class="d-flex mb-3 align-items-center" v-else>
-			<label class="text-danger"><i class="fa fa-x"></i>&nbsp;Falsche Valorisierung gespeichert</label>&nbsp;
+			<label class="text-danger"><i class="fa fa-x"></i>&nbsp;Gespeicherte Valorisierung weicht von berechneter Valorisierung ab!</label>&nbsp;
 			<button type="button" class="btn btn-primary ml-auto" @click="redoValorisation">Valorisierung neu berechnen und speichern</button>
 		</div>
 
@@ -202,7 +209,7 @@ export const ValorisationCheck = {
 							<tr>
 								<td></td>
 								<td>Grundbetrag</td>
-								<td>{{ gehaltsbestandteilInfo[gehaltsbestandteil_id].grundbetrag }}</td>
+								<td>{{ method.grundbetrag }}</td>
 							</tr>
 							<tr v-for="(valorisierung, valorisierungsdatum) in method.valorisation_methods"
 								v-bind:class="valorisierung.calculated_betrag_valorisiert != valorisierung.historie_betrag_valorisiert ? 'table-danger' : ''">
@@ -229,7 +236,7 @@ export const ValorisationCheck = {
 							<tr>
 								<td></td>
 								<td>Grundbetrag</td>
-								<td>{{ gehaltsbestandteilInfo[gehaltsbestandteil_id].grundbetrag }}</td>
+								<td>{{ method.grundbetrag }}</td>
 							</tr>
 							<tr v-for="(valorisierung, valorisierungsdatum) in method.valorisation_methods"
 								v-bind:class="valorisierung.calculated_betrag_valorisiert != valorisierung.historie_betrag_valorisiert ? 'table-danger' : ''">

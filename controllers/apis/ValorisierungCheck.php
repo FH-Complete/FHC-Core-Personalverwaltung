@@ -18,7 +18,6 @@ class ValorisierungCheck extends FHCAPI_Controller
 			)
 		);
 
-		//$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungCheckLib', null, 'ValorisierungCheckLib');
 	}

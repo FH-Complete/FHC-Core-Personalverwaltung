@@ -219,11 +219,11 @@ class ValorisierungLib
 		}
 		else
 		{
-		    $noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
-		    $noval->initialize($this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
-		    $dvdata->valorisierungmethode = 'keine Valorisierung';
-		    $dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
-		    $dvdata->sumsalarypostval = $dvdata->sumsalarypreval;
+			$noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
+			$noval->initialize($this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
+			$dvdata->valorisierungmethode = 'keine Valorisierung';
+			$dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
+			$dvdata->sumsalarypostval = $dvdata->sumsalarypreval;
 		}
 	}
 
