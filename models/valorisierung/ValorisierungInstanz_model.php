@@ -41,37 +41,39 @@ class ValorisierungInstanz_model extends DB_Model
 		}
 	}
 
+	// todo get instanzen by datum
 	public function getValorisierungInstanzenByDienstverhaeltnis($dienstverhaeltnis_id, $ausgewaehlt = null)
 	{
 		$params = [$dienstverhaeltnis_id];
 
-		$qry = '
+		$qry = "
 			SELECT
 				valorisierungsdatum, valorisierung_kurzbz, oe_kurzbz, ausgewaehlt
 			FROM
 				hr.tbl_valorisierung_instanz vi
 			WHERE
 			(
-				vi.oe_kurzbz IS NULL
-				OR EXISTS (
+				-- vi.oe_kurzbz IS NULL
+				EXISTS (
 					SELECT 1
 					FROM
 						hr.tbl_dienstverhaeltnis
 					WHERE
 						dienstverhaeltnis_id = ?
-						AND oe_kurzbz = vi.oe_kurzbz
+						AND (oe_kurzbz = vi.oe_kurzbz OR vi.oe_kurzbz IS NULL)
+						AND vi.valorisierungsdatum BETWEEN COALESCE(von, '1970-01-01') AND COALESCE(bis, '2170-12-31')
 				)
-			)';
+			)";
 
 		if (isset($ausgewaehlt) && is_bool($ausgewaehlt))
 		{
-			$qry .= ' AND ausgewaehlt = ?';
+			$qry .= " AND ausgewaehlt = ?";
 			$params[] = $ausgewaehlt;
 		}
 
 		$qry .=
-			' ORDER BY
-				valorisierungsdatum, valorisierung_kurzbz, valorisierung_instanz_id';
+			" ORDER BY
+				valorisierungsdatum, valorisierung_kurzbz, valorisierung_instanz_id";
 
 		return $this->execQuery($qry, $params);
 	}
