@@ -171,6 +171,7 @@ export const EmployeeContract = {
             isFetching.value = true
             try {
               const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
+                console.log('dvByPerson', res.data.retval)
                 dvList.value = res.data.retval;          
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
@@ -239,7 +240,7 @@ export const EmployeeContract = {
                 chartOptions.series[0].data = tempData1;
                 chartOptions.series[1].data = tempData2;
             } catch (error) {
-                console.log(error)                
+                console.log(error)
             } finally {
                 isFetching.value = false
             }
@@ -385,7 +386,9 @@ export const EmployeeContract = {
                             gueltig_ab: currentDV.value.von,
                             gueltig_bis: currentDV.value.bis,
                         }
-                    }
+                    },
+                    unruly: currentDV.value.unruly,
+                    person_id: currentDV.value.person_id
                 };
             enddvmodalRef.value.showModal();            
         }
@@ -452,6 +455,11 @@ export const EmployeeContract = {
         }
 
         const handleDvEnded = async () => {
+            fetchData(route.params.uid);
+            emit('updateHeader');
+        }
+
+        const handleUpdateUnruly = async () => {
             fetchData(route.params.uid);
             emit('updateHeader');
         }
@@ -611,7 +619,7 @@ export const EmployeeContract = {
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate, 
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
             createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
-            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
+            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, handleUpdateUnruly, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp
@@ -1120,7 +1128,8 @@ export const EmployeeContract = {
     <enddvmodal 
         ref="enddvmodalRef" 
         :curdv="endDV"
-        @dvended="handleDvEnded">
+        @dvended="handleDvEnded"
+        @updateunruly="handleUpdateUnruly">
     </enddvmodal>
 
     <deletedvmodal 

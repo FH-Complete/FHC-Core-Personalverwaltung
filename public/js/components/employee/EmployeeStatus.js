@@ -40,12 +40,16 @@ export const EmployeeStatus = {
              let von = new Date(dv.von);
              let bis = dv.bis != null ? new Date(dv.bis) : null;
              if (currentDate.value >= von && (bis == null || bis >= currentDate.value)) {
-              anzDV++;
-              let vaExists = statusList.value.find((item) => item.text == formatVertragsart(dv.vertragsart_kurzbz))
-              if (!vaExists) {
-                statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: '', css: 'bg-dv rounded-0'})
-              }
-              dvIDs.push(dv.dienstverhaeltnis_id)
+                 anzDV++;
+                 let vaExists = statusList.value.find((item) => item.text == formatVertragsart(dv.vertragsart_kurzbz))
+                 if (!vaExists) {
+                     statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: '', css: 'bg-dv rounded-0'})
+                 }
+                 dvIDs.push(dv.dienstverhaeltnis_id)
+
+                 if(dv.unruly && !(statusList.value.findIndex((entry)=>entry.text === 'Unruly') > 0)) {
+                     statusList.value.push({text: 'Unruly', description: '', css: 'bg-unruly rounded-0'})
+                 }
              }
           })
           if (anzDV > 1) {

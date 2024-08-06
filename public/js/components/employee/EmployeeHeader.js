@@ -308,7 +308,6 @@ export const EmployeeHeader = {
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
                     </div>
                     <EmployeeStatus v-if="!restricted" ref="statusRef"></EmployeeStatus>
-                   
                 </div>
              
             </div>
@@ -365,4 +364,3 @@ export const EmployeeHeader = {
         
         `
 }
-

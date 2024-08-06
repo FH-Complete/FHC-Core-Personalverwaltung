@@ -132,7 +132,7 @@ export const SearchExistingDialog = {
             <span class="text-primary fw-semibold"><i class="fa fa-circle-info text-primary"></i>&nbsp;{{ personList.length }} Personen gefunden</span>
             <table class="table table-sm table-striped table-hover mt-2">
                 <thead>
-                    <tr><th>UID</th><th>Name</th><th>Geb.Dat.</th><th>SVNr</th><th>Email</th><th>Status</th><th>Aktion</th></tr>
+                    <tr><th>UID</th><th>Name</th><th>Geb.Dat.</th><th>SVNr</th><th>Unruly</th><th>Email</th><th>Status</th><th>Aktion</th></tr>
                 </thead>
                 <tbody>
                     <tr v-for="person in personList" >
@@ -140,6 +140,7 @@ export const SearchExistingDialog = {
                         <td>{{ person.nachname }}, {{ person.vorname }}</td>
                         <td>{{ formatDate(person.gebdatum) }}</td>
                         <td>{{ person.svnr }}</td>
+                        <td>{{ (person.unruly  ? 'Ja' : 'Nein') }}</td>
                         <td><span v-if="person.emails.length > 0">{{ person.emails.join(", ") }}</span></td>
                         <td>{{ person.status }}</td>
                         <td @click.stop>
