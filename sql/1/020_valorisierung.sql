@@ -55,3 +55,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_valorisierung_historie (
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_valorisierung_historie TO vilesci;
 GRANT SELECT,UPDATE ON SEQUENCE hr.tbl_valorisierung_historie_valorisierung_historie_id_seq TO vilesci;
+
+INSERT INTO system.tbl_berechtigung (berechtigung_kurzbz, beschreibung) VALUES
+('extension/pv21_valorisierung', 'Zugriff auf Valorisierung GUI') 
+ON CONFLICT (berechtigung_kurzbz) DO NOTHING;
