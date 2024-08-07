@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Valorisation extends Auth_Controller
 {
 
-	const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
+	const DEFAULT_PERMISSION = 'extension/pv21_valorisierung:r';
 
 	/**
 	 * Constructor
