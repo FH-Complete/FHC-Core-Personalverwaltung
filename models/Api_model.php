@@ -428,7 +428,6 @@ class Api_model extends DB_Model
             p.vorname,
             p.vornamen,
             p.sprache,
-            p.geschlecht,
             p.gebdatum,
             p.svnr,
             p.anmerkung,
@@ -984,26 +983,38 @@ class Api_model extends DB_Model
     /**
      * search person (used by employee create dialog)
      */
-    function filterPerson($surname, $birthdate=null)
+    function filterPerson($nachname, $vorname = null, $birthdate=null, $filterUnruly=null)
     {
 
-        $parametersArray = array($surname);
+        $parametersArray = array($nachname);
         $where ="p.nachname~* ? ";
-        if (mb_strlen($surname) == 2)
+        if (mb_strlen($nachname) == 2)
         {
             $where = "p.nachname=? ";
         }
 
-        if (mb_strlen($surname) == 2)
+        if (mb_strlen($nachname) == 2)
         {
             $where = "p.nachname=? ";
         }
+
+		if(isset($vorname) && $vorname != '')
+		{
+			$where.= " AND p.vorname~*?";
+			$parametersArray[] = $vorname;
+		}
 
         if(isset($birthdate) && $birthdate != '')
         {
 			$where.=" AND p.gebdatum=?";
             $parametersArray[] = $birthdate;
         }
+
+		if(isset($filterUnruly))
+		{
+			$where.=" AND p.unruly=?";
+			$parametersArray[] = $filterUnruly;
+		}
 
         $qry='
             SELECT

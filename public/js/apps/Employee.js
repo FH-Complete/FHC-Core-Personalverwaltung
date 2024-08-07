@@ -24,7 +24,7 @@ const router = VueRouter.createRouter(
 		history: VueRouter.createWebHistory(),
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome, name: 'Employee',
 				children: [					
 					{ path: '', 
 					  component: EmployeePerson, 
@@ -269,4 +269,3 @@ pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(Phrasen);
 pvApp.use(FhcAlert);
 pvApp.mount('#wrapper');
-

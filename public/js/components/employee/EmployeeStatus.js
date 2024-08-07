@@ -1,6 +1,12 @@
 export const EmployeeStatus = {
+    props: {
+      tags: {
+          default: [],
+          type: Array
+      }
+    },
     expose: ['refresh'],
-    setup() {
+    setup( props ) {
 
         const { watch, ref, reactive, computed, onMounted, inject } = Vue;
         const route = VueRouter.useRoute();
@@ -32,6 +38,8 @@ export const EmployeeStatus = {
 
         let statusList = Vue.ref([]);    
 
+        const statusTags = Vue.ref(props.tags)
+
         const generateStatusList = () => {
           let anzDV = 0;
           let dvIDs = [];
@@ -46,10 +54,6 @@ export const EmployeeStatus = {
                      statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: '', css: 'bg-dv rounded-0'})
                  }
                  dvIDs.push(dv.dienstverhaeltnis_id)
-
-                 if(dv.unruly && !(statusList.value.findIndex((entry)=>entry.text === 'Unruly') > 0)) {
-                     statusList.value.push({text: 'Unruly', description: '', css: 'bg-unruly rounded-0'})
-                 }
              }
           })
           if (anzDV > 1) {
@@ -109,7 +113,7 @@ export const EmployeeStatus = {
         }
 
         onMounted(async () => {
-          await router.isReady() 
+          await router.isReady()
           console.log('route.path', route.path)
           currentPersonID.value = route.params.id
           currentPersonUID.value = route.params.uid         
@@ -131,13 +135,16 @@ export const EmployeeStatus = {
           fetchData(currentPersonUID.value);
         }
 
-        return {statusList, refresh};
+        return {statusList, statusTags, refresh};
     },
     template: `
     <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2 mt-auto" >
-      <template v-for="item in statusList">
-        <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary rounded-0'" >{{ item.text }}</span>
-      </template>
+        <template v-for="item in statusTags">
+            <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary rounded-0'" >{{ item.text }}</span>
+        </template>
+        <template v-for="item in statusList">
+            <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary rounded-0'" >{{ item.text }}</span>
+        </template>
     </div>   
    `
 }
