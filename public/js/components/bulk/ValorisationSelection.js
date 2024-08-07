@@ -111,6 +111,27 @@ export const ValorisationSelection = {
 				return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 			},
 			tabulatorOptions: function() {
+                                const moneyformatterparams = {
+                                    decimal: ",",
+                                    thousand: ".",
+                                    symbol: false,
+                                    symbolAfter: false,
+                                    negativeSign: true,
+                                    precision: 2
+                                };
+
+                                const formatDate = function(cell, formatterParams, onRendered) {
+                                    var dateval = cell.getValue();
+                                    const re = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+                                    var matches = null;
+
+                                    if( null !== dateval && null !== (matches = dateval.match(re)) ) {
+                                        return matches[3] + '.' + matches[2] + '.' + matches[1];
+                                    } else {
+                                        return dateval;
+                                    }
+                                };
+
 				return {
 						height: '75vh',
 						// Unique ID
@@ -125,8 +146,8 @@ export const ValorisationSelection = {
 						// Column definitions
 						columns: [
 						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
-						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number'},
-						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number'},
+						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams},
+						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams},
 						{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
 						{title: 'Standard-Kostenstelle', field: 'stdkst', headerFilter: true},
 						{title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
@@ -134,8 +155,8 @@ export const ValorisationSelection = {
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
-						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true},
-						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true}
+						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate},
+						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate}
 					]
 				};
 			},
@@ -162,9 +183,38 @@ export const ValorisationSelection = {
 								sumpostval += row.getData().sumsalarypostval;
 							}
 
-							elsumpreval.innerHTML = sumpreval.toFixed(2).replace('.', ',');
-							elsumpostval.innerHTML = sumpostval.toFixed(2).replace('.', ',');
-							elvaldifferenz.innerHTML = (sumpostval - sumpreval).toFixed(2).replace('.', ',');
+                                                        const moneyformatter = this.modules.format.getFormatter('money');
+                                                        const moneyformatterparams = {
+                                                            decimal: ",",
+                                                            thousand: ".",
+                                                            symbol: "EUR ",
+                                                            symbolAfter: false,
+                                                            negativeSign: true,
+                                                            precision: 2
+                                                        };
+
+                                                        const sumpreval_wrapper = {
+                                                            getValue: function() {
+                                                                return sumpreval;
+                                                            }
+                                                        };
+
+                                                        const sumpostval_wrapper = {
+                                                            getValue: function() {
+                                                                return sumpostval;
+                                                            }
+                                                        };
+
+                                                        const differenz_wrapper = {
+                                                            getValue: function() {
+                                                                return (sumpostval - sumpreval);
+                                                            }
+                                                        };
+
+                                                        elfiltered.innerHTML = rows.length;
+							elsumpreval.innerHTML = moneyformatter(sumpreval_wrapper, moneyformatterparams);
+							elsumpostval.innerHTML = moneyformatter(sumpostval_wrapper, moneyformatterparams);
+							elvaldifferenz.innerHTML = moneyformatter(differenz_wrapper, moneyformatterparams);
 						}
 					},
 					{
