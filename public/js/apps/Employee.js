@@ -11,6 +11,7 @@ import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
+import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
@@ -25,17 +26,17 @@ const router = VueRouter.createRouter(
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
-				children: [					
-					{ path: '', 
-					  component: EmployeePerson, 
+				children: [
+					{ path: '',
+					  component: EmployeePerson,
 					  name: 'person',
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid })  },
-					{ path: 'contract', 
+					{ path: 'contract',
 					  component: EmployeeContract,
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
-					{ path: 'contract/:dienstverhaeltnis_id', 
+					{ path: 'contract/:dienstverhaeltnis_id',
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })		
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })
 					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
@@ -43,6 +44,7 @@ const router = VueRouter.createRouter(
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: true}
 		],
 	}
 );
@@ -51,7 +53,7 @@ Highcharts.setOptions({
 	lang: {
 		thousandsSep: '.',
 		decimalPoint: ',',
-		dateFormat: 'dd.mm.YYYY', 
+		dateFormat: 'dd.mm.YYYY'
 	}
   })
 
