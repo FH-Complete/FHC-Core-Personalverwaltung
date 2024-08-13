@@ -410,14 +410,14 @@ export const ValorisationSelection = {
 						<tr>
 							<th>Methoden</th>
 							<td>
-								<span v-for="(methode, index) in valorisierungInfo.methoden">
+								<div v-for="(methode, index) in valorisierungInfo.methoden">
 									<span v-if="index > 0">
-										<br><br>
+										<br>
 									</span>
 									<b>{{methode.valorisierung_methode_kurzbz}}</b><br>
 									Beschreibung: {{methode.valorisierung_methode_beschreibung}}<br>
-									Parameter: {{methode.valorisierung_methode_parameter}}
-								</span>
+									Parameter: <pre>{{JSON.stringify(JSON.parse(methode.valorisierung_methode_parameter), null, 2)}}</pre>
+								</div>
 							</td>
 						</tr>
 					</tbody>

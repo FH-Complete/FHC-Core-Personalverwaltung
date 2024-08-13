@@ -1,6 +1,7 @@
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "../../apps/common.js";
+import { Modal } from '../Modal.js';
 
 export const ValorisationCheck = {
     props: {
@@ -8,7 +9,8 @@ export const ValorisationCheck = {
     },
 	components: {
 		searchbar,
-		CoreNavigationCmpt
+		CoreNavigationCmpt,
+		Modal
 	},
 	data() {
 		return 	{
@@ -16,7 +18,8 @@ export const ValorisationCheck = {
 			searchfunction: searchfunction,
 			appSideMenuEntries: {},
 			valorisierungCheckData: {},
-			dvGehaltData: {}
+			dvData: {},
+			viewedValorisierungMethod: {}
 		};
 	},
 	created: function() {
@@ -24,13 +27,13 @@ export const ValorisationCheck = {
 	},
 	methods: {
 		getAllData: function() {
-			this.getGehaltDvData();
+			this.getDvData();
 			this.getValorisierungCheckData();
 		},
-		getGehaltDvData: function() {
-			const res = Vue.$fhcapi.ValorisierungCheck.getDvGehaltData(this.dienstverhaeltnis_id)
+		getDvData: function() {
+			const res = Vue.$fhcapi.ValorisierungCheck.getDvData(this.dienstverhaeltnis_id)
 				.then((response) => {
-					this.dvGehaltData = response.data.data;
+					this.dvData = response.data.data;
 				})
 				.catch(this.handleErrors);
 		},
@@ -48,6 +51,10 @@ export const ValorisationCheck = {
 					this.getAllData();
 				})
 				.catch(this.handleErrors);
+		},
+		showMethodenInfo: function(event, valorisierung) {
+			this.viewedValorisierungMethod = valorisierung;
+			this.$refs.infoModalRef.show();
 		},
 		newSideMenuEntryHandler: function(payload) {
 				this.appSideMenuEntries = payload;
@@ -86,9 +93,9 @@ export const ValorisationCheck = {
 		},
 		dienstverhaeltnisInfo: function() {
 			let dienstverhaeltnisInfo = {};
-			if (this.dvGehaltData.length > 0)
+			if (this.dvData.length > 0)
 			{
-				let dv = this.dvGehaltData[0];
+				let dv = this.dvData[0];
 				dienstverhaeltnisInfo = {
 					'von': dv.von,
 					'vertragsart': dv.vertragsart,
@@ -99,19 +106,6 @@ export const ValorisationCheck = {
 			}
 
 			return dienstverhaeltnisInfo;
-		},
-		gehaltsbestandteilInfo: function() {
-			let gehaltsbestandteile = {};
-			for (let dv of this.dvGehaltData)
-			{
-				gehaltsbestandteile[dv.gehaltsbestandteil_id] = {
-					'gehaltstyp': dv.gehaltstyp,
-					'von': dv.gehaltsbestandteil_von,
-					'grundbetrag': dv.grund_betrag_decrypted
-				}
-			}
-
-			return gehaltsbestandteile;
 		},
 		valorisierungValid: function() {
 			for (let gehaltsbestandteil_id in this.valorisierungCheckData) {
@@ -124,8 +118,7 @@ export const ValorisationCheck = {
 					let method = valData['valorisation_methods'][methodIdx];
 
 					// if history betrag valorisiert different from calculated - invalid
-					if (method.historie_betrag_valorisiert != method.calculated_betrag_valorisiert)
-						return false;
+					if (method.historie_betrag_valorisiert != method.calculated_betrag_valorisiert) return false;
 				}
 			}
 			return true;
@@ -185,8 +178,8 @@ export const ValorisationCheck = {
 		<div class="mh-100 pb-5" >
 			<div class="row" v-for="(method, gehaltsbestandteil_id) in valorisierungCheckData">
 				<h1 class="h3">
-					Gehaltsbestandteil {{ gehaltsbestandteilInfo[gehaltsbestandteil_id]['gehaltstyp'] }},
-					{{ gehaltsbestandteilInfo[gehaltsbestandteil_id]['von'] }},
+					Gehaltsbestandteil {{ method.gehaltstyp }},
+					{{ method.von }},
 					Betrag valorisiert:
 					<span
 						v-bind:class="finalCalculatedValorisations[gehaltsbestandteil_id] != method.final_betrag_valorisiert ? 'text-danger' : ''">
@@ -224,11 +217,12 @@ export const ValorisationCheck = {
 					<table class="table table-condensed table-bordered">
 						<thead>
 							<tr class="text-center">
-								<th colspan="3">Berechnet</th>
+								<th colspan="4">Berechnet</th>
 							</tr>
 							<tr>
 								<th>Valorisierungsdatum</th>
 								<th>Bezeichnung</th>
+								<th>Methode</th>
 								<th>Betrag valorisiert</th>
 							</tr>
 						</thead>
@@ -236,12 +230,16 @@ export const ValorisationCheck = {
 							<tr>
 								<td></td>
 								<td>Grundbetrag</td>
+								<td>-</td>
 								<td>{{ method.grundbetrag }}</td>
 							</tr>
 							<tr v-for="(valorisierung, valorisierungsdatum) in method.valorisation_methods"
 								v-bind:class="valorisierung.calculated_betrag_valorisiert != valorisierung.historie_betrag_valorisiert ? 'table-danger' : ''">
 								<td>{{ valorisierungsdatum }}</td>
 								<td>{{ valorisierung.valorisierung_kurzbz }}</td>
+								<td>{{ valorisierung.valorisierung_methode_kurzbz }}&nbsp;
+									<i class="fa fa-info-circle fa-lg" role="button" @click="showMethodenInfo($event, valorisierung)"></i>
+								</td>
 								<td>{{ valorisierung.calculated_betrag_valorisiert }}</td>
 							</tr>
 						</tbody>
@@ -254,5 +252,26 @@ export const ValorisationCheck = {
 
 	</div>
 	</div>
+	<!-- detail modal -->
+	<Modal :title="'Valorisierungsmethode Information'" ref="infoModalRef" v-model="viewedValorisierungMethod">
+		<template #body>
+			<table class="table table-bordered">
+				<tbody>
+					<tr>
+						<th>Bezeichnung</th>
+						<td>{{viewedValorisierungMethod.valorisierung_methode_kurzbz}}</td>
+					</tr>
+					<tr>
+						<th>Beschreibung</th>
+						<td>{{viewedValorisierungMethod.valorisierung_methode_beschreibung}}</td>
+					</tr>
+					<tr>
+						<th>Parameter</th>
+						<td><pre>{{JSON.stringify(this.viewedValorisierungMethod.valorisierung_methode_parameter, null, 2)}}</pre></td>
+					</tr>
+				</tbody>
+			</table>
+		</template>
+	</Modal>
 	`
 };

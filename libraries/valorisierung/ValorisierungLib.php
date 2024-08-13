@@ -65,6 +65,7 @@ class ValorisierungLib
 		$dvdata = new StdClass();
 		$dvdata->dienstverhaeltnis_id = $dienstverhaeltnis_id;
 		$this->_calculateValorisation($dvdata);
+		return $dvdata;
 	}
 
 	public function redoAllValorisationForDvId($dienstverhaeltnis_id)
@@ -196,7 +197,9 @@ class ValorisierungLib
 			{
 				$applicableValorisationMethods[] = array(
 					'kurzbz' => $valinstanzmethod->valorisierung_methode_kurzbz,
-					'method' => $valorisationMethod
+					'method' => $valorisationMethod,
+					'params' => $params,
+					'description' => $valinstanzmethod->beschreibung
 				);
 			}
 		}
@@ -208,8 +211,11 @@ class ValorisierungLib
 
 		if(count($applicableValorisationMethods) == 1)
 		{
-			$usedvalinstanz = $applicableValorisationMethods[0]['method'];
-			$dvdata->valorisierungmethode = $applicableValorisationMethods[0]['kurzbz'];
+			$valMethod = $applicableValorisationMethods[0];
+			$usedvalinstanz = $valMethod['method'];
+			$dvdata->valorisierungmethode = $valMethod['kurzbz'];
+			$dvdata->valorisierung_methode_parameter = $valMethod['params'];
+			$dvdata->valorisierung_methode_beschreibung = $valMethod['description'];
 			$dvdata->sumsalarypreval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
 			$usedvalinstanz->calculateValorisation();
 			$dvdata->sumsalarypostval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);

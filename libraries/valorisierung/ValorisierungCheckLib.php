@@ -10,6 +10,7 @@ class ValorisierungCheckLib
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
+		$this->_ci->load->model('vertragsbestandteil/GehaltsTyp_model', 'GehaltstypModel');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungHistorie_model', 'ValorisierunghistorieModel');
 		$this->_ci->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
@@ -19,7 +20,7 @@ class ValorisierungCheckLib
 
 	public function getValorisationDataForCheck($dienstverhaeltnisIdArr)
 	{
-;		$valorisationData = [];
+		$valorisationData = [];
 
 		// calculate Valorisierung data
 		foreach ($dienstverhaeltnisIdArr as $dienstverhaeltnis_id)
@@ -59,7 +60,10 @@ class ValorisierungCheckLib
 						// start with Grundbetrag, not betrag valorisiert
 						$grundbetrag = $gehaltsbestandteil->getGrundbetrag();
 						$gehaltsbestandteil->setBetrag_valorisiert($grundbetrag);
-						// set Grundbetrag
+						// set Gehaltsbestandteil data
+						$gehaltstyp = $this->_ci->GehaltstypModel->getGehaltstypByGehaltsbestandteil($gehaltsbestandteil_id);
+						$valorisationData[$gehaltsbestandteil_id]['gehaltstyp'] = isset($gehaltstyp) ? $gehaltstyp->bezeichnung : '';
+						$valorisationData[$gehaltsbestandteil_id]['von'] = $gehaltsbestandteil->getVon();
 						$valorisationData[$gehaltsbestandteil_id]['grundbetrag'] = $grundbetrag;
 						// initialise valorisation methods
 						$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'] = null;
@@ -75,7 +79,8 @@ class ValorisierungCheckLib
 				$this->_ci->ValorisierungLib->setDvDataForValorisation($dvData);
 
 				// execute calculations
-				$this->_ci->ValorisierungLib->calculateValorisationForDvId($dienstverhaeltnis_id);
+				$dvdata = $this->_ci->ValorisierungLib->calculateValorisationForDvId($dienstverhaeltnis_id);
+
 				$calculatedValorisation = $this->_ci->ValorisierungLib->getCalculatedValorisation();
 
 				// store the calculated amounts
@@ -83,6 +88,12 @@ class ValorisierungCheckLib
 				{
 					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['valorisierung_kurzbz']
 						= $instanz->valorisierung_kurzbz;
+					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['valorisierung_methode_kurzbz']
+						= $dvdata->valorisierungmethode;
+					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['valorisierung_methode_parameter']
+						= $dvdata->valorisierung_methode_parameter;
+					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['valorisierung_methode_beschreibung']
+						= $dvdata->valorisierung_methode_beschreibung;
 					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['calculated_betrag_valorisiert']
 						= $betrag_valorisiert;
 				}
@@ -110,27 +121,20 @@ class ValorisierungCheckLib
 	 * @param
 	 * @return object success or error
 	 */
-	public function getDvGehaltData($dienstverhaeltnis_id)
+	public function getDvData($dienstverhaeltnis_id)
 	{
 		$qry = '
 			SELECT
-				dv.dienstverhaeltnis_id, gehaltsbestandteil_id,
-				grundbetrag AS "grund_betrag_decrypted", betrag_valorisiert AS "betr_valorisiert_decrypted",
-				dv.von, va.bezeichnung AS "vertragsart",
-				pers.vorname, pers.nachname, dv.mitarbeiter_uid, oe.bezeichnung AS "unternehmen",
-				gb.von AS "gehaltsbestandteil_von", gt.bezeichnung AS "gehaltstyp"
+				dv.dienstverhaeltnis_id, dv.von, va.bezeichnung AS "vertragsart",
+				pers.vorname, pers.nachname, dv.mitarbeiter_uid, oe.bezeichnung AS "unternehmen"
 			FROM
 				hr.tbl_dienstverhaeltnis dv
 				JOIN hr.tbl_vertragsart va USING (vertragsart_kurzbz)
 				JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
 				JOIN public.tbl_benutzer ben ON dv.mitarbeiter_uid = ben.uid
 				JOIN public.tbl_person pers USING (person_id)
-				LEFT JOIN hr.tbl_gehaltsbestandteil gb ON dv.dienstverhaeltnis_id = gb.dienstverhaeltnis_id
-				LEFT JOIN hr.tbl_gehaltstyp gt USING (gehaltstyp_kurzbz)
 			WHERE
-				dv.dienstverhaeltnis_id = ?
-			ORDER BY
-				gb.von DESC, gb.gehaltsbestandteil_id DESC';
+				dv.dienstverhaeltnis_id = ?';
 
 		return $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
 			$qry,

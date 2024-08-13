@@ -11,7 +11,7 @@ class ValorisierungCheck extends FHCAPI_Controller
 		parent::__construct(
 			array(
 				'index' => self::DEFAULT_PERMISSION,
-				'getDvGehaltData' => self::DEFAULT_PERMISSION,
+				'getDvData' => self::DEFAULT_PERMISSION,
 				'getValorisierungCheckData' => self::DEFAULT_PERMISSION,
 				'checkValorisationValidityOfDv' => self::DEFAULT_PERMISSION,
 				'redoValorisation' => self::DEFAULT_PERMISSION.'w'
@@ -27,18 +27,17 @@ class ValorisierungCheck extends FHCAPI_Controller
 		$this->terminateWithSuccess('not implemented');
 	}
 
-	public function getDvGehaltData()
+	public function getDvData()
 	{
 		$dienstverhaeltnis_id = $this->input->get('dienstverhaeltnis_id');
 
 		if (!isset($dienstverhaeltnis_id)) $this->terminateWithError('Dienstverhältnis Id fehlt');
 
-		$dvRes = $this->ValorisierungCheckLib->getDvGehaltData($dienstverhaeltnis_id);
+		$dvRes = $this->ValorisierungCheckLib->getDvData($dienstverhaeltnis_id);
 
 		if (isError($dvRes)) $this->terminateWithError(getError($dvRes));
 
 		$this->terminateWithSuccess(hasData($dvRes) ? getData($dvRes) : []);
-
 	}
 
 	public function getValorisierungCheckData()
