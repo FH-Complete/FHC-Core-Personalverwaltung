@@ -254,8 +254,6 @@ class ValorisierungLib
 				$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
 			);
 
-			// delete Valorisierung history if needed
-
 			// write Valorisierung history
 			$this->_ci->ValorisierungHistorie_model->insert(
 				[
