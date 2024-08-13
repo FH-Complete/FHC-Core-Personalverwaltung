@@ -207,8 +207,9 @@ export const EmployeeHeader = {
 
         const refresh = () => {
             console.log('refresh called')
-            fetchHeaderData(props.personID, props.personUID)
-            statusRef.value.refresh()
+            fetchHeaderData(props.personID, props.personUID);
+            checkPerson(props.personID);
+            statusRef.value.refresh();
         }
 
 
