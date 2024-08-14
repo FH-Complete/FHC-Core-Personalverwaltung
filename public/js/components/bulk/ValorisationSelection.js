@@ -68,6 +68,7 @@ export const ValorisationSelection = {
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData([]);
 						this.getValorisierungsInstanzen();
+						this.$fhcAlert.alertSuccess('Valorisierung erfolgreich abgeschlossen');
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 					})
 					.catch(this.handleErrors);
@@ -104,6 +105,7 @@ export const ValorisationSelection = {
 				else {
 					this.$fhcAlert.handleSystemError(response);
 				}
+				this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 			}
 		},
 		computed: {
@@ -111,26 +113,26 @@ export const ValorisationSelection = {
 				return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 			},
 			tabulatorOptions: function() {
-                                const moneyformatterparams = {
-                                    decimal: ",",
-                                    thousand: ".",
-                                    symbol: false,
-                                    symbolAfter: false,
-                                    negativeSign: true,
-                                    precision: 2
-                                };
+				const moneyformatterparams = {
+					decimal: ",",
+					thousand: ".",
+					symbol: false,
+					symbolAfter: false,
+					negativeSign: true,
+					precision: 2
+				};
 
-                                const formatDate = function(cell, formatterParams, onRendered) {
-                                    var dateval = cell.getValue();
-                                    const re = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
-                                    var matches = null;
+				const formatDate = function(cell, formatterParams, onRendered) {
+					var dateval = cell.getValue();
+					const re = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
+					var matches = null;
 
-                                    if( null !== dateval && null !== (matches = dateval.match(re)) ) {
-                                        return matches[3] + '.' + matches[2] + '.' + matches[1];
-                                    } else {
-                                        return dateval;
-                                    }
-                                };
+					if( null !== dateval && null !== (matches = dateval.match(re)) ) {
+						return matches[3] + '.' + matches[2] + '.' + matches[1];
+					} else {
+						return dateval;
+					}
+				};
 
 				return {
 						height: '75vh',
@@ -183,35 +185,35 @@ export const ValorisationSelection = {
 								sumpostval += row.getData().sumsalarypostval;
 							}
 
-                                                        const moneyformatter = this.modules.format.getFormatter('money');
-                                                        const moneyformatterparams = {
-                                                            decimal: ",",
-                                                            thousand: ".",
-                                                            symbol: "EUR ",
-                                                            symbolAfter: false,
-                                                            negativeSign: true,
-                                                            precision: 2
-                                                        };
+							const moneyformatter = this.modules.format.getFormatter('money');
+							const moneyformatterparams = {
+								decimal: ",",
+								thousand: ".",
+								symbol: "EUR ",
+								symbolAfter: false,
+								negativeSign: true,
+								precision: 2
+							};
 
-                                                        const sumpreval_wrapper = {
-                                                            getValue: function() {
-                                                                return sumpreval;
-                                                            }
-                                                        };
+							const sumpreval_wrapper = {
+								getValue: function() {
+									return sumpreval;
+								}
+							};
 
-                                                        const sumpostval_wrapper = {
-                                                            getValue: function() {
-                                                                return sumpostval;
-                                                            }
-                                                        };
+							const sumpostval_wrapper = {
+								getValue: function() {
+									return sumpostval;
+								}
+							};
 
-                                                        const differenz_wrapper = {
-                                                            getValue: function() {
-                                                                return (sumpostval - sumpreval);
-                                                            }
-                                                        };
+							const differenz_wrapper = {
+								getValue: function() {
+									return (sumpostval - sumpreval);
+								}
+							};
 
-                                                        elfiltered.innerHTML = rows.length;
+							elfiltered.innerHTML = rows.length;
 							elsumpreval.innerHTML = moneyformatter(sumpreval_wrapper, moneyformatterparams);
 							elsumpostval.innerHTML = moneyformatter(sumpostval_wrapper, moneyformatterparams);
 							elvaldifferenz.innerHTML = moneyformatter(differenz_wrapper, moneyformatterparams);
