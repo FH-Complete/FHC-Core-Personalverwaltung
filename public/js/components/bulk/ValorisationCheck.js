@@ -4,9 +4,9 @@ import {searchbaroptions, searchfunction } from "../../apps/common.js";
 import { Modal } from '../Modal.js';
 
 export const ValorisationCheck = {
-    props: {
-       dienstverhaeltnis_id: { type: Number, required: true }
-    },
+	props: {
+		dienstverhaeltnis_id: { type: Number, required: true }
+	},
 	components: {
 		searchbar,
 		CoreNavigationCmpt,
@@ -71,22 +71,38 @@ export const ValorisationCheck = {
 		}
 	},
 	computed: {
+		valorisierungCheckDataArr: function() {
+			let dataArr = [];
+			for (let gehaltsbestandteil_id in this.valorisierungCheckData)
+			{
+				let va = this.valorisierungCheckData[gehaltsbestandteil_id];
+				va.gehaltsbestandteil_id = gehaltsbestandteil_id;
+				dataArr.push(va);
+			}
+			dataArr.sort(function(a, b){
+				if (a.valorisierung == true && b.valorisierung == false) return -1;
+				if (a.bis == null && b.bis != null) return -1;
+				if (a.bis != null && b.bis == null) return 1;
+				return b.von.localeCompare(a.von)
+			});
+			return dataArr;
+		},
 		finalCalculatedValorisations: function() {
 			let valorisations = {};
 			for (let gehaltsbestandteil_id in this.valorisierungCheckData)
 			{
 				let va = this.valorisierungCheckData[gehaltsbestandteil_id]['valorisation_methods'];
 
-				if (va == null)
-				{
-					valorisations[gehaltsbestandteil_id] = this.valorisierungCheckData[gehaltsbestandteil_id]['grundbetrag'];
-				}
-				else
-				{
-					// get last calculated amount
-					let latestDate = Object.keys(va).reduce((a, b) => va[a] > va[b] ? a : b);
-					valorisations[gehaltsbestandteil_id] = va[latestDate].calculated_betrag_valorisiert;
-				}
+				// initialize with Grundbetrag
+				valorisations[gehaltsbestandteil_id] = parseFloat(this.valorisierungCheckData[gehaltsbestandteil_id]['grundbetrag']);
+
+				if (va == null) continue;
+
+				// get last calculated amount
+				let latestDate = Object.keys(va).reduce((a, b) => va[a] > va[b] ? a : b);
+				let lastBetrag = parseFloat(va[latestDate].calculated_betrag_valorisiert);
+				if (!lastBetrag) continue;
+				valorisations[gehaltsbestandteil_id] = lastBetrag;
 			}
 
 			return valorisations;
@@ -106,6 +122,23 @@ export const ValorisationCheck = {
 			}
 
 			return dienstverhaeltnisInfo;
+		},
+		dienstverhaeltnisSums: function() {
+			let sums = {
+				saved: 0,
+				calculated: 0
+			};
+
+			for (let gehaltsbestandteil_id in this.valorisierungCheckData)
+			{
+				sums.saved += parseFloat(this.valorisierungCheckData[gehaltsbestandteil_id].final_betrag_valorisiert);
+			}
+
+			if (Object.keys(this.finalCalculatedValorisations).length <= 0) return sums;
+
+			sums.calculated = Object.values(this.finalCalculatedValorisations).reduce((a, b) => a + b);
+
+			return sums;
 		},
 		valorisierungValid: function() {
 			for (let gehaltsbestandteil_id in this.valorisierungCheckData) {
@@ -166,25 +199,36 @@ export const ValorisationCheck = {
 			</div>
 		</div>
 
-		<div class="d-flex mb-3 align-items-center" v-if="valorisierungValid">
-			<label class="text-success"><i class="fa fa-check"></i>&nbsp;Valorisierung korrekt gespeichert</label>&nbsp;
+		<div class="row">
+
+			<div class="col-6">
+				<div class="d-flex mb-3 align-items-center" v-if="valorisierungValid">
+					<label class="text-success"><i class="fa fa-check"></i>&nbsp;Valorisierung korrekt gespeichert</label>&nbsp;
+				</div>
+
+				<div class="d-flex mb-3 align-items-center" v-else>
+					<label class="text-danger"><i class="fa fa-x"></i>&nbsp;Gespeicherte Valorisierung weicht von berechneter Valorisierung ab!</label>&nbsp;
+					<button type="button" class="btn btn-primary ml-auto" @click="redoValorisation">Valorisierung neu berechnen und speichern</button>
+				</div>
+			</div>
+
+			<div class="col-6 mb-3 text-end fw-bold fs-5">
+				&sum; gespeichert: {{ dienstverhaeltnisSums.saved }}; &sum; berechnet: {{ dienstverhaeltnisSums.calculated }}
+			</div>
+
 		</div>
 
-		<div class="d-flex mb-3 align-items-center" v-else>
-			<label class="text-danger"><i class="fa fa-x"></i>&nbsp;Gespeicherte Valorisierung weicht von berechneter Valorisierung ab!</label>&nbsp;
-			<button type="button" class="btn btn-primary ml-auto" @click="redoValorisation">Valorisierung neu berechnen und speichern</button>
-		</div>
-
-		<div class="mh-100 pb-5" >
-			<div class="row" v-for="(method, gehaltsbestandteil_id) in valorisierungCheckData">
+		<div class="mh-100 pb-5">
+			<div class="row" v-for="method in valorisierungCheckDataArr">
 				<h1 class="h3">
 					Gehaltsbestandteil {{ method.gehaltstyp }},
-					{{ method.von }},
-					Betrag valorisiert:
+					{{ method.von }}<span v-if="method.bis != null"> - {{ method.bis }}</span>, Betrag valorisiert:
 					<span
-						v-bind:class="finalCalculatedValorisations[gehaltsbestandteil_id] != method.final_betrag_valorisiert ? 'text-danger' : ''">
+						v-bind:class="finalCalculatedValorisations[method.gehaltsbestandteil_id] != method.final_betrag_valorisiert ? 'text-danger' : ''">
 						{{ method.final_betrag_valorisiert }}
-					</span>
+					</span>,
+					Valorisierung:
+					{{ method.valorisierung ? 'Ja' : 'Nein' }}
 				</h1>
 				<div class="col-6">
 					<table class="table table-condensed table-bordered">

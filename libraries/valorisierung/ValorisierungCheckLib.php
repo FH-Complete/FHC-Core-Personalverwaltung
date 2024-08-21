@@ -10,7 +10,6 @@ class ValorisierungCheckLib
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
-		$this->_ci->load->model('vertragsbestandteil/GehaltsTyp_model', 'GehaltstypModel');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungHistorie_model', 'ValorisierunghistorieModel');
 		$this->_ci->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
@@ -27,6 +26,23 @@ class ValorisierungCheckLib
 		{
 			$calculatedValorisation = [];
 
+			// get all Gehaltsbestandteile of DV
+			$gehaltsbestandteilData = [];
+			$ghRes = $this->getGehaltsbestandteilData($dienstverhaeltnis_id);
+
+			if (hasData($ghRes))
+			{
+				foreach (getData($ghRes) as $gh)
+				{
+					$valorisationData[$gh->gehaltsbestandteil_id]['gehaltstyp'] = $gh->gehaltstyp_bezeichnung;
+					$valorisationData[$gh->gehaltsbestandteil_id]['von'] = $gh->von;
+					$valorisationData[$gh->gehaltsbestandteil_id]['bis'] = $gh->bis;
+					$valorisationData[$gh->gehaltsbestandteil_id]['grundbetrag'] = $gh->grund_betrag_decrypted;
+					$valorisationData[$gh->gehaltsbestandteil_id]['final_betrag_valorisiert']  = $gh->betr_valorisiert_decrypted;
+					$valorisationData[$gh->gehaltsbestandteil_id]['valorisierung']  = $gh->valorisierung;
+				}
+			}
+
 			// get all Instanzen applicable for the DV
 			$instanzen = $this->_ci->ValorisierungInstanz_model->getValorisierungInstanzenByDienstverhaeltnis(
 				$dienstverhaeltnis_id,
@@ -36,7 +52,6 @@ class ValorisierungCheckLib
 			if (!hasData($instanzen)) continue;
 
 			$instanzenData = getData($instanzen);
-			$prevBetraegeValorisiert = [];
 
 			foreach ($instanzenData as $instanz)
 			{
@@ -55,16 +70,10 @@ class ValorisierungCheckLib
 					// first calculation
 					if (!isset($valorisationData[$gehaltsbestandteil_id]['valorisation_methods']))
 					{
-						// save previous betrag valorisiert for later comparison
-						$valorisationData[$gehaltsbestandteil_id]['final_betrag_valorisiert']  = $gehaltsbestandteil->getBetrag_valorisiert();
 						// start with Grundbetrag, not betrag valorisiert
 						$grundbetrag = $gehaltsbestandteil->getGrundbetrag();
 						$gehaltsbestandteil->setBetrag_valorisiert($grundbetrag);
-						// set Gehaltsbestandteil data
-						$gehaltstyp = $this->_ci->GehaltstypModel->getGehaltstypByGehaltsbestandteil($gehaltsbestandteil_id);
-						$valorisationData[$gehaltsbestandteil_id]['gehaltstyp'] = isset($gehaltstyp) ? $gehaltstyp->bezeichnung : '';
-						$valorisationData[$gehaltsbestandteil_id]['von'] = $gehaltsbestandteil->getVon();
-						$valorisationData[$gehaltsbestandteil_id]['grundbetrag'] = $grundbetrag;
+
 						// initialise valorisation methods
 						$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'] = null;
 					}
@@ -83,7 +92,7 @@ class ValorisierungCheckLib
 
 				$calculatedValorisation = $this->_ci->ValorisierungLib->getCalculatedValorisation();
 
-				// store the calculated amounts
+				// store the calculated amounts and valorisation method data
 				foreach ($calculatedValorisation as $gehaltsbestandteil_id => $betrag_valorisiert)
 				{
 					$valorisationData[$gehaltsbestandteil_id]['valorisation_methods'][$instanz->valorisierungsdatum]['valorisierung_kurzbz']
@@ -138,6 +147,26 @@ class ValorisierungCheckLib
 
 		return $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
 			$qry,
+			[$dienstverhaeltnis_id]
+		);
+	}
+
+	public function getGehaltsbestandteilData($dienstverhaeltnis_id)
+	{
+		$qry = '
+			SELECT
+				gh.gehaltsbestandteil_id, gh.gehaltstyp_kurzbz, gh.von, gh.bis, typ.bezeichnung AS gehaltstyp_bezeichnung,
+				grundbetrag AS grund_betrag_decrypted, betrag_valorisiert AS betr_valorisiert_decrypted, gh.valorisierung
+			FROM
+				hr.tbl_gehaltsbestandteil gh
+				JOIN hr.tbl_gehaltstyp typ USING (gehaltstyp_kurzbz)
+			WHERE
+				gh.dienstverhaeltnis_id = ?
+			ORDER BY
+				CASE WHEN gh.valorisierung THEN 0 ELSE 1 END, gh.von, gh.bis NULLS LAST, gh.gehaltsbestandteil_id';
+
+		return $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
+			$qry,
 			[$dienstverhaeltnis_id],
 			$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
 		);
@@ -168,7 +197,7 @@ class ValorisierungCheckLib
 
 		foreach ($valorisationData as $geh_id => $dataArr)
 		{
-			if (isEmptyArray($dataArr['valorisation_methods'])) continue;
+			if (!isset($dataArr['valorisation_methods']) || isEmptyArray($dataArr['valorisation_methods'])) continue;
 
 			foreach ($dataArr['valorisation_methods'] as $valorisierungsdatum => $valorisierungsData)
 			{
@@ -200,7 +229,7 @@ class ValorisierungCheckLib
 
 		foreach ($valorisationData as $geh_id => $dataArr)
 		{
-			if (isEmptyArray($dataArr['valorisation_methods']))
+			if (!isset($dataArr['valorisation_methods']) || isEmptyArray($dataArr['valorisation_methods']))
 			{
 				if ($dataArr['final_betrag_valorisiert'] != $dataArr['grundbetrag']) $invalidGehaltsbestandteile[] = $geh_id;
 				continue;
@@ -208,7 +237,9 @@ class ValorisierungCheckLib
 
 			$lastValorisierung = $dataArr['valorisation_methods'][max(array_keys($dataArr['valorisation_methods']))];
 
-			if ($dataArr['final_betrag_valorisiert'] != $lastValorisierung['historie_betrag_valorisiert']
+			if ((isset($dataArr['final_betrag_valorisiert'])
+					&& (!isset($lastValorisierung['calculated_betrag_valorisiert']) || !isset($lastValorisierung['historie_betrag_valorisiert'])))
+				|| $dataArr['final_betrag_valorisiert'] != $lastValorisierung['historie_betrag_valorisiert']
 				|| $dataArr['final_betrag_valorisiert'] != $lastValorisierung['calculated_betrag_valorisiert'])
 				$invalidGehaltsbestandteile[] = $geh_id;
 		}
@@ -218,42 +249,32 @@ class ValorisierungCheckLib
 
 	public function resetValorisation($dienstverhaeltnis_id)
 	{
-		// get all Instanzen applicable for the DV
-		$instanzen = $this->_ci->ValorisierungInstanz_model->getValorisierungInstanzenByDienstverhaeltnis(
-			$dienstverhaeltnis_id,
-			$ausgewaehlt = true
-		);
-
 		$gehaltsbestandteilArr = [];
 		$errors = [];
 
-		if (hasData($instanzen))
+		// start transaction
+		$this->_ci->db->trans_begin();
+
+		$gehaltsbestandteileRes = $this->getGehaltsbestandteilData($dienstverhaeltnis_id);
+		if (isError($gehaltsbestandteileRes)) $errors[] = getError($deleteRes);
+
+		if (hasData($gehaltsbestandteileRes))
 		{
-			$instanzenData = getData($instanzen);
+			$gehaltsbestandteile = getData($gehaltsbestandteileRes);
 
-			// start transaction
-			$this->_ci->db->trans_begin();
-
-			foreach ($instanzenData as $instanz)
+			// for each gehaltsbestandteil of the dv
+			foreach ($gehaltsbestandteile as $gehaltsbestandteil)
 			{
-				$this->_ci->ValorisierungLib->initialize(['valorisierung_kurzbz' => $instanz->valorisierung_kurzbz]);
+				$gehaltsbestandteil_id = $gehaltsbestandteil->gehaltsbestandteil_id;
 
-				$dvData = $this->_ci->ValorisierungLib->fetchDvDataForValorisation($dienstverhaeltnis_id);
+				// delete valorisation history
+				$deleteRes = $this->_ci->ValorisierunghistorieModel->delete(
+					['gehaltsbestandteil_id' => $gehaltsbestandteil_id]
+				);
 
-				// for each gehaltsbestandteil of the dv
-				foreach ($dvData['gehaltsbestandteile'] as $gehaltsbestandteil)
-				{
-					$gehaltsbestandteil_id = $gehaltsbestandteil->getGehaltsbestandteil_id();
-					// delete valorisation history
-					$deleteRes = $this->_ci->ValorisierunghistorieModel->delete(
-						['gehaltsbestandteil_id' => $gehaltsbestandteil_id],
-						['valorisierungsdatum' => $instanz->valorisierungsdatum]
-					);
+				if (isError($deleteRes)) $errors[] = getError($deleteRes);
 
-					if (isError($deleteRes)) $errors[] = getError($deleteRes);
-
-					$gehaltsbestandteilArr[$gehaltsbestandteil_id] = $gehaltsbestandteil->getGrundbetrag();
-				}
+				$gehaltsbestandteilArr[$gehaltsbestandteil_id] = $gehaltsbestandteil->grund_betrag_decrypted;
 			}
 
 			foreach ($gehaltsbestandteilArr as $gehaltsbestandteil_id => $grundbetrag)
@@ -267,20 +288,20 @@ class ValorisierungCheckLib
 
 				if (isError($updateRes)) $errors[] = getError($updateRes);
 			}
-
-			// Transaction complete!
-			$this->_ci->db->trans_complete();
-
-			// rollback if something failed
-			if($this->_ci->db->trans_status() === false)
-			{
-				$this->_ci->db->trans_rollback();
-				return error("Errors when resetting valorisation, aborting: ".implode('; ', $errors));
-			}
-
-			// commit transaction
-			$this->_ci->db->trans_commit();
 		}
+
+		// Transaction complete!
+		$this->_ci->db->trans_complete();
+
+		// rollback if something failed
+		if($this->_ci->db->trans_status() === false)
+		{
+			$this->_ci->db->trans_rollback();
+			return error("Errors when resetting valorisation, aborting: ".implode('; ', $errors));
+		}
+
+		// commit transaction
+		$this->_ci->db->trans_commit();
 
 		return success('Valorisierung erfolgreich rückgängig gemacht');
 	}
