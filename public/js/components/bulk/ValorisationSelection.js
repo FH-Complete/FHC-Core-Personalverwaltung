@@ -3,6 +3,7 @@ import {CoreFilterCmpt} from "../../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "../../apps/common.js";
 import { Modal } from '../Modal.js';
+import {formatter} from './valorisationformathelper.js';
 
 export const ValorisationSelection = {
 	components: {
@@ -123,15 +124,7 @@ export const ValorisationSelection = {
 				};
 
 				const formatDate = function(cell, formatterParams, onRendered) {
-					var dateval = cell.getValue();
-					const re = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
-					var matches = null;
-
-					if( null !== dateval && null !== (matches = dateval.match(re)) ) {
-						return matches[3] + '.' + matches[2] + '.' + matches[1];
-					} else {
-						return dateval;
-					}
+					formatter.formatDateGerman(cell.getValue());
 				};
 
 				return {

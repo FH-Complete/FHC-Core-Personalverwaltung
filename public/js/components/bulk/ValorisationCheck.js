@@ -1,7 +1,8 @@
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "../../apps/common.js";
-import { Modal } from '../Modal.js';
+import {Modal} from '../Modal.js';
+import {formatter} from './valorisationformathelper.js';
 
 export const ValorisationCheck = {
 	props: {
@@ -19,7 +20,8 @@ export const ValorisationCheck = {
 			appSideMenuEntries: {},
 			valorisierungCheckData: {},
 			dvData: {},
-			viewedValorisierungMethod: {}
+			viewedValorisierungMethod: {},
+			formatter: formatter
 		};
 	},
 	created: function() {
@@ -47,7 +49,6 @@ export const ValorisationCheck = {
 		redoValorisation: function() {
 			const res = Vue.$fhcapi.ValorisierungCheck.redoValorisation(this.dienstverhaeltnis_id)
 				.then((response) => {
-					//this.redoData = response.data.data;
 					this.getAllData();
 				})
 				.catch(this.handleErrors);
@@ -189,7 +190,8 @@ export const ValorisationCheck = {
 		<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
 			<h1 class="h2">
 				Valorisierungscheck {{dienstverhaeltnisInfo.vorname+' '+dienstverhaeltnisInfo.nachname}},
-				{{ dienstverhaeltnisInfo.unternehmen }}, {{ dienstverhaeltnisInfo.vertragsart }}, {{ dienstverhaeltnisInfo.von }}
+				{{ dienstverhaeltnisInfo.unternehmen }}, {{ dienstverhaeltnisInfo.vertragsart }},
+				{{ this.formatter.formatDateGerman(dienstverhaeltnisInfo.von) }}
 			</h1>
 			<div class="btn-toolbar mb-2 mb-md-0">
 			<div class="btn-group me-2">
@@ -213,7 +215,8 @@ export const ValorisationCheck = {
 			</div>
 
 			<div class="col-6 mb-3 text-end fw-bold fs-5">
-				&sum; gespeichert: {{ dienstverhaeltnisSums.saved }}; &sum; berechnet: {{ dienstverhaeltnisSums.calculated }}
+				&sum; gespeichert: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.saved) }};
+				&sum; berechnet: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.calculated) }}
 			</div>
 
 		</div>
@@ -222,10 +225,10 @@ export const ValorisationCheck = {
 			<div class="row" v-for="method in valorisierungCheckDataArr">
 				<h1 class="h3">
 					Gehaltsbestandteil {{ method.gehaltstyp }},
-					{{ method.von }}<span v-if="method.bis != null"> - {{ method.bis }}</span>, Betrag valorisiert:
+					{{ this.formatter.formatDateGerman(method.von) }}<span v-if="method.bis != null"> - {{ this.formatter.formatDateGerman(method.bis) }}</span>, Betrag valorisiert:
 					<span
 						v-bind:class="finalCalculatedValorisations[method.gehaltsbestandteil_id] != method.final_betrag_valorisiert ? 'text-danger' : ''">
-						{{ method.final_betrag_valorisiert }}
+						{{ this.formatter.formatCurrencyGerman(method.final_betrag_valorisiert) }}
 					</span>,
 					Valorisierung:
 					{{ method.valorisierung ? 'Ja' : 'Nein' }}
@@ -246,13 +249,13 @@ export const ValorisationCheck = {
 							<tr>
 								<td></td>
 								<td>Grundbetrag</td>
-								<td>{{ method.grundbetrag }}</td>
+								<td>{{ this.formatter.formatCurrencyGerman(method.grundbetrag) }}</td>
 							</tr>
 							<tr v-for="(valorisierung, valorisierungsdatum) in method.valorisation_methods"
 								v-bind:class="valorisierung.calculated_betrag_valorisiert != valorisierung.historie_betrag_valorisiert ? 'table-danger' : ''">
-								<td>{{ valorisierungsdatum }}</td>
+								<td>{{ this.formatter.formatDateGerman(valorisierungsdatum) }}</td>
 								<td>{{ valorisierung.valorisierung_kurzbz }}</td>
-								<td>{{ valorisierung.historie_betrag_valorisiert }}</td>
+								<td>{{ this.formatter.formatCurrencyGerman(valorisierung.historie_betrag_valorisiert) }}</td>
 							</tr>
 						</tbody>
 					</table>
@@ -275,16 +278,16 @@ export const ValorisationCheck = {
 								<td></td>
 								<td>Grundbetrag</td>
 								<td>-</td>
-								<td>{{ method.grundbetrag }}</td>
+								<td>{{ this.formatter.formatCurrencyGerman(method.grundbetrag) }}</td>
 							</tr>
 							<tr v-for="(valorisierung, valorisierungsdatum) in method.valorisation_methods"
 								v-bind:class="valorisierung.calculated_betrag_valorisiert != valorisierung.historie_betrag_valorisiert ? 'table-danger' : ''">
-								<td>{{ valorisierungsdatum }}</td>
+								<td>{{ this.formatter.formatDateGerman(valorisierungsdatum) }}</td>
 								<td>{{ valorisierung.valorisierung_kurzbz }}</td>
 								<td>{{ valorisierung.valorisierung_methode_kurzbz }}&nbsp;
 									<i class="fa fa-info-circle fa-lg" role="button" @click="showMethodenInfo($event, valorisierung)"></i>
 								</td>
-								<td>{{ valorisierung.calculated_betrag_valorisiert }}</td>
+								<td>{{ this.formatter.formatCurrencyGerman(valorisierung.calculated_betrag_valorisiert) }}</td>
 							</tr>
 						</tbody>
 					</table>
