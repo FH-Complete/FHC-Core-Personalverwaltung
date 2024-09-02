@@ -1,7 +1,7 @@
 export default {
   getKarenztypen: function() {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/Api/getKarenztypen';
+            + '/extensions/FHC-Core-Personalverwaltung/apis/v1/CommonsAPI/getKarenztypen';
     return axios.get(url);
   },
   saveKarenz: function(payload) {

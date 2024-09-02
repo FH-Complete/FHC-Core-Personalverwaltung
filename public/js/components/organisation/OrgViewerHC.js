@@ -98,7 +98,7 @@ const OrgViewer = {
                 location.hostname + ":" +
                 location.port;                 
 
-              const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/getOrgStructure?oe=${oe}`;
+              const url = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/apis/v1/OrgAPI/getOrgStructure?oe=${oe}`;
         
               const res = await fetch(url)
               let response = await res.json()              

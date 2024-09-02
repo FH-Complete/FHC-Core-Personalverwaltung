@@ -41,7 +41,7 @@ const EmployeeChooser = {
     };
 
     const generateImageLink = (person_id) => {
-      return `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/foto?person_id=${person_id}`;
+      return `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/apis/v1/PersonAPI/foto?person_id=${person_id}`;
     };
 
     const keyUp = () => {
