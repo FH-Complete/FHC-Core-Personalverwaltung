@@ -51,11 +51,13 @@ export const EmployeeHeader = {
             try {
                 // fetch header data
                 const res = await Vue.$fhcapi.Employee.personHeaderData(personID, uid);
+                debugger
                 employee.value = res.data.retval[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
                 const resAbteilung = await Vue.$fhcapi.Employee.personAbteilung(employee.value.uid);
                // response = await resAbteilung.json();
+                debugger
                 employee.value = { ...employee.value, ...{ abteilung: resAbteilung.data.retval } };
             } catch (error) {
                 console.log(error);
@@ -214,7 +216,7 @@ export const EmployeeHeader = {
         const getStatusTags = ()=> {
             const statusArr = []
 
-            if(employee.value.unruly) {
+            if(employee?.value?.unruly) {
                 statusArr.push({text: 'Unruly', css: 'bg-unruly rounded-0'})
             }
 

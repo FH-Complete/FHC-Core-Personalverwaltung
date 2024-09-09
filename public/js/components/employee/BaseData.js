@@ -285,9 +285,9 @@ export const BaseData = {
                     <label for="titelPost" class="form-label">{{ $p.t('person', 'titelpost' )}}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
                 </div>
-                <div class="col-lg-2 col-md-4">
+                <div class="form-check col-lg-2 col-md-4">
                     <label for="unruly" class="form-label">{{ $p.t('person', 'unruly' )}}</label>
-                    <input type="checkbox" :readonly="readonly" @click="readonlyBlocker" id="unruly" v-model="currentValue.unruly">
+                    <input type="checkbox" class="form-check-input" :readonly="readonly" @click="readonlyBlocker" id="unruly" v-model="currentValue.unruly">
                 </div>
                 <div class="col-lg-4"></div>
                 <!--Name -->

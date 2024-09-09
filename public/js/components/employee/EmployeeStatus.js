@@ -131,6 +131,14 @@ export const EmployeeStatus = {
           }
         )
 
+        watch(
+            () => props.tags,
+            (newVal) => {
+                statusTags.value = newVal
+            },
+            { deep: true }
+        )
+
         const refresh = () => {
           fetchData(currentPersonUID.value);
         }
