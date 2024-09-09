@@ -11,10 +11,12 @@ export const searchbaroptions = {
         "raum",
         "mitarbeiter",
         "mitarbeiter_ohne_zuordnung",
+/*
         "student",
         "prestudent",
         "document",
         "cms",
+*/
         "organisationunit"
     ],
     actions: {

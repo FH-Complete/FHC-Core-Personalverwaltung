@@ -12,7 +12,12 @@
 			    ws.wochenstunden AS "Wochenstunden", ws.von AS "WS_von", ws.bis AS "WS_bis",
 			    \'[\' || kst.ksttypbezeichnung || \'] \' || kst.bezeichnung as "Standardkostenstelle",
 			    \'[\' || oe.oetypbezeichnung || \'] \' || oe.bezeichnung as "Disziplinäre Zuordnung",
-			    d.dienstverhaeltnis_id AS "DienstverhaeltnisId"
+			    d.dienstverhaeltnis_id AS "DienstverhaeltnisId",
+			    CASE
+				WHEN (d.von >= NOW()::date) THEN \'zukünftig\'
+				WHEN (COALESCE(d.bis, \'2100-12-31\'::date) > NOW()::date) THEN \'laufend\'
+				ELSE \'beendet\'
+			    END AS "DV_status"
 		    FROM 
 			    hr.tbl_dienstverhaeltnis d 
 		    JOIN 
@@ -66,7 +71,7 @@
 				    vb.von ASC
 		    ) ws ON ws.dienstverhaeltnis_id = d.dienstverhaeltnis_id
 		    WHERE 
-			    d.vertragsart_kurzbz = \'echterdv\' AND (d.von >= NOW()::date OR COALESCE(d.bis, \'2100-12-31\'::date) > NOW()::date)
+			    d.vertragsart_kurzbz = \'echterdv\'
 		    ORDER BY
 			    p.nachname, p.vorname
 		',

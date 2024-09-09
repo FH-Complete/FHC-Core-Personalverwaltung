@@ -220,6 +220,10 @@ export const BaseData = {
             toastRef.value.show();
         }
 
+        const readonlyBlocker = (e) => {
+            if (readonly.value) e.preventDefault();
+        }
+
         return {
             
             currentValue,
@@ -232,8 +236,8 @@ export const BaseData = {
             sprache,
             GESCHLECHT,
             nations,  
-            theModel,          
-
+            theModel,
+            readonlyBlocker,
             save,
             toggleMode,  
             validNachname,    
@@ -281,7 +285,7 @@ export const BaseData = {
                     <label for="titelPost" class="form-label">{{ $p.t('person', 'titelpost' )}}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
                 </div>
-                <div class="col-lg-6"></div>
+                <div class="col-lg-4"></div>
                 <!--Name -->
                 <div class="col-lg-3 col-md-4">
                     <label for="nachname" class="required form-label">{{ $p.t('person','nachname') }}</label>
