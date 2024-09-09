@@ -27,10 +27,10 @@ export default {
         </div>
       </div>
       <div class="col-2">
-        <select v-model="auszahlungen" :disabled="isinputdisabled('auszahlungen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option value="14" selected>14 Auszahlungen</option>
-          <option value="12">12 Auszahlungen</option>
-        </select>
+        <div class="input-group input-group-sm">
+          <input v-model="betrag_valorisiert" disabled="" type="text" class="form-control form-control-sm" placeholder="Betrag valorisiert" aria-label="betrag">
+          <span class="input-group-text">&euro; (valorisiert)</span>
+        </div>
       </div>
       <div class="col-1">&nbsp;</div>
       <gueltigkeit ref="gueltigkeit" :config="getgueltigkeit"></gueltigkeit>
@@ -42,6 +42,12 @@ export default {
     </div>
     <div class="row g-2 mb-3">
       <div class="col-2 ps-3">
+        <select v-model="auszahlungen" :disabled="isinputdisabled('auszahlungen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option value="14" selected>14 Auszahlungen</option>
+          <option value="12">12 Auszahlungen</option>
+        </select>
+      </div>
+      <div class="col-2">
         <div class="input-group input-group-sm">
             <datepicker v-model="valorisierungssperre" :disabled="isinputdisabled('valorisierungssperre')"
               v-bind:enable-time-picker="false"
@@ -63,7 +69,7 @@ export default {
           </label>
         </div>
       </div>
-      <div class="col-8">&nbsp;</div>
+      <div class="col-6">&nbsp;</div>
     </div>
   </div>
   `,
@@ -72,6 +78,7 @@ export default {
       id: null,
       gehaltstyp : '',
       betrag: '',
+      betrag_valorisiert: '',
       gueltig_ab: '',
       gueltig_bis: '',
       valorisierung: true,
@@ -115,6 +122,12 @@ export default {
         }
         this.betrag = this.config.data.betrag.replace('.', ',');
       }
+      if( this.config?.data?.betrag_valorisiert !== undefined ) {
+        if(!isNaN(this.config.data.betrag_valorisiert)) {
+            this.config.data.betrag_valorisiert = this.config.data.betrag_valorisiert.toString();
+        }
+        this.betrag_valorisiert = this.config.data.betrag_valorisiert.replace('.', ',');
+      }
       if( this.config?.data?.valorisierung !== undefined ) {
         this.valorisierung = this.config.data.valorisierung;
       }
@@ -139,6 +152,7 @@ export default {
           id: this.id,
           gehaltstyp: this.gehaltstyp,
           betrag: this.betrag.replace(',', '.'),
+          betrag_valorisiert: this.betrag.replace(',', '.'),
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
           valorisierung: Boolean(this.valorisierung),

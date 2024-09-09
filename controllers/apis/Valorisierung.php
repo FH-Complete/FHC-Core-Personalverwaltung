@@ -5,7 +5,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 class Valorisierung extends FHCAPI_Controller
 {
-	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+	const DEFAULT_PERMISSION = 'extension/pv21_valorisierung:r';
 
 	public function __construct() {
 		parent::__construct(

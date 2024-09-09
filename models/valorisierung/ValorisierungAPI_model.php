@@ -1,7 +1,7 @@
 <?php
 class ValorisierungAPI_model extends DB_Model
 {
-	public function getDVsForValorisation($valorisierungsDatum, $valorisierungsOeKurzbz = null)
+	public function getDVsForValorisation($valorisierungsDatum, $valorisierungsOeKurzbz = null, $person_id = null)
 	{
 		$sql = <<<EOSQL
 SELECT
@@ -49,7 +49,7 @@ LEFT JOIN (
 ) kstzuordnung USING(dienstverhaeltnis_id)
 LEFT JOIN (
 	SELECT
-		vb.dienstverhaeltnis_id, STRING_AGG(oe.bezeichnung, ', ') AS oe, 
+		vb.dienstverhaeltnis_id, STRING_AGG(oe.bezeichnung, ', ') AS oe,
 		STRING_AGG(oe.oe_kurzbz, ', ') AS oe_kurzbz
 	FROM
 		hr.tbl_vertragsbestandteil vb
@@ -78,6 +78,10 @@ EOSQL;
 
 		if (isset($valorisierungsOeKurzbz)) $sql .= <<<EOSQL
 	AND {$this->db->escape($valorisierungsOeKurzbz)} = dv.oe_kurzbz
+EOSQL;
+
+		if (isset($person_id)) $sql .= <<<EOSQL
+	AND {$this->db->escape($person_id)} = p.person_id
 EOSQL;
 
 		return $this->execReadOnlyQuery($sql);

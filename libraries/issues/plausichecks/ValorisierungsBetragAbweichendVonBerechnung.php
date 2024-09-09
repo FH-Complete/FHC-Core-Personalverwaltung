@@ -21,57 +21,38 @@ class ValorisierungsBetragAbweichendVonBerechnung extends PlausiChecker
 
 		$results = [];
 
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 		$dienstverhaeltnis_id = isset($params['dienstverhaeltnis_id']) ? $params['dienstverhaeltnis_id'] : null;
 
-		$dv_id_arr = [];
+		$dvIdArr = [];
 
 		// if dv id provided, use the id
 		if (isset($dienstverhaeltnis_id))
 		{
-			$dv_id_arr[] = $dienstverhaeltnis_id;
+			$dvIdArr[] = $dienstverhaeltnis_id;
 		}
 		else // otherwise get all dvs for current date
 		{
-			$dvRes = $this->_ci->ValorisierungAPI_model->getDVsForValorisation(date("Y-m-d"));
+			$dvRes = $this->_ci->ValorisierungAPI_model->getDVsForValorisation(date("Y-m-d"), null, $person_id);
 
 			// If error occurred then return the error
 			if (isError($dvRes)) return $dvRes;
 
-			if (hasData($dvRes)) $dv_id_arr = array_column(getData($dvRes), 'dienstverhaeltnis_id');
+			if (hasData($dvRes)) $dvIdArr = array_column(getData($dvRes), 'dienstverhaeltnis_id');
 		}
 
-		$valorisationData = $this->_ci->ValorisierungCheckLib->getValorisationDataForCheck($dv_id_arr);
+		$invalidGehaltsbestandteile = $this->_ci->ValorisierungCheckLib->getInvalidGehaltsbestandteile($dvIdArr);
 
-
-		// check that valorisationData is valid
-		if (!isset($valorisationData['historie'])
-			|| !is_array($valorisationData['historie'])
-			|| !isset($valorisationData['calculated'])
-			|| !is_array($valorisationData['calculated']))
-			return error('Invalid valorisation check data');
-
-		$gehaltsbestandteil_id_arr = array_unique(
-			array_merge(array_keys($valorisationData['historie']), array_keys($valorisationData['calculated']))
-		);
-
-		// for each gehaltsbestandteil id in history or dvs
-		foreach ($gehaltsbestandteil_id_arr as $geh_id)
+		foreach ($invalidGehaltsbestandteile as $gehaltsbestandteil_id)
 		{
-			// if there are differences
-			if (!isset($valorisationData['historie'][$geh_id])
-				|| !isset($valorisationData['calculated'][$geh_id])
-				|| $valorisationData['historie'][$geh_id] != $valorisationData['calculated'][$geh_id])
+			$issueData = $this->_getIssueDataFromGehaltsbestandteil($gehaltsbestandteil_id);
+			if (isset($issueData))
 			{
-				// write issue with data of gehaltsbestandteil
-				$issueData = $this->_getIssueDataFromGehaltsbestandteil($geh_id);
-				if (isset($issueData))
-				{
-					$results[] = array(
-							'person_id' => $issueData->person_id,
-							'resolution_params' => array('dienstverhaeltnis_id' => $issueData->dienstverhaeltnis_id),
-							'fehlertext_params' => array('gehaltsbestandteil_id' => $issueData->gehaltsbestandteil_id)
-					);
-				}
+				$results[] = array(
+						'person_id' => $issueData->person_id,
+						'resolution_params' => array('dienstverhaeltnis_id' => $issueData->dienstverhaeltnis_id),
+						'fehlertext_params' => array('gehaltsbestandteil_id' => $issueData->gehaltsbestandteil_id)
+				);
 			}
 		}
 

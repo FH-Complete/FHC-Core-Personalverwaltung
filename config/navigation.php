@@ -44,7 +44,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'icon' => 'sitemap',
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	),
-	'Valorisierung' => array(
+	'BulkEdit' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Bulk'),
 		'description' => 'Bulk Edit',
 		'icon' => 'percent',
@@ -55,6 +55,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'description' => 'Gehaltsbänder',
 		'icon' => 'money-bill-wave',
 		'requiredPermissions' => 'basis/mitarbeiter:r'
+	),
+	'Valorisierung' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Valorisation'),
+		'description' => 'Valorisierung',
+		'icon' => 'money-bill-wave',
+		'requiredPermissions' => 'extension/pv21_valorisierung:r'
 	),
 	'Berichte' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Reports'),

@@ -279,6 +279,7 @@ export default {
               gehaltstyp: gb.gehaltstyp_kurzbz,
               anmerkung: gb.anmerkung,
               betrag: gb.grundbetrag,
+              betrag_valorisiert: gb.betrag_valorisiert,
               valorisierung: gb.valorisierung,
               valorisierungssperre: gb.valorisierungsperre,
               auszahlungen: gb.auszahlungen,
