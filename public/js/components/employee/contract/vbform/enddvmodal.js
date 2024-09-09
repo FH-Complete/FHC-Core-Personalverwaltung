@@ -15,7 +15,7 @@ export default {
                 <dienstverhaeltnis ref="dienstverhaeltnisRef" :config="curdv" :showdvcheckoverlap="false"></dienstverhaeltnis>
             </div>
 
-            <input type="checkbox" v-model="unrulyInternal" @change=saveUnrulyPerson id="unruly" :disabled="saving" ref="unrulyCheckbox">
+            <input type="checkbox" v-model="unrulyInternal" id="unruly" :disabled="saving" ref="unrulyCheckbox">
 			<label for="unruly" style="margin-left: 12px;" >{{ $p.t('studierendenantrag', 'mark_person_as_unruly') }}</label>
 
             
@@ -67,6 +67,17 @@ export default {
       Vue.$fhcapi.DV.endDV(payload)
       .then((response) => {
         this.handleDVEnded(response.data);
+      }).then(() => {
+        if(!this.unrulyInternal) return
+
+        // TODO maybe add updateUnruly into pv21 api for concurrency reasons
+        Vue.$fhcapi.Person.updatePersonUnruly({
+          person_id: this.curdv.person_id,
+          unruly: this.unrulyInternal
+        }).then((response) => {
+          this.$emit('updateunruly', this.unrulyInternal);
+        })
+
       })
       .finally(() => {
           this.spinners.saving = false;
