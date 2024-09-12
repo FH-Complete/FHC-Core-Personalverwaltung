@@ -77,12 +77,16 @@ export const CreateEmployeeFrm = {
 
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Employee.filterPerson(
-                    { ...currentValue.value, unruly: true}
+                const res = await Vue.$fhcapi.Unruly.filterPerson(
+                    { ...currentValue.value, unruly: true},
+                    FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                 );
                 isFetching.value = false;
-                if(!res.data.retval) return;
-                unrulyPersonList.value = res.data.retval;
+
+                if(!res.data.data.retval) return;
+                // fhc api controller in backend but no plugin in pv21
+                // if(!res.data.retval) return;
+                unrulyPersonList.value = res.data.data.retval;
 
             } catch (error) {
                 console.log(error);
@@ -224,7 +228,7 @@ export const CreateEmployeeFrm = {
 
     },
     template: `
-    <form class="row g-3" ref="createEmployeeFrm">
+    <form class="row g-3" ref="createEmployeeFrm" xmlns="http://www.w3.org/1999/html">
         <div class="col-md-8">
             <h6>Stammdaten Mindestanforderung</h6>
             <div class="row">
@@ -351,10 +355,7 @@ export const CreateEmployeeFrm = {
         <template v-if="unrulyPersonList.length">
             <h6><span class="badge" :class="'bg-unruly rounded-0'" >Unruly</span> Personen mit ähnlichen Daten:</h6>
             <p v-for="unruly in unrulyPersonList">
-                
-                <router-link :to="{name: 'Employee', params: { id: unruly.person_id, uid: unruly.uid } }">
-                    {{unruly.vorname}} {{unruly.nachname}} UID: {{unruly.uid}} PID: {{unruly.person_id}}
-                </router-link>   
+                {{unruly.vorname}} {{unruly.nachname}} PID: {{unruly.person_id}}
             </p>
         </template>
         
