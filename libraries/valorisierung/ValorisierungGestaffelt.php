@@ -56,20 +56,17 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	protected function calcGehaltsbestandteilAnteile()
 	{
-		$sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_GBS);
-		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
+		$sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS);
+		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			if( $gehaltsbestandteil->getValorisierung() )
-			{
-				$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert() / $sumvalsalary;
- 			}
+			$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert() / $sumvalsalary;
 		}
 	}
 
 	protected function scaleSumsalaryToFTE()
 	{
-		$this->sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_GBS);
+		$this->sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS);
 		if( floatval($this->wochenstunden) < floatval($this->fulltimehours) && $this->wochenstunden > 0 && floatval($this->fulltimehours) > 0 )
 		{
 			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval($this->fulltimehours);
@@ -112,16 +109,14 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	protected function distributeValorisationToGehaltsbestandteile()
 	{
-		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
+		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			if( $gehaltsbestandteil->getValorisierung() )
-			{
-				$betrag_valorisiert =
-					$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] * $this->valorisation
-					+ $gehaltsbestandteil->getBetrag_valorisiert();
-				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
- 			}
+			$betrag_valorisiert =
+				$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] * $this->valorisation
+				+ $gehaltsbestandteil->getBetrag_valorisiert();
+
+			$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
 		}
 	}
 }

@@ -17,16 +17,13 @@ class ValorisierungFixBetrag extends AbstractValorisationMethod
 
 	public function calculateValorisation()
 	{
-		$sumsalary = $this->calcSummeGehaltsbestandteile(AbstractValorisationMethod::NUR_ZU_VALORISIERENDE_GBS);
-		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
+		$sumsalary = $this->calcSummeGehaltsbestandteile(AbstractValorisationMethod::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS);
+		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			if( $gehaltsbestandteil->getValorisierung() )
-			{
-				$fraction = $gehaltsbestandteil->getBetrag_valorisiert() / $sumsalary;
-				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() + ($this->params->valorisierung->fixbetrag * $fraction);
-				$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
- 			}
+			$fraction = $gehaltsbestandteil->getBetrag_valorisiert() / $sumsalary;
+			$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() + ($this->params->valorisierung->fixbetrag * $fraction);
+			$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
 		}
 	}
 }

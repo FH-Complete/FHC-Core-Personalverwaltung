@@ -181,7 +181,7 @@ class ValorisierungLib
 	{
 		$this->_checkParamsForValorisation();
 
-		$valinstanzmethoden = $this->_ci->ValorisierungInstanzMethod_model->loadValorisierungInstanzByKurzbz(
+		$valinstanzmethoden = $this->_ci->ValorisierungInstanzMethod_model->loadValorisierungInstanzById(
 			$this->_valorisierungInstanz->valorisierung_instanz_id
 		);
 
@@ -190,7 +190,13 @@ class ValorisierungLib
 		{
 			$valorisationMethod = $this->_ci->ValorisationFactory->getValorisationMethod($valinstanzmethod->valorisierung_methode_kurzbz);
 			$params = json_decode($valinstanzmethod->valorisierung_methode_parameter);
-			$valorisationMethod->initialize($this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, $params);
+			$valorisationMethod->initialize(
+				$this->_valorisierungInstanz->valorisierungsdatum,
+				$this->_dienstverhaeltnis,
+				$this->_vertragsbestandteile,
+				$this->_gehaltsbestandteile,
+				$params
+			);
 			$valorisationMethod->checkParams();
 
 			if($valorisationMethod->checkIfApplicable())
@@ -226,7 +232,7 @@ class ValorisierungLib
 		else
 		{
 			$noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
-			$noval->initialize($this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
+			$noval->initialize($this->_valorisierungInstanz->valorisierungsdatum, $this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
 			$dvdata->valorisierungmethode = 'keine Valorisierung';
 			$dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
 			$dvdata->sumsalarypostval = $dvdata->sumsalarypreval;

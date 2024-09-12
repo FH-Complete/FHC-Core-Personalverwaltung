@@ -7,7 +7,9 @@
 abstract class AbstractValorisationMethod implements IValorisationMethod
 {
 	const ALLE_GBS = false;
-	const NUR_ZU_VALORISIERENDE_GBS = true;
+	const NUR_ZU_VALORISIERENDE_GBS = false;
+	const NUR_UNGESPERRTE_GBS = false;
+	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = true;
 
 	protected $ci; // code igniter instance
 	protected $dienstverhaeltnis;
@@ -23,6 +25,7 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		// load config
 		$this->ci->load->config('extensions/FHC-Core-Personalverwaltung/valorisierung');
 
+		$this->valorisierungsdatum = null;
 		$this->dienstverhaeltnis = null;
 		$this->vertragsbestandteile = null;
 		$this->gehaltsbestandteile = null;
@@ -42,8 +45,9 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		}
 	}
 
-	public function initialize($dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params)
+	public function initialize($valorisierungsdatum, $dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params)
 	{
+		$this->valorisierungsdatum = $valorisierungsdatum;
 		$this->dienstverhaeltnis = $dienstverhaeltnis;
 		$this->vertragsbestandteile = $vertragsbestandteile;
 		$this->gehaltsbestandteile = $gehaltsbestandteile;
@@ -77,13 +81,8 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 	public function calcSummeGehaltsbestandteile($mode=self::ALLE_GBS)
 	{
 		$sumsalary = 0;
-		foreach( $this->gehaltsbestandteile as $gehaltsbestandteil )
+		foreach( $this->getGehaltsbestandteileForValorisierung($mode) as $gehaltsbestandteil )
 		{
-			if( ($mode === self::NUR_ZU_VALORISIERENDE_GBS)
-				&& !$gehaltsbestandteil->getValorisierung() )
-			{
-				continue;
-			}
 			$sumsalary += $gehaltsbestandteil->getBetrag_valorisiert();
 		}
 		return $sumsalary;
@@ -97,14 +96,40 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 	public function getBetraegeValorisiertForEachGehaltsbestandteil()
 	{
 		$betraege = [];
-		foreach( $this->gehaltsbestandteile as $gehaltsbestandteil )
+		foreach( $this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil )
 		{
-			if( !$gehaltsbestandteil->getValorisierung() )
-			{
-				continue;
-			}
 			$betraege[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert();
 		}
 		return $betraege;
+	}
+
+	/**
+	 *
+	 * Gets all Gehaltsbestandteile applicable for a valorisation.
+	 * @param $mode name of mode for setting which Dienstverhälnisse should be retrieved
+	 * @return array with Gehaltsbestandteile
+	 */
+	public function getGehaltsbestandteileForValorisierung($mode=self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS)
+	{
+		$gehaltsbestandteile = [];
+		foreach ($this->gehaltsbestandteile as $gehaltsbestandteil)
+		{
+			// valorisation flag
+			$zuValorisieren = $gehaltsbestandteil->getValorisierung();
+
+			// valorisation lock
+			$sperrDatum = $gehaltsbestandteil->getValorisierungssperre();
+			$gesperrt = isset($sperrDatum) && new DateTime($sperrDatum) >= new DateTime($this->valorisierungsdatum);
+
+			// add Gehaltsbestandteil if applicable
+			if ($mode == self::ALLE_GBS
+				|| ($mode == self::NUR_ZU_VALORISIERENDE_GBS && $zuValorisieren)
+				|| ($mode == self::NUR_UNGESPERRTE_GBS && !$gesperrt)
+				|| ($mode == self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS && $zuValorisieren && !$gesperrt))
+			{
+				$gehaltsbestandteile[] = $gehaltsbestandteil;
+			}
+		}
+		return $gehaltsbestandteile;
 	}
 }
