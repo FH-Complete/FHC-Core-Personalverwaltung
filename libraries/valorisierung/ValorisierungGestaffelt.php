@@ -60,7 +60,8 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
-			$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert() / $sumvalsalary;
+			$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] =
+				$sumvalsalary == 0 ? 0 : $gehaltsbestandteil->getBetrag_valorisiert() / $sumvalsalary;
 		}
 	}
 
