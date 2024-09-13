@@ -281,7 +281,7 @@ export default {
               betrag: gb.grundbetrag,
               betrag_valorisiert: gb.betrag_valorisiert,
               valorisierung: gb.valorisierung,
-              valorisierungssperre: gb.valorisierungsperre,
+              valorisierungssperre: gb.valorisierungssperre,
               auszahlungen: gb.auszahlungen,
               gueltigkeit: this.gueltigkeit2gui(gb, mode)
           }
