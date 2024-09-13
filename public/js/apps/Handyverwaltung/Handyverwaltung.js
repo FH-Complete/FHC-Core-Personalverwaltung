@@ -138,7 +138,7 @@ const handyVerwaltungApp = Vue.createApp({
 		const employeesTabulatorOptions = {
 			height: "100%",
 			layout: 'fitColumns',
-                        persistenceID: 'handyverwaltung_20240604_01',
+                        persistenceID: 'handyverwaltung_20240905_03',
                         footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 			columns: [
 				{title: "UID", field: "UID", headerFilter: true},
@@ -156,6 +156,7 @@ const handyVerwaltungApp = Vue.createApp({
 				{title: "Standardkostenstelle", field: "Standardkostenstelle", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}}, 
 				{title: "Disziplinäre Zuordnung", field: "Disziplinäre Zuordnung", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
 				{title: "Dienstverhaeltnis ID", field: "DienstverhaeltnisId", headerFilter: true},
+                                {title: "DV_status", field: "DV_status", headerFilter: "list", headerFilterFunc:"=", headerFilterParams: {valuesLookup:true, autocomplete: true, sort: "asc"}},
 			]
 		};
                 return employeesTabulatorOptions;
