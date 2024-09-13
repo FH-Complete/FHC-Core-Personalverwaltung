@@ -124,7 +124,7 @@ export const ValorisationSelection = {
 				};
 
 				const formatDate = function(cell, formatterParams, onRendered) {
-					formatter.formatDateGerman(cell.getValue());
+					return formatter.formatDateGerman(cell.getValue());
 				};
 
 				return {
@@ -216,7 +216,7 @@ export const ValorisationSelection = {
 							event: "dataLoaded",
 							handler: function(data) {
 								var el = document.getElementById("totalrows_count");
-								el.innerHTML = (false !== data) ? data.length : 0;
+								el.innerHTML = (false !== data && typeof data != 'undefined') ? data.length : 0;
 							}
 					}
 				];
@@ -246,7 +246,7 @@ export const ValorisationSelection = {
 					.filter((value, index, array) => value.oe_kurzbz == this.valorisierung_oe_kurzbz) // filter unique
 					.map(vi => vi.valorisierungsdatum) // get only dates
 					.filter((value, index, array) => array.indexOf(value) === index && value != '') // filter unique
-					.map(date => ({value: date, label: date})); // transform to object
+					.map(date => ({value: date, label: formatter.formatDateGerman(date)})); // transform to object
 
 				dates.unshift({ // add default label
 					value: '',
