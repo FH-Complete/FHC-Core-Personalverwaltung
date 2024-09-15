@@ -118,7 +118,7 @@ class ValorisierungInstanz_model extends DB_Model
 
 		$qry = '
 			SELECT
-				valorisierung_kurzbz AS value, valorisierung_kurzbz || \' (\' || valorisierungsdatum || \')\' AS label,
+				valorisierung_kurzbz AS value, valorisierung_kurzbz || \' (\' || to_char(valorisierungsdatum, \'DD.MM.YYYY\') || \')\' AS label,
 				\'false\'::boolean AS disabled, valorisierungsdatum, oe_kurzbz, oe.bezeichnung AS oe_bezeichnung
 			FROM
 				hr.tbl_valorisierung_instanz vi
