@@ -10,7 +10,7 @@ export const EmployeeHeader = {
         ModalDialog,
         "p-skeleton": primevue.skeleton,
         EmployeeStatus,
-	},	
+	},
     props: {
         personID: Number,
         personUID: String,
@@ -22,7 +22,7 @@ export const EmployeeHeader = {
 
         /* const route = VueRouter.useRoute();
         const router = VueRouter.useRouter(); */
-        const { watch, ref, onMounted } = Vue; 
+        const { watch, ref, onMounted } = Vue;
         const currentPersonID = Vue.computed(() => { return props.personID });
         const currentPersonUID = Vue.computed(() => { return props.personUID });
 
@@ -31,11 +31,11 @@ export const EmployeeHeader = {
         const previewImage = ref();
         const statusRef = ref();
 
-        const isFetching = ref(false);        
+        const isFetching = ref(false);
         const isFetchingName = ref(false);
         const isFetchingIssues = ref(false);
-        
-       //const currentDate = ref(null);        
+
+       //const currentDate = ref(null);
 
         const openissuescount = ref();
 
@@ -79,7 +79,7 @@ export const EmployeeHeader = {
 
         const checkPerson = async() => {
             isFetchingIssues.value = true;
-            try {            
+            try {
                 const res = await Vue.$fhcapi.Issue.checkPerson(props.personID);
                 openissuescount.value = res.data.data.openissues;
             } catch (error) {
@@ -96,7 +96,7 @@ export const EmployeeHeader = {
             } else {
                 previewImage.value = null;
                 fileInput.value.value = null;
-            }                   
+            }
         });
 
         /* watch(
@@ -114,10 +114,10 @@ export const EmployeeHeader = {
             }
         })
 
-        // Toast 
+        // Toast
         const toastRef = ref();
         const toastDeleteRef = ref();
-        
+
         const showToast = () => {
             toastRef.value.show();
         }
@@ -141,11 +141,11 @@ export const EmployeeHeader = {
         const postFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);                
+                const res = await Vue.$fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);
                 fetchHeaderData(props.personID, props.personUID);
                 showToast();
             } catch (error) {
-                console.log(error);                
+                console.log(error);
             } finally {
                 isFetching.value = false;
             }
@@ -155,17 +155,17 @@ export const EmployeeHeader = {
         const postDeleteFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.deletePersonEmployeeFoto(props.personID);                
+                const res = await Vue.$fhcapi.Employee.deletePersonEmployeeFoto(props.personID);
                 fetchHeaderData(props.personID, props.personUID);
                 showDeleteToast();
             } catch (error) {
-                console.log(error);                
+                console.log(error);
             } finally {
                 isFetching.value = false;
-            }            
+            }
         }
 
-        // Modal 
+        // Modal
         let modalRef = ref();
 
         const showModal = () => {
@@ -179,11 +179,11 @@ export const EmployeeHeader = {
         // confirm
         let confirmDeleteRef = ref();
 
-        const showDeleteModal = async () => {            
+        const showDeleteModal = async () => {
             const ok = await confirmDeleteRef.value.show();
-            
+
             if (ok) {
-              postDeleteFile();            
+              postDeleteFile();
             }
           }
 
@@ -207,10 +207,11 @@ export const EmployeeHeader = {
 
         const refresh = () => {
             console.log('refresh called')
-            fetchHeaderData(props.personID, props.personUID)
-            statusRef.value.refresh()
+            fetchHeaderData(props.personID, props.personUID);
+            checkPerson(props.personID);
+            statusRef.value.refresh();
         }
-        
+
 
         return {
             showModal,
@@ -254,7 +255,7 @@ export const EmployeeHeader = {
 
         <div class="d-flex justify-content-between ms-sm-auto col-lg-12 p-md-2" >
             <div class="d-flex align-items-top flex-fill" >
-            
+
                 <div class="fotocontainer" v-if="!isFetchingName">
                     <img v-if="employee?.foto" class="rounded" style="max-width:101px" :src="'data:image/jpeg;charset=utf-8;base64,' + employee?.foto" />
                     <div v-if="employee?.foto && !restricted" class="fotobutton" >
@@ -270,71 +271,71 @@ export const EmployeeHeader = {
                 </div>
 
                 <div v-if="employee?.foto==undefined  || isFetchingName" style="position:relative">
-                    <svg  class="bd-placeholder-img rounded" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>          
+                    <svg  class="bd-placeholder-img rounded" width="100" height="131" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
                     <div class="fotobutton-visible" v-if="!restricted && !isFetchingName">
-                        <div class="d-grid gap-2 d-md-flex ">                      
+                        <div class="d-grid gap-2 d-md-flex ">
                             <button type="button" class="btn btn-outline-dark btn-sm" @click="showModal" >
                                 <i class="fa fa-pen"></i>
                             </button>
                         </div>
                     </div>
-                </div>                             
-                
+                </div>
+
                 <div class="ms-3 flex-fill d-flex flex-column" >
                     <div class="align-items-top">
                         <h2 class="h4" v-if="!isFetchingName">{{ employee?.titelpre }} {{ employee?.vorname }} {{ employee?.nachname }}<span v-if="employee?.titelpost != null && employee?.titelpost != ''">, {{ employee?.titelpost }}</span></h2>
-                        <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>      
-    
+                        <h2 class="h4" v-else><p-skeleton style="width:30%"></p-skeleton></h2>
+
                         <div v-if="employee?.abteilung && !isFetching" class="mb-1">
                             <template v-for="(item, index) in employee?.abteilung">
                                 <strong class="text-muted">{{ item?.organisationseinheittyp_kurzbz }}</strong> {{ item?.bezeichnung }} |
-                                <strong class="text-muted">Vorgesetzte*r </strong> 
+                                <strong class="text-muted">Vorgesetzte*r </strong>
                                 <a href="#" @click.prevent="redirect(item?.supervisor?.person_id, item?.supervisor?.uid)" v-if="!restricted">{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</a>
                                 <span v-else>{{ item?.supervisor?.titelpre }} {{ item?.supervisor?.vorname }} {{ item?.supervisor?.nachname }}</span>
                                 <br v-if="index < employee?.abteilung?.length - 1" />
-                            </template>    
-                            </div>  
-                        <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>                
+                            </template>
+                            </div>
+                        <div v-else class="mb-1"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></div>
                         <div v-if="!isFetchingName" class="mb-1">
-                            <strong class="text-muted">Email</strong>&nbsp; 
-                            <span v-if="!employee?.alias">  
+                            <strong class="text-muted">Email</strong>&nbsp;
+                            <span v-if="!employee?.alias">
                                 <a :href="'mailto:'+employee?.uid+'@'+FHC_JS_CONFIG.domain">{{  employee?.uid }}@{{ FHC_JS_CONFIG.domain }}</a>
                             </span>
                             <span v-if="employee?.alias">
-                                <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a> 
+                                <a :href="'mailto:'+employee?.alias+'@'+FHC_JS_CONFIG.domain">{{  employee?.alias }}@{{ FHC_JS_CONFIG.domain }}</a>
                             </span>
-                            <span v-if="employee?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW</strong> {{  employee?.telefonklappe }}</span>  
-                        </div>  
-                        <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>            
+                            <span v-if="employee?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW</strong> {{  employee?.telefonklappe }}</span>
+                        </div>
+                        <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>
                     </div>
                     <EmployeeStatus v-if="!restricted" ref="statusRef"></EmployeeStatus>
-                   
+
                 </div>
-             
+
             </div>
-            
+
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
                     <div class="px-2" v-if="!restricted">
                         <h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
-                        <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6> 
-                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6> 
+                        <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6>
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6>
                     </div>
                     <div class="px-2">
                         <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
-                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>
                     </div>
                     <div class="px-2" style="border-left: 1px solid #EEE">
                         <h4 class="mb-1">UID</h4>
-                        <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.uid }}</h6>  
-                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6> 
+                        <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.uid }}</h6>
+                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>
                     </div>
-                </div>                
+                </div>
             </div>
-        
+
         </div>
-        
+
 
         <!-- FotoModal -->
         <Modal title="Foto" ref="modalRef">
@@ -345,7 +346,7 @@ export const EmployeeHeader = {
                 </div>
                 <div class="mb-3">
                     <div class="imagePreviewWrapper" >
-                        <img class="preview" :src="previewImage" />                        
+                        <img class="preview" :src="previewImage" />
                     </div>
                 </div>
 
@@ -355,14 +356,14 @@ export const EmployeeHeader = {
                 <button class="btn btn-primary"  @click="okHandler()">OK</button>
             </template>
         </Modal>
-        
+
         <!-- Confirm Delete -->
         <ModalDialog title="Warnung" ref="confirmDeleteRef">
             <template #body>
                 Foto wirklich löschen?
             </template>
         </ModalDialog>
-        
+
         `
 }
 

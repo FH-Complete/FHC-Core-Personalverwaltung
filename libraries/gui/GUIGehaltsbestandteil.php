@@ -100,7 +100,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp']);
             $gbs->setGrundbetrag($this->data['betrag']);
 			// TODO take a look
-            $gbs->setBetrag_valorisiert($this->data['betrag']);
+            //$gbs->setBetrag_valorisiert($this->data['betrag']);
             $gbs->setAuszahlungen($this->data['auszahlungen']);
 			$gbs->setValorisierungssperre($this->data['valorisierungssperre']);
             $gbs->setValorisierung($this->data['valorisierung']);
@@ -156,6 +156,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
 		if( intval($this->gbsInstance->getGehaltsbestandteil_id()) > 0 ) 
 		{
 			$this->data['id'] = $this->gbsInstance->getGehaltsbestandteil_id();
+			$this->data['betrag_valorisiert'] = $this->gbsInstance->getBetrag_valorisiert();
 		}
 	}
 }
