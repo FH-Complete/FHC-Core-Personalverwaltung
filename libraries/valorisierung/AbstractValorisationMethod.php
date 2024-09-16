@@ -6,10 +6,10 @@
  */
 abstract class AbstractValorisationMethod implements IValorisationMethod
 {
-	const ALLE_GBS = false;
-	const NUR_ZU_VALORISIERENDE_GBS = false;
-	const NUR_UNGESPERRTE_GBS = false;
-	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = true;
+	const ALLE_GBS = 0;
+	const NUR_ZU_VALORISIERENDE_GBS = 1;
+	const NUR_UNGESPERRTE_GBS = 2;
+	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = 3;
 
 	protected $ci; // code igniter instance
 	protected $dienstverhaeltnis;
