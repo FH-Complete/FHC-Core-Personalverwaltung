@@ -122,10 +122,10 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 			$gesperrt = isset($sperrDatum) && new DateTime($sperrDatum) >= new DateTime($this->valorisierungsdatum);
 
 			// add Gehaltsbestandteil if applicable
-			if ($mode == self::ALLE_GBS
-				|| ($mode == self::NUR_ZU_VALORISIERENDE_GBS && $zuValorisieren)
-				|| ($mode == self::NUR_UNGESPERRTE_GBS && !$gesperrt)
-				|| ($mode == self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS && $zuValorisieren && !$gesperrt))
+			if ($mode === self::ALLE_GBS
+				|| ($mode === self::NUR_ZU_VALORISIERENDE_GBS && $zuValorisieren)
+				|| ($mode === self::NUR_UNGESPERRTE_GBS && !$gesperrt)
+				|| ($mode === self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS && $zuValorisieren && !$gesperrt))
 			{
 				$gehaltsbestandteile[] = $gehaltsbestandteil;
 			}
