@@ -185,13 +185,13 @@ export const EmployeeContract = {
                 } else {
                     currentDVID.value = null;
                     currentDV.value = null;
-                }          
+                }
             } catch (error) {
                 console.log(error)
                 isFetching.value = false
             }
 
-            
+
         }
 
         const fetchVertrag = async (dv_id, date) => {
@@ -202,7 +202,7 @@ export const EmployeeContract = {
                 getCurrentVertragsbestandteil();
                 //}
             } catch (error) {
-                console.log(error)                
+                console.log(error)
             } finally {
                 isFetching.value = false
             }
@@ -216,11 +216,11 @@ export const EmployeeContract = {
                 const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
                 gbtList.value = res.data;
             } catch (error) {
-                console.log(error)                
+                console.log(error)
             } finally {
                 isFetching.value = false
             }
-           
+
         }
 
         // fetch chart data
@@ -640,7 +640,7 @@ export const EmployeeContract = {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, offCanvasRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
-            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
+            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex,
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, handleUpdateUnruly, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,

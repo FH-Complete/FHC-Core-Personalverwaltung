@@ -167,7 +167,7 @@ export default {
     },
     updatePersonUnruly: function(payload) {
         const url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-            + '/api/frontend/v1/unrulyperson/UnrulyPerson/updatePersonUnrulyStatus';
+            + '/api/frontend/v1/checkperson/CheckPerson/updatePersonUnrulyStatus';
         return axios.post(url, payload, {
             headers: {
                 'Content-Type': 'application/json'

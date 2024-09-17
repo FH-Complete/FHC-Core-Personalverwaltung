@@ -993,11 +993,6 @@ class Api_model extends DB_Model
             $where = "p.nachname=? ";
         }
 
-        if (mb_strlen($nachname) == 2)
-        {
-            $where = "p.nachname=? ";
-        }
-
 		if(isset($vorname) && $vorname != '')
 		{
 			$where.= " AND p.vorname~*?";
