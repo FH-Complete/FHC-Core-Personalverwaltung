@@ -6,10 +6,10 @@
  */
 abstract class AbstractValorisationMethod implements IValorisationMethod
 {
-	const ALLE_GBS = false;
-	const NUR_ZU_VALORISIERENDE_GBS = false;
-	const NUR_UNGESPERRTE_GBS = false;
-	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = true;
+	const ALLE_GBS = 0;
+	const NUR_ZU_VALORISIERENDE_GBS = 1;
+	const NUR_UNGESPERRTE_GBS = 2;
+	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = 3;
 
 	protected $ci; // code igniter instance
 	protected $dienstverhaeltnis;
@@ -122,10 +122,10 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 			$gesperrt = isset($sperrDatum) && new DateTime($sperrDatum) >= new DateTime($this->valorisierungsdatum);
 
 			// add Gehaltsbestandteil if applicable
-			if ($mode == self::ALLE_GBS
-				|| ($mode == self::NUR_ZU_VALORISIERENDE_GBS && $zuValorisieren)
-				|| ($mode == self::NUR_UNGESPERRTE_GBS && !$gesperrt)
-				|| ($mode == self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS && $zuValorisieren && !$gesperrt))
+			if ($mode === self::ALLE_GBS
+				|| ($mode === self::NUR_ZU_VALORISIERENDE_GBS && $zuValorisieren)
+				|| ($mode === self::NUR_UNGESPERRTE_GBS && !$gesperrt)
+				|| ($mode === self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS && $zuValorisieren && !$gesperrt))
 			{
 				$gehaltsbestandteile[] = $gehaltsbestandteil;
 			}
