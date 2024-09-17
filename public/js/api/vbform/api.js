@@ -15,7 +15,7 @@ import Stundensatz from "./stundensatz.js";
 import Zeit from "./zeit.js";
 import Deadline from "./deadline.js";
 import SalaryRange from "./salaryrange.js";
-import Unruly from "../../../../../js/api/unrulyperson.js";
+import CheckPerson from "../../../../../js/api/checkperson.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -35,5 +35,5 @@ export default {
     "Zeit": Zeit,
     "Deadline": Deadline,
     "SalaryRange": SalaryRange,
-    "Unruly": Unruly
+    "CheckPerson": CheckPerson
 };

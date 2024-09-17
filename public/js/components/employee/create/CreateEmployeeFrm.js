@@ -77,7 +77,7 @@ export const CreateEmployeeFrm = {
 
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Unruly.filterPerson(
+                const res = await Vue.$fhcapi.CheckPerson.filterPerson(
                     { ...currentValue.value, unruly: true},
                     FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                 );
