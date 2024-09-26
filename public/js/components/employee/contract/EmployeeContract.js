@@ -87,6 +87,7 @@ export const EmployeeContract = {
         const teilzeittypen = inject('teilzeittypen');
 
         const readonly = ref(false);
+        const valorisationValid = ref(true);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -291,6 +292,7 @@ export const EmployeeContract = {
                 fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
+                checkValorisation();
             }
         )
         watch(
@@ -448,6 +450,7 @@ export const EmployeeContract = {
                     fetchVertrag(currentDVID.value, currentDate.value);
                     fetchGBT(currentDVID.value, currentDate.value);
                     fetchGBTChartData(currentDVID.value);
+                    checkValorisation();
                     emit('updateHeader');
                 }
             })
@@ -613,6 +616,26 @@ export const EmployeeContract = {
 
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
+        const checkValorisation = async () => {
+			if (currentDVID != null && currentDVID.value > 0) {
+				isFetching.value = true
+				try {
+					const res = await Vue.$fhcapi.ValorisierungCheck.checkValorisationValidityOfDv(currentDVID.value);
+					valorisationValid.value = res.data.data;
+				} catch (error) {
+					console.log(error)
+				} finally {
+					isFetching.value = false
+				}
+			}
+        }
+        checkValorisation();
+
+        const valorisationCheckPath = computed(() => {
+			const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+			return `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/`+currentDVID.value;
+        });
+
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, offCanvasRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
@@ -621,7 +644,7 @@ export const EmployeeContract = {
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, handleUpdateUnruly, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
-            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp
+            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid
         }
     },
     template: `
@@ -1039,7 +1062,15 @@ export const EmployeeContract = {
                         <!-- Bruttomonatsgehalt  -->
                         <div class="card mt-3">
                             <div class="card-header">
-                                <h5 class="mb-0">Bruttomonatsgehalt</h5>
+								<div class="d-flex justify-content-between align-items-center">
+									<div><h5 class="mb-0">Bruttomonatsgehalt</h5></div>
+									<div v-if="!valorisationValid">
+										<router-link :to="valorisationCheckPath"
+											class="flex-sm-fill text-sm-start">
+											Zur Valorisierungsprüfung
+										</router-link>
+									</div>
+								</div>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3" v-if="currentDV != null">
