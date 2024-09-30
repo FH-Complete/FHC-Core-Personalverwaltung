@@ -18,7 +18,7 @@ export const OrgChooser = {
         isFetching.value = true
         try {
           const res = await CoreRESTClient.get(
-            'extensions/FHC-Core-Personalverwaltung/apis/v1/OrgAPI/getOrgHeads');
+            'extensions/FHC-Core-Personalverwaltung/api/v1/OrgAPI/getOrgHeads');
           orgList.value = CoreRESTClient.getData(res.data);
           if (orgList.value.length > 0)  {
             //orgList.value.reverse();

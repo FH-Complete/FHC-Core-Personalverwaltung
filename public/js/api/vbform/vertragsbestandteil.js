@@ -1,13 +1,13 @@
 export default {
   getCurrentVBs: function(dvid) {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/apis/v1/DVAPI/getCurrentVBs/' 
+            + '/extensions/FHC-Core-Personalverwaltung/api/v1/DVAPI/getCurrentVBs/' 
             + dvid;
       return axios.get(url);
   },
   getCurrentAndFutureVBs: function(dvid, options) {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root  + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-            + '/extensions/FHC-Core-Personalverwaltung/apis/v1/DVAPI/getCurrentAndFutureVBs/' 
+            + '/extensions/FHC-Core-Personalverwaltung/api/v1/DVAPI/getCurrentAndFutureVBs/' 
             + dvid;
       if( typeof options !== 'undefined' ) {
         const params = new URLSearchParams(options);
@@ -17,13 +17,13 @@ export default {
   },
   getAllVBs: function(dvid) {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/apis/v1/DVAPI/getAllVBs/' 
+            + '/extensions/FHC-Core-Personalverwaltung/api/v1/DVAPI/getAllVBs/' 
             + dvid;
       return axios.get(url);
   },
   getVB: function(vbid) {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root  + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/apis/v1/DVAPI/getVB/' 
+            + '/extensions/FHC-Core-Personalverwaltung/api/v1/DVAPI/getVB/' 
             + vbid;
       return axios.get(url);
   }

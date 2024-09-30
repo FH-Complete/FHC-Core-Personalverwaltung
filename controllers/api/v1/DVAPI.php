@@ -12,6 +12,7 @@ class DVAPI extends Auth_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
+    const READ_ONLY_PERMISSION = 'basis/mitarbeiter:r';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
 
     public function __construct() {
@@ -43,6 +44,8 @@ class DVAPI extends Auth_Controller
             'gbtChartDataByDV' => DVAPI::DEFAULT_PERMISSION,
             //
             'getEmployeesWithoutContract' => DVAPI::DEFAULT_PERMISSION,
+            //
+            'getDvEndeGruende' => DVAPI::READ_ONLY_PERMISSION
                 
             )
         );
@@ -58,7 +61,7 @@ class DVAPI extends Auth_Controller
         $this->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GBTModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/TmpStore_model', 'TmpStoreModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
-        
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/DvEndeGrund_model', 'DvEndeGrundModel');
     }
     
 
@@ -736,6 +739,24 @@ class DVAPI extends Auth_Controller
     {
         $data = $this->ApiModel->getEmployeesWithoutContract();
         $this->outputJson($data);
+    }
+
+    function getDvEndeGruende()
+    {
+        $this->DvEndeGrundModel->resetQuery();
+        $this->DvEndeGrundModel->addSelect('dvendegrund_kurzbz AS value, bezeichnung AS label, NOT(aktiv) AS disabled');
+        $this->DvEndeGrundModel->addOrder('sort, bezeichnung', 'ASC');
+        $dvendegruende = $this->DvEndeGrundModel->load();
+        if( hasData($dvendegruende) )
+        {
+            $this->outputJson($dvendegruende);
+            return;
+        }
+        else
+        {
+            $this->outputJsonError('no contract types found');
+            return;
+        }
     }
 
 }

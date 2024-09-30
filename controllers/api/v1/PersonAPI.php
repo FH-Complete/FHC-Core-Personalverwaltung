@@ -1191,4 +1191,15 @@ class PersonAPI extends Auth_Controller
         return true;
     }
 
+    /**
+     * Search for employees. Used by employee chooser component.
+     * @deprecated
+     */
+    function filter()
+    {
+        $searchString = $this->input->get('search', TRUE);
+        $data = $this->ApiModel->filter($searchString);
+        return $this->outputJson($data);
+    }
+
 }

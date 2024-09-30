@@ -15,7 +15,7 @@ const EmployeeChooser = {
 
     const endpoint =
       protocol_host +
-      "/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/filter";
+      "/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/v1/PersonAPI/filter";
     let url = "";
 
     const searchString = Vue.ref("");
@@ -41,7 +41,7 @@ const EmployeeChooser = {
     };
 
     const generateImageLink = (person_id) => {
-      return `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/apis/v1/PersonAPI/foto?person_id=${person_id}`;
+      return `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/api/v1/PersonAPI/foto?person_id=${person_id}`;
     };
 
     const keyUp = () => {

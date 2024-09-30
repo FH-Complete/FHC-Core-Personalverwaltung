@@ -4,7 +4,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 use CI3_Events as Events;
 
-class TabsConfig extends FHCAPI_Controller
+class TabsConfigAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
