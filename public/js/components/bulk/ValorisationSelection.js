@@ -3,6 +3,7 @@ import {CoreFilterCmpt} from "../../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "../../apps/common.js";
 import { Modal } from '../Modal.js';
+import {formatter} from './valorisationformathelper.js';
 
 export const ValorisationSelection = {
 	components: {
@@ -68,6 +69,7 @@ export const ValorisationSelection = {
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData([]);
 						this.getValorisierungsInstanzen();
+						this.$fhcAlert.alertSuccess('Valorisierung erfolgreich abgeschlossen');
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 					})
 					.catch(this.handleErrors);
@@ -104,6 +106,7 @@ export const ValorisationSelection = {
 				else {
 					this.$fhcAlert.handleSystemError(response);
 				}
+				this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 			}
 		},
 		computed: {
@@ -111,26 +114,18 @@ export const ValorisationSelection = {
 				return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 			},
 			tabulatorOptions: function() {
-                                const moneyformatterparams = {
-                                    decimal: ",",
-                                    thousand: ".",
-                                    symbol: false,
-                                    symbolAfter: false,
-                                    negativeSign: true,
-                                    precision: 2
-                                };
+				const moneyformatterparams = {
+					decimal: ",",
+					thousand: ".",
+					symbol: false,
+					symbolAfter: false,
+					negativeSign: true,
+					precision: 2
+				};
 
-                                const formatDate = function(cell, formatterParams, onRendered) {
-                                    var dateval = cell.getValue();
-                                    const re = /([0-9]{4})-([0-9]{2})-([0-9]{2})/;
-                                    var matches = null;
-
-                                    if( null !== dateval && null !== (matches = dateval.match(re)) ) {
-                                        return matches[3] + '.' + matches[2] + '.' + matches[1];
-                                    } else {
-                                        return dateval;
-                                    }
-                                };
+				const formatDate = function(cell, formatterParams, onRendered) {
+					return formatter.formatDateGerman(cell.getValue());
+				};
 
 				return {
 						height: '75vh',
@@ -183,35 +178,35 @@ export const ValorisationSelection = {
 								sumpostval += row.getData().sumsalarypostval;
 							}
 
-                                                        const moneyformatter = this.modules.format.getFormatter('money');
-                                                        const moneyformatterparams = {
-                                                            decimal: ",",
-                                                            thousand: ".",
-                                                            symbol: "EUR ",
-                                                            symbolAfter: false,
-                                                            negativeSign: true,
-                                                            precision: 2
-                                                        };
+							const moneyformatter = this.modules.format.getFormatter('money');
+							const moneyformatterparams = {
+								decimal: ",",
+								thousand: ".",
+								symbol: "EUR ",
+								symbolAfter: false,
+								negativeSign: true,
+								precision: 2
+							};
 
-                                                        const sumpreval_wrapper = {
-                                                            getValue: function() {
-                                                                return sumpreval;
-                                                            }
-                                                        };
+							const sumpreval_wrapper = {
+								getValue: function() {
+									return sumpreval;
+								}
+							};
 
-                                                        const sumpostval_wrapper = {
-                                                            getValue: function() {
-                                                                return sumpostval;
-                                                            }
-                                                        };
+							const sumpostval_wrapper = {
+								getValue: function() {
+									return sumpostval;
+								}
+							};
 
-                                                        const differenz_wrapper = {
-                                                            getValue: function() {
-                                                                return (sumpostval - sumpreval);
-                                                            }
-                                                        };
+							const differenz_wrapper = {
+								getValue: function() {
+									return (sumpostval - sumpreval);
+								}
+							};
 
-                                                        elfiltered.innerHTML = rows.length;
+							elfiltered.innerHTML = rows.length;
 							elsumpreval.innerHTML = moneyformatter(sumpreval_wrapper, moneyformatterparams);
 							elsumpostval.innerHTML = moneyformatter(sumpostval_wrapper, moneyformatterparams);
 							elvaldifferenz.innerHTML = moneyformatter(differenz_wrapper, moneyformatterparams);
@@ -221,7 +216,7 @@ export const ValorisationSelection = {
 							event: "dataLoaded",
 							handler: function(data) {
 								var el = document.getElementById("totalrows_count");
-								el.innerHTML = (false !== data) ? data.length : 0;
+								el.innerHTML = (false !== data && typeof data != 'undefined') ? data.length : 0;
 							}
 					}
 				];
@@ -251,7 +246,7 @@ export const ValorisationSelection = {
 					.filter((value, index, array) => value.oe_kurzbz == this.valorisierung_oe_kurzbz) // filter unique
 					.map(vi => vi.valorisierungsdatum) // get only dates
 					.filter((value, index, array) => array.indexOf(value) === index && value != '') // filter unique
-					.map(date => ({value: date, label: date})); // transform to object
+					.map(date => ({value: date, label: formatter.formatDateGerman(date)})); // transform to object
 
 				dates.unshift({ // add default label
 					value: '',
@@ -410,14 +405,14 @@ export const ValorisationSelection = {
 						<tr>
 							<th>Methoden</th>
 							<td>
-								<span v-for="(methode, index) in valorisierungInfo.methoden">
+								<div v-for="(methode, index) in valorisierungInfo.methoden">
 									<span v-if="index > 0">
-										<br><br>
+										<br>
 									</span>
 									<b>{{methode.valorisierung_methode_kurzbz}}</b><br>
 									Beschreibung: {{methode.valorisierung_methode_beschreibung}}<br>
-									Parameter: {{methode.valorisierung_methode_parameter}}
-								</span>
+									Parameter: <pre>{{JSON.stringify(JSON.parse(methode.valorisierung_methode_parameter), null, 2)}}</pre>
+								</div>
 							</td>
 						</tr>
 					</tbody>

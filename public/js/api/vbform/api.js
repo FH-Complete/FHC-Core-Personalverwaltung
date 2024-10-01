@@ -37,7 +37,7 @@ export default {
     "Zeit": Zeit,
     "Deadline": Deadline,
     "SalaryRange": SalaryRange,
-    "CheckPerson": CheckPerson,
     "Valorisierung": Valorisierung,
-    "ValorisierungCheck": ValorisierungCheck
+    "ValorisierungCheck": ValorisierungCheck,
+    "CheckPerson": CheckPerson
 };

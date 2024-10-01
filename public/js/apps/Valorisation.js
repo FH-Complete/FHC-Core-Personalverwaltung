@@ -9,8 +9,6 @@ import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
-var personSelectedRef = { callback: () => {}};
-
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 

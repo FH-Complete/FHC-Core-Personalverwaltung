@@ -350,19 +350,14 @@ export const CreateEmployeeFrm = {
             </div>
             
         </div>
-    </div>
-    <div class="col-md-4">
+        <div class="col-md-4">
         <template v-if="unrulyPersonList.length">
             <h6><span class="badge" :class="'bg-unruly rounded-0'" >Unruly</span> Personen mit ähnlichen Daten:</h6>
             <p v-for="unruly in unrulyPersonList">
                 {{unruly.vorname}} {{unruly.nachname}} PID: {{unruly.person_id}}
             </p>
         </template>
-        
-    </div>
-
-        
-        
+        </div>
     </form>
     `    
 }

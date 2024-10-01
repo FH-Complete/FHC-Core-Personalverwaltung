@@ -65,6 +65,7 @@ class ValorisierungLib
 		$dvdata = new StdClass();
 		$dvdata->dienstverhaeltnis_id = $dienstverhaeltnis_id;
 		$this->_calculateValorisation($dvdata);
+		return $dvdata;
 	}
 
 	public function redoAllValorisationForDvId($dienstverhaeltnis_id)
@@ -180,7 +181,7 @@ class ValorisierungLib
 	{
 		$this->_checkParamsForValorisation();
 
-		$valinstanzmethoden = $this->_ci->ValorisierungInstanzMethod_model->loadValorisierungInstanzByKurzbz(
+		$valinstanzmethoden = $this->_ci->ValorisierungInstanzMethod_model->loadValorisierungInstanzById(
 			$this->_valorisierungInstanz->valorisierung_instanz_id
 		);
 
@@ -189,14 +190,22 @@ class ValorisierungLib
 		{
 			$valorisationMethod = $this->_ci->ValorisationFactory->getValorisationMethod($valinstanzmethod->valorisierung_methode_kurzbz);
 			$params = json_decode($valinstanzmethod->valorisierung_methode_parameter);
-			$valorisationMethod->initialize($this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, $params);
+			$valorisationMethod->initialize(
+				$this->_valorisierungInstanz->valorisierungsdatum,
+				$this->_dienstverhaeltnis,
+				$this->_vertragsbestandteile,
+				$this->_gehaltsbestandteile,
+				$params
+			);
 			$valorisationMethod->checkParams();
 
 			if($valorisationMethod->checkIfApplicable())
 			{
 				$applicableValorisationMethods[] = array(
 					'kurzbz' => $valinstanzmethod->valorisierung_methode_kurzbz,
-					'method' => $valorisationMethod
+					'method' => $valorisationMethod,
+					'params' => $params,
+					'description' => $valinstanzmethod->beschreibung
 				);
 			}
 		}
@@ -208,8 +217,11 @@ class ValorisierungLib
 
 		if(count($applicableValorisationMethods) == 1)
 		{
-			$usedvalinstanz = $applicableValorisationMethods[0]['method'];
-			$dvdata->valorisierungmethode = $applicableValorisationMethods[0]['kurzbz'];
+			$valMethod = $applicableValorisationMethods[0];
+			$usedvalinstanz = $valMethod['method'];
+			$dvdata->valorisierungmethode = $valMethod['kurzbz'];
+			$dvdata->valorisierung_methode_parameter = $valMethod['params'];
+			$dvdata->valorisierung_methode_beschreibung = $valMethod['description'];
 			$dvdata->sumsalarypreval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
 			$usedvalinstanz->calculateValorisation();
 			$dvdata->sumsalarypostval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
@@ -220,7 +232,7 @@ class ValorisierungLib
 		else
 		{
 			$noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
-			$noval->initialize($this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
+			$noval->initialize($this->_valorisierungInstanz->valorisierungsdatum, $this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
 			$dvdata->valorisierungmethode = 'keine Valorisierung';
 			$dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
 			$dvdata->sumsalarypostval = $dvdata->sumsalarypreval;
@@ -247,8 +259,6 @@ class ValorisierungLib
 				['betrag_valorisiert' => $betrag_valorisiert, 'updateamum' => 'NOW()', 'updatevon' => getAuthUID()],
 				$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
 			);
-
-			// delete Valorisierung history if needed
 
 			// write Valorisierung history
 			$this->_ci->ValorisierungHistorie_model->insert(

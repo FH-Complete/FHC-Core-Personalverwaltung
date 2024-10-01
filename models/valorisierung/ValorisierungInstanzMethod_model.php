@@ -20,7 +20,7 @@ class ValorisierungInstanzMethod_model extends DB_Model
 		}
 	}
 
-	public function loadValorisierungInstanzByKurzbz($valorisierung_instanz_id)
+	public function loadValorisierungInstanzById($valorisierung_instanz_id)
 	{
 		$res = $this->loadWhere('valorisierung_instanz_id = ' . $this->escape($valorisierung_instanz_id));
 		if( hasData($res) )
