@@ -991,7 +991,7 @@ class PersonAPI extends Auth_Controller
 
     public function getStundensaetze($uid = null)
 	{
-		$qry = "SELECT *
+		$qry = "SELECT hr.tbl_stundensatz.*, hr.tbl_stundensatztyp.bezeichnung
 				FROM hr.tbl_stundensatz
 				JOIN hr.tbl_stundensatztyp USING (stundensatztyp)
 				WHERE uid = ?

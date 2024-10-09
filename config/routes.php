@@ -11,3 +11,4 @@ $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/time'] = 
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/lifecycle'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/summary'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/document'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
+$route['extensions/FHC-Core-Personalverwaltung/Valorisation/(:any)/(:any)'] = 'extensions/FHC-Core-Personalverwaltung/Valorisation/index';
