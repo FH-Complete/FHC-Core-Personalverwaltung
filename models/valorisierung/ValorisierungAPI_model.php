@@ -16,11 +16,14 @@ SELECT
 	va.bezeichnung AS vertragsart,
 	oe.bezeichnung AS unternehmen,
 	dv.von AS dvvon,
-	dv.bis AS dvbis
+	dv.bis AS dvbis,
+	ma.personalnummer AS personalnummer
 FROM
 	hr.tbl_dienstverhaeltnis dv
 JOIN
-	public.tbl_benutzer b ON b.uid = dv.mitarbeiter_uid
+	public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = dv.mitarbeiter_uid
+JOIN
+	public.tbl_benutzer b ON b.uid = ma.mitarbeiter_uid
 JOIN
 	public.tbl_person p ON b.person_id = p.person_id
 JOIN

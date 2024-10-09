@@ -24,7 +24,17 @@ export const ValorisationSelection = {
 				valorisierungsdatum: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation'
+						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation',
+                                downloadconfig: {
+                                    'csv': {
+                                        formatter:'csv',
+                                        file: 'pv21_valorisation.csv',
+                                        options: {
+                                            delimiter: ';',
+                                            bom: true
+                                        }
+                                    }
+                                }
 			};
 		},
 		created: function() {
@@ -148,6 +158,7 @@ export const ValorisationSelection = {
 						{title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
 						{title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true},
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
+                                                {title: 'Personalnummer', field: 'personalnummer'},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
 						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate},
@@ -333,6 +344,7 @@ export const ValorisationSelection = {
 			<div class="mh-100 pb-5" >
 				<core-filter-cmpt
 					ref="valorisationTabulator"
+                                        :download="downloadconfig"
 					table-only
 					:side-menu="false"
 					:tabulator-options="tabulatorOptions"
