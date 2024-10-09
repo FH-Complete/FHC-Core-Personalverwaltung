@@ -133,6 +133,10 @@ export const ValorisationSelection = {
 					precision: 2
 				};
 
+                                const sumsDownload = function(value, data, type, params, column){
+                                    return value.toString().replace('.', ',');
+                                }
+
 				const formatDate = function(cell, formatterParams, onRendered) {
 					return formatter.formatDateGerman(cell.getValue());
 				};
@@ -151,14 +155,14 @@ export const ValorisationSelection = {
 						// Column definitions
 						columns: [
 						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
-						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams},
-						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams},
+                                                {title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
+						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
+						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
 						{title: 'Standard-Kostenstelle', field: 'stdkst', headerFilter: true},
 						{title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
-						{title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true},
+						{title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true, download:false},
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
-                                                {title: 'Personalnummer', field: 'personalnummer'},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
 						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate},
