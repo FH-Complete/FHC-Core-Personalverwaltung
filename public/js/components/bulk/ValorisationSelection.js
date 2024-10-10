@@ -24,7 +24,8 @@ export const ValorisationSelection = {
 				valorisierungsdatum: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation'
+						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation',
+				formatter: formatter
 			};
 		},
 		created: function() {
@@ -400,7 +401,7 @@ export const ValorisationSelection = {
 						</tr>
 						<tr>
 							<th>Datum</th>
-							<td>{{valorisierungInfo.valorisierungsdatum}}</td>
+							<td>{{this.formatter.formatDateGerman(valorisierungInfo.valorisierungsdatum)}}</td>
 						</tr>
 						<tr>
 							<th>Methoden</th>
