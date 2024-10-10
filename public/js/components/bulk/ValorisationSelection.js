@@ -24,7 +24,7 @@ export const ValorisationSelection = {
 				valorisierungsdatum: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation',
+						'/extensions/FHC-Core-Personalverwaltung/api/v1/Valorisierung/calculateValorisation',
                                 downloadconfig: {
                                     'csv': {
                                         formatter:'csv',
