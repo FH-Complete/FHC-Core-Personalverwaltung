@@ -24,7 +24,17 @@ export const ValorisationSelection = {
 				valorisierungsdatum: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation'
+						'/extensions/FHC-Core-Personalverwaltung/apis/Valorisierung/calculateValorisation',
+                                downloadconfig: {
+                                    'csv': {
+                                        formatter:'csv',
+                                        file: 'pv21_valorisation.csv',
+                                        options: {
+                                            delimiter: ';',
+                                            bom: true
+                                        }
+                                    }
+                                }
 			};
 		},
 		created: function() {
@@ -123,6 +133,10 @@ export const ValorisationSelection = {
 					precision: 2
 				};
 
+                                const sumsDownload = function(value, data, type, params, column){
+                                    return value.toString().replace('.', ',');
+                                }
+
 				const formatDate = function(cell, formatterParams, onRendered) {
 					return formatter.formatDateGerman(cell.getValue());
 				};
@@ -141,17 +155,18 @@ export const ValorisationSelection = {
 						// Column definitions
 						columns: [
 						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
-						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams},
-						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams},
+                                                {title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
+						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
+						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
 						{title: 'Standard-Kostenstelle', field: 'stdkst', headerFilter: true},
 						{title: 'Diszpl. Zuordnung', field: 'diszplzuordnung', headerFilter: true},
-						{title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true},
+						{title: 'OE-Pfad', field: 'oe_pfad', headerFilter: true, download:false},
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
-						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate},
-						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate}
+						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman},
+						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman}
 					]
 				};
 			},
@@ -333,6 +348,7 @@ export const ValorisationSelection = {
 			<div class="mh-100 pb-5" >
 				<core-filter-cmpt
 					ref="valorisationTabulator"
+                                        :download="downloadconfig"
 					table-only
 					:side-menu="false"
 					:tabulator-options="tabulatorOptions"
