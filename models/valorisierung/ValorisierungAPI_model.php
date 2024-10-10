@@ -1,6 +1,12 @@
 <?php
 class ValorisierungAPI_model extends DB_Model
 {
+	/**
+	 * Gets all Dienstverhältnisse for a valorisation date.
+	 * @param valorisierungsDatum date of valorisation, all Dvs with date between start/end are returned
+	 * @param valorisierungsOeKurzbz
+	 * @param person_id
+	 */
 	public function getDVsForValorisation($valorisierungsDatum, $valorisierungsOeKurzbz = null, $person_id = null)
 	{
 		$sql = <<<EOSQL

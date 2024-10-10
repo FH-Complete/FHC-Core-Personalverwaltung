@@ -27,6 +27,9 @@ class ValorisierungCheck extends FHCAPI_Controller
 		$this->terminateWithSuccess('not implemented');
 	}
 
+	/**
+	 * Get Dienstverhaeltnis data for a Dienstverhaeltnis
+	 */
 	public function getDvData()
 	{
 		$dienstverhaeltnis_id = $this->input->get('dienstverhaeltnis_id');
@@ -40,6 +43,9 @@ class ValorisierungCheck extends FHCAPI_Controller
 		$this->terminateWithSuccess(hasData($dvRes) ? getData($dvRes) : []);
 	}
 
+	/**
+	 * Get data of a Dienstverhaeltnis needed for valorisation check
+	 */
 	public function getValorisierungCheckData()
 	{
 		$dienstverhaeltnis_id = $this->input->get('dienstverhaeltnis_id');
@@ -57,6 +63,9 @@ class ValorisierungCheck extends FHCAPI_Controller
 		}
 	}
 
+	/**
+	 * Check if a Dienstverhaeltnis has invalid GEhaltsbestandteile
+	 */
 	public function checkValorisationValidityOfDv()
 	{
 		$dienstverhaeltnis_id = $this->input->get('dienstverhaeltnis_id');
@@ -75,9 +84,7 @@ class ValorisierungCheck extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Initiates revalisation for a certain Dienstverhaeltnis
 	 */
 	public function redoValorisation()
 	{

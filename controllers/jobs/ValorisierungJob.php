@@ -25,6 +25,7 @@ class ValorisierungJob extends JOB_Controller
 			die("missing parameter valorisierung_kurzbz\n");
 		}
 
+		// display Valorisation Kurzbezeichnung
 		echo "ValorisierungKurzbz: " . $valorisierung_kurzbz . "\n";
 		echo "DienstverhaeltnisId: " . $dienstverhaeltnis_id . "\n";
 
@@ -32,12 +33,14 @@ class ValorisierungJob extends JOB_Controller
 
 		$this->ValorisierungLib->initialize(['valorisierung_kurzbz' => $valorisierung_kurzbz]);
 
+		// get all applicale valorisation instances of the Kurzbezeichnung
 		$valinstanz = $this->ValorisierungInstanz_model->loadValorisierungInstanzByKurzbz($valorisierung_kurzbz);
 		if( is_null($valinstanz) )
 		{
 			die('Valorisierung Instanz ' . $valorisierung_kurzbz . ' not found.' . "\n");
 		}
 
+		// calculate valorisation for one Dienstverhaeltnis or for all applicable DVs
 		if (isset($dienstverhaeltnis_id))
 		{
 			$this->ValorisierungLib->calculateValorisationForDvId($dienstverhaeltnis_id);
