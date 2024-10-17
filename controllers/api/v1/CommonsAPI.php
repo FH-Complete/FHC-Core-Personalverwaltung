@@ -9,37 +9,38 @@ class CommonsAPI extends Auth_Controller
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
 
     public function __construct() {
-        parent::__construct(array(
-            'getSprache' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getSachaufwandtyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getNations' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getAusbildung' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getStandorteIntern' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getOrtschaften' => CommonsAPI::DEFAULT_PERMISSION,                
-            'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            
-            'getContractExpire' => CommonsAPI::DEFAULT_PERMISSION,
-            'getContractNew' => CommonsAPI::DEFAULT_PERMISSION,
-            'getBirthdays' => CommonsAPI::DEFAULT_PERMISSION,
-            'getCovidState' => CommonsAPI::DEFAULT_PERMISSION,
-            
-            'getCourseHours' => CommonsAPI::DEFAULT_PERMISSION,
-            'getAllCourseHours' => CommonsAPI::DEFAULT_PERMISSION,
-            'getAllSupportHours' => CommonsAPI::DEFAULT_PERMISSION,
-            'getReportData' => CommonsAPI::DEFAULT_PERMISSION,                
-            'getKontakttyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],        
-            'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],        
-        
-            'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		    'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+        parent::__construct(
+	    array(
+		'getSprache' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getSachaufwandtyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getNations' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getAusbildung' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getStandorteIntern' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getOrtschaften' => CommonsAPI::DEFAULT_PERMISSION,
+		'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
 
-            'getKarenztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		    'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		    'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		    'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getContractExpire' => CommonsAPI::DEFAULT_PERMISSION,
+		'getContractNew' => CommonsAPI::DEFAULT_PERMISSION,
+		'getBirthdays' => CommonsAPI::DEFAULT_PERMISSION,
+		'getCovidState' => CommonsAPI::DEFAULT_PERMISSION,
+
+		'getCourseHours' => CommonsAPI::DEFAULT_PERMISSION,
+		'getAllCourseHours' => CommonsAPI::DEFAULT_PERMISSION,
+		'getAllSupportHours' => CommonsAPI::DEFAULT_PERMISSION,
+		'getReportData' => CommonsAPI::DEFAULT_PERMISSION,
+		'getKontakttyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+
+		'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+
+		'getKarenztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -50,7 +51,7 @@ class CommonsAPI extends Auth_Controller
         $this->load->model('codex/Ausbildung_model', 'AusbildungModel');
 
         $this->load->model('system/sprache_model', 'SpracheModel');
-        $this->load->model('ressource/ort_model', 'OrtModel');        
+        $this->load->model('ressource/ort_model', 'OrtModel');
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Organisationseinheit_model', 'OrganisationseinheitModel');
         $this->load->model('codex/bisverwendung_model', 'BisverwendungModel');
@@ -61,11 +62,11 @@ class CommonsAPI extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltstyp_model', 'GehaltstypModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
-        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');	
-	    $this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
-	    $this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
-	    $this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');	
-	    $this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+        $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
     }
 
 

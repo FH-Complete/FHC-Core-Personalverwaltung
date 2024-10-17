@@ -7,7 +7,7 @@ const BirthdayCountCard = {
      props: {
      },
      setup( ) {
-        
+        const $fhcApi = Vue.inject('$fhcApi');
         const birthdayData = Vue.ref();
         const currentDate = Vue.ref(new Date());
         const currentMonth = Vue.ref(currentDate.value.getMonth()+1);
@@ -27,22 +27,17 @@ const BirthdayCountCard = {
 
 
         const fetchBirthdays = async () => {
-			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router; 
-              
-              let ts = Math.round(currentDate.value.getTime() / 1000);  // unix timestamp
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getBirthdays?date=${ts}`;
-              isFetching.value = true;
-			  const res = await fetch(url)
-			  let response = await res.json();
-              isFetching.value = false;              
-			  console.log(response.retval);	  
-			  birthdayData.value = response.retval;			  
-			} catch (error) {
-			  console.log(error);
-              isFetching.value = false;           
-			}		
-		}
+            try {
+                let ts = Math.round(currentDate.value.getTime() / 1000);  // unix timestamp
+                isFetching.value = true;
+                const response = await $fhcApi.factory.Common.getBirthdays(ts);
+                birthdayData.value = response.data.retval;
+            } catch (error) {
+                console.log(error);
+            } finally {
+                isFetching.value = false;
+            }
+        }
 
         Vue.onMounted(() => {
             fetchBirthdays();
