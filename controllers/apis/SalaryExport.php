@@ -94,7 +94,7 @@ class SalaryExport extends Auth_Controller
 	{
 		$header = array("Personalnummer", "Name", "SVNR", "Vertragsart", "Gehaltstyp",
 			"Von", "Bis", "Betrag");
-		$delimiter = "\t";
+		$delimiter = ";";
 
 		if (count($data) > 0) {
 			header('Content-Type: application/csv; charset=utf-8');
