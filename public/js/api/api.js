@@ -17,7 +17,7 @@ import Deadline from "./deadline.js";
 import SalaryRange from "./salaryrange.js";
 import Valorisierung from "./valorisierung.js";
 import ValorisierungCheck from "./valorisierungcheck.js";
-import CheckPerson from "../../../../../js/api/checkperson.js";
+import CheckPerson from "../../../../js/api/checkperson.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
