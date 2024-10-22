@@ -31,7 +31,7 @@ export const OrgViewer = {
        
               let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
 
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/v1/OrgAPI/getOrgStructure?oe=${oe}`;
+              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgStructure?oe=${oe}`;
         
               isFetching.value = true  
               const res = await fetch(url)
@@ -48,7 +48,7 @@ export const OrgViewer = {
             try {
        
               let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/v1/OrgAPI/getOrgPersonen?oe=${oe}`;        
+              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgPersonen?oe=${oe}`;        
               const res = await fetch(url)
               let response = await res.json()    
               return { response };

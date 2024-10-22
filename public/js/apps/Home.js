@@ -2,7 +2,7 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../api/vbform/api.js";
+import pv21apifactory from "../api/api.js";
 import FhcApi from '../../../../js/plugin/FhcApi.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import { DeadlineIssueTable } from '../components/home/DeadlineIssueTable.js';

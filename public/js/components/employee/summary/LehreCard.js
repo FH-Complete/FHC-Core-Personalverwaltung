@@ -137,7 +137,7 @@ export const LehreCard = {
             }
 			try {
 			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getAllCourseHours?uid=${currentUID.value}`;
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllCourseHours?uid=${currentUID.value}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();
@@ -160,7 +160,7 @@ export const LehreCard = {
             }
 			try {
 			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getAllSupportHours?uid=${currentUID.value}`;
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllSupportHours?uid=${currentUID.value}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();

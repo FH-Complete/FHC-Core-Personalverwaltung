@@ -154,7 +154,7 @@ export const DVDialog = {
             isFetching.value = true
             let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             const endpoint =
-                `${full}/extensions/FHC-Core-Personalverwaltung/api/v1/DVAPI/createDV`;
+                `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/DVAPI/createDV`;
 
             const res = await fetch(endpoint,{
                 method: "POST",

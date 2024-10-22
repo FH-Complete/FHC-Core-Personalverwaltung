@@ -1,5 +1,5 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../api/vbform/api.js";
+import pv21apifactory from "../api/api.js";
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
@@ -172,97 +172,97 @@ const pvApp = Vue.createApp({
 
 const fetchNations = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getNations');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getNations');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchSachaufwandTyp = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getSachaufwandtyp');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getSachaufwandtyp');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchKontakttyp = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getKontakttyp');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getKontakttyp');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchAdressentyp = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getAdressentyp');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAdressentyp');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchSprache = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getSprache');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getSprache');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchAusbildung = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getAusbildung');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAusbildung');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchStandorteIntern = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getStandorteIntern');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getStandorteIntern');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchOrte = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getOrte');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getOrte');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchKarenztypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getKarenztypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getKarenztypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchGehaltstypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getGehaltstypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltstypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchVertragsarten = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getVertragsarten');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsarten');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchVertragsbestandteiltypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getVertragsbestandteiltypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsbestandteiltypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchTeilzeittypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getTeilzeittypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getTeilzeittypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchFreitexttypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getFreitexttypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getFreitexttypen');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchHourlyratetypes = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/CommonsAPI/getStundensatztypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getStundensatztypen');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchUnternehmen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/OrgAPI/getUnternehmen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getUnternehmen');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchBeendigungsgruende = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/v1/DVAPI/getDvEndeGruende');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/DVAPI/getDvEndeGruende');
 	return CoreRESTClient.getData(res.data);
 }
 
