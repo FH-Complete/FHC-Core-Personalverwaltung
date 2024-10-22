@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
+import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
 import { Toast } from '../Toast.js';
 
@@ -13,7 +14,7 @@ export const SalaryExport = {
         'progressbar': progressbar,
         Modal,
         ModalDialog,
-
+        CoreFilterCmpt,
         Toast,
     },
     props: {
@@ -85,6 +86,7 @@ export const SalaryExport = {
 
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
+        const filterPerson = ref('');
 
         const addMonths = (date, amount, isEndDate) => {
             const _date = new Date(date);
@@ -125,7 +127,7 @@ export const SalaryExport = {
         const exportSalarylist = async () => {
             isFetching.value = true
             try {
-              const response = await Vue.$fhcapi.SalaryExport.getAll(filterDate.value, true);        
+              const response = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, filterDate.value, true);        
               
              /*  // create file link in browser's memory
               const href = URL.createObjectURL(response.data);
@@ -162,7 +164,7 @@ export const SalaryExport = {
             
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.SalaryExport.getAll(filterDate.value, false);         
+              const res = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, filterDate.value, false);         
               if (res.data.error !==1) {
                 salaryExportList.value = res.data.retval;
               } else {
@@ -175,12 +177,6 @@ export const SalaryExport = {
             }
         }
         
-
-        const cancelHandler = async () => {
-            cancelAction.value = true;
-            modalRef.value.hide();
-            // await fetchData();
-        }
 
         const dateFormatter = (cell) => {
             return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
@@ -278,33 +274,98 @@ export const SalaryExport = {
                 //movableRows: true,
                 reactiveData: true,
                 selectable: true,
-                index: 'gehaltsband_betrag_id',
+                index: 'gehaltsband_betrag_id', // TODO custom index column
                 columns: columnsDef,
                 data: salaryExportList.value,
                 groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + "), " + data.vertragsart_bezeichnung}
             };
     
-            tabulator.value = new Tabulator(
+            /* tabulator.value = new Tabulator(
                 tableRef.value,
                 tabulatorOptions
             );
             tabulator.value.on("rowSelectionChanged", data => {
 				selectedData.value = data;
-			});
+			}); */
 
         })
 
         // Workaround to update tabulator
         Vue.watch(salaryExportList, (newVal, oldVal) => {
             console.log('salaryExportList changed');
-            tabulator.value?.setData(salaryExportList.value);
-        }, {deep: true})   
+            //tabulator.value?.setData(salaryExportList.value);
+            if( salaryTableRef.value?.tabulator !== null ) {
+                salaryTableRef.value.tabulator.setData(salaryExportList.value);
+            }
+        }, {deep: true}) 
+        
+        Vue.watch(filterPerson, () => {
+            if (filterDate.value == null) return;
+            fetchData();
+        })
+
+      // ---------------------------------
+      // Tabulator & Filter Component
+      // ---------------------------------
+
+      const salaryTableRef = ref(null);      
+
+      const salaryTableColumnsDef = [
+        /* { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
+        { title: 'Name', field: "name_gesamt", hozAlign: "left", sorter:"string", headerFilter: true, width:250 }, */
+        { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
+        { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates'  },
+        { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 },
+        { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+        { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+        { title: 'Gehalt', field: "betrag_valorisiert", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
+            formatterParams:{
+                decimal:",",
+                thousand:".",
+                negativeSign:true,
+                precision:2,
+            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },                
+        /*{ title: 'SVNr.', field: "svnr", hozAlign: "center", sorter:"string", headerFilter:true, width:150 },                
+         { title: 'Wochenstunden', field: "betrag_bis", sorter:"string", headerFilter:"list", hozAlign: "right", formatter:"money", 
+            formatterParams:{
+                decimal:",",
+                thousand:".",
+                negativeSign:true,
+                precision:2,
+            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} }, */
+            
+      ];
+
+      // Options
+
+      const salaryTabulatorOptions = Vue.reactive({
+          reactiveData: true,
+          data: salaryExportList.value,
+          index: 'gehaltsband_betrag_id', // TODO custom index column
+          layout: 'fitColumns',
+          columns: salaryTableColumnsDef,
+          groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + ") " }
+      })
+
+      const salaryTabulatorEvents = Vue.computed(() => [
+        {
+            event: 'cellEdited',            
+        },
+        {
+            event: 'tableBuilt',
+            handler: () => {
+                fetchData();
+            }
+        }
+      ]);
                 
 
-        return { t, isFetching, tableRef, tabulator, currentDate, presetDates, filterDate, exportSalarylist,
-            formatDateISO, filterDateHandler, modalRef,  
-            currentBetrag, decFilter, incFilter,
-            cancelHandler, formatDateGerman, progressValue, startOfMonth, startOfYear, endOfMonth, endOfYear }
+        return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, presetDates, filterDate, exportSalarylist,
+            formatDateISO, filterDateHandler, modalRef, 
+            salaryTabulatorEvents, salaryTabulatorOptions, 
+            currentBetrag, decFilter, incFilter, filterPerson,
+            formatDateGerman, progressValue, startOfMonth, startOfYear, endOfMonth, endOfYear }
 
     },
     template: `    
@@ -316,58 +377,53 @@ export const SalaryExport = {
             </div>           
         </div>
        
-        <div class="flex-grow-1 d-flex flex-column" style="width:100%"  >
-            <div class="d-flex">
-                <div class="me-auto">
-                    <button type="button" class="btn btn-sm btn-primary me-3" @click="exportSalarylist()"><i class="fa fa-file-csv"></i> Export</button>
-                </div>
-                <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">      
-                    <button type="button" class="btn btn-sm btn-primary" @click="decFilter()"  :disabled="filterDate==null"><i class="fa fa-minus"></i></button>  
-                    <datepicker id="filter" :modelValue="filterDate" 
-                        @update:model-value="filterDateHandler"
-                        v-bind:enable-time-picker="false"   
-                        :clearable="true"                                 
-                        range :preset-dates="presetDates"
-                        auto-apply 
-                        locale="de"
-                        format="dd.MM.yyyy"
-                        model-type="yyyy-MM-dd"
-                        input-class-name="dp-custom-input"
-                        style="max-width:240px;min-width:240px" >
-                        
-                        <template #preset-date-range-button="{ label, value, presetDate }">
-                            <span 
-                                role="button"
-                                :tabindex="0"
-                                @click="presetDate(value)"
-                                @keyup.enter.prevent="presetDate(value)"
-                                @keyup.space.prevent="presetDate(value)">
-                            {{ label }}
-                            </span>
-                        </template>
-                    </datepicker>
-                    <button type="button" class="btn btn-sm btn-primary me-2" @click="incFilter()" :disabled="filterDate==null"><i class="fa fa-plus"></i></button>  
-                </div>
-            </div>
-            <!-- TABULATOR -->
-            <div ref="tableRef" class="fhc-tabulator" style="height:300px"></div>
-        </div>
 
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                {{ t('gehaltsband','gehaltsband') }} '{{ currentBetrag?.bezeichnung }} ({{ formatDateGerman(currentBetrag?.von) }}-{{ formatDateGerman(currentBetrag?.von) }})' {{ t('person','wirklichLoeschen') }}?
-            </template>
-        </ModalDialog>
 
-        <Modal title="DV beenden" ref="modalRef">
-            <template #body>
-                <div >
-                    <progressbar :percent="progressValue" bgType="bg-info"></progressbar>
-                </div>
-            </template>
-            <template #footer>                
-                <button class="btn btn-primary"  @click="cancelHandler()">Abbrechen</button>
-            </template>
-        </Modal>
+        <core-filter-cmpt 
+			ref="salaryTableRef"
+			table-only
+			:side-menu="false"
+			:tabulator-options="salaryTabulatorOptions"
+            :tabulator-events="salaryTabulatorEvents"			
+			>
+			<template #actions>				
+			 	<div class="d-flex gap-2 align-items-baseline">					
+          
+                    <button type="button" class="btn btn-sm btn-primary me-2 text-nowrap" @click="exportSalarylist()"><i class="fa fa-file-csv"></i> Export</button>
+                    <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">      
+                        <label for="filterPerson" class="ms-5">Person: </label>
+                        <input type="text" class="form-control form-control-sm"  id="filterPerson" maxlength="32" v-model="filterPerson">
+
+                        <label for="filter_zeitraum" class="ms-1">Zeitraum: </label>
+                        <button type="button" class="btn btn-sm btn-primary" @click="decFilter()"  :disabled="filterDate==null"><i class="fa fa-minus"></i></button>  
+                        <datepicker id="filter" :modelValue="filterDate" 
+                            @update:model-value="filterDateHandler"
+                            v-bind:enable-time-picker="false"   
+                            :clearable="true"                                 
+                            range :preset-dates="presetDates"
+                            auto-apply 
+                            locale="de"
+                            format="dd.MM.yyyy"
+                            model-type="yyyy-MM-dd"
+                            input-class-name="dp-custom-input"
+                            style="max-width:240px;min-width:240px" >
+                            
+                            <template #preset-date-range-button="{ label, value, presetDate }">
+                                <span 
+                                    role="button"
+                                    :tabindex="0"
+                                    @click="presetDate(value)"
+                                    @keyup.enter.prevent="presetDate(value)"
+                                    @keyup.space.prevent="presetDate(value)">
+                                {{ label }}
+                                </span>
+                            </template>
+                        </datepicker>
+                        <button type="button" class="btn btn-sm btn-primary me-2" @click="incFilter()" :disabled="filterDate==null"><i class="fa fa-plus"></i></button>  
+                    </div>
+
+				</div>
+			</template>
+		</core-filter-cmpt>
     `
 }

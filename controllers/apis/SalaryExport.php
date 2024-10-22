@@ -43,6 +43,7 @@ class SalaryExport extends Auth_Controller
 
 		$von = $this->input->get('von', null);
 		$bis = $this->input->get('bis', null);
+		$person = $this->input->get('filterPerson', null);
 
 		// validate 
 		$date_von = DateTime::createFromFormat( 'Y-m-d', $von );
@@ -56,7 +57,7 @@ class SalaryExport extends Auth_Controller
         $von_datestring = $date_von->format("Y-m-d");
 		$bis_datestring = $date_bis->format("Y-m-d");
 
-		$this->_ci->GehaltsbestandteilModel->addSelect('tbl_gehaltsbestandteil.*, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, dienstverhaeltnis.von, dienstverhaeltnis.bis, vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr');
+		$this->_ci->GehaltsbestandteilModel->addSelect('tbl_gehaltsbestandteil.*, dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, dienstverhaeltnis.von, dienstverhaeltnis.bis, vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr');
 		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_dienstverhaeltnis dienstverhaeltnis', 'dienstverhaeltnis_id');
 		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_gehaltstyp gehaltstyp', 'gehaltstyp_kurzbz');
 		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_vertragsart vertragsart', 'vertragsart_kurzbz');
@@ -71,6 +72,14 @@ class SalaryExport extends Auth_Controller
 				((tbl_gehaltsbestandteil.von <= ". $this->_ci->db->escape($bis_datestring) .")
 					OR tbl_gehaltsbestandteil.von IS NULL)
 		";
+
+		if ($person != null && $person !== '') {
+			if (!is_numeric($person)) {
+				$where .= " AND (nachname ~* ".$this->_ci->db->escape($person). ") ";
+			} else {
+				$where .= " AND (mitarbeiter.personalnummer = ".$this->_ci->db->escape($person). ") ";
+			}
+		}
 
 		$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, $this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
 
@@ -92,7 +101,7 @@ class SalaryExport extends Auth_Controller
 
 	private function export2csv($data)
 	{
-		$header = array("Personalnummer", "Name", "SVNR", "Vertragsart", "Gehaltstyp",
+		$header = array("Personalnummer", "Name", "SVNR", "Vertragsart", "DV von", "DV bis", "Gehaltstyp",
 			"Von", "Bis", "Betrag");
 		$delimiter = ";";
 
@@ -109,7 +118,7 @@ class SalaryExport extends Auth_Controller
 			// Save data
 			foreach ($data as $element) {
 				fputcsv($fp, array($element->personalnummer, $element->name_gesamt, 
-					$element->svnr, $element->vertragsart_bezeichnung, $element->gehaltstyp_bezeichnung, 
+					$element->svnr, $element->vertragsart_bezeichnung, $element->dv_von, $element->dv_bis, $element->gehaltstyp_bezeichnung, 
 					$element->von, $element->bis, $element->betrag_valorisiert), $delimiter);
 			}
 			fclose($fp);
