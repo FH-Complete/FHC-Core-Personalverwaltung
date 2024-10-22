@@ -140,9 +140,31 @@ class PersonAPI extends Auth_Controller
         {
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
-            $surnameString = $payload['surname'];
-            $birthdateString = $payload['birthdate'];
-            $result = $this->ApiModel->filterPerson($surnameString, $birthdateString);
+			$nachnameString = null;
+			$vornameString = null;
+			$filterUnruly = null;
+			$birthdateString = null;
+			if(array_key_exists( 'surname', $payload)) {
+				$nachnameString = $payload['surname'];
+			} else if (array_key_exists( 'nachname', $payload) ) {
+				$nachnameString = $payload['nachname'];
+			}
+
+			if(array_key_exists('vorname', $payload)) {
+				$vornameString = $payload['vorname'];
+			}
+
+			if(array_key_exists('unruly', $payload)){
+				$filterUnruly = $payload['unruly'];
+			}
+
+			if(array_key_exists('birthdate', $payload)) {
+				$birthdateString = $payload['birthdate'];
+			} else if (array_key_exists('gebdatum', $payload)) {
+				// TODO: enable if gebdatum filter for unrulys is desired
+//				$birthdateString = $payload['gebdatum'];
+			}
+            $result = $this->ApiModel->filterPerson($nachnameString, $vornameString, $birthdateString, $filterUnruly);
 
             if (isSuccess($result))
 			    $this->outputJson($result);

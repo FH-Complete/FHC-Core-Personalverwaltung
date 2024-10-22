@@ -118,8 +118,6 @@ export const CreateWizard = {
                     </Step>                    
                 </Steps>
 
-                
-
             </template>
             <template #footer>
                 <div class="float-start">
@@ -138,8 +136,4 @@ export const CreateWizard = {
             </template>
 
         </Modal>`
-
-
 }
-
-
