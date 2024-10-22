@@ -18,7 +18,7 @@
 //import {LogsViewerTabulatorOptions} from './TabulatorSetup.js';
 //import {LogsViewerTabulatorEventHandlers} from './TabulatorSetup.js';
 import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../../api/vbform/api.js";
+import pv21apifactory from "../../api/api.js";
 
 import {CoreFilterCmpt} from '../../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
@@ -33,7 +33,7 @@ import { EmployeeContractInfo } from "../../components/employee/contract/Employe
 
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
-import karenz from "../../api/vbform/karenz.js";
+import karenz from "../../api/karenz.js";
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
