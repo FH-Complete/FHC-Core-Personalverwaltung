@@ -1,12 +1,14 @@
 <?php
 
+/**
+ * Library for handling checking of valorisation amounts
+ */
 class ValorisierungCheckLib
 {
 	private $_ci;
 
 	public function __construct()
 	{
-
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
@@ -17,6 +19,11 @@ class ValorisierungCheckLib
 
 	/************************************************************* public methods *******************************************************************/
 
+	/**
+	* Get valorisation data needed for valorisation check
+	* @param dienstverhaeltnisIdArr array with Dienstverhaletnisse, for which valorisation data should be retrieved
+	* @return array with data for each Gehaltsbestandteile (Gehaltsbestandteil id is key)
+	*/
 	public function getValorisationDataForCheck($dienstverhaeltnisIdArr)
 	{
 		$valorisationData = [];
@@ -126,8 +133,8 @@ class ValorisierungCheckLib
 	}
 
 	/**
-	 *
-	 * @param
+	 * Gets Dienstverheltnis data
+	 * @param dienstverhaeltnis_id
 	 * @return object success or error
 	 */
 	public function getDvData($dienstverhaeltnis_id)
@@ -151,6 +158,11 @@ class ValorisierungCheckLib
 		);
 	}
 
+	/**
+	 * Gets Gehaltsbestandteil data of a Dienstverhaeltnis
+	 * @param dienstverhaeltnis_id
+	 * @return object success or error
+	 */
 	public function getGehaltsbestandteilData($dienstverhaeltnis_id)
 	{
 		$qry = '
@@ -173,9 +185,9 @@ class ValorisierungCheckLib
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Get all Gehaltsbestandteile which did not pass the valorisaiton checks
+	 * @param dienstverhaeltnisIdArr all Dienstverhaeltnisse for which check should be executed
+	 * @return array with gehaltsbestandteil Ids which did not pass the checks
 	 */
 	public function getInvalidGehaltsbestandteile($dienstverhaeltnisIdArr)
 	{
@@ -186,8 +198,8 @@ class ValorisierungCheckLib
 	}
 
 	/**
-	 *
-	 * @param
+	 * Get Gehaltsbestandteile which did not pass the history check, because valorisation amounts are different from valorisation history
+	 * @param dienstverhaeltnisIdArr
 	 * @return object success or error
 	 */
 	public function getInvalidGehaltsbestandteileFromHistoryCheck($dienstverhaeltnisIdArr)
@@ -218,8 +230,8 @@ class ValorisierungCheckLib
 	}
 
 	/**
-	 *
-	 * @param
+	 * Get Gehaltsbestandteile which did not pass the history check, because valorisation amounts are different from valorisation history
+	 * @param dienstverhaeltnisIdArr
 	 * @return object success or error
 	 */
 	public function getInvalidGehaltsbestandteileFromBetragCheck($dienstverhaeltnisIdArr)
@@ -229,6 +241,7 @@ class ValorisierungCheckLib
 
 		foreach ($valorisationData as $geh_id => $dataArr)
 		{
+			// invalid if there are no applicable valorisations method and grundbetrag is not equal to final valorisation amount
 			if (!isset($dataArr['valorisation_methods']) || isEmptyArray($dataArr['valorisation_methods']))
 			{
 				if ($dataArr['final_betrag_valorisiert'] != $dataArr['grundbetrag']) $invalidGehaltsbestandteile[] = $geh_id;
@@ -237,6 +250,7 @@ class ValorisierungCheckLib
 
 			$lastValorisierung = $dataArr['valorisation_methods'][max(array_keys($dataArr['valorisation_methods']))];
 
+			// invalid if final valorisation amount is not equal to final history amount or calculated valorisation amount
 			if ((isset($dataArr['final_betrag_valorisiert'])
 					&& (!isset($lastValorisierung['calculated_betrag_valorisiert']) || !isset($lastValorisierung['historie_betrag_valorisiert'])))
 				|| $dataArr['final_betrag_valorisiert'] != $lastValorisierung['historie_betrag_valorisiert']
@@ -247,6 +261,11 @@ class ValorisierungCheckLib
 		return $invalidGehaltsbestandteile;
 	}
 
+	/**
+	* Reset ("undo") the valorisation
+	* @param dienstverhaeltnis_id
+	* @return success or error
+	*/
 	public function resetValorisation($dienstverhaeltnis_id)
 	{
 		$gehaltsbestandteilArr = [];

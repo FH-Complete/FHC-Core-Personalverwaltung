@@ -7,9 +7,7 @@ require_once 'ValorisierungFixBetrag.php';
 require_once 'ValorisierungGestaffelt.php';
 
 /**
- * Description of ValorisationFactory
- *
- * @author bambi
+ * Factory for retrieving correct valorisation method
  */
 class ValorisationFactory
 {
@@ -17,7 +15,12 @@ class ValorisationFactory
 	const VALORISATION_PROZENT	= 'ValorisierungProzent';
 	const VALORISATION_FIXBETRAG	= 'ValorisierungFixBetrag';
 	const VALORISATION_STAGGERED	= 'ValorisierungGestaffelt';
-	
+
+	/**
+	* Get the valorisation method object.
+	* @param method name of method
+	* @return valorisation method object
+	*/
 	public function getValorisationMethod($method) {
 		$instance = null;
 		switch ($method)
@@ -29,7 +32,7 @@ class ValorisationFactory
 			case self::VALORISATION_PROZENT:
 				$instance = new ValorisierungProzent();
 				break;
-			
+
 			case self::VALORISATION_FIXBETRAG:
 				$instance = new ValorisierungFixBetrag();
 				break;
@@ -37,7 +40,7 @@ class ValorisationFactory
 			case self::VALORISATION_STAGGERED:
 				$instance = new ValorisierungGestaffelt();
 				break;
-			
+
 			default:
 				throw new Exception('unknown Valorisation Method ' . $method);
 		}

@@ -1,8 +1,6 @@
 <?php
 /**
- * Description of ValorisierungGestaffelt
- *
- * @author bambi
+ * Valorisation method: valorisation increase in steps ("gestaffelt"), e.g. first 1000 7%, second 1500 5%, rest 2%
  */
 class ValorisierungGestaffelt extends AbstractValorisationMethod
 {
@@ -56,10 +54,15 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	protected function calcGehaltsbestandteilAnteile()
 	{
+		// get valorisation sum for all applicable Gehaltsbestandteile
 		$sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS);
+
+		// for each applicable Gehaltsbestandteil
 		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
+
+			// save fraction of valorisation amount (avoid division by 0)
 			$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] =
 				$sumvalsalary == 0 ? 0 : $gehaltsbestandteil->getBetrag_valorisiert() / $sumvalsalary;
 		}
@@ -67,13 +70,18 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	protected function scaleSumsalaryToFTE()
 	{
+		// get valorisation sum for all applicable Gehaltsbestandteile
 		$this->sumvalsalary = $this->calcSummeGehaltsbestandteile(self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS);
+
+		// if week hours are under full time hours
 		if( floatval($this->wochenstunden) < floatval($this->fulltimehours) && $this->wochenstunden > 0 && floatval($this->fulltimehours) > 0 )
 		{
+			// scale sum up to full time hours
 			$this->sumvalsalaryfte = $this->sumvalsalary / floatval($this->wochenstunden) * floatval($this->fulltimehours);
 		}
 		else
 		{
+			// otherwise just take sum amount
 			$this->sumvalsalaryfte = $this->sumvalsalary;
 		}
 	}
@@ -83,26 +91,37 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		$scalefactor_fte2pt = 1;
 		if( $this->wochenstunden < floatval($this->fulltimehours) && $this->wochenstunden > 0 && floatval($this->fulltimehours) > 0 )
 		{
+			// get scale factor if week hours are under fulltime hours
 			$scalefactor_fte2pt = 1 / floatval($this->fulltimehours) * floatval($this->wochenstunden);
 		}
 
 		$this->valorisation = 0;
+
+		// for each valorisation step
 		foreach($this->params->valorisierung->stufen as $idx => $step)
 		{
+			// if sum (over all Gehaltsbestandteile) of salary falls into step margin
 			if( $this->sumvalsalaryfte > $step->untergrenze )
 			{
 				if( $step->obergrenze !== NULL && $this->sumvalsalaryfte > $step->obergrenze )
 				{
+					// add amount falling into margin
 					$stepsum = $step->obergrenze - $step->untergrenze;
 				}
 				else
 				{
+					// if last entry, add remaining amount
 					$stepsum = $this->sumvalsalaryfte - $step->untergrenze;
 				}
 
+				// calculate percent for the step
 				$valstep = $stepsum * ($step->prozent / 100);
+
+				// scale down to week hours
 				$valscaled = $valstep * $scalefactor_fte2pt;
 				//echo "Step " . $idx . ": valfte: " . $valstep . " valtz: " . $valscaled . "\n";
+
+				// add valorisation
 				$this->valorisation += $valscaled;
 			}
 		}
@@ -110,9 +129,12 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 
 	protected function distributeValorisationToGehaltsbestandteile()
 	{
+		// for each applicable Gehaltsbestandteil
 		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
+
+			// add valorisation part to valorisaiton amount
 			$betrag_valorisiert =
 				$this->anteile[$gehaltsbestandteil->getGehaltsbestandteil_id()] * $this->valorisation
 				+ $gehaltsbestandteil->getBetrag_valorisiert();
