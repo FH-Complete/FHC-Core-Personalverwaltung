@@ -1,21 +1,20 @@
 <?php
 /**
- * Description of AbstractValorisationMethod
- *
- * @author bambi
+ * Generic valorisation method, contains logic used for all valorisation methods
  */
 abstract class AbstractValorisationMethod implements IValorisationMethod
 {
-	const ALLE_GBS = 0;
-	const NUR_ZU_VALORISIERENDE_GBS = 1;
-	const NUR_UNGESPERRTE_GBS = 2;
-	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = 3;
+	// constants for mode (which Gehaltsbestandteile are applicable?)
+	const ALLE_GBS = 0; // all Gehaltsbestandteile
+	const NUR_ZU_VALORISIERENDE_GBS = 1; // only Gehaltsbestandteile with valorisaiton = true
+	const NUR_UNGESPERRTE_GBS = 2; // only Gehaltsbestandteile which have no Valorisierungssperre
+	const NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS = 3; // valorisation = true and no Valorisierungssperre
 
 	protected $ci; // code igniter instance
-	protected $dienstverhaeltnis;
-	protected $vertragsbestandteile;
-	protected $gehaltsbestandteile;
-	protected $params;
+	protected $dienstverhaeltnis; // the DV for which Valorisation is calculated
+	protected $vertragsbestandteile; // Vertragsbestandteile of the DV
+	protected $gehaltsbestandteile; // Gehaltsbestandteile of the DV
+	protected $params; // parameter passed to valorisation method
 
 	public function __construct()
 	{
@@ -32,6 +31,9 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		$this->params = null;
 	}
 
+	/**
+	 * Check structure of passed params
+	 */
 	public function checkParams()
 	{
 		if (!isset($this->params->kriterien) || !is_object($this->params->kriterien))
@@ -45,6 +47,9 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		}
 	}
 
+	/**
+	* Initialize the valorisation method, set params needed for valorisation calculation
+	*/
 	public function initialize($valorisierungsdatum, $dienstverhaeltnis, $vertragsbestandteile, $gehaltsbestandteile, $params)
 	{
 		$this->valorisierungsdatum = $valorisierungsdatum;
@@ -54,6 +59,10 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		$this->params = $params;
 	}
 
+	/**
+	* Checks if a valorisation method is applicable
+	* @return bool true if applicable, false if not
+	*/
 	public function checkIfApplicable()
 	{
 		$sumsalary = $this->calcSummeGehaltsbestandteile();
@@ -78,6 +87,11 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		return true;
 	}
 
+	/**
+	 * Calculates sum of all Valorisation amounts (for all applicable Gehaltsbestandteile)
+	 * @param $mode which Gehaltsbestandteile should be taken into account?
+	 * @return valorisation amount sum
+	 */
 	public function calcSummeGehaltsbestandteile($mode=self::ALLE_GBS)
 	{
 		$sumsalary = 0;
@@ -89,9 +103,8 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Get all Valorisation amounts (for all applicable Gehaltsbestandteile)
+	 * @return array with all amounts
 	 */
 	public function getBetraegeValorisiertForEachGehaltsbestandteil()
 	{

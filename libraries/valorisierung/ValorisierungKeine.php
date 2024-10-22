@@ -1,8 +1,6 @@
 <?php
 /**
- * Description of ValorisierungKeine
- *
- * @author bambi
+ * Valorisation method: no valorisation
  */
 class ValorisierungKeine extends AbstractValorisationMethod
 {
