@@ -239,54 +239,7 @@ export const SalaryExport = {
 
         Vue.onMounted(async () => {
 
-            
-            await fetchData()
-            
-            const columnsDef = [
-                /* { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
-                { title: 'Name', field: "name_gesamt", hozAlign: "left", sorter:"string", headerFilter: true, width:250 },
-                { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, */
-                { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 },
-                { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:150, headerFilterFunc: 'dates', width:150 },
-                { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:150, headerFilterFunc: 'dates', width:150 },
-                { title: 'Gehalt', field: "betrag_valorisiert", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-                    formatterParams:{
-                        decimal:",",
-                        thousand:".",
-                        negativeSign:true,
-                        precision:2,
-                    }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },                
-                /*{ title: 'SVNr.', field: "svnr", hozAlign: "center", sorter:"string", headerFilter:true, width:150 },                
-                 { title: 'Wochenstunden', field: "betrag_bis", sorter:"string", headerFilter:"list", hozAlign: "right", formatter:"money", 
-                    formatterParams:{
-                        decimal:",",
-                        thousand:".",
-                        negativeSign:true,
-                        precision:2,
-                    }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} }, */
-              ];
-    
-            let tabulatorOptions = {
-                height:"100%",
-                width: "100%",
-                layout: "fitColumns",
-                //rowHeader:{headerSort:false, resizable: false, minWidth:30, width:30, rowHandle:true, formatter:"handle"},
-                //movableRows: true,
-                reactiveData: true,
-                selectable: true,
-                index: 'gehaltsband_betrag_id', // TODO custom index column
-                columns: columnsDef,
-                data: salaryExportList.value,
-                groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + "), " + data.vertragsart_bezeichnung}
-            };
-    
-            /* tabulator.value = new Tabulator(
-                tableRef.value,
-                tabulatorOptions
-            );
-            tabulator.value.on("rowSelectionChanged", data => {
-				selectedData.value = data;
-			}); */
+            // await fetchData()
 
         })
 
@@ -312,29 +265,38 @@ export const SalaryExport = {
 
       const salaryTableColumnsDef = [
         /* { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
-        { title: 'Name', field: "name_gesamt", hozAlign: "left", sorter:"string", headerFilter: true, width:250 }, */
+        { title: 'Name', field: "name_gesamt", hozAlign: "left", sorter:"string", headerFilter: true, width:250 }, */        
         { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates'  },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
         { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 },
+        { title: 'WS', field: "wochenstunden", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
+            formatterParams:{
+                decimal:",",
+                thousand:".",
+                negativeSign:true,
+                precision:2,
+            }, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },    
         { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
         { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
-        { title: 'Gehalt', field: "betrag_valorisiert", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
+        { title: 'Betrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:{
                 decimal:",",
                 thousand:".",
                 negativeSign:true,
                 precision:2,
-            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },                
-        /*{ title: 'SVNr.', field: "svnr", hozAlign: "center", sorter:"string", headerFilter:true, width:150 },                
-         { title: 'Wochenstunden', field: "betrag_bis", sorter:"string", headerFilter:"list", hozAlign: "right", formatter:"money", 
+            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },  
+        { title: 'Betrag val.', field: "betr_valorisiert_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:{
                 decimal:",",
                 thousand:".",
                 negativeSign:true,
                 precision:2,
-            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} }, */
-            
+            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },    
+        { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+        { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+        { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
+        { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 }, 
       ];
 
       // Options
