@@ -21,6 +21,11 @@ class ValorisierungHistorie_model extends DB_Model implements IEncryption
 		);
 	}
 
+	/**
+	* Gets Valorisation history for all Gehaltsbestandteile of given Dienstverhältnisse.
+	* @param $dienstverhaeltnisIdArr
+	* @return success or error object
+	*/
 	public function getValorisierungHistorieByDv($dienstverhaeltnisIdArr)
 	{
 		$params = [$dienstverhaeltnisIdArr];

@@ -18,6 +18,7 @@ import SalaryRange from "./salaryrange.js";
 import SalaryExport from "./salaryexport.js";
 import Valorisierung from "./valorisierung.js";
 import ValorisierungCheck from "./valorisierungcheck.js";
+import CheckPerson from "../../../../js/api/checkperson.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -39,5 +40,6 @@ export default {
     "SalaryRange": SalaryRange,
     "SalaryExport": SalaryExport,
     "Valorisierung": Valorisierung,
-    "ValorisierungCheck": ValorisierungCheck
+    "ValorisierungCheck": ValorisierungCheck,
+    "CheckPerson": CheckPerson
 };

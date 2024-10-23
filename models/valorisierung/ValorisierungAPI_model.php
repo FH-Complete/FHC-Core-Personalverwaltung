@@ -1,6 +1,12 @@
 <?php
 class ValorisierungAPI_model extends DB_Model
 {
+	/**
+	 * Gets all Dienstverhältnisse for a valorisation date.
+	 * @param valorisierungsDatum date of valorisation, all Dvs with date between start/end are returned
+	 * @param valorisierungsOeKurzbz
+	 * @param person_id
+	 */
 	public function getDVsForValorisation($valorisierungsDatum, $valorisierungsOeKurzbz = null, $person_id = null)
 	{
 		$sql = <<<EOSQL
@@ -16,11 +22,14 @@ SELECT
 	va.bezeichnung AS vertragsart,
 	oe.bezeichnung AS unternehmen,
 	dv.von AS dvvon,
-	dv.bis AS dvbis
+	dv.bis AS dvbis,
+	ma.personalnummer AS personalnummer
 FROM
 	hr.tbl_dienstverhaeltnis dv
 JOIN
-	public.tbl_benutzer b ON b.uid = dv.mitarbeiter_uid
+	public.tbl_mitarbeiter ma ON ma.mitarbeiter_uid = dv.mitarbeiter_uid
+JOIN
+	public.tbl_benutzer b ON b.uid = ma.mitarbeiter_uid
 JOIN
 	public.tbl_person p ON b.person_id = p.person_id
 JOIN

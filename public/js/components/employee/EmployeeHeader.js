@@ -212,6 +212,15 @@ export const EmployeeHeader = {
             statusRef.value.refresh();
         }
 
+        const getStatusTags = ()=> {
+            const statusArr = []
+
+            if(employee?.value?.unruly) {
+                statusArr.push({text: 'Unruly', css: 'bg-unruly rounded-0'})
+            }
+
+            return statusArr
+        }
 
         return {
             showModal,
@@ -225,7 +234,7 @@ export const EmployeeHeader = {
             toastRef,toastDeleteRef,
             redirect,
             FHC_JS_CONFIG,
-
+            getStatusTags,
             employee,
             fileInput,
             previewImage,
@@ -308,8 +317,7 @@ export const EmployeeHeader = {
                         </div>
                         <div v-else class="mb-1"><p-skeleton  style="width:35%"></p-skeleton></div>
                     </div>
-                    <EmployeeStatus v-if="!restricted" ref="statusRef"></EmployeeStatus>
-
+                    <EmployeeStatus v-if="!restricted" ref="statusRef" :tags="getStatusTags()"></EmployeeStatus>
                 </div>
 
             </div>
@@ -366,4 +374,3 @@ export const EmployeeHeader = {
 
         `
 }
-

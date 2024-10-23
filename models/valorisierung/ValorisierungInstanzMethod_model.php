@@ -20,6 +20,11 @@ class ValorisierungInstanzMethod_model extends DB_Model
 		}
 	}
 
+	/**
+	* Gets Valorisation Instanz Methods by Valorisation id
+	* @param $valorisierung_instanz_id
+	* @return array with Valorisation Instances
+	*/
 	public function loadValorisierungInstanzById($valorisierung_instanz_id)
 	{
 		$res = $this->loadWhere('valorisierung_instanz_id = ' . $this->escape($valorisierung_instanz_id));

@@ -321,10 +321,21 @@ export const SalaryExport = {
             }
         }
       ]);
+
+      const downloadconfig = {
+            'csv': {
+                formatter:'csv',
+                file: 'pv21_valorisation.csv',
+                options: {
+                    delimiter: ';',
+                    bom: true
+                }
+            }
+        }
                 
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, presetDates, filterDate, exportSalarylist,
-            formatDateISO, filterDateHandler, modalRef, 
+            formatDateISO, filterDateHandler, modalRef, downloadconfig,
             salaryTabulatorEvents, salaryTabulatorOptions, 
             currentBetrag, decFilter, incFilter, filterPerson,
             formatDateGerman, progressValue, startOfMonth, startOfYear, endOfMonth, endOfYear }
@@ -346,14 +357,14 @@ export const SalaryExport = {
 			table-only
 			:side-menu="false"
 			:tabulator-options="salaryTabulatorOptions"
-            :tabulator-events="salaryTabulatorEvents"			
+            :tabulator-events="salaryTabulatorEvents"		
+            :download="downloadconfig"	
 			>
 			<template #actions>				
 			 	<div class="d-flex gap-2 align-items-baseline">					
           
-                    <button type="button" class="btn btn-sm btn-primary me-2 text-nowrap" @click="exportSalarylist()"><i class="fa fa-file-csv"></i> Export</button>
                     <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">      
-                        <label for="filterPerson" class="ms-5">Person: </label>
+                        <label for="filterPerson" >Person: </label>
                         <input type="text" class="form-control form-control-sm"  id="filterPerson" maxlength="32" v-model="filterPerson">
 
                         <label for="filter_zeitraum" class="ms-1">Zeitraum: </label>

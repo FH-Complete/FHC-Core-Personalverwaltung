@@ -1,5 +1,5 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../api/vbform/api.js";
+import pv21apifactory from "../api/api.js";
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';

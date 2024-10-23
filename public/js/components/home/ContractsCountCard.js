@@ -11,7 +11,7 @@ const ContractCountCard = {
         showNew: Boolean
      },
      setup( props ) {
-        
+        const $fhcApi = Vue.inject('$fhcApi');
         const contractDataNew = Vue.ref();
         const currentDate = Vue.ref(new Date());
         const currentMonth = Vue.ref(currentDate.value.getMonth()+1);
@@ -78,29 +78,29 @@ const ContractCountCard = {
         }
         
         const fetchContractsNew = async () => {
-			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;  
-              
-              let method = "getContractNew";
-              if (!props.showNew) {
-                method = "getContractExpire";
-                title.value = "Dienstaustritte";
-              }
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/${method}?month=${currentMonth.value}&year=${currentYear.value}`;
-              isFetching.value = true;
-			  const res = await fetch(url)
-			  let response = await res.json();
-              isFetching.value = false;              
-			  contractDataNew.value = response.retval.map((row) => {
-                              row.von = (row.von === null) ? null : new Date(row.von);
-                              row.bis = (row.bis === null) ? null : new Date(row.bis);
-                              return row;
-                          });
-			} catch (error) {
-			  console.log(error);
-              isFetching.value = false;           
-			}		
-		}
+            const year = currentYear.value;
+            const month = currentMonth.value;
+            let response = null;
+
+            try {
+                isFetching.value = true;
+                if (!props.showNew) {
+                    title.value = "Dienstaustritte";
+                    response = await $fhcApi.factory.Common.getContractExpire(year, month);
+                } else {
+                    response = await $fhcApi.factory.Common.getContractNew(year, month);
+                }
+                contractDataNew.value = response.data.retval.map((row) => {
+                    row.von = (row.von === null) ? null : new Date(row.von);
+                    row.bis = (row.bis === null) ? null : new Date(row.bis);
+                    return row;
+                });
+            } catch (error) {
+                console.log(error);
+            } finally {
+                isFetching.value = false;
+            }
+        }
 
         Vue.onMounted(() => {
             fetchContractsNew();
@@ -108,7 +108,7 @@ const ContractCountCard = {
 
         const onPersonSelect = (event) => {
             contractsOverlay.value.hide();
-            let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
+            let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
             window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${event.data.person_id}/${event.data.uid}/summary`;
         }
       

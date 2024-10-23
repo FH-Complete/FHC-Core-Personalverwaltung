@@ -1,5 +1,5 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../api/vbform/api.js";
+import pv21apifactory from "../api/api.js";
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";

@@ -27,6 +27,9 @@ class Valorisierung extends FHCAPI_Controller
 		$this->terminateWithSuccess('not implemented');
 	}
 
+	/**
+	 * Get all valorisation instances which are not yet selected, i.e. valorisation has not yet been completed.
+	 */
 	public function getValorisierungsInstanzen()
 	{
 		$valinstanzen = $this->ValorisierungInstanz_model->getAllNonSelectedValorisierungInstanzen();
@@ -40,6 +43,9 @@ class Valorisierung extends FHCAPI_Controller
 		}
 	}
 
+	/**
+	 * Calculate all valorisation for a valorisation instance
+	 */
 	public function calculateValorisation()
 	{
 		$data = json_decode($this->input->raw_input_stream, true);
@@ -49,6 +55,9 @@ class Valorisierung extends FHCAPI_Controller
 		$this->terminateWithSuccess($this->ValorisierungLib->calculateAllValorisation());
 	}
 
+	/**
+	 * Initiates valorisation for a Valorisierung Kurzbezeichnung
+	 */
 	public function doValorisation()
 	{
 		$data = json_decode($this->input->raw_input_stream, true);
@@ -59,9 +68,7 @@ class Valorisierung extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Get the information for a valorisation instance
 	 */
 	public function getValorisationInfo()
 	{

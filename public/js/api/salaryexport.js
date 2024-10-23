@@ -1,7 +1,7 @@
 export default {
 	getAll: function(filterPerson, filterDate, exportCSV) {
 		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                + '/extensions/FHC-Core-Personalverwaltung/apis/SalaryExport/getAll';
+                + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getAll';
 		if (filterDate == null) return axios.get(url);
 
 		if (!filterPerson) {
@@ -16,7 +16,7 @@ export default {
 	},
 	getSalaryRangeList: function(uid) {
 		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                + '/extensions/FHC-Core-Personalverwaltung/apis/SalaryExport/getSalaryExportList';
+                + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getSalaryExportList';
 		return axios.get(url);
 	}
 	
