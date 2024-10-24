@@ -139,7 +139,9 @@ class GehaltsLib
 				'datum' => $date,
 				'betrag' => $bestandteil->betrag_valorisiert,
 				'gehaltsbestandteil_id' => $bestandteil->gehaltsbestandteil_id,
-				'mitarbeiter_uid' => $bestandteil->mitarbeiter_uid
+				'mitarbeiter_uid' => $bestandteil->mitarbeiter_uid,
+				'gehaltsbestandteil_von' => $bestandteil->von,
+				'gehaltsbestandteil_bis' => $bestandteil->bis
 			),
 			$this->_ci->GehaltshistorieModel->getEncryptedColumns()
 		);
