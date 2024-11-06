@@ -53,17 +53,21 @@ export const SalaryExport = {
         }
 
         const startOfMonth = () => {
-            const _date = new Date(currentDate.value);
-            _date.setDate(1);
+            const _date = new Date();
+            _date.setFullYear(filterMonth.value.year, filterMonth.value.month, 1); 
             _date.setHours(0, 0, 0, 0);
             return _date;
         }
+
         const endOfMonth = () => {
-            const _date = new Date(currentDate.value);
-            const month = _date.getMonth();
-            _date.setFullYear(_date.getFullYear(), month + 1, 0);
+            const _date = new Date();
+            _date.setFullYear(filterMonth.value.year, filterMonth.value.month + 1, 0);
             _date.setHours(23, 59, 59, 999);
             return _date;
+        }
+
+        const getFilterInterval = () => {
+            return [formatDateISO(startOfMonth()), formatDateISO(endOfMonth())]
         }
 
         const formatDateISO = (ds) => {
@@ -87,37 +91,10 @@ export const SalaryExport = {
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
         const filterPerson = ref('');
-
-        const addMonths = (date, amount, isEndDate) => {
-            const _date = new Date(date);
-            if (isNaN(amount)) return _date;
-            if (!amount) {
-              return _date;
-            }
-            const dayOfMonth = _date.getDate();
-            const endOfDesiredMonth = new Date(date);
-            endOfDesiredMonth.setMonth(_date.getMonth() + amount + 1, 0);
-            const daysInMonth = endOfDesiredMonth.getDate();
-            if (dayOfMonth >= daysInMonth || isEndDate) {
-                // If we're already at the end of the month, then this is the correct date
-                // and we're done.
-                return endOfDesiredMonth;
-            } else {
-                _date.setFullYear(
-                    endOfDesiredMonth.getFullYear(),
-                    endOfDesiredMonth.getMonth(),
-                    dayOfMonth,
-                  );
-                return _date;
-            }            
-        }
-        
-
-        const presetDates = ref([
-            { label: 'Heute', value: [new Date(), new Date()] },
-            { label: 'Aktuelles Monat', value: [startOfMonth(new Date()), endOfMonth(new Date())] },                  
-            { label: 'Aktuelles Jahr', value: [startOfYear(new Date()), endOfYear(new Date())] },
-          ]);
+        const filterMonth = ref({
+            month: new Date().getMonth(),
+            year: new Date().getFullYear()
+          });
 
         const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
@@ -127,7 +104,7 @@ export const SalaryExport = {
         const exportSalarylist = async () => {
             isFetching.value = true
             try {
-              const response = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, filterDate.value, true);        
+              const response = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, getFilterInterval(), true);        
               
              /*  // create file link in browser's memory
               const href = URL.createObjectURL(response.data);
@@ -152,10 +129,11 @@ export const SalaryExport = {
 
         const filterDateHandler = (d) => {            
             console.log('filter date set: ', d);
+            filterMonth.value = d;
             if (d == null) {
                 filterDate.value = null;
             } else {
-                filterDate.value = d; //truncateDate(new Date(d));
+                filterDate.value = d; 
             }
             fetchData()
         }
@@ -164,7 +142,7 @@ export const SalaryExport = {
             
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, filterDate.value, false);         
+              const res = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, getFilterInterval(), false);         
               if (res.data.error !==1) {
                 salaryExportList.value = res.data.retval;
               } else {
@@ -180,61 +158,6 @@ export const SalaryExport = {
 
         const dateFormatter = (cell) => {
             return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
-        }
-
-        const addDays = (date, amount) => {
-            const _date = new Date(date);
-            _date.setDate(_date.getDate() + amount);
-            return _date;
-        }
-
-        const diffInMonths = (_dateLeft, _dateRight) => {
-            const yearDiff = _dateLeft.getFullYear() - _dateRight.getFullYear();
-            const monthDiff = _dateLeft.getMonth() - _dateRight.getMonth();
-
-            return yearDiff * 12 + monthDiff;
-        }
-
-        const decFilter = () => {
-            let startDate = new Date(filterDate.value[0])
-            let endDate = new Date(filterDate.value[1])
-            let diffMonths = diffInMonths(startDate, endDate)
-            if (diffMonths == -11) {
-                // decrement year
-                startDate = addMonths(startDate, -12, false)
-                endDate = addMonths(endDate, -12, true)
-                filterDate.value = [formatDateISO(startDate), formatDateISO(endDate)]
-            } else if (diffMonths == 0 && startDate.getDate() == endDate.getDate()) {
-                // decrement day
-                startDate = addDays(startDate, -1)
-                endDate = addDays(endDate, -1)
-                filterDate.value = [formatDateISO(startDate), formatDateISO(endDate)]
-            } else {
-                // decrement month
-                filterDate.value = [formatDateISO(addMonths(startDate, -1, false)),formatDateISO(addMonths(endDate, -1, true))]
-            }
-            fetchData()
-        }
-
-        const incFilter = () => {
-            let startDate = new Date(filterDate.value[0])
-            let endDate = new Date(filterDate.value[1])
-            let diffMonths = diffInMonths(startDate, endDate)
-            if (diffMonths == -11) {
-                // increment year
-                startDate = addMonths(startDate, 12, false)
-                endDate = addMonths(endDate, 12, true)
-                filterDate.value = [formatDateISO(startDate), formatDateISO(endDate)]
-            } else if (diffMonths == 0 && startDate.getDate() == endDate.getDate()) {
-                // decrement day
-                startDate = addDays(startDate, 1)
-                endDate = addDays(endDate, 1)
-                filterDate.value = [formatDateISO(startDate), formatDateISO(endDate)]
-            } else {
-                // increment month
-                filterDate.value = [formatDateISO(addMonths(startDate, 1, false)),formatDateISO(addMonths(endDate, 1, true))]
-            }
-            fetchData()
         }
 
         Vue.onMounted(async () => {
@@ -334,11 +257,11 @@ export const SalaryExport = {
         }
                 
 
-        return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, presetDates, filterDate, exportSalarylist,
+        return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
             formatDateISO, filterDateHandler, modalRef, downloadconfig,
             salaryTabulatorEvents, salaryTabulatorOptions, 
-            currentBetrag, decFilter, incFilter, filterPerson,
-            formatDateGerman, progressValue, startOfMonth, startOfYear, endOfMonth, endOfYear }
+            currentBetrag, filterPerson,
+            formatDateGerman, progressValue }
 
     },
     template: `    
@@ -367,32 +290,17 @@ export const SalaryExport = {
                         <label for="filterPerson" >Person: </label>
                         <input type="text" class="form-control form-control-sm"  id="filterPerson" maxlength="32" v-model="filterPerson">
 
-                        <label for="filter_zeitraum" class="ms-1">Zeitraum: </label>
-                        <button type="button" class="btn btn-sm btn-primary" @click="decFilter()"  :disabled="filterDate==null"><i class="fa fa-minus"></i></button>  
-                        <datepicker id="filter" :modelValue="filterDate" 
-                            @update:model-value="filterDateHandler"
-                            v-bind:enable-time-picker="false"   
-                            :clearable="true"                                 
-                            range :preset-dates="presetDates"
+                        <label for="filter_zeitraum" class="ms-1">Monat: </label>
+                        <datepicker id="filter" :modelValue="filterMonth" 
+                            @update:model-value="filterDateHandler"                            
+                            :clearable="true"           
+                            month-picker
                             auto-apply 
                             locale="de"
-                            format="dd.MM.yyyy"
-                            model-type="yyyy-MM-dd"
                             input-class-name="dp-custom-input"
-                            style="max-width:240px;min-width:240px" >
+                            style="max-width:150px;min-width:150px" >
                             
-                            <template #preset-date-range-button="{ label, value, presetDate }">
-                                <span 
-                                    role="button"
-                                    :tabindex="0"
-                                    @click="presetDate(value)"
-                                    @keyup.enter.prevent="presetDate(value)"
-                                    @keyup.space.prevent="presetDate(value)">
-                                {{ label }}
-                                </span>
-                            </template>
                         </datepicker>
-                        <button type="button" class="btn btn-sm btn-primary me-2" @click="incFilter()" :disabled="filterDate==null"><i class="fa fa-plus"></i></button>  
                     </div>
 
 				</div>
