@@ -1,4 +1,4 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import fhcapifactory from "../../../../js/api/fhcapifactory.js";
 import pv21apifactory from "../api/api.js";
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";

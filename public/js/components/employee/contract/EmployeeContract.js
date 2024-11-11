@@ -88,6 +88,7 @@ export const EmployeeContract = {
 
         const readonly = ref(false);
         const valorisationValid = ref(true);
+        const showsalaryinfo = ref(false);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -210,6 +211,10 @@ export const EmployeeContract = {
 
         // Gehaltsbestandteile
         const fetchGBT = async (dv_id, date) => {
+            if(!showsalaryinfo.value) {
+                gbtList.value = [];
+                return;
+            }
 
             isFetching.value = true
             try {
@@ -225,6 +230,11 @@ export const EmployeeContract = {
 
         // fetch chart data
         const fetchGBTChartData = async (dv_id, date) => {
+            if(!showsalaryinfo.value) {
+                gbtChartData.value = [];
+                return;
+            }
+
             isFetching.value = true
             try {
                 const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
@@ -287,12 +297,13 @@ export const EmployeeContract = {
         )
         watch(
             currentDVID,
-            (newVal) => {
+            async (newVal) => {
                 if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
+                await checkSalaryPermission();
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
-                checkValorisation();
+                checkValorisation();                
             }
         )
         watch(
@@ -618,6 +629,10 @@ export const EmployeeContract = {
 
         const checkValorisation = async () => {
 			if (currentDVID != null && currentDVID.value > 0) {
+                                if(!showsalaryinfo.value) {
+                                    valorisationValid.value = true;
+                                    return;
+                                }
 				isFetching.value = true
 				try {
 					const res = await Vue.$fhcapi.ValorisierungCheck.checkValorisationValidityOfDv(currentDVID.value);
@@ -636,6 +651,27 @@ export const EmployeeContract = {
 			return `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/`+currentDVID.value;
         });
 
+        const checkSalaryPermission = async () => {
+            var isBerechtigt = false;
+            if (currentDVID != null && currentDVID.value > 0) {
+                try {
+                    const res = await Vue.$fhcapi.permission.isBerechtigt(
+                        'extension/pv21_gehaelter', 
+                        's',
+                        currentDV.value.oe_kurzbz, 
+                        null
+                    );
+                    isBerechtigt = res.data.data.isBerechtigt;
+                } catch (error) {
+                    isBerechtigt = false;
+                    console.log(error)
+                }
+            }
+            showsalaryinfo.value = isBerechtigt;
+            return isBerechtigt;
+        };
+        checkSalaryPermission();
+        
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, offCanvasRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
@@ -644,7 +680,8 @@ export const EmployeeContract = {
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, handleUpdateUnruly, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
-            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid
+            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
+            showsalaryinfo
         }
     },
     template: `
@@ -1060,7 +1097,7 @@ export const EmployeeContract = {
                         </div><!-- card -->
 
                         <!-- Bruttomonatsgehalt  -->
-                        <div class="card mt-3">
+                        <div class="card mt-3" v-if="showsalaryinfo">
                             <div class="card-header">
 								<div class="d-flex justify-content-between align-items-center">
 									<div><h5 class="mb-0">Bruttomonatsgehalt</h5></div>
@@ -1117,7 +1154,7 @@ export const EmployeeContract = {
                         </div> <!-- card -->
 
                         <!-- Gehalt -->
-                        <div class="card mt-3">
+                        <div class="card mt-3" v-if="showsalaryinfo">
                             <div class="card-header">
                                 <h5 class="mb-0">Gehalt</h5>
                             </div>
