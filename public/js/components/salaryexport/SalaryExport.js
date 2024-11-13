@@ -4,6 +4,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
+import {formatter} from '../bulk/valorisationformathelper.js';
 import { Toast } from '../Toast.js';
 
 
@@ -26,6 +27,7 @@ export const SalaryExport = {
         const salaryExportList = ref([])
         const currentBetrag = ref();
         const isFetching = ref(false);
+        const jobRunning = ref(false);
         const { t } = usePhrasen();
         const modalRef = ref();
         const cancelAction = ref(false);
@@ -34,6 +36,8 @@ export const SalaryExport = {
         const tableRef = ref(null); // reference to your table element
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
+
+        const abrechnungExists = ref(true);
 
 
         const startOfYear = () => {
@@ -136,15 +140,47 @@ export const SalaryExport = {
                 filterDate.value = d; 
             }
             fetchData()
+            
+        }
+
+        const dateFormatter = (cell) => {
+            return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
+        }
+
+        const formatDate = function(cell, formatterParams, onRendered) {
+            return formatter.formatDateGerman(cell.getValue());
+        };
+
+        const sumsDownload = function(value, data, type, params, column){
+            return value.toString().replace('.', ',');
+        }
+
+
+        const fetchAbrechnungExists = async (date) => {
+            try {
+                let i = getFilterInterval();
+                const res = await Vue.$fhcapi.SalaryExport.abrechnungExists(i[0]);  
+                if (res.data.error !==1) {                    
+                    abrechnungExists.value = false;
+                  } else {
+                    abrechnungExists.value = res.data.retval.length > 0;
+                  }   
+            } catch (error) {
+                 console.log(error)              
+            } 
         }
 
         const fetchData = async () => {
             
             isFetching.value = true
             try {
+              if (salaryTableRef.value != null) {
+                salaryTableRef.value.tabulator.dataLoader.alertLoader();
+              }
               const res = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, getFilterInterval(), false);         
               if (res.data.error !==1) {
                 salaryExportList.value = res.data.retval;
+                fetchAbrechnungExists();
               } else {
                 salaryExportList.value = [];
               }              
@@ -152,18 +188,25 @@ export const SalaryExport = {
               console.log(error)              
             } finally {
                 isFetching.value = false
+                if (salaryTableRef.value != null) {
+                    salaryTableRef.value.tabulator.dataLoader.clearAlert();
+                }
             }
         }
         
-
-        const dateFormatter = (cell) => {
-            return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
+        const runAbrechnungJob = async() => {
+            jobRunning.value = true
+            try {
+               let i = getFilterInterval();
+              const res = await Vue.$fhcapi.SalaryExport.runAbrechnungJob(i[0]);                                
+            } catch (error) {
+              console.log(error)              
+            } finally {
+                jobRunning.value = false               
+            }
         }
-
+        
         Vue.onMounted(async () => {
-
-            // await fetchData()
-
         })
 
         // Workaround to update tabulator
@@ -184,40 +227,34 @@ export const SalaryExport = {
       // Tabulator & Filter Component
       // ---------------------------------
 
-      const salaryTableRef = ref(null);      
+      const salaryTableRef = ref(null);   
+      
+      const moneyFormatterParams = {
+        decimal: ",",
+        thousand: ".",
+        symbol: false,
+        symbolAfter: false,
+        negativeSign: true,
+        precision: 2
+      };
 
       const salaryTableColumnsDef = [
         /* { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
         { title: 'Name', field: "name_gesamt", hozAlign: "left", sorter:"string", headerFilter: true, width:250 }, */        
         { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
-        { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates'  },
-        { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+        { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 },
         { title: 'WS', field: "wochenstunden", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:{
-                decimal:",",
-                thousand:".",
-                negativeSign:true,
-                precision:2,
-            }, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },    
-        { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
-        { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+            formatterParams:moneyFormatterParams, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
+        { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Betrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:{
-                decimal:",",
-                thousand:".",
-                negativeSign:true,
-                precision:2,
-            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },  
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },  
         { title: 'Betrag val.', field: "betr_valorisiert_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:{
-                decimal:",",
-                thousand:".",
-                negativeSign:true,
-                precision:2,
-            }, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true} },    
-        { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
-        { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: dateFormatter, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates' },
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
+        { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
         { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 }, 
       ];
@@ -248,7 +285,7 @@ export const SalaryExport = {
       const downloadconfig = {
             'csv': {
                 formatter:'csv',
-                file: 'pv21_valorisation.csv',
+                file: 'pv21_gehaltsliste.csv',
                 options: {
                     delimiter: ';',
                     bom: true
@@ -260,19 +297,11 @@ export const SalaryExport = {
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
             formatDateISO, filterDateHandler, modalRef, downloadconfig,
             salaryTabulatorEvents, salaryTabulatorOptions, 
-            currentBetrag, filterPerson,
-            formatDateGerman, progressValue }
+            currentBetrag, filterPerson, jobRunning,
+            formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
 
     },
     template: `    
-
-
-        <div v-if="isFetching" class="d-flex justify-content-center container-fluid px-0 " >
-            <div  class="spinner-border"  role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>           
-        </div>
-       
 
 
         <core-filter-cmpt 
@@ -301,6 +330,10 @@ export const SalaryExport = {
                             style="max-width:150px;min-width:150px" >
                             
                         </datepicker>
+
+                        <button  type="button" class="btn btn-sm btn-primary me-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Abrechnung erzeugen</button>
+
+
                     </div>
 
 				</div>

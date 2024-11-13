@@ -108,12 +108,28 @@ class GehaltsLib
 	{
 		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
 
-		$date = $this->getDate($date);
+		$date = $this->getDate(strtotime($date));
 
 		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
 		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);
 		$where .= " AND betrag = " . $this->_ci->db->escape($bestandteil->betrag_valorisiert);
 		$where .= " AND gehaltsbestandteil_id = " . $this->_ci->db->escape($bestandteil->gehaltsbestandteil_id);
+
+		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+
+		if (isError($result)) return $result;
+
+		return $result;
+	}
+
+	public function existsAnyGehaltshistorie($date)
+	{
+		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
+
+		$date = $this->getDate($date);
+
+		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
+		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);		
 
 		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, $this->_ci->GehaltshistorieModel->getEncryptedColumns());
 

@@ -18,6 +18,16 @@ export default {
 		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
                 + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getSalaryExportList';
 		return axios.get(url);
-	}
+	},
+	abrechnungExists: function(date) {
+		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+		+ '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/existsAnyGehaltshistorie';
+		return axios.get(url, { params: {date} });
+	},
+	runAbrechnungJob: function(date) {
+		var url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
+		+ '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/runGehaltshistorieJob';
+		return axios.get(url, { params: {date} });
+	},
 	
 };

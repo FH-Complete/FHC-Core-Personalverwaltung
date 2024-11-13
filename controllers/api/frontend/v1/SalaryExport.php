@@ -16,6 +16,8 @@ class SalaryExport extends Auth_Controller
 			array(
 				'index' => Self::DEFAULT_PERMISSION,
 				'getAll' => Self::DEFAULT_PERMISSION,
+				'existsAnyGehaltshistorie' => Self::DEFAULT_PERMISSION,
+				'runGehaltshistorieJob' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -29,6 +31,7 @@ class SalaryExport extends Auth_Controller
         $this->_ci = &get_instance();
 		$this->_ci->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltshistorie_model', 'GehaltshistorieModel');
 		$this->_ci->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
+		$this->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib');
 		// Loads the DB config to encrypt/decrypt data
 		$this->_ci->GehaltshistorieModel->config->load('db_crypt');
     }
@@ -36,6 +39,90 @@ class SalaryExport extends Auth_Controller
     function index()
     {}
 	
+
+	public function existsAnyGehaltshistorie()
+	{
+		$date = $this->input->get('date', null);
+
+		if ($date === null) {
+			$this->outputJsonError('missing date parameter');
+			return;
+		}
+
+		$result = $this->_ci->gehaltslib->existsAnyGehaltshistorie($date);
+		
+		if (isError($result))
+		{
+			$this->logError(getError($result));
+			$this->outputJsonError(getError($result));
+			return;
+		}
+
+		return $this->outputJson($result);
+
+	}
+
+	public function runGehaltshistorieJob()
+	{
+		$date = $this->input->get('date', null);	
+
+		if ($date === null) {
+			$this->outputJsonError('missing date parameter');
+			return;
+		}
+
+		// check for existing data to avoid unwanted modification
+		$result = $this->_ci->gehaltslib->existsAnyGehaltshistorie($date);
+		
+		if (isError($result))
+		{
+			$this->outputJsonError(getError($result));
+			return;
+		} elseif (hasData($result))
+		{
+			$this->outputJsonError(getError($result));
+			return;
+		}
+
+		// code copied from GehaltshistorieJob
+		$result = $this->_ci->gehaltslib->getBestandteile($date);
+		
+		if (isError($result))
+		{
+			$this->outputJsonError(getError($result));
+			return;
+		}
+
+		$count = 0;
+
+		if (!hasData($result))
+		{
+			// nothing to do
+		}
+		else
+		{
+			$bestandteile = getData($result);
+			foreach ($bestandteile as $bestandteil)
+			{
+				$abrechnung = $this->_ci->gehaltslib->existsGehaltshistorie($bestandteil, $date);
+				if (!hasData($abrechnung))
+				{
+					$result = $this->_ci->gehaltslib->addHistorie($bestandteil, $date);
+					
+					if (isError($result))
+					{
+						$this->outputJsonError(getError($result));
+						return;
+					}
+					else
+						$count++;
+				}
+			}
+		}
+	
+
+		return $this->outputJson(array("count" => $count));
+	}
 	
 	public function getAll()
 	{
@@ -56,15 +143,6 @@ class SalaryExport extends Auth_Controller
 
         $von_datestring = $date_von->format("Y-m-d");
 		$bis_datestring = $date_bis->format("Y-m-d");
-
-		/* replaced by raw SQL 
-		$this->_ci->GehaltsbestandteilModel->addSelect('tbl_gehaltsbestandteil.*, dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, dienstverhaeltnis.von, dienstverhaeltnis.bis, vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr');
-		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_dienstverhaeltnis dienstverhaeltnis', 'dienstverhaeltnis_id');
-		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_gehaltstyp gehaltstyp', 'gehaltstyp_kurzbz');
-		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_vertragsart vertragsart', 'vertragsart_kurzbz');
-		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_mitarbeiter mitarbeiter', 'mitarbeiter_uid');
-		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_benutzer benutzer', 'mitarbeiter.mitarbeiter_uid = benutzer.uid');
-		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_person person', 'benutzer.person_id = person.person_id'); */
 
 		$vbs_where = 'AND ((vertragsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
 							OR vertragsbestandteil.bis IS NULL)
