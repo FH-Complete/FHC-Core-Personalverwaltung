@@ -152,7 +152,7 @@ export const SalaryExport = {
         };
 
         const sumsDownload = function(value, data, type, params, column){
-            return value.toString().replace('.', ',');
+            return value != null ? value.toString().replace('.', ',') : '';
         }
 
 
@@ -239,8 +239,9 @@ export const SalaryExport = {
       };
 
       const salaryTableColumnsDef = [
-        /* { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
-        { title: 'Name', field: "name_gesamt", hozAlign: "left", sorter:"string", headerFilter: true, width:250 }, */        
+        { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
+        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:250, visible:false, download:true }, 
+        { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:250, visible:false, download:true }, 
         { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
@@ -255,6 +256,7 @@ export const SalaryExport = {
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
         { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'SVNr.', field: "svnr", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
         { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
         { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 }, 
       ];
@@ -267,7 +269,7 @@ export const SalaryExport = {
           index: 'gehaltsband_betrag_id', // TODO custom index column
           layout: 'fitColumns',
           columns: salaryTableColumnsDef,
-          groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + ") " }
+          groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + ") " },
       })
 
       const salaryTabulatorEvents = Vue.computed(() => [
@@ -288,9 +290,10 @@ export const SalaryExport = {
                 file: 'pv21_gehaltsliste.csv',
                 options: {
                     delimiter: ';',
-                    bom: true
+                    bom: true,
+                 //   rowGroups: true,
                 }
-            }
+            },            
         }
                 
 

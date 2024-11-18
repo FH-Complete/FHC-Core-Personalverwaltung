@@ -158,6 +158,7 @@ class SalaryExport extends Auth_Controller
 				gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
+				person.nachname,person.vorname,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden,
 				ksttypbezeichnung, kstorgbezeichnung
