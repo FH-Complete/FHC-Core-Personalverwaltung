@@ -22,13 +22,13 @@ class ValorisierungHistorie_model extends DB_Model implements IEncryption
 	}
 
 	/**
-	* Gets Valorisation history for all Gehaltsbestandteile of given Dienstverhältnisse.
-	* @param $dienstverhaeltnisIdArr
-	* @return success or error object
-	*/
+	 * Gets Valorisation history for all Gehaltsbestandteile of given Dienstverhältnisse.
+	 * @param $dienstverhaeltnisIdArr
+	 * @return success or error object
+	 */
 	public function getValorisierungHistorieByDv($dienstverhaeltnisIdArr)
 	{
-		$params = [$dienstverhaeltnisIdArr];
+		$params = [];
 
 		$qry = '
 			SELECT
@@ -42,9 +42,17 @@ class ValorisierungHistorie_model extends DB_Model implements IEncryption
 					hr.tbl_dienstverhaeltnis
 					JOIN hr.tbl_gehaltsbestandteil USING (dienstverhaeltnis_id)
 				WHERE
-					gehaltsbestandteil_id = h.gehaltsbestandteil_id
-					AND dienstverhaeltnis_id IN ?
-			)';
+					gehaltsbestandteil_id = h.gehaltsbestandteil_id';
+
+		if (isset($dienstverhaeltnisIdArr) && !isEmptyArray($dienstverhaeltnisIdArr))
+		{
+			$qry .= '
+					AND dienstverhaeltnis_id IN ?';
+
+			$params[] = $dienstverhaeltnisIdArr;
+		}
+
+		$qry .= ')';
 
 		return $this->execQuery(
 			$qry,
