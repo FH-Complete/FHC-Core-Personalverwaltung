@@ -14,7 +14,7 @@
 			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',       
-                       'public/css/components/searchbar.css',
+                       'public/css/components/searchbar/searchbar.css',
 					   'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css'],
       'customJSs' => [
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
