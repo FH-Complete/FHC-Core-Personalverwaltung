@@ -125,6 +125,7 @@ class GehaltsLib
 	public function existsAnyGehaltshistorie($date)
 	{
 		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
+		$this->_ci->GehaltshistorieModel->addLimit(1);
 
 		$date = $this->getDate($date);
 

@@ -1,4 +1,4 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import fhcapifactory from "../../../../js/api/fhcapifactory.js";
 import { CoreFilterAPIs } from '../../../../js/components/filter/API.js';
 
 Vue.$fhcapi = fhcapifactory;
@@ -139,9 +139,9 @@ export const searchbaroptions = {
 };
 
 export const searchfunction = (searchsettings) =>  {
-    return Vue.$fhcapi.Search.search(searchsettings);  
+    return Vue.$fhcapi.search.search(searchsettings);  
 };
 
 export const searchfunctiondummy = (searchsettings) => {
-    return Vue.$fhcapi.Search.searchdummy(searchsettings);  
+    return Vue.$fhcapi.search.searchdummy(searchsettings);  
 };

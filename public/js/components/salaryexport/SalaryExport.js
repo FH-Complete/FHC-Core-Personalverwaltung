@@ -23,7 +23,7 @@ export const SalaryExport = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue
+        const { toRefs, ref, inject } = Vue
         const salaryExportList = ref([])
         const currentBetrag = ref();
         const isFetching = ref(false);
@@ -38,6 +38,8 @@ export const SalaryExport = {
         const selectedData = ref([]);
 
         const abrechnungExists = ref(true);
+
+        const fhcApi = inject('$fhcApi');
 
 
         const startOfYear = () => {
@@ -156,14 +158,14 @@ export const SalaryExport = {
         }
 
 
-        const fetchAbrechnungExists = async (date) => {
+        const fetchAbrechnungExists = async () => {
             try {
                 let i = getFilterInterval();
-                const res = await Vue.$fhcapi.SalaryExport.abrechnungExists(i[0]);  
-                if (res.data.error !==1) {                    
+                const res = await fhcApi.factory.SalaryExport.abrechnungExists(i[0]);  
+                if (res.error !==1) {                    
                     abrechnungExists.value = false;
                   } else {
-                    abrechnungExists.value = res.data.retval.length > 0;
+                    abrechnungExists.value = res.retval.length > 0;
                   }   
             } catch (error) {
                  console.log(error)              
@@ -177,9 +179,12 @@ export const SalaryExport = {
               if (salaryTableRef.value != null) {
                 salaryTableRef.value.tabulator.dataLoader.alertLoader();
               }
-              const res = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, getFilterInterval(), false);         
-              if (res.data.error !==1) {
-                salaryExportList.value = res.data.retval;
+              
+              const res = await fhcApi.factory.SalaryExport.getAll(filterPerson.value, getFilterInterval(), false); 
+
+              if (res.error !==1) {
+                salaryExportList.value = res.retval.map((item, index) => ({index, ...item}));
+                //salaryExportList.value = res.retval;
                 fetchAbrechnungExists();
               } else {
                 salaryExportList.value = [];
@@ -239,6 +244,7 @@ export const SalaryExport = {
       };
 
       const salaryTableColumnsDef = [
+        { title: 'Index', field: "index", visible:false, download:false },        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:250, visible:false, download:true }, 
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:250, visible:false, download:true }, 
@@ -264,9 +270,10 @@ export const SalaryExport = {
       // Options
 
       const salaryTabulatorOptions = Vue.reactive({
+          height: "700px",
           reactiveData: true,
           data: salaryExportList.value,
-          index: 'gehaltsband_betrag_id', // TODO custom index column
+          index: 'index', 
           layout: 'fitColumns',
           columns: salaryTableColumnsDef,
           groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + ") " },
