@@ -330,10 +330,7 @@ export const SalaryExport = {
 			<template #actions>				
 			 	<div class="d-flex gap-2 align-items-baseline">					
           
-                    <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">      
-                        <label for="filterPerson" >Person: </label>
-                        <input type="text" class="form-control form-control-sm"  id="filterPerson" maxlength="32" v-model="filterPerson">
-
+                    <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">                              
                         <label for="filter_zeitraum" class="ms-1">Monat: </label>
                         <datepicker id="filter" :modelValue="filterMonth" 
                             @update:model-value="filterDateHandler"                            
