@@ -158,9 +158,6 @@ export const searchbaroptions = {
 };
 
 export const searchfunction = (searchsettings) =>  {
-    return Vue.$fhcapi.Search.search(searchsettings);  
+    return Vue.$fhcapi.search.search(searchsettings);  
 };
 
-export const searchfunctiondummy = (searchsettings) => {
-    return Vue.$fhcapi.Search.searchdummy(searchsettings);  
-};
