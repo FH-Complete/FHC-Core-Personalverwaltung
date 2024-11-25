@@ -15,11 +15,10 @@ export default {
 			  filterPerson: filterPerson 
 		});
 	},
-	getSalaryRangeList: function(uid) {
-		let url = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getSalaryExportList';
-		return axios.get(url);
-	},
+	/* getSalaryRangeList: function(uid) {
+		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getSalaryExportList';
+		return this.$fhcApi.get(url);
+	}, */
 	abrechnungExists: function(date) {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/existsAnyGehaltshistorie';
 		return this.$fhcApi.get(url, {date} );
