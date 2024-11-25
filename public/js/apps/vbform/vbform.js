@@ -4,7 +4,7 @@ import debug_viewer from '../../components/vbform/debug_viewer.js';
 import vbformhelper from '../../components/vbform/vbformhelper.js';
 import store from '../../components/vbform/vbsharedstate.js';
 import presets_chooser from './../../components/vbform/presets_chooser.js';
-import fhcapifactory from "../../api/vbform/api.js";
+import fhcapifactory from "../../api/api.js";
 
 Vue.$fhcapi = fhcapifactory;
 

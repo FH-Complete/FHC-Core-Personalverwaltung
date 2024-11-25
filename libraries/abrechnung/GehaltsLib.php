@@ -24,16 +24,16 @@ class GehaltsLib
 		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_mitarbeiter mitarbeiter', 'mitarbeiter_uid');
 		$this->_ci->GehaltsbestandteilModel->addJoin('public.tbl_benutzer benutzer', 'mitarbeiter.mitarbeiter_uid = benutzer.uid');
 
-		$date = $this->getDate($date);
+		$dt = ($date === null) ? new DateTime() : new DateTime($date);
+		$dt->modify('first day of this month');
+		$monthstart = $dt->format('Y-m-d');
+		$dt->modify('last day of this month');
+		$monthend = $dt->format('Y-m-d');
+
 		$where = "
-				(((EXTRACT(MONTH FROM tbl_gehaltsbestandteil.bis) >= ". $this->_ci->db->escape($date['month']) .")
-					AND (EXTRACT(YEAR FROM tbl_gehaltsbestandteil.bis) >= ". $this->_ci->db->escape($date['year']) ."))
-					OR tbl_gehaltsbestandteil.bis IS NULL)
+				COALESCE(tbl_gehaltsbestandteil.bis, '2170-12-31') >= ". $this->_ci->db->escape($monthstart) ."
 				AND
-				(((EXTRACT(MONTH FROM tbl_gehaltsbestandteil.von) <= ". $this->_ci->db->escape($date['month']) .")
-					AND (EXTRACT(YEAR FROM tbl_gehaltsbestandteil.von) <= ". $this->_ci->db->escape($date['year']) ."))
-					OR tbl_gehaltsbestandteil.von IS NULL)
-		";
+				COALESCE(tbl_gehaltsbestandteil.von, '1970-01-01') <= ". $this->_ci->db->escape($monthend);
 
 		if (is_null($user) || strtolower($user) === "null")
 			$where .= ' AND benutzer.aktiv';
@@ -139,7 +139,9 @@ class GehaltsLib
 				'datum' => $date,
 				'betrag' => $bestandteil->betrag_valorisiert,
 				'gehaltsbestandteil_id' => $bestandteil->gehaltsbestandteil_id,
-				'mitarbeiter_uid' => $bestandteil->mitarbeiter_uid
+				'mitarbeiter_uid' => $bestandteil->mitarbeiter_uid,
+				'gehaltsbestandteil_von' => $bestandteil->von,
+				'gehaltsbestandteil_bis' => $bestandteil->bis
 			),
 			$this->_ci->GehaltshistorieModel->getEncryptedColumns()
 		);
