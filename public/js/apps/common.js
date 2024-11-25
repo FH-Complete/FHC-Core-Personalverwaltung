@@ -50,6 +50,12 @@ export const searchbaroptions = {
 		raum: {
 			defaultaction: {
 				type: "link",
+				renderif: function(data) {
+					if(data.content_id === "N/A"){
+						return false;
+					}
+					return true;
+				},
 				action: function(data) { 
 					const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
 						'cms/content.php?content_id=' + data.content_id;
@@ -152,9 +158,6 @@ export const searchbaroptions = {
 };
 
 export const searchfunction = (searchsettings) =>  {
-    return Vue.$fhcapi.Search.search(searchsettings);  
+    return Vue.$fhcapi.search.search(searchsettings);  
 };
 
-export const searchfunctiondummy = (searchsettings) => {
-    return Vue.$fhcapi.Search.searchdummy(searchsettings);  
-};
