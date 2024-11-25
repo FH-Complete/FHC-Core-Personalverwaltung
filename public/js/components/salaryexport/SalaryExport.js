@@ -243,11 +243,11 @@ export const SalaryExport = {
         precision: 2
       };
 
-      const salaryTableColumnsDef = [
-        { title: 'Index', field: "index", visible:false, download:false },        
+      const salaryTableColumnsDef = [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
-        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:250, visible:false, download:true }, 
-        { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:250, visible:false, download:true }, 
+        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+        { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+        { title: 'Index', field: "index", visible:false, download:false, hozAlign: "left", sorter:"string", headerFilter:true, width:100  },        
         { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
@@ -273,10 +273,15 @@ export const SalaryExport = {
           height: "700px",
           reactiveData: true,
           data: salaryExportList.value,
-          index: 'index', 
+         // index: 'index', 
           layout: 'fitColumns',
           columns: salaryTableColumnsDef,
-          groupBy:function(data) { return data.personalnummer + " " + data.name_gesamt + " (" + data.svnr + ") " },
+          groupBy: "personalnummer",
+          groupHeader:function(value, count, data, group) { return data[0].personalnummer + " " + data[0].name_gesamt + " (" + data[0].svnr + ") " },
+          initialSort:[
+            {column:"nachname", dir:"asc"}, //sort by this first
+            // {column:"vorname", dir:"asc"}, //then sort by this second -> wrong sort order tabulator bug?
+          ]
       })
 
       const salaryTabulatorEvents = Vue.computed(() => [
