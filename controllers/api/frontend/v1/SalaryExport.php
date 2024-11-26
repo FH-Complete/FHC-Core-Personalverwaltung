@@ -159,7 +159,7 @@ class SalaryExport extends Auth_Controller
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
 				person.nachname,person.vorname,
-				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis,
+				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden,
 				ksttypbezeichnung, kstorgbezeichnung
 			FROM
@@ -173,8 +173,10 @@ class SalaryExport extends Auth_Controller
 				JOIN public.tbl_person person on (benutzer.person_id = person.person_id)
 				LEFT JOIN (
 					SELECT
-						dienstverhaeltnis_id,vertragsbestandteil_id,von,bis 
+						dienstverhaeltnis_id,vertragsbestandteil_id,von,bis,karenztyp_kurzbz, hr.tbl_karenztyp.bezeichnung
 					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
+					JOIN hr.tbl_vertragsbestandteil_karenz vb_karenztyp using(vertragsbestandteil_id)
+					JOIN hr.tbl_karenztyp using(karenztyp_kurzbz)
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'karenz\'
 						'.$vbs_where.'	
