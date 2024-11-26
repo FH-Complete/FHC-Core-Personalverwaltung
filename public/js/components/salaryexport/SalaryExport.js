@@ -245,6 +245,7 @@ export const SalaryExport = {
 
       const salaryTableColumnsDef = [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
+        { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Index', field: "index", visible:false, download:false, hozAlign: "left", sorter:"string", headerFilter:true, width:100  },        

@@ -180,7 +180,9 @@ class SalaryExport extends Auth_Controller
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'freitext\'
 						'.$vbs_where.'	
-				) as vertragsbestandteil_freitext USING(dienstverhaeltnis_id)
+				) as vertragsbestandteil_freitext 
+				 	ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_freitext.dienstverhaeltnis_id 
+            			AND gehaltsbestandteil.vertragsbestandteil_id=vertragsbestandteil_freitext.vertragsbestandteil_id)
 
 				LEFT JOIN (
 					SELECT
@@ -191,7 +193,7 @@ class SalaryExport extends Auth_Controller
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'karenz\'
 						'.$vbs_where.'	
-					) as vertragsbestandteil_karenz USING(dienstverhaeltnis_id)
+					) as vertragsbestandteil_karenz ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_karenz.dienstverhaeltnis_id)
 				LEFT JOIN (
 					SELECT
 						dienstverhaeltnis_id,vertragsbestandteil_id,von,bis,wochenstunden,teilzeittyp_kurzbz 
@@ -201,7 +203,7 @@ class SalaryExport extends Auth_Controller
 						vertragsbestandteiltyp_kurzbz=\'stunden\'
 						'.$vbs_where.'
 						
-					) as vertragsbestandteil_stunden USING(dienstverhaeltnis_id)
+					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id)
 				 
 				LEFT JOIN (
 					SELECT 
@@ -215,7 +217,7 @@ class SalaryExport extends Auth_Controller
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'funktion\' AND funktion_kurzbz=\'kstzuordnung\'
 						'.$vbs_where.'
-			    ) kst USING(dienstverhaeltnis_id)
+			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
 				
 			WHERE
 				((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
