@@ -4,7 +4,7 @@ import FhcApi from '../../../../js/plugin/FhcApi.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "./common.js";
+import {searchbaroptions } from "./common.js";
 import {SalaryExport} from '../components/salaryexport/SalaryExport.js';
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
@@ -18,7 +18,7 @@ const pvApp = Vue.createApp(	{
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
-			searchfunction: searchfunction,
+			searchfunction: Vue.$fhcapi.search.search,
 			appSideMenuEntries: {},
 		}
 	},
