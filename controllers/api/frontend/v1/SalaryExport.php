@@ -161,7 +161,7 @@ class SalaryExport extends Auth_Controller
 				person.nachname,person.vorname,
 				vertragsbestandteil_freitext.freitexttyp_kurzbz,vertragsbestandteil_freitext.titel freitext_titel, vertragsbestandteil_freitext.anmerkung as freitext_anmerkung,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
-				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden,
+				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
 				ksttypbezeichnung, kstorgbezeichnung
 			FROM
 
@@ -196,9 +196,10 @@ class SalaryExport extends Auth_Controller
 					) as vertragsbestandteil_karenz ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_karenz.dienstverhaeltnis_id)
 				LEFT JOIN (
 					SELECT
-						dienstverhaeltnis_id,vertragsbestandteil_id,von,bis,wochenstunden,teilzeittyp_kurzbz 
+						dienstverhaeltnis_id,vertragsbestandteil_id,von,bis,wochenstunden,teilzeittyp_kurzbz, hr.tbl_teilzeittyp.bezeichnung 
 					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
 						JOIN hr.tbl_vertragsbestandteil_stunden USING(vertragsbestandteil_id)
+						JOIN hr.tbl_teilzeittyp USING(teilzeittyp_kurzbz)
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'stunden\'
 						'.$vbs_where.'
