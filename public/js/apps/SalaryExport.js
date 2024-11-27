@@ -18,7 +18,7 @@ const pvApp = Vue.createApp(	{
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
-			searchfunction: Vue.$fhcapi.search.search,
+			searchfunction: this.$fhcapi.factory.search.search, 
 			appSideMenuEntries: {},
 		}
 	},
