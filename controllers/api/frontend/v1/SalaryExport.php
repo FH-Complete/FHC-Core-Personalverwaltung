@@ -130,6 +130,7 @@ class SalaryExport extends Auth_Controller
 
 		$von = $this->input->get('von', null);
 		$bis = $this->input->get('bis', null);
+		$orgID = $this->input->get('orgID', null);
 		$person = $this->input->get('filterPerson', null);
 
 		// validate 
@@ -138,6 +139,11 @@ class SalaryExport extends Auth_Controller
 
 		if ($date_von === false || $date_bis === false) {
 			$this->outputJsonError('no date range selected');
+			return;
+		}
+
+		if ($orgID === null) {
+			$this->outputJsonError('no organisation selected');
 			return;
 		}
 
@@ -237,6 +243,8 @@ class SalaryExport extends Auth_Controller
 				$where .= " AND (mitarbeiter.personalnummer = ".$this->_ci->db->escape($person). ") ";
 			}
 		}
+
+		$where .= " AND (dienstverhaeltnis.oe_kurzbz = ".$this->_ci->db->escape($orgID). ") ";
 
 		$qry = $qry.$where;
 

@@ -1,5 +1,6 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
+import {OrgChooser} from "../organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
@@ -17,6 +18,7 @@ export const SalaryExport = {
         ModalDialog,
         CoreFilterCmpt,
         Toast,
+        OrgChooser,
     },
     props: {
        
@@ -32,6 +34,7 @@ export const SalaryExport = {
         const modalRef = ref();
         const cancelAction = ref(false);
         const progressValue = ref(0);
+        const currentOrgID = Vue.ref();
 
         const tableRef = ref(null); // reference to your table element
         const tabulator = ref(null); // variable to hold your table
@@ -180,7 +183,7 @@ export const SalaryExport = {
                 salaryTableRef.value.tabulator.dataLoader.alertLoader();
               }
               
-              const res = await fhcApi.factory.SalaryExport.getAll(filterPerson.value, getFilterInterval(), false); 
+              const res = await fhcApi.factory.SalaryExport.getAll(currentOrgID.value, filterPerson.value, getFilterInterval(), false); 
 
               if (res.error !==1) {
                 salaryExportList.value = res.retval.map((item, index) => ({index, ...item}));
@@ -311,10 +314,16 @@ export const SalaryExport = {
                 }
             },            
         }
+
+        const orgSelectedHandler = (orgID) => {
+            console.log('org selected:', orgID);
+			currentOrgID.value = orgID;
+            if (!!filterMonth.value.year) fetchData();
+        }
                 
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
-            formatDateISO, filterDateHandler, modalRef, downloadconfig,
+            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler,
             salaryTabulatorEvents, salaryTabulatorOptions, 
             currentBetrag, filterPerson, jobRunning,
             formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
@@ -334,7 +343,9 @@ export const SalaryExport = {
 			<template #actions>				
 			 	<div class="d-flex gap-2 align-items-baseline">					
           
-                    <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">                              
+                    <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">       
+                        <label for="orgchooser" class="ms-1">Organisation: </label>
+                        <org-chooser  @org-selected="orgSelectedHandler" class="form-control form-select-sm" id="orgchooser"></org-chooser>                       
                         <label for="filter_zeitraum" class="ms-1">Monat: </label>
                         <datepicker id="filter" :modelValue="filterMonth" 
                             @update:model-value="filterDateHandler"                            

@@ -1,5 +1,5 @@
 export default {
-	getAll: function(filterPerson, filterDate, exportCSV) {
+	getAll: function(orgID, filterPerson, filterDate, exportCSV) {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getAll';
 
 		if (filterDate == null) this.$fhcApi.get(url);
@@ -12,6 +12,7 @@ export default {
 			{ von: filterDate[0], 
 			  bis: filterDate[1], 
 			  export: !!exportCSV, 
+			  orgID: orgID,
 			  filterPerson: filterPerson 
 		});
 	},
