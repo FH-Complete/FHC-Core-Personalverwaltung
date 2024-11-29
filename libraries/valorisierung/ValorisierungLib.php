@@ -72,6 +72,15 @@ class ValorisierungLib
 	}
 
 	/**
+	* Get all current Dvs
+	* @return Dienstverhaeltnis data
+	*/
+	public function getDienstverhaeltnisse()
+	{
+		return $this->_getAllDvs();
+	}
+
+	/**
 	* Calculate valorisation for a single Dienstverhältnis
 	* @param $dienstverhaeltnis_id
 	* @param $fetchData wether to automatically fetch data for the DV (Gehaltsbestandteile etc.)
@@ -122,9 +131,10 @@ class ValorisierungLib
 	/**
 	* Get Dienstverhältnis data needed for calculation
 	* @param $dienstverhaeltnis_id
+	* @param $date if no date defined by valorisation instance, this fallback date is used. If null, not date limitations.
 	* @return the Dienstverhältnis data
 	*/
-	public function fetchDvDataForValorisation($dienstverhaeltnis_id)
+	public function fetchDvDataForValorisation($dienstverhaeltnis_id, $date = null)
 	{
 		$dvData = [
 			'dienverhaeltnis' => null,
@@ -135,13 +145,13 @@ class ValorisierungLib
 		$dvData['dienstverhaeltnis'] = $this->_ci->VertragsbestandteilLib->fetchDienstverhaeltnis($dienstverhaeltnis_id);
 		$dvData['vertragsbestandteile'] = $this->_ci->VertragsbestandteilLib->fetchVertragsbestandteile(
 			$dienstverhaeltnis_id,
-			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->valorisierungsdatum ?? $date,
 			false
 		);
 
 		$dvData['gehaltsbestandteile'] = $this->_ci->GehaltsbestandteilLib->fetchGehaltsbestandteile(
 			$dienstverhaeltnis_id,
-			$this->_valorisierungInstanz->valorisierungsdatum,
+			$this->_valorisierungInstanz->valorisierungsdatum ?? $date,
 			false
 		);
 
@@ -219,6 +229,50 @@ class ValorisierungLib
 	}
 
 	/**
+	* Gets all current DVs
+	*/
+	private function _getAllDvs()
+	{
+		$dvsdata = [];
+		$today = date('Y-m-d');
+
+		// get all Dienstverhältnisse valid today
+		$result = $this->_ci->ValorisierungAPI_model->getDVsForValorisation(
+			$today
+		);
+
+		if(isError($result))
+		{
+			throw new Exception('Fehler beim Holen der Dienstverhältnisse');
+		}
+
+		if(hasData($result))
+		{
+			$noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
+
+			// calculate sum for each DV
+			$dvsdata = getData($result);
+			foreach($dvsdata as $dvdata)
+			{
+				$this->setDvDataForValorisation($this->fetchDvDataForValorisation($dvdata->dienstverhaeltnis_id, $today));
+				$noval->initialize(
+					$today,
+					$this->_dienstverhaeltnis,
+					$this->_vertragsbestandteile,
+					$this->_gehaltsbestandteile,
+					null
+				);
+
+				$dvdata->valorisierungmethode = null;
+				$dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
+				$dvdata->sumsalarypostval = null;
+			}
+		}
+
+		return $dvsdata;
+	}
+
+	/**
 	* Calculate the valorisation for data of one Dienstverhältnis
 	* @param object $dvdata
 	*/
@@ -290,7 +344,13 @@ class ValorisierungLib
 			// less than 1 valorisation method applicable: using valorisation method with typ "no valorisation" (for correct display of sums)
 			$noval = $this->_ci->ValorisationFactory->getValorisationMethod($this->_ci->ValorisationFactory::VALORISATION_KEINE);
 
-			$noval->initialize($this->_valorisierungInstanz->valorisierungsdatum, $this->_dienstverhaeltnis, $this->_vertragsbestandteile, $this->_gehaltsbestandteile, null);
+			$noval->initialize(
+				$this->_valorisierungInstanz->valorisierungsdatum,
+				$this->_dienstverhaeltnis,
+				$this->_vertragsbestandteile,
+				$this->_gehaltsbestandteile,
+				null
+			);
 			$dvdata->valorisierungmethode = 'keine Valorisierung';
 			$dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
 			$dvdata->sumsalarypostval = $dvdata->sumsalarypreval;

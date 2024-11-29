@@ -14,11 +14,13 @@ class Valorisierung extends FHCAPI_Controller
 				'calculateValorisation' => self::DEFAULT_PERMISSION,
 				'doValorisation' => self::DEFAULT_PERMISSION.'w',
 				'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION,
+				'getDienstverhaeltnisse' => self::DEFAULT_PERMISSION,
 				'getValorisationInfo' => self::DEFAULT_PERMISSION
 			)
 		);
 
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungAPI_model');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
 	}
 
@@ -53,6 +55,14 @@ class Valorisierung extends FHCAPI_Controller
 		$this->ValorisierungLib->initialize(['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']]);
 
 		$this->terminateWithSuccess($this->ValorisierungLib->calculateAllValorisation());
+	}
+
+	/**
+	 * Calculate all valorisation for a valorisation instance
+	 */
+	public function getDienstverhaeltnisse()
+	{
+		$this->terminateWithSuccess($this->ValorisierungLib->getDienstverhaeltnisse());
 	}
 
 	/**

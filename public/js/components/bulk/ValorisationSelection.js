@@ -23,19 +23,19 @@ export const ValorisationSelection = {
 				valorisierung_oe_kurzbz: '',
 				valorisierungsdatum: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
-						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-						'/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/calculateValorisation',
+					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+					'/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/calculateValorisation',
 				formatter: formatter,
-                                downloadconfig: {
-                                    'csv': {
-                                        formatter:'csv',
-                                        file: 'pv21_valorisation.csv',
-                                        options: {
-                                            delimiter: ';',
-                                            bom: true
-                                        }
-                                    }
-                                }
+				downloadconfig: {
+					'csv': {
+						formatter:'csv',
+						file: 'pv21_valorisation.csv',
+						options: {
+							delimiter: ';',
+							bom: true
+						}
+					}
+				}
 			};
 		},
 		created: function() {
@@ -81,6 +81,15 @@ export const ValorisationSelection = {
 						this.$refs.valorisationTabulator.tabulator.setData([]);
 						this.getValorisierungsInstanzen();
 						this.$fhcAlert.alertSuccess('Valorisierung erfolgreich abgeschlossen');
+						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
+					})
+					.catch(this.handleErrors);
+			},
+			getDienstverhaeltnisse: function() {
+				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
+				const res = Vue.$fhcapi.Valorisierung.getDienstverhaeltnisse()
+					.then((response) => {
+						this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 					})
 					.catch(this.handleErrors);
@@ -134,29 +143,39 @@ export const ValorisationSelection = {
 					precision: 2
 				};
 
-                                const sumsDownload = function(value, data, type, params, column){
-                                    return value.toString().replace('.', ',');
-                                }
+				const sumsDownload = function(value, data, type, params, column){
+					return value.toString().replace('.', ',');
+				}
 
 				const formatDate = function(cell, formatterParams, onRendered) {
 					return formatter.formatDateGerman(cell.getValue());
 				};
 
+				const nullValueFormatter = function(row) {
+					const rowData = row.getData();
+
+					for (let column in rowData) {
+						rowData[column] = rowData[column] ?? '-';
+					}
+				};
+
 				return {
-						height: '75vh',
-						// Unique ID
-						index: 'dienstverhaeltnis_id',
+					height: '75vh',
+					// Unique ID
+					index: 'dienstverhaeltnis_id',
 
-						// @see: https://tabulator.info/docs/5.2/layout#layout
-						// This is the default option and can be omitted.
-						layout: 'fitDataStretch',
+					// @see: https://tabulator.info/docs/5.2/layout#layout
+					// This is the default option and can be omitted.
+					layout: 'fitDataStretch',
 
-						footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p>&sum; nach Valorisierung: <span id="sumpostval"></span></p><p>Differenz: <span id="valdifferenz"></span></p></div>',
+					footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p id="sumpostval_text">&sum; nach Valorisierung: <span id="sumpostval"></span></p><p id="differenz_text">Differenz: <span id="valdifferenz"></span></p></div>',
 
-						// Column definitions
-						columns: [
+					rowFormatter: nullValueFormatter,
+
+					// Column definitions
+					columns: [
 						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
-                                                {title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
+						{title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
 						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
@@ -188,11 +207,20 @@ export const ValorisationSelection = {
 							var elvaldifferenz = document.getElementById("valdifferenz");
 							var sumpreval = 0;
 							var sumpostval = 0;
+							var noSalaryPostval = true;
 
 							for( var row of rows ) {
-								sumpreval += row.getData().sumsalarypreval;
-								sumpostval += row.getData().sumsalarypostval;
+								var rowData = row.getData();
+								sumpreval += rowData.sumsalarypreval;
+								if (rowData.sumsalarypostval != null) {
+									sumpostval += rowData.sumsalarypostval;
+									noSalaryPostval = false;
+								}
 							}
+
+							// hide salary after valorisation, if it doesn't exist
+							document.getElementById('sumpostval_text').style.display = noSalaryPostval ? 'none' : 'block';
+							document.getElementById('differenz_text').style.display = noSalaryPostval ? 'none' : 'block';
 
 							const moneyformatter = this.modules.format.getFormatter('money');
 							const moneyformatterparams = {
@@ -229,11 +257,11 @@ export const ValorisationSelection = {
 						}
 					},
 					{
-							event: "dataLoaded",
-							handler: function(data) {
-								var el = document.getElementById("totalrows_count");
-								el.innerHTML = (false !== data && typeof data != 'undefined') ? data.length : 0;
-							}
+						event: "dataLoaded",
+						handler: function(data) {
+							var el = document.getElementById("totalrows_count");
+							el.innerHTML = (false !== data && typeof data != 'undefined') ? data.length : 0;
+						}
 					}
 				];
 			},
@@ -349,11 +377,11 @@ export const ValorisationSelection = {
 			<div class="mh-100 pb-5" >
 				<core-filter-cmpt
 					ref="valorisationTabulator"
-                                        :download="downloadconfig"
+					:download="downloadconfig"
 					table-only
 					:side-menu="false"
 					:tabulator-options="tabulatorOptions"
-								:tabulator-events="tabulatorEvents">
+					:tabulator-events="tabulatorEvents">
 					<template #actions>
 						<div class="d-flex gap-2 align-items-baseline mb-4">
 							<select v-model="valorisierung_oe_kurzbz" class="form-select w-auto" aria-label="ValorisierungsOe" @change="oeChanged">
@@ -390,6 +418,7 @@ export const ValorisationSelection = {
 						</div>
 						<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
 						<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
+						<button class="btn btn-secondary ms-5" @click="getDienstverhaeltnisse">Gehälter anzeigen</button>
 					</template>
 				</core-filter-cmpt>
 			</div>

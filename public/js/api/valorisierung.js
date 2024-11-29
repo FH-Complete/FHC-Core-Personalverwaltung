@@ -14,6 +14,11 @@ export default {
             + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisierungsInstanzen';
     return axios.get(url);
   },
+  getDienstverhaeltnisse: function() {
+    var url = FHC_JS_DATA_STORAGE_OBJECT.app_root  + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getDienstverhaeltnisse';
+    return axios.get(url);
+  },
   getValorisationInfo: function(valorisierunginstanz_kurzbz) {
     var url = FHC_JS_DATA_STORAGE_OBJECT.app_root  + FHC_JS_DATA_STORAGE_OBJECT.ci_router
             + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisationInfo';
