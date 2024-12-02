@@ -161,7 +161,7 @@ class SalaryExport extends Auth_Controller
 				gehaltsbestandteil.gehaltsbestandteil_id,gehaltsbestandteil.von, gehaltsbestandteil.bis, 
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
 				dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
-				gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
+				gehaltstyp.gehaltstyp_kurzbz, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
 				person.nachname,person.vorname,
@@ -210,12 +210,13 @@ class SalaryExport extends Auth_Controller
 						vertragsbestandteiltyp_kurzbz=\'stunden\'
 						'.$vbs_where.'
 						
-					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id)
+					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id
+					 AND gehaltsbestandteil.vertragsbestandteil_id=vertragsbestandteil_stunden.vertragsbestandteil_id)
 				 
 				LEFT JOIN (
 					SELECT 
 						bf.uid,oe_kurzbz,public.tbl_organisationseinheit.bezeichnung kstorgbezeichnung, kstt.bezeichnung AS ksttypbezeichnung, 
-						vertragsbestandteil.dienstverhaeltnis_id
+						vertragsbestandteil.dienstverhaeltnis_id, vertragsbestandteil.vertragsbestandteil_id
 					FROM 
 						public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit using(oe_kurzbz)
 						JOIN public.tbl_organisationseinheittyp kstt USING(organisationseinheittyp_kurzbz)
@@ -224,10 +225,12 @@ class SalaryExport extends Auth_Controller
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'funktion\' AND funktion_kurzbz=\'kstzuordnung\'
 						'.$vbs_where.'
+						-- ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id AND kst.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
 				
 			WHERE
-				((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
+				gehaltstyp.gehaltstyp_kurzbz <> \'lohnausgleichatz\'
+				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
 					OR gehaltsbestandteil.bis IS NULL)
 				AND
 				((gehaltsbestandteil.von <= '. $this->_ci->db->escape($bis_datestring) .')
