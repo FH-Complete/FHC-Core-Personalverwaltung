@@ -205,7 +205,7 @@ class SalaryExport extends Auth_Controller
 						dienstverhaeltnis_id,vertragsbestandteil_id,von,bis,wochenstunden,teilzeittyp_kurzbz, hr.tbl_teilzeittyp.bezeichnung 
 					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
 						JOIN hr.tbl_vertragsbestandteil_stunden USING(vertragsbestandteil_id)
-						JOIN hr.tbl_teilzeittyp USING(teilzeittyp_kurzbz)
+						LEFT JOIN hr.tbl_teilzeittyp USING(teilzeittyp_kurzbz)
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'stunden\'
 						'.$vbs_where.'
