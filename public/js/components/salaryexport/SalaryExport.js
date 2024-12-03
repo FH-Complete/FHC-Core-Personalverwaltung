@@ -25,7 +25,7 @@ export const SalaryExport = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref, inject } = Vue
+        const { ref, inject } = Vue
         const salaryExportList = ref([])
         const currentBetrag = ref();
         const isFetching = ref(false);
@@ -34,7 +34,8 @@ export const SalaryExport = {
         const modalRef = ref();
         const cancelAction = ref(false);
         const progressValue = ref(0);
-        const currentOrgID = Vue.ref();
+        const currentOrgID = ref();
+        const listType = ref('live');
 
         const tableRef = ref(null); // reference to your table element
         const tabulator = ref(null); // variable to hold your table
@@ -179,11 +180,11 @@ export const SalaryExport = {
             
             isFetching.value = true
             try {
-              if (salaryTableRef.value != null) {
+              if (salaryTableRef.value.tabulator != null) {
                 salaryTableRef.value.tabulator.dataLoader.alertLoader();
               }
               
-              const res = await fhcApi.factory.SalaryExport.getAll(currentOrgID.value, filterPerson.value, getFilterInterval(), false); 
+              const res = await fhcApi.factory.SalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false); 
 
               if (res.error !==1) {
                 salaryExportList.value = res.retval.map((item, index) => ({index, ...item}));
@@ -196,7 +197,7 @@ export const SalaryExport = {
               console.log(error)              
             } finally {
                 isFetching.value = false
-                if (salaryTableRef.value != null) {
+                if (salaryTableRef.value.tabulator != null) {
                     salaryTableRef.value.tabulator.dataLoader.clearAlert();
                 }
             }
@@ -228,6 +229,11 @@ export const SalaryExport = {
         
         Vue.watch(filterPerson, () => {
             if (filterDate.value == null) return;
+            fetchData();
+        })
+
+        Vue.watch(listType, () => {
+            console.log('listType changed', listType.value);
             fetchData();
         })
 
@@ -324,7 +330,7 @@ export const SalaryExport = {
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
             formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler,
-            salaryTabulatorEvents, salaryTabulatorOptions, 
+            salaryTabulatorEvents, salaryTabulatorOptions, listType,
             currentBetrag, filterPerson, jobRunning,
             formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
 
@@ -361,13 +367,13 @@ export const SalaryExport = {
                         <button  type="button" class="btn btn-sm btn-primary me-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>
 
                         <div class="btn-group btn-group-sm" role="group" aria-label="Gehaltsliste Button Group">
-                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypLive" autocomplete="off" checked>
+                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypLive" autocomplete="off" value="live" v-model="listType"  >
                             <label class="btn btn-outline-primary" for="btnGListeTypLive">Live</label>
 
-                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypHistorie" autocomplete="off">
+                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypHistorie" autocomplete="off" value="history" v-model="listType">
                             <label class="btn btn-outline-primary" for="btnGListeTypHistorie">Historie</label>
 
-                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypDiff" autocomplete="off">
+                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypDiff" autocomplete="off" value="diff" v-model="listType">
                             <label class="btn btn-outline-primary" for="btnGListeTypDiff">Diff</label>
                         </div>
 
