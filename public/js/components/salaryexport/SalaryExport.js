@@ -206,12 +206,24 @@ export const SalaryExport = {
         const runAbrechnungJob = async() => {
             jobRunning.value = true
             try {
+                if (salaryTableRef.value.tabulator != null) {
+                    salaryTableRef.value.tabulator.dataLoader.alertLoader();
+                }
                let i = getFilterInterval();
-              const res = await Vue.$fhcapi.SalaryExport.runAbrechnungJob(i[0]);                                
+               const res = await Vue.$fhcapi.SalaryExport.runAbrechnungJob(i[0]);      
+               if (listType.value != 'history') {
+                 listType.value = 'history';                          
+               } else {
+                 fetchData();                                 
+               }
+               fetchAbrechnungExists();
             } catch (error) {
               console.log(error)              
             } finally {
-                jobRunning.value = false               
+                jobRunning.value = false    
+                if (salaryTableRef.value.tabulator != null) {
+                    salaryTableRef.value.tabulator.dataLoader.clearAlert();
+                }           
             }
         }
         
@@ -252,7 +264,7 @@ export const SalaryExport = {
         precision: 2
       };
 
-      const salaryTableColumnsDef = [        
+      const salaryTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
         { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
@@ -271,7 +283,9 @@ export const SalaryExport = {
         { title: 'Betrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },  
         { title: 'Betrag val.', field: "betr_valorisiert_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true }, 
+        { title: 'H-Betrag val.', field: "hbetrag_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money",
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true }, 
         { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },
@@ -373,8 +387,8 @@ export const SalaryExport = {
                             <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypHistorie" autocomplete="off" value="history" v-model="listType">
                             <label class="btn btn-outline-primary" for="btnGListeTypHistorie">Historie</label>
 
-                            <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypDiff" autocomplete="off" value="diff" v-model="listType">
-                            <label class="btn btn-outline-primary" for="btnGListeTypDiff">Diff</label>
+                            <!--input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypDiff" autocomplete="off" value="diff" v-model="listType">
+                            <label class="btn btn-outline-primary" for="btnGListeTypDiff">Diff</label-->
                         </div>
 
                     </div>
