@@ -131,6 +131,7 @@ class SalaryExport extends Auth_Controller
 		$von = $this->input->get('von', null);
 		$bis = $this->input->get('bis', null);
 		$orgID = $this->input->get('orgID', null);
+		$listType = $this->input->get('listType', 'live');
 		$person = $this->input->get('filterPerson', null);
 
 		// validate 
@@ -156,7 +157,7 @@ class SalaryExport extends Auth_Controller
 						((vertragsbestandteil.von <= '. $this->_ci->db->escape($bis_datestring) .')
 							OR vertragsbestandteil.von IS NULL)';
 
-		$qry = '
+		$qry_live = '
 			SELECT
 				gehaltsbestandteil.gehaltsbestandteil_id,gehaltsbestandteil.von, gehaltsbestandteil.bis, 
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
@@ -249,14 +250,37 @@ class SalaryExport extends Auth_Controller
 
 		$where .= " AND (dienstverhaeltnis.oe_kurzbz = ".$this->_ci->db->escape($orgID). ") ";
 
-		$qry = $qry.$where;
+		$qry_live = $qry_live.$where;
+
+		$qry_history = '
+			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted
+			FROM (select * from ('.$qry_live.') t) live 
+			JOIN hr.tbl_gehaltshistorie historie using(gehaltsbestandteil_id) 
+			WHERE
+				((historie.datum >= '. $this->_ci->db->escape($von_datestring) .')
+					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')
+			';
 
 		//$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, $this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
+
+		
+
+		switch ($listType) {
+			case 'live':
+				$qry = $qry_live;
+				$encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
+				break;
+			case 'history':
+				$qry = $qry_history;
+				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+				break;
+		};
+
 
 		$result = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
 			$qry,
 			[],
-			$this->_ci->GehaltsbestandteilModel->getEncryptedColumns()
+			$encryptedCols
 		);
 
 		//var_dump($result);
@@ -266,7 +290,7 @@ class SalaryExport extends Auth_Controller
 			return;
 		}
 
-		if (!hasData($result)) return error("Keine Gehaltsbestandteile gefunden!");
+		//if (!hasData($result)) return error("Keine Gehaltsbestandteile gefunden!");
 
 		if (!$export) {
 			return $this->outputJson($result);
