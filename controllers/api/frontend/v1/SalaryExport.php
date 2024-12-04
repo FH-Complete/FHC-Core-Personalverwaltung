@@ -18,6 +18,7 @@ class SalaryExport extends Auth_Controller
 				'getAll' => Self::DEFAULT_PERMISSION,
 				'existsAnyGehaltshistorie' => Self::DEFAULT_PERMISSION,
 				'runGehaltshistorieJob' => Self::DEFAULT_PERMISSION,
+				'deleteGehaltshistorie' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -79,8 +80,15 @@ class SalaryExport extends Auth_Controller
 			return;
 		}
 
+		$orgID = $this->input->get('orgID', null);
+
+		if ($orgID === null) {
+			$this->outputJsonError('no organisation selected');
+			return;
+		}
+
 		// check for existing data to avoid unwanted modification
-		$result = $this->_ci->gehaltslib->existsAnyGehaltshistorie($date);
+		$result = $this->_ci->gehaltslib->existsAnyGehaltshistorie($date, $orgID);
 		
 		if (isError($result))
 		{
@@ -93,7 +101,7 @@ class SalaryExport extends Auth_Controller
 		}
 
 		// code copied from GehaltshistorieJob
-		$result = $this->_ci->gehaltslib->getBestandteile($date);
+		$result = $this->_ci->gehaltslib->getBestandteile($date, null, $orgID);
 		
 		if (isError($result))
 		{
@@ -130,6 +138,38 @@ class SalaryExport extends Auth_Controller
 	
 
 		return $this->outputJson(array("count" => $count));
+	}
+
+	public function deleteGehaltshistorie()
+	{
+		if($this->input->method() === 'post')
+        {
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+			$orgID = null;
+			$date = null;
+			
+			if(array_key_exists( 'orgID', $payload)) {
+				$orgID = $payload['orgID'];
+			}
+			if(array_key_exists( 'date', $payload)) {
+				$date = $payload['date'];
+			}
+
+			$result = $this->_ci->gehaltslib->deleteGehaltshistorieByOrg($orgID, $date);
+		
+			if (isError($result))
+			{
+				$this->logError(getError($result));
+				$this->outputJsonError(getError($result));
+				return;
+			}
+
+			return $this->outputJson($result);
+
+		} else {
+            $this->output->set_status_header('405');
+        }
 	}
 	
 	public function getAll()

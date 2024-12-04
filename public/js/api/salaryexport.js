@@ -27,8 +27,14 @@ export default {
 	},
 	runAbrechnungJob: function(date) {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/runGehaltshistorieJob';
-		return this.$fhcApi.get(url, {date}, {
+		return this.$fhcApi.get(url, {date, orgID}, {
 			timeout: 60000
+		} );
+	},
+	deleteAbrechnung: function(date, orgID) {
+		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/deleteGehaltshistorie';
+		return this.$fhcApi.post(url, {date, orgID}, {
+			timeout: 10000
 		} );
 	},
 	

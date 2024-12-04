@@ -21,15 +21,15 @@ class Gehaltshistorie_model extends DB_Model
 		);
     }
 
-	public function deleteByOrgID($orgID, $date)
+	public function deleteByOrgID($orgID, $dateStr)
     {		
-		if (is_null($date) || strtolower($date) === 'null')
+		if (is_null($dateStr) || strtolower($dateStr) === 'null')
 		{
 			throw new Exception('missing date parameter');
 		}
 		else
 		{
-			$date = date("Y-m-t", strtotime($date));
+			$date = strtotime($dateStr);
 		}
 
         $qry = 'DELETE FROM
@@ -41,7 +41,9 @@ class Gehaltshistorie_model extends DB_Model
 					AND EXTRACT(MONTH FROM h.datum) = ? and EXTRACT(Year FROM h.datum) = ?
 		';
 
-        return $this->execQuery($qry, array($orgID, date("n", $date), date("y", $date)));
+		//var_dump(date("n", $date));
+
+        return $this->execQuery($qry, array($orgID, date("n", $date), date("Y", $date)));
     }
 
 	public function deleteByGehaltsbestandteilID($gehaltsbestandteil_id)

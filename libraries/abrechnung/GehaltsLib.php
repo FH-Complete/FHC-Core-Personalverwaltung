@@ -185,14 +185,14 @@ class GehaltsLib
 		return	$ret;
 	}
 
-	public function deleteAbrechnungByOrg($orgID, $month)
+	public function deleteGehaltshistorieByOrg($orgID, $date)
 	{
-		$ret = $this->_ci->GehaltshistorieModel->deleteByGehaltsbestandteilID(
-			$bestandteil->getGehaltsbestandteil_id());
+		$ret = $this->_ci->GehaltshistorieModel->deleteByOrgID(
+			$orgID, $date);
 
 		if (isError($ret))
 		{
-			throw new Exception('error deleting Gehaltshistorie');
+			throw new Exception('error deleting gehaltshistorie [orgID='.$orgID.', date='.$date.']');
 		}
 
 		return	$ret;

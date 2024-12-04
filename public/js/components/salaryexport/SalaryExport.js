@@ -99,6 +99,8 @@ export const SalaryExport = {
         }
         // Modal 
         const confirmDeleteRef = Vue.ref();
+        // Toast
+        const deleteToastRef = Vue.ref();
 
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
@@ -228,9 +230,31 @@ export const SalaryExport = {
                 }           
             }
         }
+
+        const deleteAbrechnung = async() => {
+            jobRunning.value = true
+            try {
+                if (salaryTableRef.value.tabulator != null) {
+                    salaryTableRef.value.tabulator.dataLoader.alertLoader();
+                }
+               let i = getFilterInterval();
+               const res = await fhcApi.factory.SalaryExport.deleteAbrechnung(i[0], currentOrgID.value);      
+               if (listType.value != 'history') {
+                 listType.value = 'history';                          
+               } else {
+                 fetchData();                                 
+               }
+               fetchAbrechnungExists();
+            } catch (error) {
+              console.log(error)              
+            } finally {
+                jobRunning.value = false    
+                if (salaryTableRef.value.tabulator != null) {
+                    salaryTableRef.value.tabulator.dataLoader.clearAlert();
+                }           
+            }
+        }
         
-        Vue.onMounted(async () => {
-        })
 
         // Workaround to update tabulator
         Vue.watch(salaryExportList, (newVal, oldVal) => {
@@ -359,34 +383,26 @@ export const SalaryExport = {
             const ok = await confirmDeleteRef.value.show();
             
             if (ok) {   
-
-                isFetching.value = true
-                try {                  
-                  const res = await fhcApi.factory.SalaryExport.deleteAll(currentOrgID.value, getFilterInterval());                   
-                  if (res.error == 0) {
-                    fetchData();
-                    fetchAbrechnungExists();
-                    showDeletedToast();
-                  }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                    isFetching.value = false
-                }
-                
+                await deleteAbrechnung()
+                deleteToastRef.value.show();
             }
         }
                 
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
-            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler,
-            salaryTabulatorEvents, salaryTabulatorOptions, listType, confirmDeleteRef,
+            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler, deleteToastRef,
+            salaryTabulatorEvents, salaryTabulatorOptions, listType, confirmDeleteRef, showDeleteModal,
             currentBetrag, filterPerson, jobRunning,
             formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
 
     },
     template: `    
 
+        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
+            <Toast ref="deleteToastRef">
+                <template #body><h4>{{ t('person','gehaltshistoriegeloescht') }}</h4></template>
+            </Toast>
+        </div>
 
         <core-filter-cmpt 
 			ref="salaryTableRef"
@@ -426,7 +442,7 @@ export const SalaryExport = {
                         </div>
 
                         <button  type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>
-                        <button  type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie löschen</button>
+                        <button  type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="showDeleteModal">Gehaltshistorie löschen</button>
 
                         
 
@@ -438,7 +454,7 @@ export const SalaryExport = {
 
         <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
             <template #body>
-                Gehaltshistorie von {{ filterMonth }} {{ t('person','wirklichLoeschen') }}?
+                Gehaltshistorie von {{ filterMonth.month }}/{{ filterMonth.year }} {{ t('person','wirklichLoeschen') }}?
             </template>
         </ModalDialog>
     `
