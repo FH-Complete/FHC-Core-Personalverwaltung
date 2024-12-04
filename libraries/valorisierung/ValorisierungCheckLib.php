@@ -115,17 +115,18 @@ class ValorisierungCheckLib
 				}
 			}
 
-			// get history data
-			$historieRes = $this->_ci->ValorisierunghistorieModel->getValorisierungHistorieByDv($dienstverhaeltnisIdArr);
+		}
 
-			if (hasData($historieRes))
+		// get history data
+		$historieRes = $this->_ci->ValorisierunghistorieModel->getValorisierungHistorieByDv($dienstverhaeltnisIdArr);
+
+		if (hasData($historieRes))
+		{
+			$historieData = getData($historieRes);
+			foreach ($historieData as $hist)
 			{
-				$historieData = getData($historieRes);
-				foreach ($historieData as $hist)
-				{
-					$valorisationData[$hist->gehaltsbestandteil_id]['valorisation_methods'][$hist->valorisierungsdatum]['historie_betrag_valorisiert']
-						= $hist->betr_valorisiert_decrypted;
-				}
+				$valorisationData[$hist->gehaltsbestandteil_id]['valorisation_methods'][$hist->valorisierungsdatum]['historie_betrag_valorisiert']
+					= $hist->betr_valorisiert_decrypted;
 			}
 		}
 
@@ -255,7 +256,9 @@ class ValorisierungCheckLib
 					&& (!isset($lastValorisierung['calculated_betrag_valorisiert']) || !isset($lastValorisierung['historie_betrag_valorisiert'])))
 				|| $dataArr['final_betrag_valorisiert'] != $lastValorisierung['historie_betrag_valorisiert']
 				|| $dataArr['final_betrag_valorisiert'] != $lastValorisierung['calculated_betrag_valorisiert'])
-				$invalidGehaltsbestandteile[] = $geh_id;
+				{
+					$invalidGehaltsbestandteile[] = $geh_id;
+				}
 		}
 
 		return $invalidGehaltsbestandteile;
