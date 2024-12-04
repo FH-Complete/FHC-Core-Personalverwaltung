@@ -122,15 +122,19 @@ class GehaltsLib
 		return $result;
 	}
 
-	public function existsAnyGehaltshistorie($date)
+	public function existsAnyGehaltshistorie($date, $orgID)
 	{
 		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
+		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_gehaltsbestandteil gb', 'gehaltsbestandteil_id');
+		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_dienstverhaeltnis dienstverhaeltnis', 'dienstverhaeltnis_id');
 		$this->_ci->GehaltshistorieModel->addLimit(1);
+		
 
 		$date = $this->getDate($date);
 
 		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
-		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);		
+		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);
+		$where .= " AND dienstverhaeltnis.oe_kurzbz = ".$this->_ci->db->escape($orgID);
 
 		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, $this->_ci->GehaltshistorieModel->getEncryptedColumns());
 

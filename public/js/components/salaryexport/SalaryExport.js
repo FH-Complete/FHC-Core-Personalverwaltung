@@ -167,7 +167,7 @@ export const SalaryExport = {
         const fetchAbrechnungExists = async () => {
             try {
                 let i = getFilterInterval();
-                const res = await fhcApi.factory.SalaryExport.abrechnungExists(i[0]);  
+                const res = await fhcApi.factory.SalaryExport.abrechnungExists(i[0], currentOrgID.value);  
                 if (res.error !== 0) {                    
                     abrechnungExists.value = false;
                   } else {

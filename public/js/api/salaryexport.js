@@ -21,9 +21,9 @@ export default {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/getSalaryExportList';
 		return this.$fhcApi.get(url);
 	}, */
-	abrechnungExists: function(date) {
+	abrechnungExists: function(date, orgID) {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/existsAnyGehaltshistorie';
-		return this.$fhcApi.get(url, {date} );
+		return this.$fhcApi.get(url, {date, orgID} );
 	},
 	runAbrechnungJob: function(date) {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/runGehaltshistorieJob';

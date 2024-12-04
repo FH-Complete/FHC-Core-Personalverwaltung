@@ -49,7 +49,14 @@ class SalaryExport extends Auth_Controller
 			return;
 		}
 
-		$result = $this->_ci->gehaltslib->existsAnyGehaltshistorie($date);
+		$orgID = $this->input->get('orgID', null);
+
+		if ($orgID === null) {
+			$this->outputJsonError('no organisation selected');
+			return;
+		}
+
+		$result = $this->_ci->gehaltslib->existsAnyGehaltshistorie($date, $orgID);
 		
 		if (isError($result))
 		{
