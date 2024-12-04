@@ -62,6 +62,7 @@ class SalaryExport extends Auth_Controller
 
 	}
 
+
 	public function runGehaltshistorieJob()
 	{
 		$date = $this->input->get('date', null);	

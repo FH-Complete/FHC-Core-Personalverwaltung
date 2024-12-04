@@ -27,7 +27,9 @@ export default {
 	},
 	runAbrechnungJob: function(date) {
 		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/SalaryExport/runGehaltshistorieJob';
-		return axios.get(url, { params: {date} });
+		return this.$fhcApi.get(url, {date}, {
+			timeout: 60000
+		} );
 	},
 	
 };

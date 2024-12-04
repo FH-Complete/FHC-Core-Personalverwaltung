@@ -97,6 +97,8 @@ export const SalaryExport = {
                 return ''
             }
         }
+        // Modal 
+        const confirmDeleteRef = Vue.ref();
 
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
@@ -210,7 +212,7 @@ export const SalaryExport = {
                     salaryTableRef.value.tabulator.dataLoader.alertLoader();
                 }
                let i = getFilterInterval();
-               const res = await Vue.$fhcapi.SalaryExport.runAbrechnungJob(i[0]);      
+               const res = await fhcApi.factory.SalaryExport.runAbrechnungJob(i[0]);      
                if (listType.value != 'history') {
                  listType.value = 'history';                          
                } else {
@@ -264,6 +266,16 @@ export const SalaryExport = {
         precision: 2
       };
 
+      const rowFormatter = (row) => {
+        let data = row.getData();
+        let now = new Date(new Date().setHours(0, 0, 0, 0));
+    
+        if(listType == 'history' && data.betr_valorisiert_decrypted != data.hbetrag_decrypted ){
+            row.getElement().style.color = "#871919"
+            row.getElement().style.fontWeight = "bold"
+        }
+      }
+
       const salaryTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
         { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
@@ -303,6 +315,7 @@ export const SalaryExport = {
          // index: 'index', 
           layout: 'fitColumns',
           columns: salaryTableColumnsDef,
+          rowFormatter: rowFormatter,
           groupBy: "personalnummer",
           groupHeader:function(value, count, data, group) { return data[0].personalnummer + " " + data[0].name_gesamt + " (" + data[0].svnr + ") " },
           initialSort:[
@@ -340,11 +353,34 @@ export const SalaryExport = {
 			currentOrgID.value = orgID;
             if (!!filterMonth.value.year) fetchData();
         }
+
+        const showDeleteModal = async () => {
+            
+            const ok = await confirmDeleteRef.value.show();
+            
+            if (ok) {   
+
+                isFetching.value = true
+                try {                  
+                  const res = await fhcApi.factory.SalaryExport.deleteAll(currentOrgID.value, getFilterInterval());                   
+                  if (res.error == 0) {
+                    fetchData();
+                    fetchAbrechnungExists();
+                    showDeletedToast();
+                  }
+                } catch (error) {
+                    console.log(error)              
+                } finally {
+                    isFetching.value = false
+                }
+                
+            }
+        }
                 
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
             formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler,
-            salaryTabulatorEvents, salaryTabulatorOptions, listType,
+            salaryTabulatorEvents, salaryTabulatorOptions, listType, confirmDeleteRef,
             currentBetrag, filterPerson, jobRunning,
             formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
 
@@ -378,9 +414,7 @@ export const SalaryExport = {
                             
                         </datepicker>
 
-                        <button  type="button" class="btn btn-sm btn-primary me-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>
-
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Gehaltsliste Button Group">
+                        <div class="btn-group btn-group-sm ms-2" role="group" aria-label="Gehaltsliste Button Group">
                             <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypLive" autocomplete="off" value="live" v-model="listType"  >
                             <label class="btn btn-outline-primary" for="btnGListeTypLive">Live</label>
 
@@ -391,10 +425,21 @@ export const SalaryExport = {
                             <label class="btn btn-outline-primary" for="btnGListeTypDiff">Diff</label-->
                         </div>
 
+                        <button  type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>
+                        <button  type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie löschen</button>
+
+                        
+
                     </div>
 
 				</div>
 			</template>
 		</core-filter-cmpt>
+
+        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+            <template #body>
+                Gehaltshistorie von {{ filterMonth }} {{ t('person','wirklichLoeschen') }}?
+            </template>
+        </ModalDialog>
     `
 }
