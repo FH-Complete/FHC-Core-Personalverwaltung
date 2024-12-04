@@ -270,7 +270,7 @@ export const SalaryExport = {
         let data = row.getData();
         let now = new Date(new Date().setHours(0, 0, 0, 0));
     
-        if(listType == 'history' && data.betr_valorisiert_decrypted != data.hbetrag_decrypted ){
+        if(listType.value == 'history' && data.betr_valorisiert_decrypted != data.hbetrag_decrypted ){
             row.getElement().style.color = "#871919"
             row.getElement().style.fontWeight = "bold"
         }
