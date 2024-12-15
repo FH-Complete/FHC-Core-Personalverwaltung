@@ -72,12 +72,12 @@ class ValorisierungLib
 	}
 
 	/**
-	* Get all current Dvs
+	* Get Gehaelter of Dvs
 	* @return Dienstverhaeltnis data
 	*/
-	public function getDienstverhaeltnisse()
+	public function getGehaelter($gehaelter_stichtag, $gehaelter_oe_kurzbz)
 	{
-		return $this->_getAllDvs();
+		return $this->_getGehaelter($gehaelter_stichtag, $gehaelter_oe_kurzbz);
 	}
 
 	/**
@@ -229,16 +229,18 @@ class ValorisierungLib
 	}
 
 	/**
-	* Gets all current DVs
+	* Gets all Gehaelter for a Stichtag and a root oe
+	* @param $gehaelter_stichtag
+	* @param $gehaelter_oe_kurzbz
 	*/
-	private function _getAllDvs()
+	private function _getGehaelter($gehaelter_stichtag, $gehaelter_oe_kurzbz)
 	{
 		$dvsdata = [];
-		$today = date('Y-m-d');
 
 		// get all Dienstverhältnisse valid today
 		$result = $this->_ci->ValorisierungAPI_model->getDVsForValorisation(
-			$today
+			$gehaelter_stichtag,
+			$gehaelter_oe_kurzbz
 		);
 
 		if(isError($result))
@@ -254,9 +256,9 @@ class ValorisierungLib
 			$dvsdata = getData($result);
 			foreach($dvsdata as $dvdata)
 			{
-				$this->setDvDataForValorisation($this->fetchDvDataForValorisation($dvdata->dienstverhaeltnis_id, $today));
+				$this->setDvDataForValorisation($this->fetchDvDataForValorisation($dvdata->dienstverhaeltnis_id, $gehaelter_stichtag));
 				$noval->initialize(
-					$today,
+					$gehaelter_stichtag,
 					$this->_dienstverhaeltnis,
 					$this->_vertragsbestandteile,
 					$this->_gehaltsbestandteile,

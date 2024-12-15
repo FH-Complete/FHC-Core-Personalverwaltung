@@ -14,11 +14,13 @@ class Valorisierung extends FHCAPI_Controller
 				'calculateValorisation' => self::DEFAULT_PERMISSION,
 				'doValorisation' => self::DEFAULT_PERMISSION.'w',
 				'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION,
-				'getDienstverhaeltnisse' => self::DEFAULT_PERMISSION,
-				'getValorisationInfo' => self::DEFAULT_PERMISSION
+				'getGehaelter' => self::DEFAULT_PERMISSION,
+				'getValorisationInfo' => self::DEFAULT_PERMISSION,
+				'getAllUnternehmen' => self::DEFAULT_PERMISSION
 			)
 		);
 
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungInstanz_model');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungAPI_model');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
@@ -58,11 +60,17 @@ class Valorisierung extends FHCAPI_Controller
 	}
 
 	/**
-	 * Calculate all valorisation for a valorisation instance
+	 * Get Gehaelter (no valorisation) for given parameters
 	 */
-	public function getDienstverhaeltnisse()
+	public function getGehaelter()
 	{
-		$this->terminateWithSuccess($this->ValorisierungLib->getDienstverhaeltnisse());
+		$gehaelter_stichtag = $this->input->get('gehaelter_stichtag');
+
+		if (!isset($gehaelter_stichtag) || isEmptyString($gehaelter_stichtag)) $this->terminateWithError('Parameter Gehälter Stichtag fehlt');
+
+		$gehaelter_oe_kurzbz = $this->input->get('gehaelter_oe_kurzbz');
+
+		$this->terminateWithSuccess($this->ValorisierungLib->getGehaelter($gehaelter_stichtag, $gehaelter_oe_kurzbz));
 	}
 
 	/**
@@ -94,6 +102,25 @@ class Valorisierung extends FHCAPI_Controller
 		else
 		{
 			$this->terminateWithSuccess(getData($valInstanzInfo) ?? []);
+		}
+	}
+
+	/**
+	 * Get all Unternehmen
+	 */
+	public function getAllUnternehmen()
+	{
+		$this->OrganisationseinheitModel->addSelect('oe_kurzbz, bezeichnung');
+		$this->OrganisationseinheitModel->addOrder('bezeichnung');
+		$this->OrganisationseinheitModel->addOrder('oe_kurzbz');
+		$oeRes = $this->OrganisationseinheitModel->loadWhere(['oe_parent_kurzbz' => NULL]);
+		if( isError($oeRes) )
+		{
+			$this->terminateWithError('Fehler beim Laden der Unternehmen');
+		}
+		else
+		{
+			$this->terminateWithSuccess(getData($oeRes) ?? []);
 		}
 	}
 }

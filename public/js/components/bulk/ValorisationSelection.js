@@ -10,7 +10,8 @@ export const ValorisationSelection = {
 			searchbar,
 			CoreNavigationCmpt,
 			CoreFilterCmpt,
-			Modal
+			Modal,
+			datepicker: VueDatePicker
 		},
 		data() {
 			return 	{
@@ -19,9 +20,12 @@ export const ValorisationSelection = {
 				appSideMenuEntries: {},
 				alleValorisierungsinstanzen: [],
 				valorisierungInfoData: [],
+				alleUnternehmen: [],
 				valorisierungsinstanz_kurzbz: '',
 				valorisierung_oe_kurzbz: '',
 				valorisierungsdatum: '',
+				gehaelter_oe_kurzbz: '',
+				gehaelter_stichtag: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 					'/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/calculateValorisation',
@@ -40,6 +44,7 @@ export const ValorisationSelection = {
 		},
 		created: function() {
 			this.getValorisierungsInstanzen();
+			this.getAllUnternehmen();
 		},
 		methods: {
 			getValorisierungsInstanzen: function() {
@@ -85,9 +90,13 @@ export const ValorisationSelection = {
 					})
 					.catch(this.handleErrors);
 			},
-			getDienstverhaeltnisse: function() {
+			getGehaelter: function() {
+				if( this.gehaelter_stichtag === '' ) {
+					this.$fhcAlert.alertWarning('Kein Stichtagsdatum ausgewählt.');
+					return;
+				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = Vue.$fhcapi.Valorisierung.getDienstverhaeltnisse()
+				const res = Vue.$fhcapi.Valorisierung.getGehaelter(this.gehaelter_stichtag, this.gehaelter_oe_kurzbz)
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
@@ -116,6 +125,15 @@ export const ValorisationSelection = {
 				// set Valorisierungsinstanz to first in list when datum is changed
 				if (valInstanzen.length > 0)
 					this.valorisierungsinstanz_kurzbz = valInstanzen[0].value;
+			},
+			getAllUnternehmen: function() {
+				const res = Vue.$fhcapi.Valorisierung.getAllUnternehmen()
+					.then((response) => {
+						this.alleUnternehmen = response.data.data;
+						this.gehaelter_oe_kurzbz = '';
+						if (this.alleUnternehmen.length > 0) this.gehaelter_oe_kurzbz = this.alleUnternehmen[0].oe_kurzbz;
+					})
+					.catch(this.handleErrors);
 			},
 			handleErrors: function(response) {
 				if (response.hasOwnProperty('response') && response.response?.data?.errors) {
@@ -168,7 +186,7 @@ export const ValorisationSelection = {
 					// This is the default option and can be omitted.
 					layout: 'fitDataStretch',
 
-					footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p id="sumpostval_text">&sum; nach Valorisierung: <span id="sumpostval"></span></p><p id="differenz_text">Differenz: <span id="valdifferenz"></span></p></div>',
+					footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; <span id="label_gehaelter_before"></span>: <span id="sumpreval"></span></p><p id="sumpostval_text">&sum; nach Valorisierung: <span id="sumpostval"></span></p><p id="differenz_text">Differenz: <span id="valdifferenz"></span></p></div>',
 
 					rowFormatter: nullValueFormatter,
 
@@ -207,6 +225,7 @@ export const ValorisationSelection = {
 							var elvaldifferenz = document.getElementById("valdifferenz");
 							var sumpreval = 0;
 							var sumpostval = 0;
+							// if no valorisation is calculated: there is no salary postval
 							var noSalaryPostval = true;
 
 							for( var row of rows ) {
@@ -221,6 +240,9 @@ export const ValorisationSelection = {
 							// hide salary after valorisation, if it doesn't exist
 							document.getElementById('sumpostval_text').style.display = noSalaryPostval ? 'none' : 'block';
 							document.getElementById('differenz_text').style.display = noSalaryPostval ? 'none' : 'block';
+
+							// and use correct text (with/without valorisation)
+							document.getElementById('label_gehaelter_before').textContent = noSalaryPostval ? 'Gehaelter' : 'vor Valorisierung';
 
 							const moneyformatter = this.modules.format.getFormatter('money');
 							const moneyformatterparams = {
@@ -383,42 +405,84 @@ export const ValorisationSelection = {
 					:tabulator-options="tabulatorOptions"
 					:tabulator-events="tabulatorEvents">
 					<template #actions>
-						<div class="d-flex gap-2 align-items-baseline mb-4">
-							<select v-model="valorisierung_oe_kurzbz" class="form-select w-auto" aria-label="ValorisierungsOe" @change="oeChanged">
-								<option
-									v-for="vo in valorisierungsOrganisationseinheiten"
-									:value="vo.value"
-									:disabled="vo.disabled">
-									{{ vo.label }}
-								</option>
-							</select>
-							<select v-model="valorisierungsdatum" class="form-select w-auto" aria-label="ValorisierungsDatum" @change="datumChanged">
-								<option
-									v-for="vd in valorisierungsDates"
-									:value="vd.value"
-									:disabled="vd.disabled">
-									{{ vd.label }}
-								</option>
-							</select>
-							<div v-show="valorisierungsdatum != ''">
-								<div class="input-group mb-3">
-								<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz">
-									<option
-										v-for="vi in datumValorisierungsinstanzen"
-										:value="vi.value"
-										:disabled="vi.disabled">
-										{{ vi.label }}
-									</option>
-								</select>
-								<button class="btn btn-outline-secondary" type="button" @click="getValorisationInfo">
-									<i class="fa fa-info"></i>
-								</button>
-								</div>
-							</div>
-						</div>
-						<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
-						<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
-						<button class="btn btn-secondary ms-5" @click="getDienstverhaeltnisse">Gehälter anzeigen</button>
+						<table class="table table-borderless">
+							<tbody>
+								<tr>
+									<td>
+										<select v-model="valorisierung_oe_kurzbz" class="form-select" aria-label="ValorisierungsOe" @change="oeChanged">
+											<option
+												v-for="vo in valorisierungsOrganisationseinheiten"
+												:value="vo.value"
+												:disabled="vo.disabled">
+												{{ vo.label }}
+											</option>
+										</select>
+									</td>
+									<td>
+										<select v-model="valorisierungsdatum" class="form-select" aria-label="ValorisierungsDatum" @change="datumChanged">
+											<option
+												v-for="vd in valorisierungsDates"
+												:value="vd.value"
+												:disabled="vd.disabled">
+												{{ vd.label }}
+											</option>
+										</select>
+									</td>
+									<td v-show="valorisierungsdatum != ''">
+										<div class="input-group">
+										<select v-model="valorisierungsinstanz_kurzbz" class="form-select" aria-label="ValorisierungsInstanz">
+											<option
+												v-for="vi in datumValorisierungsinstanzen"
+												:value="vi.value"
+												:disabled="vi.disabled">
+												{{ vi.label }}
+											</option>
+										</select>
+										<button class="btn btn-outline-secondary" type="button" @click="getValorisationInfo">
+											<i class="fa fa-info"></i>
+										</button>
+										</div>
+									</td>
+									<td>
+										<button class="btn btn-primary me-5" @click="calculateValorisation">Valorisierung berechnen</button>
+										<button class="btn btn-primary" @click="doValorisation">Gewählte Valorisierung abschließen</button>
+									</td>
+								</tr>
+								<tr>
+								<td colspan="4">
+									<hr class="hr m-0" />
+								</td>
+								</tr>
+								<tr>
+									<td>
+										<select v-model="gehaelter_oe_kurzbz" class="form-select" aria-label="GehaelterOe">
+											<option
+												v-for="unt in alleUnternehmen"
+												:value="unt.oe_kurzbz"
+												:disabled="unt.disabled">
+												{{ unt.bezeichnung }}
+											</option>
+										</select>
+									</td>
+									<td>
+										<datepicker id="stichtagSelect"
+											v-model="gehaelter_stichtag"
+											v-bind:enable-time-picker="false"
+											v-bind:placeholder="'Stichtag wählen'"
+											v-bind:text-input="true"
+											auto-apply
+											locale="de"
+											format="dd.MM.yyyy"
+											model-type="yyyy-MM-dd"
+											style="width: 100%;" >
+										</datepicker>
+									</td>
+									<td>
+										<button class="btn btn-primary" @click="getGehaelter">Gehälter zum Stichtag anzeigen</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</template>
 				</core-filter-cmpt>
 			</div>
