@@ -11,6 +11,7 @@ import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
+import highchartsPlugin from "../../../../js/plugin/highchartsVue.js"
 
 Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
