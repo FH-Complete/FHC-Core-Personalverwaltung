@@ -96,7 +96,7 @@ class SalaryExport extends Auth_Controller
 			return;
 		} elseif (hasData($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->outputJsonError('Gehaltshistorie existiert bereits!');
 			return;
 		}
 
