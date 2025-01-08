@@ -189,9 +189,32 @@ export const SalaryExport = {
               }
               
               const res = await fhcApi.factory.SalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false); 
+              // merge live and history value into one field 
+              let value = null;
+              let source = '';
+              // helper to select the right value and add the index field
+              // priority:
+              // 1. use data from history table
+              // 2. use data from valorisierung table
+              // 3. use data from gehaltsbestandteil ("live data")
+              const selectValue = (r, index) => {
+                if (r.hbetrag_decrypted != "") {
+                    // history data
+                    value = r.hbetrag_decrypted
+                    source = 'h'
+                // TODO data from valorisierung table
+                } else if (r.betr_valorisiert_decrypted != "") {
+                    // live data
+                    value = r.betr_valorisiert_decrypted
+                    source = 'l'
+                }
+                return {index, ...r, betrag: value, source}
+              }
+
+              let list = res.retval.map((row, index) => selectValue(row, index) )
 
               if (res.error !==1) {
-                salaryExportList.value = res.retval.map((item, index) => ({index, ...item}));
+                salaryExportList.value = list // res.retval.map((item, index) => ({index, ...item}));
                 //salaryExportList.value = res.retval;
                 fetchAbrechnungExists();
               } else {
@@ -300,6 +323,7 @@ export const SalaryExport = {
         }
       }
 
+
       const salaryTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
         { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
@@ -316,12 +340,14 @@ export const SalaryExport = {
         { title: 'Teilzeittyp', field: "teilzeittyp", hozAlign: "left", sorter:"string", headerFilter:true, width:100 },
         { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Betrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
+        { title: 'Grundbetrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },  
-        { title: 'Betrag val.', field: "betr_valorisiert_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
+        { title: 'Betrag', field: "betrag", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
+       /*  { title: 'Betrag val.', field: "betr_valorisiert_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true }, 
         { title: 'H-Betrag val.', field: "hbetrag_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money",
-            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true }, 
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true },  */
         { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },
@@ -430,16 +456,13 @@ export const SalaryExport = {
                             
                         </datepicker>
 
-                        <div class="btn-group btn-group-sm ms-2" role="group" aria-label="Gehaltsliste Button Group">
+                        <!--div class="btn-group btn-group-sm ms-2" role="group" aria-label="Gehaltsliste Button Group">
                             <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypLive" autocomplete="off" value="live" v-model="listType"  >
                             <label class="btn btn-outline-primary" for="btnGListeTypLive">Live</label>
 
                             <input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypHistorie" autocomplete="off" value="history" v-model="listType">
                             <label class="btn btn-outline-primary" for="btnGListeTypHistorie">Historie</label>
-
-                            <!--input type="radio" class="btn-check" name="btnGListeTyp" id="btnGListeTypDiff" autocomplete="off" value="diff" v-model="listType">
-                            <label class="btn btn-outline-primary" for="btnGListeTypDiff">Diff</label-->
-                        </div>
+                        </div-->
 
                         <button  type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>
                         <button  type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="showDeleteModal">Gehaltshistorie löschen</button>

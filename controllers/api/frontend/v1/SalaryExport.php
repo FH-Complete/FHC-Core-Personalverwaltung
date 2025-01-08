@@ -303,26 +303,27 @@ class SalaryExport extends Auth_Controller
 		$qry_history = '
 			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted
 			FROM (select * from ('.$qry_live.') t) live 
-			JOIN hr.tbl_gehaltshistorie historie using(gehaltsbestandteil_id) 
+			LEFT JOIN hr.tbl_gehaltshistorie historie using(gehaltsbestandteil_id) 
 			WHERE
 				((historie.datum >= '. $this->_ci->db->escape($von_datestring) .')
 					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')
 			';
 
+		//echo $qry_history;
 		//$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, $this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
 
 		
 
-		switch ($listType) {
+		/* switch ($listType) {
 			case 'live':
 				$qry = $qry_live;
 				$encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
 				break;
-			case 'history':
+			case 'history': */
 				$qry = $qry_history;
 				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
-				break;
-		};
+				/* break;
+		}; */
 
 
 		$result = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
