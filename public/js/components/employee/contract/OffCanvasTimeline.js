@@ -385,7 +385,7 @@ export const OffCanvasTimeline = {
                                                 
                                             </div>
                                             <div v-if="bestandteil.typ == 'gbs'">
-                                                € {{ formatNumber(bestandteil.gbs?.grundbetrag) }}
+                                                € {{ formatNumber(bestandteil.gbs?.betrag_valorisiert) }} <span v-if="bestandteil.gbs?.betrag_valorisiert !== bestandteil.gbs?.grundbetrag">(€ {{ formatNumber(bestandteil.gbs?.grundbetrag) }})</span>
                                             </div>
                                         </div>
                                     </div>
