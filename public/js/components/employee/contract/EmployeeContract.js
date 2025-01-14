@@ -29,7 +29,7 @@ export const EmployeeContract = {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
-        const { watch, ref, reactive, computed, inject } = Vue;
+        const { watch, ref, reactive, computed, inject, provide } = Vue;
         const route = VueRouter.useRoute();
         const router = VueRouter.useRouter();
         const { t } = usePhrasen();
@@ -88,7 +88,14 @@ export const EmployeeContract = {
 
         const readonly = ref(false);
         const valorisationValid = ref(true);
-        const showsalaryinfo = ref(false);
+		
+        const hassalarypermission = ref(false);
+		const hasdvpermission = ref(false);
+		const hasdvkorrpermission = ref(false);
+
+		provide('hassalarypermission', hassalarypermission);
+		provide('hasdvpermission', hasdvpermission);
+		provide('hasdvkorrpermission', hasdvkorrpermission);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -211,7 +218,7 @@ export const EmployeeContract = {
 
         // Gehaltsbestandteile
         const fetchGBT = async (dv_id, date) => {
-            if(!showsalaryinfo.value) {
+            if(!hassalarypermission.value) {
                 gbtList.value = [];
                 return;
             }
@@ -230,7 +237,7 @@ export const EmployeeContract = {
 
         // fetch chart data
         const fetchGBTChartData = async (dv_id, date) => {
-            if(!showsalaryinfo.value) {
+            if(!hassalarypermission.value) {
                 gbtChartData.value = [];
                 return;
             }
@@ -301,6 +308,8 @@ export const EmployeeContract = {
                 if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
                 await checkSalaryPermission();
+				await checkDvPermission();
+				await checkDvKorrPermission();
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
                 checkValorisation();                
@@ -629,7 +638,7 @@ export const EmployeeContract = {
 
         const checkValorisation = async () => {
 			if (currentDVID != null && currentDVID.value > 0) {
-                                if(!showsalaryinfo.value) {
+                                if(!hassalarypermission.value) {
                                     valorisationValid.value = true;
                                     return;
                                 }
@@ -656,7 +665,7 @@ export const EmployeeContract = {
             if (currentDVID != null && currentDVID.value > 0) {
                 try {
                     const res = await Vue.$fhcapi.permission.isBerechtigt(
-                        'extension/pv21_gehaelter', 
+                        'basis/gehaelter', 
                         's',
                         currentDV.value.oe_kurzbz, 
                         null
@@ -667,11 +676,53 @@ export const EmployeeContract = {
                     console.log(error)
                 }
             }
-            showsalaryinfo.value = isBerechtigt;
+            hassalarypermission.value = isBerechtigt;
             return isBerechtigt;
         };
         checkSalaryPermission();
-        
+		
+		const checkDvPermission = async() => {
+			var isBerechtigt = false;
+			if (currentDVID != null && currentDVID.value > 0) {
+				try {
+					const res = await Vue.$fhcapi.permission.isBerechtigt(
+						'extension/pv21_dv', 
+						's',
+						currentDV.value.oe_kurzbz, 
+						null
+					);
+					isBerechtigt = res.data.data.isBerechtigt;
+				} catch (error) {
+					isBerechtigt = false;
+					console.log(error)
+				}
+			}
+            hasdvpermission.value = isBerechtigt;
+            return isBerechtigt;
+		};
+		checkDvPermission();
+
+		const checkDvKorrPermission = async() => {
+			var isBerechtigt = false;
+			if (currentDVID != null && currentDVID.value > 0) {
+				try {
+					const res = await Vue.$fhcapi.permission.isBerechtigt(
+						'extension/pv21_dv_korr', 
+						's',
+						currentDV.value.oe_kurzbz, 
+						null
+					);
+					isBerechtigt = res.data.data.isBerechtigt;
+				} catch (error) {
+					isBerechtigt = false;
+					console.log(error)
+				}
+			}
+            hasdvkorrpermission.value = isBerechtigt;
+            return isBerechtigt;
+		};
+		checkDvKorrPermission();
+		
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, offCanvasRef,
             VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
@@ -681,7 +732,7 @@ export const EmployeeContract = {
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
-            showsalaryinfo
+            hassalarypermission, hasdvpermission, hasdvkorrpermission
         }
     },
     template: `
@@ -709,13 +760,13 @@ export const EmployeeContract = {
                     </div>
                     <div class="d-flex">
                         <div class="me-auto">
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
+                            <button v-if="!readonly && hasdvpermission" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>
+                            <button v-if="!readonly && hasdvpermission" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <DropDownButton class="me-2" :links="[{action:linkToLehrtaetigkeitsbestaetigungODT,text:'Lehrtätigkeitsbestätigung (odt)'},{action:linkToLehrtaetigkeitsbestaetigungPDF,text:'Lehrtätigkeitsbestätigung (pdf)'}]">
                                 Bestätigung drucken
                             </DropDownButton>
                             <!-- Drop Down Button -->
-                            <DropDownButton class="me-2" :links="[{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:deleteDVDialog,text:'DV löschen (nur in Ausnahmefällen)'}]">
+                            <DropDownButton v-if="hasdvpermission" class="me-2" :links="(hasdvkorrpermission) ? [{action:korrekturDVDialog,text:'DV korrigieren'},{action:endDVDialog,text:'DV beenden'},{action:deleteDVDialog,text:'DV löschen (nur in Ausnahmefällen)'}] : [{action:endDVDialog,text:'DV beenden'}]">
                                 Weitere Aktionen
                             </DropDownButton>
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
@@ -1097,7 +1148,7 @@ export const EmployeeContract = {
                         </div><!-- card -->
 
                         <!-- Bruttomonatsgehalt  -->
-                        <div class="card mt-3" v-if="showsalaryinfo">
+                        <div class="card mt-3" v-if="hassalarypermission">
                             <div class="card-header">
 								<div class="d-flex justify-content-between align-items-center">
 									<div><h5 class="mb-0">Bruttomonatsgehalt</h5></div>
@@ -1154,7 +1205,7 @@ export const EmployeeContract = {
                         </div> <!-- card -->
 
                         <!-- Gehalt -->
-                        <div class="card mt-3" v-if="showsalaryinfo">
+                        <div class="card mt-3" v-if="hassalarypermission">
                             <div class="card-header">
                                 <h5 class="mb-0">Gehalt</h5>
                             </div>

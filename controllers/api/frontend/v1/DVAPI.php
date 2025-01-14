@@ -14,6 +14,8 @@ class DVAPI extends Auth_Controller
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const READ_ONLY_PERMISSION = 'basis/mitarbeiter:r';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+	const DV_CREATE_EDIT_PERMISSION = 'extension/pv21_dv:rw';
+	const DV_CORRECTION_PERMISSION = 'extension/pv21_dv_korr:rw';
 
     public function __construct() {
         parent::__construct(array(
@@ -21,12 +23,12 @@ class DVAPI extends Auth_Controller
             'dvByPerson' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
             'dvByID'=> DVAPI::DEFAULT_PERMISSION,
             'dvInfoByPerson' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'createDV'  => DVAPI::DEFAULT_PERMISSION,
-            'deleteDV'  => DVAPI::DEFAULT_PERMISSION,
-            'endDV'  => DVAPI::DEFAULT_PERMISSION,
-            'deactivateDV'  => DVAPI::DEFAULT_PERMISSION,
+            'createDV'  => self::DV_CREATE_EDIT_PERMISSION,
+            'deleteDV'  => self::DV_CREATE_EDIT_PERMISSION,
+            'endDV'  => self::DV_CREATE_EDIT_PERMISSION,
+            'deactivateDV'  => self::DV_CREATE_EDIT_PERMISSION,
             'vertragByDV' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-            'saveVertrag' => DVAPI::DEFAULT_PERMISSION,
+            'saveVertrag' => [self::DV_CREATE_EDIT_PERMISSION, self::DV_CORRECTION_PERMISSION],
             // 
             'getCurrentVBs' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
 		    'getCurrentAndFutureVBs' => DVAPI::DEFAULT_PERMISSION,
