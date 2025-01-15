@@ -60,7 +60,7 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/SalaryExport'),
 		'description' => 'Gehaltsliste',
 		'icon' => 'file-export',
-		'requiredPermissions' => 'basis/mitarbeiter:r'
+		'requiredPermissions' => 'basis/gehaelter:r'
 	),
 	'Valorisierung' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Valorisation'),

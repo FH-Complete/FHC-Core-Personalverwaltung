@@ -6,7 +6,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class SalaryExport extends Auth_Controller
 {
 
-    const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+    const DEFAULT_PERMISSION = 'basis/gehaelter:r';
     // code igniter
     protected $_ci;
 
