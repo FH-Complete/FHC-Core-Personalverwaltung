@@ -149,8 +149,8 @@ export const SalaryExport = {
             } else {
                 filterDate.value = d; 
             }
-            fetchData()
-            
+            //fetchData()
+            fetchAbrechnungExists();
         }
 
         const dateFormatter = (cell) => {
@@ -174,7 +174,13 @@ export const SalaryExport = {
                     abrechnungExists.value = false;
                   } else {
                     abrechnungExists.value = res.retval.length > 0;
-                  }   
+                  }
+				if( abrechnungExists.value ) {
+					listType.value = 'history';
+				} else {
+					listType.value = 'live';
+				}
+				fetchData();
             } catch (error) {
                  console.log(error)              
             } 
@@ -198,12 +204,12 @@ export const SalaryExport = {
               // 2. use data from valorisierung table
               // 3. use data from gehaltsbestandteil ("live data")
               const selectValue = (r, index) => {
-                if (r.hbetrag_decrypted != "") {
+                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted !== "") {
                     // history data
                     value = r.hbetrag_decrypted
                     source = 'h'
                 // TODO data from valorisierung table
-                } else if (r.betr_valorisiert_decrypted != "") {
+                } else if (r.betr_valorisiert_decrypted !== "") {
                     // live data
                     value = r.betr_valorisiert_decrypted
                     source = 'l'
@@ -216,7 +222,7 @@ export const SalaryExport = {
               if (res.error !==1) {
                 salaryExportList.value = list // res.retval.map((item, index) => ({index, ...item}));
                 //salaryExportList.value = res.retval;
-                fetchAbrechnungExists();
+                //fetchAbrechnungExists();
               } else {
                 salaryExportList.value = [];
               }              
@@ -238,11 +244,11 @@ export const SalaryExport = {
                 }
                let i = getFilterInterval();
                const res = await fhcApi.factory.SalaryExport.runAbrechnungJob(i[0]);      
-               if (listType.value != 'history') {
-                 listType.value = 'history';                          
-               } else {
-                 fetchData();                                 
-               }
+//               if (listType.value != 'history') {
+//                 listType.value = 'history';                          
+//               } else {
+//                 fetchData();                                 
+//               }
                fetchAbrechnungExists();
             } catch (error) {
               console.log(error)              
@@ -262,11 +268,11 @@ export const SalaryExport = {
                 }
                let i = getFilterInterval();
                const res = await fhcApi.factory.SalaryExport.deleteAbrechnung(i[0], currentOrgID.value);      
-               if (listType.value != 'history') {
-                 listType.value = 'history';                          
-               } else {
-                 fetchData();                                 
-               }
+//               if (listType.value != 'history') {
+//                 listType.value = 'history';                          
+//               } else {
+//                 fetchData();                                 
+//               }
                fetchAbrechnungExists();
             } catch (error) {
               console.log(error)              
@@ -290,12 +296,14 @@ export const SalaryExport = {
         
         Vue.watch(filterPerson, () => {
             if (filterDate.value == null) return;
-            fetchData();
+            //fetchData();
+			fetchAbrechnungExists();
         })
 
         Vue.watch(listType, () => {
             console.log('listType changed', listType.value);
-            fetchData();
+            //fetchData();
+			fetchAbrechnungExists();
         })
 
       // ---------------------------------
@@ -341,7 +349,7 @@ export const SalaryExport = {
         { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Grundbetrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },  
+            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload },  
         { title: 'Betrag', field: "betrag", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
        /*  { title: 'Betrag val.', field: "betr_valorisiert_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
@@ -381,7 +389,8 @@ export const SalaryExport = {
         {
             event: 'tableBuilt',
             handler: () => {
-                fetchData();
+                //fetchData();
+				fetchAbrechnungExists();
             }
         }
       ]);
@@ -401,7 +410,10 @@ export const SalaryExport = {
         const orgSelectedHandler = (orgID) => {
             console.log('org selected:', orgID);
 			currentOrgID.value = orgID;
-            if (!!filterMonth.value.year) fetchData();
+            if (!!filterMonth.value.year) {
+				//fetchData();
+				fetchAbrechnungExists();
+			}
         }
 
         const showDeleteModal = async () => {
@@ -464,8 +476,9 @@ export const SalaryExport = {
                             <label class="btn btn-outline-primary" for="btnGListeTypHistorie">Historie</label>
                         </div-->
 
-                        <button  type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>
-                        <button  type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="showDeleteModal">Gehaltshistorie löschen</button>
+                        <button  type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning">Gehaltshistorie erzeugen</button>
+                        <button  v-if="false" type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>	
+                        <button  v-if="false" type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="showDeleteModal">Gehaltshistorie löschen</button>
 
                         
 

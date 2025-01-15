@@ -309,21 +309,16 @@ class SalaryExport extends Auth_Controller
 					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')
 			';
 
-		//echo $qry_history;
-		//$result = $this->_ci->GehaltsbestandteilModel->loadWhere($where, $this->_ci->GehaltsbestandteilModel->getEncryptedColumns());
-
-		
-
-		/* switch ($listType) {
+		switch ($listType) {
 			case 'live':
 				$qry = $qry_live;
 				$encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
 				break;
-			case 'history': */
+			case 'history': 
 				$qry = $qry_history;
 				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
-				/* break;
-		}; */
+				break;
+		};
 
 
 		$result = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
@@ -331,15 +326,11 @@ class SalaryExport extends Auth_Controller
 			[],
 			$encryptedCols
 		);
-
-		//var_dump($result);
 		
 		if (isError($result)) {
 			$this->outputJsonError('query failed');
 			return;
 		}
-
-		//if (!hasData($result)) return error("Keine Gehaltsbestandteile gefunden!");
 
 		if (!$export) {
 			return $this->outputJson($result);
