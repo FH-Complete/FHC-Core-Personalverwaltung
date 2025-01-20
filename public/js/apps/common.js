@@ -1,4 +1,4 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import fhcapifactory from "../../../../js/api/fhcapifactory.js";
 import { CoreFilterAPIs } from '../../../../js/components/filter/API.js';
 
 Vue.$fhcapi = fhcapifactory;
