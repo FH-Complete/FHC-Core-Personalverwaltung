@@ -109,10 +109,16 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                    name: 'Gesamtgehalt',
+                    name: 'Gehalt',
                     data: [],
                     color: '#6fcd98',
                     step: 'left' // or 'center' or 'right'
+                },{
+                    name: 'Gehalt (ohne Val.)',
+                    data: [],
+                    color: '#d6af02',
+                    step: 'left', // or 'center' or 'right'
+                    visible: false,
                 },
                 {
                     name: 'Abgerechnet',
@@ -229,16 +235,20 @@ export const EmployeeContract = {
             try {
                 const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
                 gbtChartData.value = res.data;
-                let tempData1 = [], tempData2 = [];
+                let tempData1 = [], tempData2 = [], tempData3 = [];
                 // chartOptions.series[0].data.length = 0;
+                Object.keys(res.data.valorisiert).forEach(element => {
+                    tempData1.push([new Date(element).getTime(), parseFloat(res.data.valorisiert[element])]);
+                 });
                 Object.keys(res.data.gesamt).forEach(element => {
-                   tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                   tempData2.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
                 });
                 res.data.abgerechnet.forEach(element => {
-                    tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
+                    tempData3.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                 });
                 chartOptions.series[0].data = tempData1;
                 chartOptions.series[1].data = tempData2;
+                chartOptions.series[2].data = tempData3;
             } catch (error) {
                 console.log(error)
             } finally {
