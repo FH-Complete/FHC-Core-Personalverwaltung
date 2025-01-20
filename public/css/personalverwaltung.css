@@ -244,3 +244,9 @@ html {
 #macombined .fhc-tabs .nav.nav-pills.flex-column {
     min-width: 220px;
 }
+
+/* fix background color of tabulator group header */
+
+.tabulator-group-level-0 {
+    background-color: #CCC !important;
+}

@@ -933,7 +933,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
 
-                                        <div class="col-md-9">
+                                        <div class="col-md-12">
                                             <label class="form-label" >Text</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
                                         </div>
