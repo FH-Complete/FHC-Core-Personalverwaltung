@@ -99,7 +99,7 @@ class Api_model extends DB_Model
 		AND dv.bis is null
 		AND dv.von <= now() - '5 months'::interval
 		AND dv.vertragsart_kurzbz in('externerlehrender')
-        AND campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval
+        AND (campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval OR campus.vw_mitarbeiter.insertamum is null)
 
 		-- Kein Lehrauftrag in den letzten 3 Semestern
         AND NOT EXISTS(
@@ -196,7 +196,8 @@ class Api_model extends DB_Model
             p.anmerkung,
             p.homepage,
             p.foto,
-            p.updateamum AS lastupdate
+            p.updateamum AS lastupdate,
+			p.unruly
         FROM tbl_person p
              JOIN tbl_benutzer ON (p.person_id=tbl_benutzer.person_id)
              JOIN tbl_mitarbeiter ON tbl_benutzer.uid::text = tbl_mitarbeiter.mitarbeiter_uid::text
@@ -427,7 +428,6 @@ class Api_model extends DB_Model
             p.vorname,
             p.vornamen,
             p.sprache,
-            p.geschlecht,
             p.gebdatum,
             p.svnr,
             p.anmerkung,
@@ -437,7 +437,8 @@ class Api_model extends DB_Model
             p.insertamum,
             p.insertvon,
             p.updatevon,
-            p.updateamum
+            p.updateamum,
+            p.unruly
         FROM tbl_person p
             LEFT JOIN tbl_benutzer on(p.person_id=tbl_benutzer.person_id)
             LEFT JOIN tbl_mitarbeiter on(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
@@ -603,6 +604,7 @@ class Api_model extends DB_Model
             p.updatevon,
             p.updateamum
         FROM tbl_mitarbeiter p join tbl_benutzer b on (p.mitarbeiter_uid=b.uid)
+        	JOIN tbl_person pp on (b.person_id=pp.person_id)
         WHERE b.person_id=?
         ";
 
@@ -981,26 +983,33 @@ class Api_model extends DB_Model
     /**
      * search person (used by employee create dialog)
      */
-    function filterPerson($surname, $birthdate=null)
+    function filterPerson($nachname, $vorname = null, $birthdate=null, $filterUnruly=null)
     {
 
-        $parametersArray = array($surname);
+        $parametersArray = array($nachname);
         $where ="p.nachname~* ? ";
-        if (mb_strlen($surname) == 2)
+        if (mb_strlen($nachname) == 2)
         {
             $where = "p.nachname=? ";
         }
 
-        if (mb_strlen($surname) == 2)
-        {
-            $where = "p.nachname=? ";
-        }
+		if(isset($vorname) && $vorname != '')
+		{
+			$where.= " AND p.vorname~*?";
+			$parametersArray[] = $vorname;
+		}
 
         if(isset($birthdate) && $birthdate != '')
         {
 			$where.=" AND p.gebdatum=?";
             $parametersArray[] = $birthdate;
         }
+
+		if(isset($filterUnruly))
+		{
+			$where.=" AND p.unruly=?";
+			$parametersArray[] = $filterUnruly;
+		}
 
         $qry='
             SELECT
@@ -1014,6 +1023,7 @@ class Api_model extends DB_Model
                 p.vornamen,
                 p.geschlecht,
                 p.gebdatum,
+                p.unruly,
                 ma.personalnummer,
                 s.matrikelnr,
                 CASE WHEN ma.personalnummer is not null THEN \'Mitarbeiter\'

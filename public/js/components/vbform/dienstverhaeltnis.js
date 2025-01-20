@@ -29,7 +29,7 @@ export default {
   <div class="col-1">&nbsp;</div>
   <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>
   <div class="col-1">
-    <div v-if="this.store.mode === 'korrektur'" class="form-check">
+    <div v-if="this.store.mode === 'korrektur' && showdvcheckoverlap === true" class="form-check">
       <input v-model="checkoverlap" class="form-check-input" type="checkbox" id="dvcheckoverlap">
       <label class="form-check-label" for="dvcheckoverlap">
         parallele DVs prüfen
@@ -37,14 +37,45 @@ export default {
     </div>
     <span v-else>&nbsp;</span>
   </div>
+  
+  <template v-if="this.store.mode === 'korrektur'">
+  <div class="col-3">
+    <select v-model="dvendegrund_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
+      <option
+        v-for="v in lists.dvendegruende"
+        :value="v.value"
+        :selected="isselected(v.value, this.dvendegrund_kurzbz)"
+        :disabled="v.disabled">
+        {{ v.label}}
+      </option>
+    </select>
+  </div>
+  <div class="col-3">
+    <textarea v-model="dvendegrund_anmerkung" 
+        class="form-control form-control-sm w-100"
+        placeholder="Anmerkung zum Beendigungsgrund..."
+    ></textarea>
+  </div>
+  <div class="col-6">&nbsp;</div>
+  </template>
   `,
+  props: {
+    showdvcheckoverlap: {
+        type: Boolean,
+        default: true,
+        required: false
+    }
+  },
   data: function() {
     return {
       'vertragsart_kurzbz': '',
       'checkoverlap': true,
+      'dvendegrund_kurzbz': '',
+      'dvendegrund_anmerkung': '',
       'lists': {
           'unternehmen': [],
-          'vertragsarten': []
+          'vertragsarten': [],
+          'dvendegruende': []
       },
       'store': store
     }
@@ -63,6 +94,7 @@ export default {
   created: function() {
     this.getUnternehmen();
     this.getVertragsarten();
+    this.getDvEndeGruende();
     this.setDataFromConfig();
   },
   methods: {
@@ -89,6 +121,16 @@ export default {
       });
       return this.lists.vertragsarten = vertragsarten;
     },
+    getDvEndeGruende: async function() {
+      const response = await Vue.$fhcapi.DV.getDvEndeGruende();
+      const dvendegruende = response.data.retval;
+      dvendegruende.unshift({
+        value: '',
+        label: 'Beendigungsgrund wählen',
+        disabled: false
+      });
+      return this.lists.dvendegruende = dvendegruende;
+    },
     isconfigured: function(field) {
       if( this.config === null ) {
           return false;
@@ -105,6 +147,14 @@ export default {
       if( this.config?.vertragsart_kurzbz !== undefined ) {
         this.vertragsart_kurzbz = this.config.vertragsart_kurzbz;
       }
+      if( this.config?.dvendegrund_kurzbz !== undefined ) {
+        this.dvendegrund_kurzbz = (this.config.dvendegrund_kurzbz === null) 
+            ? '' : this.config.dvendegrund_kurzbz;
+      }
+      if( this.config?.dvendegrund_anmerkung !== undefined ) {
+        this.dvendegrund_anmerkung = (this.config.dvendegrund_anmerkung === null) 
+            ? '' : this.config.dvendegrund_anmerkung;
+      }
       if( this.config?.checkoverlap !== undefined ) {
         this.checkoverlap = this.config.checkoverlap;
       }
@@ -114,6 +164,8 @@ export default {
         dienstverhaeltnisid: this.config.dienstverhaeltnisid,
         unternehmen: this.store.unternehmen,
         vertragsart_kurzbz: this.vertragsart_kurzbz,
+        dvendegrund_kurzbz: (this.dvendegrund_kurzbz === '') ? null : this.dvendegrund_kurzbz,
+        dvendegrund_anmerkung: (this.dvendegrund_anmerkung === '') ? null : this.dvendegrund_anmerkung,
         gueltigkeit: this.$refs.gueltigkeit.getPayload(),
         checkoverlap: this.checkoverlap
       }

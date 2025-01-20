@@ -12,7 +12,7 @@ class Home extends Auth_Controller
 	public function __construct()
 	{
 		parent::__construct(array(
-			'index'=> Home::DEFAULT_PERMISSION
+				'index'=> Home::DEFAULT_PERMISSION
 			)
 		);
 
@@ -29,4 +29,3 @@ class Home extends Auth_Controller
 		$this->load->view('extensions/FHC-Core-Personalverwaltung/home');
 	}
 }
-

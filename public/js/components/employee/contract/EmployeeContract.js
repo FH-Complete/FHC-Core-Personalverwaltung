@@ -22,10 +22,12 @@ export const EmployeeContract = {
         Toast,
     },
     props: {
-         
+        id: Number,
+        uid: String,
+        dienstverhaeltnis_id: {type: Number, required: false},
     },
     emits: ['updateHeader'],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
 
         const { watch, ref, reactive, computed, inject } = Vue;
         const route = VueRouter.useRoute();
@@ -58,7 +60,7 @@ export const EmployeeContract = {
         const VbformWrapperRef = ref();
         const vbformmode = ref('neuanlage');
         const vbformDV = ref(null);
-        
+
         const enddvmodalRef = ref();
         const endDV = ref(null);
 
@@ -69,7 +71,7 @@ export const EmployeeContract = {
         const curKarenz = ref(null);
 
         const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        
+
         const numberFormat = new Intl.NumberFormat();
         const now = ref(truncateDate(new Date()));
 
@@ -81,8 +83,11 @@ export const EmployeeContract = {
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
         const freitexttypen = inject('freitexttypen');
+        const beendigungsgruende = inject('beendigungsgruende');
+        const teilzeittypen = inject('teilzeittypen');
 
         const readonly = ref(false);
+        const valorisationValid = ref(true);
 
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
@@ -114,7 +119,7 @@ export const EmployeeContract = {
                     data: [],
                     color: '#cd6fca',
                     step: 'left' // or 'center' or 'right'
-                }, 
+                },
             ],
             xAxis: {
                 type: 'datetime',
@@ -152,8 +157,8 @@ export const EmployeeContract = {
             credits: {
                 enabled: false
               },
-          
-            
+
+
 
         })
 
@@ -167,12 +172,12 @@ export const EmployeeContract = {
             isFetching.value = true
             try {
               const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
-                dvList.value = res.data.retval;          
+                dvList.value = res.data.retval;
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
-                    if (route.params.dienstverhaeltnis_id != undefined) {
-                        currentDVID.value = route.params.dienstverhaeltnis_id;
-                        currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == route.params.dienstverhaeltnis_id);
+                    if (props.dienstverhaeltnis_id != undefined) {
+                        currentDVID.value = props.dienstverhaeltnis_id;
+                        currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == props.dienstverhaeltnis_id);
                     } else {
                         currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
                         currentDV.value = dvList.value[0];
@@ -180,13 +185,13 @@ export const EmployeeContract = {
                 } else {
                     currentDVID.value = null;
                     currentDV.value = null;
-                }          
+                }
             } catch (error) {
                 console.log(error)
                 isFetching.value = false
             }
 
-            
+
         }
 
         const fetchVertrag = async (dv_id, date) => {
@@ -197,7 +202,7 @@ export const EmployeeContract = {
                 getCurrentVertragsbestandteil();
                 //}
             } catch (error) {
-                console.log(error)                
+                console.log(error)
             } finally {
                 isFetching.value = false
             }
@@ -211,11 +216,11 @@ export const EmployeeContract = {
                 const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
                 gbtList.value = res.data;
             } catch (error) {
-                console.log(error)                
+                console.log(error)
             } finally {
                 isFetching.value = false
             }
-           
+
         }
 
         // fetch chart data
@@ -235,18 +240,18 @@ export const EmployeeContract = {
                 chartOptions.series[0].data = tempData1;
                 chartOptions.series[1].data = tempData2;
             } catch (error) {
-                console.log(error)                
+                console.log(error)
             } finally {
                 isFetching.value = false
             }
-           
+
         }
 
         const deleteDV = async (dv_id) => {
-            isFetching.value = true            
+            isFetching.value = true
             try {
                 const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
-                theModel.value.updateHeader();
+                emit('updateHeader');
             } catch (error) {
                 console.log(error);
             } finally {
@@ -254,7 +259,7 @@ export const EmployeeContract = {
             }
         }
 
-        const activeDV = computed(() => {            
+        const activeDV = computed(() => {
             return dvList.value.filter((dv) => {
                 let von = new Date(dv.von);
                 let bis = dv.bis != null ? new Date(dv.bis) : null;
@@ -272,10 +277,10 @@ export const EmployeeContract = {
         const isCurrentDate = computed(() => {
             return currentDate.value.getTime() == now.value.getTime()
         })
-        
-        fetchData(route.params.uid);
+
+        fetchData(props.uid);
         watch(
-            () => route.params.uid,
+            () => props.uid,
             (newVal) => {
                 fetchData(newVal);
             }
@@ -287,13 +292,14 @@ export const EmployeeContract = {
                 fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
+                checkValorisation();
             }
         )
         watch(
-            () => route.params.dienstverhaeltnis_id,
+            () => props.dienstverhaeltnis_id,
             (newVal) => {
-                currentDVID.value = route.params.dienstverhaeltnis_id;
-                currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == route.params.dienstverhaeltnis_id);
+                currentDVID.value = props.dienstverhaeltnis_id;
+                currentDV.value = dvList.value.find(item => item.dienstverhaeltnis_id == props.dienstverhaeltnis_id);
             }
         )
 
@@ -312,15 +318,15 @@ export const EmployeeContract = {
             dvSelectedIndex.value = e.target.selectedIndex + 1;
             currentDV.value = dvList.value[e.target.selectedIndex];
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
-            let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/') 
-                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-                    + '/extensions/FHC-Core-Personalverwaltung/Employees/' 
-                    + route.params.id + '/' + route.params.uid 
+            let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
+                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+                    + '/extensions/FHC-Core-Personalverwaltung/Employees/'
+                    + props.id + '/' + props.uid
                     + '/contract/' + currentDV.value.dienstverhaeltnis_id;
             router.push( url );
         }
 
-        
+
         const formatDate = (d) => {
             if (d != null && d != '') {
                 return d.substring(8, 10) + "." + d.substring(5, 7) + "." + d.substring(0, 4);
@@ -328,7 +334,7 @@ export const EmployeeContract = {
                 return ''
             }
         }
-        
+
 
         const formatDateISO = (ds) => {
             let padNum = (n) => {
@@ -344,7 +350,7 @@ export const EmployeeContract = {
             let ws = vertragsbestandteile.filter(value => value.vertragsbestandteiltyp_kurzbz == kurzbz);
             return ws;
         }
-        
+
         const createDVDialog = () => {
             vbformmode.value = 'neuanlage';
             vbformDV.value = null;
@@ -360,39 +366,43 @@ export const EmployeeContract = {
         const korrekturDVDialog = () => {
             vbformmode.value = 'korrektur';
             vbformDV.value = currentDV.value;
-            VbformWrapperRef.value.showModal();            
+            VbformWrapperRef.value.showModal();
         }
-        
+
         const endDVDialog = () => {
             endDV.value = {
                     dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
                     unternehmen: currentDV.value.oe_kurzbz,
                     vertragsart_kurzbz: currentDV.value.vertragsart_kurzbz,
+                    dvendegrund_kurzbz: currentDV.value.dvendegrund_kurzbz,
+                    dvendegrund_anmerkung: currentDV.value.dvendegrund_anmerkung,
                     gueltigkeit: {
                         guioptions: {
                            sharedstatemode: 'ignore',
                            disabled: [
                                'gueltig_ab'
-                           ] 
+                           ]
                         },
                         data: {
                             gueltig_ab: currentDV.value.von,
                             gueltig_bis: currentDV.value.bis,
                         }
-                    }
+                    },
+                    unruly: currentDV.value.unruly,
+                    person_id: currentDV.value.person_id
                 };
-            enddvmodalRef.value.showModal();            
+            enddvmodalRef.value.showModal();
         }
 
         const deleteDVDialog = () => {
             delDV.value = {
                     dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
-                    label: formatVertragsart(currentDV.value.vertragsart_kurzbz) + '/' + 
-                           currentDV.value.oe_bezeichnung + ', ' + 
-                           formatDate(currentDV.value.von) + ' - ' + 
+                    label: formatVertragsart(currentDV.value.vertragsart_kurzbz) + '/' +
+                           currentDV.value.oe_bezeichnung + ', ' +
+                           formatDate(currentDV.value.von) + ' - ' +
                            formatDate(currentDV.value.bis)
             };
-            deletedvmodalRef.value.showModal();    
+            deletedvmodalRef.value.showModal();
         }
 
         const linkToLehrtaetigkeitsbestaetigungODT = () => {
@@ -402,7 +412,7 @@ export const EmployeeContract = {
         const linkToLehrtaetigkeitsbestaetigungPDF = () => {
             window.location.href = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/mitarbeiter/lehrtaetigkeit.pdf.php?output=pdf&uid=' + currentDV.value.uid;
         }
-        
+
         const karenzDialog = () => {
             curKarenz.value = {
                     type: 'vertragsbestandteilkarenz',
@@ -417,7 +427,7 @@ export const EmployeeContract = {
                         gueltigkeit: {
                             guioptions: {
                                sharedstatemode: 'ignore',
-                               disabled: [] 
+                               disabled: []
                             },
                             data: {
                                 gueltig_ab: '',
@@ -426,27 +436,34 @@ export const EmployeeContract = {
                         }
                     }
                 };
-            karenzmodalRef.value.showModal();            
+            karenzmodalRef.value.showModal();
         }
 
         const showOffCanvas = () => {
             offCanvasRef.value.show();
         }
-        
+
         const handleDvSaved = async () => {
-            fetchData(route.params.uid).then(() => {
+            fetchData(props.uid).then(() => {
                 // data might have changed but currentDVID is still the same -> fetch updated data
                 if (currentDVID != null && currentDVID.value > 0) {
                     fetchVertrag(currentDVID.value, currentDate.value);
                     fetchGBT(currentDVID.value, currentDate.value);
                     fetchGBTChartData(currentDVID.value);
-                    theModel.value.updateHeader();
+                    checkValorisation();
+                    emit('updateHeader');
                 }
             })
         }
 
         const handleDvEnded = async () => {
             fetchData(route.params.uid);
+            emit('updateHeader');
+        }
+
+        const handleUpdateUnruly = async () => {
+            fetchData(route.params.uid);
+            emit('updateHeader');
         }
 
         const handleDvDeleted = () => {
@@ -454,13 +471,13 @@ export const EmployeeContract = {
             let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
                 + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                 + '/extensions/FHC-Core-Personalverwaltung/Employees/'
-                + route.params.id + '/' + route.params.uid
+                + props.id + '/' + props.uid
                 + '/contract';
             router.push( url ).then(() => {
-                router.go(0)
+                router.go(0);
             });
         }
-        
+
         const handleKarenzSaved = async () => {
             // TODO do something sensible
             console.log('Karenz saved');
@@ -548,11 +565,11 @@ export const EmployeeContract = {
         const dvDeleteHandler = () => {
             console.log('dvDeleteHandler link clicked', currentDVID);
             deleteDV(currentDVID.value).then(async () => {
-                fetchData(route.params.uid)
+                fetchData(props.uid)
                 let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
                     + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                     + '/extensions/FHC-Core-Personalverwaltung/Employees/'
-                    + route.params.id + '/' + route.params.uid
+                    + props.id + '/' + props.uid
                     + '/contract';
                 await router.push( url )
             });
@@ -585,26 +602,56 @@ export const EmployeeContract = {
         const formatFreitexttyp = (item) => {
             let va = freitexttypen.value.find(kt => kt.value == item);
             return va != undefined ? va.label : item;
-          }
+        }
+
+        const formatBeendigungsgrund = (item) => {
+            let va = beendigungsgruende.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
+        const formatTeilzeittyp = (item) => {
+            let va = teilzeittypen.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
 
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
+        const checkValorisation = async () => {
+			if (currentDVID != null && currentDVID.value > 0) {
+				isFetching.value = true
+				try {
+					const res = await Vue.$fhcapi.ValorisierungCheck.checkValorisationValidityOfDv(currentDVID.value);
+					valorisationValid.value = res.data.data;
+				} catch (error) {
+					console.log(error)
+				} finally {
+					isFetching.value = false
+				}
+			}
+        }
+        checkValorisation();
+
+        const valorisationCheckPath = computed(() => {
+			const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+			return `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/`+currentDVID.value;
+        });
+
         return {
             isFetching, dvList, vertragList, gbtList, currentDV, currentDVID, dvSelectedHandler, confirmDeleteDVRef, offCanvasRef,
-            VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate, 
+            VbformWrapperRef, route, vbformmode, vbformDV, formatNumber, activeDV, isCurrentDVActive, isCurrentDate,
             currentVBS, dropdownLink1, setDateHandler, dvDeleteHandler, formatGBTGrund, truncate, setDate2BisDatum, setDate2VonDatum,
-            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex, 
-            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, showOffCanvas, dateSelectedHandler,
+            createDVDialog, updateDVDialog, korrekturDVDialog, handleDvSaved, formatDate, formatDateISO, dvSelectedIndex,
+            currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, handleUpdateUnruly, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
-            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF,
-            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted,
+            readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
+            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid
         }
     },
     template: `
 
 
 
-    <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">    
+    <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
 
       <div class="container-fluid px-1">
 
@@ -619,13 +666,13 @@ export const EmployeeContract = {
                 <div class="col-md-12">
                     <div class="d-flex justify-content-end mb-2">
                         <div class="me-2"><span style="font-size:0.5em;font-style:italic" v-if="dvList?.length>0">({{ dvSelectedIndex }} von {{ dvList.length }})  id={{currentDVID}}</span></div>
-                        <div v-if="!isCurrentDate"><span class="badge badge-sm bg-warning me-1">Anzeigedatum ist nicht aktueller Tag</span></div> 
-                        <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum</span></div> 
-                        <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div> 
+                        <div v-if="!isCurrentDate"><span class="badge badge-sm bg-warning me-1">Anzeigedatum ist nicht aktueller Tag</span></div>
+                        <div><span class="badge badge-sm me-1" :class="{'bg-success': activeDV.length > 0, 'bg-danger': activeDV.length == 0}" v-if="!isFetching">{{ activeDV.length }} aktiv zu gewähltem Datum</span></div>
+                        <div><span class="badge badge-sm bg-secondary">{{ dvList?.length }} <span v-if="dvList">gesamt</span></span></div>
                     </div>
                     <div class="d-flex">
                         <div class="me-auto">
-                            <button v-if="!readonly" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>   
+                            <button v-if="!readonly" type="button" class="btn btn-sm btn-primary me-2" @click="createDVDialog()"><i class="fa fa-plus"></i> Dienstverhältnis</button>
                             <button v-if="!readonly" type="button" class="btn btn-sm btn-outline-secondary me-2" @click="updateDVDialog()">DV bearbeiten</button>
                             <DropDownButton class="me-2" :links="[{action:linkToLehrtaetigkeitsbestaetigungODT,text:'Lehrtätigkeitsbestätigung (odt)'},{action:linkToLehrtaetigkeitsbestaetigungPDF,text:'Lehrtätigkeitsbestätigung (pdf)'}]">
                                 Bestätigung drucken
@@ -637,21 +684,21 @@ export const EmployeeContract = {
                             <!--button v-if="!readonly" type="button" class="btn btn-sm btn-secondary" @click="showOffCanvas()">Vertragshistorie</button-->
                         </div>
 
-                        <div class="d-flex align-items-end flex-column">  
-                            <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">        
+                        <div class="d-flex align-items-end flex-column">
+                            <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">
                                 <select  v-if="!isFetching && dvList?.length>0" class="form-select form-select-sm" v-model="currentDVID" @change="dvSelectedHandler" aria-label="DV auswählen">
                                     <option v-for="(item, index) in dvList" :value="item.dienstverhaeltnis_id"  :key="item.dienstverhaeltnis_id">
                                     {{ formatVertragsart(item.vertragsart_kurzbz) }}/{{item.oe_bezeichnung}}, {{ formatDate(item.von) }} - {{ formatDate(item.bis) }}
-                                    </option> 
-                                </select> 
-                                <div v-else-if="isFetching" style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>      
+                                    </option>
+                                </select>
+                                <div v-else-if="isFetching" style="width:150px"><p-skeleton style="width:100%;height:100%"></p-skeleton></div>
 
-                                <datepicker id="currentDateSelect" :modelValue="formatDateISO(currentDate)" 
+                                <datepicker id="currentDateSelect" :modelValue="formatDateISO(currentDate)"
                                     @update:model-value="setDateHandler"
-                                    v-bind:enable-time-picker="false"   
-                                    :clearable="false"                                 
+                                    v-bind:enable-time-picker="false"
+                                    :clearable="false"
                                     six-weeks
-                                    auto-apply 
+                                    auto-apply
                                     locale="de"
                                     format="dd.MM.yyyy"
                                     model-type="yyyy-MM-dd"
@@ -660,9 +707,9 @@ export const EmployeeContract = {
                             </div>
                         </div>
                     </div>
-                    
-                </div>      
-                
+
+                </div>
+
                 <div class="row justify-content-center pt-md-2" v-if="!isCurrentDVActive && dvList?.length">
                         <div class="alert alert-warning mt-3" role="alert">
                             Dienstverhältnis ist zum ausgewählten Datum inaktiv.
@@ -671,16 +718,16 @@ export const EmployeeContract = {
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2BisDatum">
                                     Datum setzen
                                 </button>
-                                
+
                             </span>
                             <span v-else-if="currentDV?.von != null">
                                 Anzeigedatum auf Von-Datum des Dienstverhältnisses setzen: &nbsp;
                                 <button type="button" class="btn btn-sm btn-outline-secondary" @click="setDate2VonDatum">
                                     Datum setzen
                                 </button>
-                                
+
                             </span>
-                        </div>                        
+                        </div>
                 </div>
                 <div class="row pt-md-2" v-if="isCurrentDVActive && dvList?.length">
                     <div class="col-6">
@@ -689,7 +736,7 @@ export const EmployeeContract = {
                             <div class="card-header">
                                 <h5 class="mb-0">Allgemein</h5>
                             </div>
-                            <div class="card-body">        
+                            <div class="card-body">
                                 <div ref="baseDataFrm" class="row g-3" v-if="currentDV != null">
 
                                     <div class="col-md-4">
@@ -705,7 +752,7 @@ export const EmployeeContract = {
                                     </div>
 
                                     <div class="col-md-4"></div>
-                                    
+
                                     <!-- von bis -->
                                     <div class="col-md-4">
                                         <label class="form-label" >Von</label>
@@ -717,14 +764,27 @@ export const EmployeeContract = {
                                         <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatDate(currentDV?.bis)" >
                                     </div>
 
-                                    <div class="col-md-4">
-                                    <!--
+                                    <!--div class="col-md-4">
                                         <label  class="form-label" >Befristet</label>
                                         <div class="col-sm-8">
-                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" disabled >                                            
+                                            <input class="form-check-input mt-2" type="checkbox" id="befristetCheck" disabled >
                                         </div>
-                                    -->
+                                    </div-->
+
+                                    <!-- DV Beendigungsgrund -->
+                                    <div class="col-md-4" v-if="currentDV?.dvendegrund_kurzbz != null">
+                                        <label  class="form-label" >Beendigungsgrund</label>
+                                        <input readonly class="form-control-sm form-control-plaintext" type="text" id="dvendegrundKurzbz" :value="formatBeendigungsgrund(currentDV?.dvendegrund_kurzbz)"  >
                                     </div>
+                                    <div class="col-md-4"  v-else></div>
+
+                                    <div class="col-md-8" v-if="currentDV?.dvendegrund_kurzbz != null">
+                                        <label  class="form-label" >Anmerkung</label>
+                                        <textarea class="form-control-sm form-control-plaintext" readonly >{{ currentDV?.dvendegrund_anmerkung }} </textarea>
+                                    </div>
+                                    <div class="col-md-8"  v-else></div>
+
+                                    <div class="col-md-4"></div>
 
                                     <!-- Befristung -->
                                     <template v-for="(item, index) in currentVBS.befristung"  >
@@ -745,7 +805,7 @@ export const EmployeeContract = {
                                             </div>
                                         </div>
                                     </template>
-    
+
                                     <!-- Kündigungsfrist -->
                                     <template v-for="(item, index) in currentVBS.kuendigungsfrist"  >
                                         <div class="col-md-4">
@@ -757,10 +817,10 @@ export const EmployeeContract = {
                                             <label for="dvKuendigungsfristAN" class="form-label">Kündigungsfrist AN</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvKuendigungsfristAN" :value="item.arbeitnehmer_frist">
                                         </div>
-                                        
+
                                         <div class="col-md-4"></div>
                                     </template>
-                                    
+
                                     <!-- Urlaubsanspruch -->
                                     <template v-for="(item, index) in currentVBS.urlaubsanspruch"  >
                                         <div class="col-md-3">
@@ -790,14 +850,14 @@ export const EmployeeContract = {
                                                 <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvStunden"  :value="formatNumber(item.wochenstunden)">
                                             </div>
                                         </div>
-    
+
                                         <div class="col-md-4">
                                             <label for="dvTeilzeittyp" class="form-label">Teilzeittyp</label>
                                             <div class="col-sm-12">
-                                                <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp">
-                                            </div>                                        
+                                                <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvTeilzeittyp" :value="formatTeilzeittyp(item.teilzeittyp_kurzbz)">
+                                            </div>
                                         </div>
-    
+
                                         <div class="col-md-4">
                                                 <template v-for="(item, index) in currentVBS.allIn"  >
                                                     <label  class="form-label" >AllIn</label>
@@ -808,10 +868,10 @@ export const EmployeeContract = {
                                             </div>
                                     </div>
                                 </template>
-                            </div><!-- card-body -->   
-                        </div><!-- card -->   
-                                                            
-                        <!-- Zeitaufzeichnung -->     
+                            </div><!-- card-body -->
+                        </div><!-- card -->
+
+                        <!-- Zeitaufzeichnung -->
                         <div class="card mt-3">
                             <div class="card-header">
                                 <h5 class="mb-0">Zeitaufzeichnung</h5>
@@ -824,11 +884,11 @@ export const EmployeeContract = {
                                     <div class="col-md-4">
                                         <template v-for="(item, index) in currentVBS.zeitaufzeichnung"  >
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung" disabled> 
+                                                <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung" disabled>
                                                 <label class="form-check-label" >Zeitaufzeichnungspflichtig</label>
                                             </div>
                                             <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant" disabled> 
+                                                <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant" disabled>
                                                 <label class="form-check-label" >AZG relevant</label>
                                             </div>
                                             <div class="form-check">
@@ -841,7 +901,7 @@ export const EmployeeContract = {
                                 </div>
                             </div><!-- card body -->
                         </div><!-- card -->
-                        
+
                         <!-- Sonstige Vereinbarung -->
                         <div class="card mt-3">
                             <div class="card-header">
@@ -873,7 +933,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
 
-                                        <div class="col-md-9">
+                                        <div class="col-md-12">
                                             <label class="form-label" >Text</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
                                         </div>
@@ -881,7 +941,7 @@ export const EmployeeContract = {
                                 </div>
                             </div><!-- card-body -->
                         </div><!-- card -->
-                        
+
                         <!-- Karenz -->
                         <div class="card mt-3">
                             <div class="card-header">
@@ -895,7 +955,7 @@ export const EmployeeContract = {
                                     <template v-for="(item, index) in currentVBS.karenz"  >
                                         <div class="col-md-4">
                                             <label class="form-label" v-if="index==0" >Karenztyp</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatKarenztyp(item.karenztyp_kurzbz)">                                            
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatKarenztyp(item.karenztyp_kurzbz)">
                                         </div>
 
                                         <div class="col-md-2">
@@ -922,7 +982,7 @@ export const EmployeeContract = {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <!-- Dokumente -->
                         <div class="card mt-3">
                             <div class="card-header">
@@ -934,7 +994,7 @@ export const EmployeeContract = {
                                 </div>
                             </div>
                         </div>
-                             
+
                         <!-- Notizen -->
                         <div class="card mt-3">
                             <div class="card-header">
@@ -946,7 +1006,7 @@ export const EmployeeContract = {
 							   </div>
                             </div>
                         </div>
-                            
+
                     </div><!-- col-6 -->
 
                     <div class="col-6">
@@ -975,7 +1035,7 @@ export const EmployeeContract = {
                                         </div>
 
                                     </template>
-                                    
+
                                     <div class="col-md-12 py-4" v-if="currentVBS.funktion.taetigkeit.length == 0">
                                         Keine aktive Tätigkeit vorhanden.
                                     </div>
@@ -991,18 +1051,26 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="'[' + item.oe_typ_bezeichnung + '] ' + item.oe_bezeichnung">
                                         </div>
 
-                                        <div class="col-md-2">                                            
+                                        <div class="col-md-2">
                                         </div>
 
                                     </template>
                                 </div>
                             </div><!-- card-body -->
                         </div><!-- card -->
-                        
+
                         <!-- Bruttomonatsgehalt  -->
                         <div class="card mt-3">
                             <div class="card-header">
-                                <h5 class="mb-0">Bruttomonatsgehalt</h5>
+								<div class="d-flex justify-content-between align-items-center">
+									<div><h5 class="mb-0">Bruttomonatsgehalt</h5></div>
+									<div v-if="!valorisationValid">
+										<router-link :to="valorisationCheckPath"
+											class="flex-sm-fill text-sm-start">
+											Zur Valorisierungsprüfung
+										</router-link>
+									</div>
+								</div>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3" v-if="currentDV != null">
@@ -1013,7 +1081,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-3">
                                             <label class="form-label" v-if="index==0" >Grund</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatGBTGrund(item)">                                            
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatGBTGrund(item)">
                                         </div>
 
                                         <div class="col-md-2">
@@ -1047,7 +1115,7 @@ export const EmployeeContract = {
                                 </div>
                             </div><!-- card-body -->
                         </div> <!-- card -->
-                        
+
                         <!-- Gehalt -->
                         <div class="card mt-3">
                             <div class="card-header">
@@ -1060,24 +1128,24 @@ export const EmployeeContract = {
                                     </figure>
                                 </div>
                             </div><!-- card-body -->
-                        </div><!-- card -->   
-           
+                        </div><!-- card -->
+
                     </div>  <!-- col-6 -->
                 </div>  <!-- row -->
-                
+
             </div>
         </div>
 
     </div>
 
     <!--DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog-->
-    <vbform_wrapper 
-        id="vbFormWrapper" 
-        ref="VbformWrapperRef" 
-        :title="'Dienstverhältnis'" 
-        :mode="vbformmode" 
+    <vbform_wrapper
+        id="vbFormWrapper"
+        ref="VbformWrapperRef"
+        :title="'Dienstverhältnis'"
+        :mode="vbformmode"
         :curdv="vbformDV"
-        :mitarbeiter_uid="route.params.uid"
+        :mitarbeiter_uid="uid"
         @dvsaved="handleDvSaved">
     </vbform_wrapper>
 
@@ -1087,14 +1155,15 @@ export const EmployeeContract = {
         </template>
     </ModalDialog>
 
-    <enddvmodal 
-        ref="enddvmodalRef" 
+    <enddvmodal
+        ref="enddvmodalRef"
         :curdv="endDV"
-        @dvended="handleDvEnded">
+        @dvended="handleDvEnded"
+        @updateunruly="handleUpdateUnruly">
     </enddvmodal>
 
-    <deletedvmodal 
-        ref="deletedvmodalRef" 
+    <deletedvmodal
+        ref="deletedvmodalRef"
         :curdv="delDV"
         @dvdeleted="handleDvDeleted">
     </deletedvmodal>
@@ -1105,9 +1174,9 @@ export const EmployeeContract = {
         :curdv="currentDV"
         :alldv="dvList">
     </OffCanvasTimeline>
-    
-    <karenzmodal 
-        ref="karenzmodalRef" 
+
+    <karenzmodal
+        ref="karenzmodalRef"
         :curkarenz="curKarenz"
         @karenzsaved="handleKarenzSaved">
     </karenzmodal>

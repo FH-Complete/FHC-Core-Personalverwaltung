@@ -10,7 +10,6 @@ export const EmailTelData = {
         Toast,
     },
     props: {
-        editMode: { type: Boolean, required: true },
         personID: { type: Number, required: true },
         writePermission: { type: Boolean, required: false },
     },  
@@ -74,7 +73,7 @@ export const EmailTelData = {
                 kontakttyp: 'email', 
                 anmerkung: '',  
                 kontakt: '',    
-                zustellung: false, 
+                zustellung: true, 
                 updateamum: '',
                 updatevon: '',  
                 insertamum: '', 
@@ -152,6 +151,10 @@ export const EmailTelData = {
             }
         }
 
+        const getKontakttyp = (id) => {
+            return kontakttyp.value.find(item => item.kontakttyp == id)
+        }
+
         // -------------
         // form handling
         // -------------
@@ -187,7 +190,7 @@ export const EmailTelData = {
         return {
             contactList, contactListArray, 
             currentContact, showEditModal, showAddModal, showDeleteModal, hideModal, modalRef,
-            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef, t,
+            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef, t, getKontakttyp,
             // form handling
             validKontakt, frmState, contactDataFrm, readonly
         }
@@ -234,7 +237,7 @@ export const EmailTelData = {
                 </thead>
                 <tbody>               
                     <tr v-for="contact in contactListArray" :key="contact.kontakt_id">
-                        <td class="align-middle">{{ contact.kontakttyp }}</td>
+                        <td class="align-middle">{{ getKontakttyp(contact.kontakttyp).beschreibung }}</td>
                         <td class="align-middle" v-if="contact.kontakttyp == 'email'"><a v-bind:href="[\'mailto:\' + contact.kontakt]">{{ contact.kontakt }}</a></td>
                         <td class="align-middle" v-else-if="contact.kontakttyp == 'mobil' || contact.kontakttyp == 'telefon' || contact.kontakttyp == 'firmenhandy'"><a v-bind:href="[\'tel:\' + contact.kontakt]">{{ contact.kontakt }}</a></td>
                         <td class="align-middle" v-else >{{ contact.kontakt }}</td>

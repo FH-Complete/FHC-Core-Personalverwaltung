@@ -11,7 +11,6 @@ export const BaseData = {
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
         config: { type: Object, default: () => ({}), required: false},
-        editMode: { type: Boolean, required: false },
         personID: { type: Number, required: false },
         personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
@@ -221,6 +220,10 @@ export const BaseData = {
             toastRef.value.show();
         }
 
+        const readonlyBlocker = (e) => {
+            if (readonly.value) e.preventDefault();
+        }
+
         return {
             
             currentValue,
@@ -232,8 +235,9 @@ export const BaseData = {
             showToast, 
             sprache,
             GESCHLECHT,
-            nations,
-
+            nations,  
+            theModel,
+            readonlyBlocker,
             save,
             toggleMode,  
             validNachname,    
@@ -259,7 +263,7 @@ export const BaseData = {
                     <div class="h5 mb-0"><h5>{{ $p.t('global', 'stammdaten') }}</h5></div>        
                 </div>
                 <div class="card-body">
-                <div class="d-grid gap-2 d-md-flex justify-content-end ">
+                <div class="d-grid gap-2 d-md-flex justify-content-end " v-if="!theModel.restricted">
                     <button v-if="readonly" type="button" class="btn btn-sm btn-outline-secondary" @click="toggleMode()">
                         <i class="fa fa-pen"></i>
                     </button>
@@ -281,7 +285,7 @@ export const BaseData = {
                     <label for="titelPost" class="form-label">{{ $p.t('person', 'titelpost' )}}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
                 </div>
-                <div class="col-lg-6"></div>
+                <div class="col-lg-4"></div>
                 <!--Name -->
                 <div class="col-lg-3 col-md-4">
                     <label for="nachname" class="required form-label">{{ $p.t('person','nachname') }}</label>

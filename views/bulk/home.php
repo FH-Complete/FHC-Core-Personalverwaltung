@@ -14,7 +14,7 @@
                        'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
-                       'public/css/components/searchbar.css'],
+                       'public/css/components/searchbar/searchbar.css'],
       'customJSs' =>  [
                         'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
                       ],

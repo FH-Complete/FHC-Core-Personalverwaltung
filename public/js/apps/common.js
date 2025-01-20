@@ -1,4 +1,4 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
+import fhcapifactory from "../../../../js/api/fhcapifactory.js";
 import { CoreFilterAPIs } from '../../../../js/components/filter/API.js';
 
 Vue.$fhcapi = fhcapifactory;
@@ -6,15 +6,18 @@ Vue.$fhcapi = fhcapifactory;
 let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	 
 
 export const searchbaroptions = {
+    cssclass: "position-relative",
     types: [
         "person",
         "raum",
         "mitarbeiter",
         "mitarbeiter_ohne_zuordnung",
+/*
         "student",
         "prestudent",
         "document",
         "cms",
+*/
         "organisationunit"
     ],
     actions: {
@@ -44,32 +47,50 @@ export const searchbaroptions = {
                 }
             ]
         },
-        raum: {
-            defaultaction: {
-                type: "function",
-                action: function(data) { 
-                    alert('raum defaultaction ' + JSON.stringify(data)); 
-                }
-            },
-            childactions: [                      
-               {
-                    label: "Rauminformation",
-                    icon: "fas fa-info-circle",
-                    type: "link",
-                    action: function(data) { 
-                        return data.infolink;
-                    }
-                },
-                {
-                    label: "Raumreservierung",
-                    icon: "fas fa-bookmark",
-                    type: "link",
-                    action: function(data) { 
-                        return data.booklink;
-                    }
-                }
-            ]
-        },
+		raum: {
+			defaultaction: {
+				type: "link",
+				renderif: function(data) {
+					if(data.content_id === "N/A"){
+						return false;
+					}
+					return true;
+				},
+				action: function(data) { 
+					const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+						'cms/content.php?content_id=' + data.content_id;
+					return link;
+				}
+			},
+			childactions: [
+				{
+					label: "LV-Plan",
+					icon: "fas fa-bookmark",
+					type: "link",
+					action: function(data) {
+						const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+							'cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz=' + data.ort_kurzbz;
+						return link;
+					}
+				},
+				{
+					label: "Rauminformation",
+					icon: "fas fa-info-circle",
+					type: "link",
+					renderif: function(data) {
+						if(data.content_id === "N/A"){
+							return false;
+						}
+						return true;
+					},
+					action: function(data) {
+					const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+						'cms/content.php?content_id=' + data.content_id;
+						return link;
+					}
+				},
+			]
+		},
         employee: {
             defaultaction: {
                 type: "link",
@@ -137,9 +158,6 @@ export const searchbaroptions = {
 };
 
 export const searchfunction = (searchsettings) =>  {
-    return Vue.$fhcapi.Search.search(searchsettings);  
+    return Vue.$fhcapi.search.search(searchsettings);  
 };
 
-export const searchfunctiondummy = (searchsettings) => {
-    return Vue.$fhcapi.Search.searchdummy(searchsettings);  
-};
