@@ -15,6 +15,7 @@ import Stundensatz from "./stundensatz.js";
 import Zeit from "./zeit.js";
 import Deadline from "./deadline.js";
 import SalaryRange from "./salaryrange.js";
+import SalaryExport from "./salaryexport.js";
 import Valorisierung from "./valorisierung.js";
 import ValorisierungCheck from "./valorisierungcheck.js";
 import CheckPerson from "../../../../js/api/checkperson.js";
@@ -37,6 +38,7 @@ export default {
     "Zeit": Zeit,
     "Deadline": Deadline,
     "SalaryRange": SalaryRange,
+    "SalaryExport": SalaryExport,
     "Valorisierung": Valorisierung,
     "ValorisierungCheck": ValorisierungCheck,
     "CheckPerson": CheckPerson

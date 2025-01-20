@@ -12,7 +12,7 @@
       'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
-                       'public/css/components/searchbar.css'],     
+                       'public/css/components/searchbar/searchbar.css'],
       'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/components/organisation/OrgChooser.js',
                                  'public/extensions/FHC-Core-Personalverwaltung/js/apps/Organisation.js'),
 		)
