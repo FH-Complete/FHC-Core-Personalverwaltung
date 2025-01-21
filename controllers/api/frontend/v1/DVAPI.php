@@ -171,7 +171,7 @@ class DVAPI extends Auth_Controller
         
         
         $dvList = array();
-        if (is_array($dvData->retval) && count($dvData->retval) > 0) {
+        if (is_array($dvData->retval) && numberOfElements($dvData->retval) > 0) {
             $dvList = $dvData->retval;
         } else {
             $this->outputJsonError('no DV found');
@@ -459,7 +459,7 @@ class DVAPI extends Auth_Controller
 					'mitarbeiter_uid' => $payload->mitarbeiter_uid,
 					'formdata' => json_encode($payload->formdata),
 					'updatevon' => $editor,
-					'updateamum' => strftime('%Y-%m-%d %H:%M')
+					'updateamum' => date('Y-m-d H:i')
 				)
 			);
 		}
@@ -471,7 +471,7 @@ class DVAPI extends Auth_Controller
 					'mitarbeiter_uid' => $payload->mitarbeiter_uid,
 					'formdata' => json_encode($payload->formdata),
 					'insertvon' => $editor,
-					'insertamum' => strftime('%Y-%m-%d %H:%M')
+					'insertamum' => date('Y-m-d H:i')
 				)
 			);
 			$tmpstoreid = getData($ret);

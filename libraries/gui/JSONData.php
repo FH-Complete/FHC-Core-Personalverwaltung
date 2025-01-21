@@ -15,7 +15,7 @@ trait JSONData {
     {
         if (isset($decoded[$attributeName]))
         {
-            $target = filter_var($decoded[$attributeName], FILTER_SANITIZE_STRING);
+            $target = htmlspecialchars($decoded[$attributeName]);
             return true;
         }
         return false;

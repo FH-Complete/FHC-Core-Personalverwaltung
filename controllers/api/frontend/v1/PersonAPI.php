@@ -108,7 +108,7 @@ class PersonAPI extends Auth_Controller
             $dataSupervisor = $this->ApiModel->getLeitungOrg($row->oe_kurzbz);
 
             // get supervisor if there is one (some departments do not have any)
-            if (count($dataSupervisor->retval)>0)
+            if (numberOfElements($dataSupervisor->retval)>0)
             {
                 $row->supervisor = $dataSupervisor->retval[0];
             }
@@ -1169,7 +1169,7 @@ class PersonAPI extends Auth_Controller
     {
         if (isset($decoded[$attributeName]))
         {
-            $target = filter_var($decoded[$attributeName], FILTER_SANITIZE_STRING);
+            $target = htmlspecialchars($decoded[$attributeName]);
             if ($target == '') return false;
             return true;
         }

@@ -102,7 +102,7 @@ abstract class AbstractBestandteil implements JsonSerializable {
      */
     public function hasErrors()
     {
-        if (isset($this->guioptions['errors']) && count($this->guioptions['errors']) > 0)
+        if (isset($this->guioptions['errors']) && numberOfElements($this->guioptions['errors']) > 0)
         {
             return true;
         }

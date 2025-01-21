@@ -79,8 +79,8 @@ class Issue extends Auth_Controller
 		$sql = <<<EOSQL
 SELECT
 
-		person_id, uid, vorname, nachname, count(*) AS openissues ,
-		(select count(*) anz_aktiv 
+		person_id, uid, vorname, nachname, numberOfElements(*) AS openissues ,
+		(select numberOfElements(*) anz_aktiv 
 		 from hr.tbl_dienstverhaeltnis dv 
 		 where dv.mitarbeiter_uid=uid and dv.von<=now() and 
 		       (dv.bis is null OR dv.bis>=now())
@@ -100,9 +100,9 @@ WHERE
 GROUP BY 
 		person_id, uid, vorname, nachname 
 HAVING 
-		count(*) > 0 
+		numberOfElements(*) > 0 
 ORDER BY 
-		count(*) DESC;
+		numberOfElements(*) DESC;
 			
 EOSQL;
 		

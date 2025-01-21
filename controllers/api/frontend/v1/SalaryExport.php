@@ -345,7 +345,7 @@ class SalaryExport extends Auth_Controller
 			"WS", "Von", "Bis", "Betrag", "Betrag valorisiert", "Karenz von", "Karenz bis");
 		$delimiter = ";";
 
-		if (count($data) > 0) {
+		if (numberOfElements($data) > 0) {
 			header('Content-Type: application/csv; charset=utf-8');
 			header('Content-Disposition: attachment; filename="gehaltsliste.csv",');
 			ob_start();

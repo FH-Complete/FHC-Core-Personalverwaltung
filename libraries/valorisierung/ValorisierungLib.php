@@ -261,12 +261,12 @@ class ValorisierungLib
 		}
 
 		// there should always be only 1 method applicable
-		if(count($applicableValorisationMethods) > 1)
+		if(numberOfElements($applicableValorisationMethods) > 1)
 		{
 			throw new Exception('ERROR: more than one Valorisation Method applicable.');
 		}
 
-		if(count($applicableValorisationMethods) == 1)
+		if(numberOfElements($applicableValorisationMethods) == 1)
 		{
 			// get the method and instance
 			$valMethod = $applicableValorisationMethods[0];

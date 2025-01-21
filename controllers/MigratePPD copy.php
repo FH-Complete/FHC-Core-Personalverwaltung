@@ -161,7 +161,7 @@ class MigratePPD extends CI_Controller {
         $qry = "select valorisierung_id from hr.tbl_valorisierung where datum=? and $where";
         $query = $this->ci->db->query($qry, array(sprintf('%d-9-1',$jahr), $parameter));
         $result = $query->result();
-        if (count($result) > 0) 
+        if (numberOfElements($result) > 0) 
         {
             return $result[0]->valorisierung_id;        
         }
@@ -222,7 +222,7 @@ class MigratePPD extends CI_Controller {
                                         // letztes valorisiertes Gehalt holen
                                         $letztesGehalt_row = $this->getPPDVertragLetztesGehalt($vertrag_row->vertrag_id);
 
-                                        if (count($letztesGehalt_row) > 0)
+                                        if (numberOfElements($letztesGehalt_row) > 0)
                                         {
                                             $ist_gehalt = $letztesGehalt_row[0]->betrag_ist;
                                         } else {
@@ -244,7 +244,7 @@ class MigratePPD extends CI_Controller {
                                         // letztes valorisiertes Gehalt holen
                                         $letztesGehalt_row = $this->getPPDVertragLetztesGehalt($anpassung_row->vertrag_id);
 
-                                        if (count($letztesGehalt_row) > 0)
+                                        if (numberOfElements($letztesGehalt_row) > 0)
                                         {
                                             $ist_gehalt += $letztesGehalt_row[0]->betrag_ist;
                                         } else {

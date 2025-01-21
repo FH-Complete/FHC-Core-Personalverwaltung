@@ -113,9 +113,9 @@ class GUIValidationHelper
 	
 	protected function checkListForOverlaps($listofsametype)
 	{
-		for($i=0; $i < (count($listofsametype)-1); $i++)
+		for($i=0; $i < (numberOfElements($listofsametype)-1); $i++)
 		{
-			for($j=($i+1); $j < count($listofsametype); $j++)
+			for($j=($i+1); $j < numberOfElements($listofsametype); $j++)
 			{
 				$this->checkForOverlap($listofsametype[$i], $listofsametype[$j]);
 			}
@@ -126,7 +126,7 @@ class GUIValidationHelper
 	{
 		foreach ($sievedlist as $vbsofsametype)
 		{
-			if( count($vbsofsametype) > 1 )
+			if( numberOfElements($vbsofsametype) > 1 )
 			{
 				$this->checkListForOverlaps($vbsofsametype);
 			}

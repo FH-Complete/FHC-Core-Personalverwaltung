@@ -176,7 +176,7 @@ class MigratePPD extends CI_Controller {
         $qry = "select valorisierung_id from hr.tbl_valorisierung where datum=? and $where";
         $query = $this->ci->db->query($qry, array(sprintf('%d-9-1',$jahr), $parameter));
         $result = $query->result();
-        if (count($result) > 0) 
+        if (numberOfElements($result) > 0) 
         {
             return $result[0]->valorisierung_id;        
         }
