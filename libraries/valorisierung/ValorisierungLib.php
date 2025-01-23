@@ -149,10 +149,12 @@ class ValorisierungLib
 			false
 		);
 
+		$withvalorisationhistory = (!is_null($date)) ? true : false;
 		$dvData['gehaltsbestandteile'] = $this->_ci->GehaltsbestandteilLib->fetchGehaltsbestandteile(
 			$dienstverhaeltnis_id,
 			$this->_valorisierungInstanz->valorisierungsdatum ?? $date,
-			false
+			false,
+			$withvalorisationhistory
 		);
 
 		return $dvData;
