@@ -62,60 +62,58 @@ class EchteDienstverhaeltnisseOhneOeVertragsbestandteil extends PlausiChecker
 	 * @param startDate date, after which Dienstverhaeltnisse are checked
 	 * @return success with data or error
 	 */
-	private function _getEchteDienstverhaeltnisseOhneOeVertragsbestandteil($person_id = null, $dienstverhaeltnis_id = null, $startDate)
+	private function _getEchteDienstverhaeltnisseOhneOeVertragsbestandteil($person_id = null, $dienstverhaeltnis_id = null, $startDate = null)
 	{
 		$params = array();
 
 		// there should be no day in Dienstverhaeltnis not covered by an Organisationseinheit Vertragsbestandteil
 		$qry = "
 			SELECT
-				DISTINCT person_id, dienstverhaeltnis_id
+				DISTINCT ON (person_id, dienstverhaeltnis_id) person_id, dienstverhaeltnis_id, vertragsbestandteil_id
 			FROM
 			(
 				SELECT
-					ben.person_id, dv.dienstverhaeltnis_id, dv.von, dv.bis, COALESCE(datum, dv.von) AS dv_tag
+					ben.person_id, dv.dienstverhaeltnis_id, MIN(vb.von) OVER (PARTITION BY dienstverhaeltnis_id) AS erster_vb_start, vertragsbestandteil_id,
+					vb.von, vb.bis, LEAD(vb.von) OVER (PARTITION BY dienstverhaeltnis_id ORDER BY vb.von, vb.bis) AS naechstes_von,
+					dv.von AS dv_von, dv.bis AS dv_bis
 				FROM
 					public.tbl_benutzer ben
 					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
 					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
-					LEFT JOIN generate_series(dv.von, dv.bis, '1 day'::interval) datum ON datum BETWEEN dv.von AND dv.bis
+					JOIN hr.tbl_vertragsbestandteil vb USING (dienstverhaeltnis_id)
+					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
+					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
 				WHERE
-					dv.vertragsart_kurzbz = 'echterdv'";
+					dv.vertragsart_kurzbz = 'echterdv'
+					AND vb.vertragsbestandteiltyp_kurzbz = 'funktion'
+					AND bf.funktion_kurzbz = 'oezuordnung'
+				ORDER BY
+					dienstverhaeltnis_id, von
+			) vbs
+			WHERE
+			(
+				naechstes_von - bis > 1 -- there is a gap inbetween
+				OR erster_vb_start > dv_von -- there is a gap in the beginning
+				OR naechstes_von IS NULL AND (COALESCE(bis, '9999-12-13') < COALESCE(dv_bis, '9999-12-13')) -- there is a gap at the end
+			)";
 
 		if (isset($person_id))
 		{
-			$qry .= " AND ben.person_id = ?";
+			$qry .= " AND person_id = ?";
 			$params[] = $person_id;
 		}
 
 		if (isset($dienstverhaeltnis_id))
 		{
-			$qry .= " AND dv.dienstverhaeltnis_id = ?";
+			$qry .= " AND dienstverhaeltnis_id = ?";
 			$params[] = $dienstverhaeltnis_id;
 		}
 
 		if (isset($startDate))
 		{
-			$qry .= " AND dv.von >= ?::date";
+			$qry .= " AND dv_von >= ?::date";
 			$params[] = $startDate;
 		}
-
-		$qry .= "
-			) dvs
-			WHERE NOT EXISTS
-			(
-				SELECT
-					1
-				FROM
-					hr.tbl_vertragsbestandteil vb
-					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
-					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
-				WHERE
-					vb.dienstverhaeltnis_id = dvs.dienstverhaeltnis_id
-					AND vb.vertragsbestandteiltyp_kurzbz = 'funktion'
-					AND bf.funktion_kurzbz = 'oezuordnung'
-					AND dvs.dv_tag >= vb.von AND (dvs.dv_tag <= vb.bis OR (vb.bis IS NULL))
-			)";
 
 		$qry .= "
 			ORDER BY
