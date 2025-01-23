@@ -3,7 +3,11 @@ import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
+  inject: [
+	  'hassalarypermission'
+  ],
   template: `
+  <template v-if="hassalarypermission">
   <div class="row pt-3 pb-1">
     <div class="col-12">
       <div class="position-relative">
@@ -15,6 +19,7 @@ export default {
   </div>
   <gehaltsbestandteil ref="parts" v-for="config in children"
     v-bind:config="config" :key="config.guioptions.id" @removeGB="removeGB"></gehaltsbestandteil>
+  </template>
   `,
   data: function() {
     return {
