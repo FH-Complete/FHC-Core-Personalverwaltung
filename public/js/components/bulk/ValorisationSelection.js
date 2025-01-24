@@ -231,7 +231,8 @@ export const ValorisationSelection = {
 							for( var row of rows ) {
 								var rowData = row.getData();
 								sumpreval += rowData.sumsalarypreval;
-								if (rowData.sumsalarypostval != null) {
+								if (rowData.sumsalarypostval != null 
+									&& false === isNaN(rowData.sumsalarypostval)) {
 									sumpostval += rowData.sumsalarypostval;
 									noSalaryPostval = false;
 								}
