@@ -56,6 +56,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'icon' => 'money-bill-wave',
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	),
+	'Gehaltsliste' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/SalaryExport'),
+		'description' => 'Gehaltsliste',
+		'icon' => 'file-export',
+		'requiredPermissions' => 'basis/gehaelter:r'
+	),
 	'Valorisierung' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Valorisation'),
 		'description' => 'Valorisierung',

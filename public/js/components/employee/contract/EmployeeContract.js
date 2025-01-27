@@ -933,7 +933,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
 
-                                        <div class="col-md-9">
+                                        <div class="col-md-12">
                                             <label class="form-label" >Text</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
                                         </div>
@@ -1031,7 +1031,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung' && item.oe_kurzbz_sap != null" :value="item.oe_kurzbz_sap">
                                         </div>
 
                                     </template>

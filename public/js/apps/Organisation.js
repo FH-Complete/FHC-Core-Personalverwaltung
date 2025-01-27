@@ -19,7 +19,7 @@ const pvApp = Vue.createApp(	{
 			currentPersonID: null,	
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
-			searchfunction: searchfunction,
+			searchfunction: this.$fhcApi.factory.search.search,
 			appSideMenuEntries: {},
 			isCollapsed: true
 		}

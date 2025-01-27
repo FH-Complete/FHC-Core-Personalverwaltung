@@ -17,7 +17,7 @@ class PersonAPI extends Auth_Controller
 
     public function __construct() {
         parent::__construct(array(
-            'headerData' => PersonAPI::DEFAULT_PERMISSION,
+            'headerData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
             'personAbteilung' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
             'uidByPerson' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
             'filterPerson' => PersonAPI::DEFAULT_PERMISSION,
@@ -74,7 +74,7 @@ class PersonAPI extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
         $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
         $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
-        
+
          // get CI for transaction management
          $this->CI = &get_instance();
     }
@@ -482,7 +482,7 @@ class PersonAPI extends Auth_Controller
         }
     }
 
-   
+
 
     // ---------------------------------------
     // base data (Stammdaten)
@@ -1149,7 +1149,7 @@ class PersonAPI extends Auth_Controller
         return $this->outputJson($data);
     }
 
-    
+
 
     // helper to create map with ID-attribute as index key
     private function _remapData($attribute, &$data) {

@@ -108,12 +108,33 @@ class GehaltsLib
 	{
 		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
 
-		$date = $this->getDate($date);
+		$date = $this->getDate(strtotime($date));
 
 		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
 		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);
 		$where .= " AND betrag = " . $this->_ci->db->escape($bestandteil->betrag_valorisiert);
 		$where .= " AND gehaltsbestandteil_id = " . $this->_ci->db->escape($bestandteil->gehaltsbestandteil_id);
+
+		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+
+		if (isError($result)) return $result;
+
+		return $result;
+	}
+
+	public function existsAnyGehaltshistorie($date, $orgID)
+	{
+		$this->_ci->GehaltshistorieModel->addSelect('EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) as month');
+		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_gehaltsbestandteil gb', 'gehaltsbestandteil_id');
+		$this->_ci->GehaltsbestandteilModel->addJoin('hr.tbl_dienstverhaeltnis dienstverhaeltnis', 'dienstverhaeltnis_id');
+		$this->_ci->GehaltshistorieModel->addLimit(1);
+		
+
+		$date = $this->getDate($date);
+
+		$where = "EXTRACT(MONTH FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['month']);
+		$where .= " AND EXTRACT(YEAR FROM hr.tbl_gehaltshistorie.datum) = ". $this->_ci->db->escape($date['year']);
+		$where .= " AND dienstverhaeltnis.oe_kurzbz = ".$this->_ci->db->escape($orgID);
 
 		$result = $this->_ci->GehaltshistorieModel->loadWhere($where, $this->_ci->GehaltshistorieModel->getEncryptedColumns());
 
@@ -159,6 +180,19 @@ class GehaltsLib
 		if (isError($ret))
 		{
 			throw new Exception('error deleting Gehaltshistorie');
+		}
+
+		return	$ret;
+	}
+
+	public function deleteGehaltshistorieByOrg($orgID, $date)
+	{
+		$ret = $this->_ci->GehaltshistorieModel->deleteByOrgID(
+			$orgID, $date);
+
+		if (isError($ret))
+		{
+			throw new Exception('error deleting gehaltshistorie [orgID='.$orgID.', date='.$date.']');
 		}
 
 		return	$ret;

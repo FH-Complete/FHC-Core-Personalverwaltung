@@ -22,7 +22,7 @@ export const SalaryRange = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue
+        const { toRefs, ref, inject } = Vue
         const betragDialogRef = ref();
         const deleteToastRef = ref();
         const createToastRef = ref();
@@ -40,6 +40,7 @@ export const SalaryRange = {
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
 
+        const fhcApi = inject('$fhcApi');
 
         const startOfYear = () => {
             const cleanDate = new Date(currentDate.value);
@@ -142,9 +143,9 @@ export const SalaryRange = {
             
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.SalaryRange.getAll(filterDate.value);         
-              if (res.data.error !==1) {
-                salaryRangeList.value = res.data.retval;
+              const res = await fhcApi.factory.SalaryRange.getAll(filterDate.value);
+              if (res.error !==1) {
+                salaryRangeList.value = res.retval;
               } else {
                 salaryRangeList.value = [];
               }              
@@ -161,8 +162,8 @@ export const SalaryRange = {
                 console.log("dialogRes=", dialogRes);
                 
                 try {
-                    const res = await Vue.$fhcapi.SalaryRange.upsertSalaryRange(dialogRes.payload);         
-                    if (res.data.error !==1) {
+                    const res = await fhcApi.factory.SalaryRange.upsertSalaryRange(dialogRes.payload);  
+                    if (res.error !==1) {
                         fetchData();
                         createToastRef.value.show();
                       // salaryRangeList.value = res.data.retval;
@@ -187,11 +188,10 @@ export const SalaryRange = {
                 console.log("dialogRes=", dialogRes);
                 
                 try {
-                    const res = await Vue.$fhcapi.SalaryRange.upsertSalaryRange(dialogRes.payload);         
-                    if (res.data.error !==1) {
+                    const res = await fhcApi.factory.SalaryRange.upsertSalaryRange(dialogRes.payload);       
+                    if (res.error !==1) {
                         fetchData();
                         updateToastRef.value.show();
-                      // salaryRangeList.value = res.data.retval;
                     } else {
                      // salaryRangeList.value = [];
                     }              
@@ -360,8 +360,8 @@ export const SalaryRange = {
             if (ok) {   
     
                 try {
-                    const res = await Vue.$fhcapi.SalaryRange.deleteSalaryRange(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.SalaryRange.deleteSalaryRange(id);             
+                    if (res.error == 0) {
                         salaryRangeList.value = salaryRangeList.value.filter((item) => item.gehaltsband_betrag_id != id);
                         deleteToastRef.value.show();
                     }
