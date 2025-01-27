@@ -1,4 +1,6 @@
 
+import FhcApi from '../../../../js/plugin/FhcApi.js';
+import pv21apifactory from "../api/api.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
@@ -53,6 +55,7 @@ const pvApp = Vue.createApp(	{
 
 //pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(primevue.config.default);
+pvApp.use(FhcApi, {factory: pv21apifactory})
 pvApp.use(Phrasen);
 //pvApp.use(primevue.toastservice);
 

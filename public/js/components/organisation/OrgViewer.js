@@ -15,7 +15,7 @@ export const OrgViewer = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue;
+        const { toRefs, ref, inject } = Vue;
         let { oe } = toRefs(props);
         const selection = ref({});
         const filters = ref({});
@@ -26,36 +26,30 @@ export const OrgViewer = {
         const currentValue = ref({});
         const currentPersons = ref([]);
 
-        const fetchOrg = async (oe) => {
-            try {
-       
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
+        const fhcApi = inject('$fhcApi');
 
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgStructure?oe=${oe}`;
-        
-              isFetching.value = true  
-              const res = await fetch(url)
-              let response = await res.json()    
-              isFetching.value = false                          
-              return { response };
-            } catch (error) {
-              console.log(error)        
-              isFetching.value = false        
-            }	
-        }  
-        
-        const fetchPersons = async (oe) => {
+        const fetchOrg = async (oe) => {
+            isFetching.value = true
             try {
-       
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgPersonen?oe=${oe}`;        
-              const res = await fetch(url)
-              let response = await res.json()    
-              return { response };
+              const res = await fhcApi.factory.OrgViewer.getOrgStructure(oe);
+              return res;
             } catch (error) {
-              console.log(error)        
-              isFetching.value = false        
-            }	
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }
+        }
+
+        const fetchPersons = async (oe) => {
+            isFetching.value = true
+            try {
+              const res = await fhcApi.factory.OrgViewer.getOrgPersonen(oe);
+              return res;
+            } catch (error) {
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }
         }
 
         const expandAll = () => {
@@ -88,8 +82,7 @@ export const OrgViewer = {
             currentValue.value = d;
             modalRef.value.show();
             const result = fetchPersons(d.oe_kurzbz).then((data) => {
-                console.log(data.response);
-                currentPersons.value = data.response.retval;
+                currentPersons.value = data.retval;
             })
         }
 
@@ -105,8 +98,8 @@ export const OrgViewer = {
  
 
         Vue.watch(oe, (currentVal, oldVal) => {            
-            const result = fetchOrg(currentVal).then((data) => {
-                nodes.value = [data.response];
+            fetchOrg(currentVal).then((data) => {
+                nodes.value = [data];
                 expandedKeys.value[nodes.value[0].key] = true;
                 
               }

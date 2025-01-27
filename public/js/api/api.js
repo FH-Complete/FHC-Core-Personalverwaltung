@@ -19,6 +19,7 @@ import SalaryExport from "./salaryexport.js";
 import Valorisierung from "./valorisierung.js";
 import ValorisierungCheck from "./valorisierungcheck.js";
 import CheckPerson from "../../../../js/api/checkperson.js";
+import OrgViewer from "./orgviewer.js";
 
 export default {
     "Vertragsbestandteil": Vertragsbestandteil,
@@ -41,5 +42,6 @@ export default {
     "SalaryExport": SalaryExport,
     "Valorisierung": Valorisierung,
     "ValorisierungCheck": ValorisierungCheck,
-    "CheckPerson": CheckPerson
+    "CheckPerson": CheckPerson,
+    "OrgViewer": OrgViewer,
 };
