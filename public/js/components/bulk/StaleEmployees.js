@@ -14,7 +14,7 @@ export const StaleEmployees = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue
+        const { toRefs, ref, inject } = Vue
         const employeeList = ref([])
         const isFetching = ref(false);
         const { t } = usePhrasen();
@@ -25,6 +25,8 @@ export const StaleEmployees = {
         const tableRef = ref(null); // reference to your table element
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
+
+        const fhcApi = inject('$fhcApi');
         
         const formatDateISO = (ds) => {
             let padNum = (n) => {
@@ -47,8 +49,8 @@ export const StaleEmployees = {
             
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Employee.getEmployeesWithoutContract();                    
-              employeeList.value = res.data.retval;
+              const res = await fhcApi.factory.Employee.getEmployeesWithoutContract();                    
+              employeeList.value = res.retval;
             } catch (error) {
               console.log(error)              
             } finally {
@@ -74,10 +76,9 @@ export const StaleEmployees = {
                 
                 // API call
                 try {
-                    const response = await Vue.$fhcapi.DV.deactivateDV(payload)
-                    console.log(response.data);
-                    if (response.data.error === 1) {
-                            console.log(response.data.retval)
+                    const response = await fhcApi.factory.DV.deactivateDV(payload)                    
+                    if (response.error === 1) {
+                            console.log(response.retval)
                     }
                     
                     if (cancelAction.value) {
