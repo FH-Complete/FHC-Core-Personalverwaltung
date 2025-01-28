@@ -421,7 +421,9 @@ class DVAPI extends Auth_Controller
 		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
 			$dvid,
 			$today->format('Y-m-d'),
-			$this->VertragsbestandteilLib::INCLUDE_FUTURE);
+			$this->VertragsbestandteilLib::INCLUDE_FUTURE,
+			$this->VertragsbestandteilLib::NOT_WITH_VALORISATION_HISTORY
+		);
 
 		$this->outputJson(
 			array(

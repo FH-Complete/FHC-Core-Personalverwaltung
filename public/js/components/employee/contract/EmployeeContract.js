@@ -70,7 +70,7 @@ export const EmployeeContract = {
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
 
-        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
 
         const numberFormat = new Intl.NumberFormat();
         const now = ref(truncateDate(new Date()));
@@ -1041,7 +1041,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung' && item.oe_kurzbz_sap != null" :value="item.oe_kurzbz_sap">
                                         </div>
 
                                     </template>
