@@ -742,7 +742,7 @@ class DVAPI extends Auth_Controller
      */
     private function gbtChartDataGesamtValorisiert($now, $dv_id)
     {
-        $gbtList = $this->GehaltsbestandteilLib->fetchGehaltsbestandteileValorisiert($dv_id, null, false);
+        $gbtList = $this->GehaltsbestandteilLib->fetchGehaltsbestandteileValorisiertForChart($dv_id, null, false);
 
         $hasFutureDate = false;
         $data = array();
