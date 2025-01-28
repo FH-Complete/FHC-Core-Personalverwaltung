@@ -70,7 +70,7 @@ export const EmployeeContract = {
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
 
-        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
 
         const numberFormat = new Intl.NumberFormat();
         const now = ref(truncateDate(new Date()));
