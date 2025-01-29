@@ -7,12 +7,13 @@ export const DvCard = {
      },
      setup( props ) {
         
-        const { watch, ref, toRefs, onMounted } = Vue; 
+        const { watch, ref, toRefs, onMounted, inject } = Vue; 
         const dvData = ref();
         const currentDate = ref(null);
         const isFetching = ref(false);
         const title = ref("Dienstverhältnis");
-        const currentUID = toRefs(props).uid;       
+        const currentUID = toRefs(props).uid;   
+        const fhcApi = inject('$fhcApi')       
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -32,7 +33,7 @@ export const DvCard = {
 			try {
               let ts = convert2UnixTS(currentDate.value);  // unix timestamp
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Employee.getCurrentDV(currentUID.value, ts);
+              const response = await fhcApi.factory.Employee.getCurrentDV(currentUID.value, ts);
               isFetching.value = false;              
 			  console.log(response.data.retval);	  
               if (response.data.retval.length>0) {

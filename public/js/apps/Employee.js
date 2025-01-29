@@ -1,5 +1,6 @@
 import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/api.js";
+import FhcApi from '../../../../js/plugin/FhcApi.js';
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
@@ -268,6 +269,7 @@ const fetchBeendigungsgruende = async () => {
 
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+pvApp.use(FhcApi, {factory: pv21apifactory});
 pvApp.use(Phrasen);
 pvApp.use(FhcAlert);
 pvApp.mount('#wrapper');

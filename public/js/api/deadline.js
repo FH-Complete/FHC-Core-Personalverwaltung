@@ -1,28 +1,24 @@
 export default {
 
   allByPerson: function(uid, all) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getPersonFristenListe/' + uid 
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getPersonFristenListe/' + uid 
             + '?all=' + all;
-    return axios.get(url);
+    return this.$fhcApi.get(url);
   },
 
   all: function() {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenListe';
-    return axios.get(url);
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenListe';
+    return this.$fhcApi.get(url);
   },
 
   updateFristenListe: function() {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/updateFristenListe';
-    return axios.get(url);
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/updateFristenListe';
+    return this.$fhcApi.get(url);
   },
 
   updateFristStatus: function(frist_id, status_kurzbz) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/updateFristStatus';
-    return axios.post(url, {frist_id, status_kurzbz}, {
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/updateFristStatus';
+    return this.$fhcApi.post(url, {frist_id, status_kurzbz}, {
       headers: {
         'Content-Type': 'application/json'
       } 
@@ -30,9 +26,8 @@ export default {
   },
 
   batchUpdateFristStatus: function(fristen, status_kurzbz) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/batchUpdateFristStatus';
-    return axios.post(url, {fristen, status_kurzbz}, {
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/batchUpdateFristStatus';
+    return this.$fhcApi.post(url, {fristen, status_kurzbz}, {
       headers: {
         'Content-Type': 'application/json'
       } 
@@ -40,9 +35,8 @@ export default {
   },
   
   upsertFrist: function(frist) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/upsertFrist';
-    return axios.post(url, frist, {
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/upsertFrist';
+    return this.$fhcApi.post(url, frist, {
       headers: {
         'Content-Type': 'application/json'
       } 
@@ -50,9 +44,8 @@ export default {
   },
 
   deleteFrist: function(frist_id) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/deleteFrist';
-    return axios.post(url, {frist_id}, {
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/deleteFrist';
+    return this.$fhcApi.post(url, {frist_id}, {
       headers: {
         'Content-Type': 'application/json'
       } 
@@ -60,21 +53,18 @@ export default {
   }, 
 
   getFristenStatus: function() {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenStatus';
-    return axios.get(url);
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenStatus';
+    return this.$fhcApi.get(url);
   },
 
   getFristenEreignisse: function() {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenEreignisse';
-    return axios.get(url);
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenEreignisse';
+    return this.$fhcApi.get(url);
   },
 
   getFristenEreignisseManuell: function() {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenEreignisse?manuell=1';
-    return axios.get(url);
+    let url =  '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/FristenAPI/getFristenEreignisse?manuell=1';
+    return this.$fhcApi.get(url);
   },
 
 };

@@ -19,6 +19,7 @@ export const IssuesCard = {
         const vertragsbestandteiltypen = inject('vertragsbestandteiltypen');
         const gehaltstypen = inject('gehaltstypen');
         const vertragsarten = inject('vertragsarten');
+        const fhcApi = inject('$fhcApi')  
         
         const formatVertragsbestandteiltyp = (item) => {
           let va = vertragsbestandteiltypen.value.find(kt => kt.value == item);
@@ -48,7 +49,7 @@ export const IssuesCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Issue.byPerson(currentPersonID.value);
+              const response = await fhcApi.factory.Issue.byPerson(currentPersonID.value);
               isFetching.value = false;              
 			  console.log(response.data.retval);	  
               if (response.data.retval.length>0) {

@@ -4,7 +4,6 @@ import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Naviga
 import verticalsplit from "../../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions, searchfunction } from "../../apps/common.js";
-import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
 import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
 import { Toast } from '../Toast.js';
@@ -16,7 +15,7 @@ export default {
     components: {
 		Sidebar,
 		CoreNavigationCmpt,
-                CoreFilterCmpt,
+        CoreFilterCmpt,
 		EmployeeEditor,		
 		verticalsplit,
 		searchbar,

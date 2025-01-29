@@ -14,12 +14,13 @@ export const DeadlineIssueDialog = {
     },  
     setup(props) {
 
-        const { watch, ref, toRefs, onMounted, defineExpose, toRaw, reactive } = Vue; 
+        const { watch, ref, toRefs, onMounted, defineExpose, toRaw, reactive, inject } = Vue; 
         const { t } = usePhrasen();
         const frist = ref()
         const fristStatus = ref([])
         const fristEreignisse = ref([])
         const isFetching = ref(false)
+        const fhcApi = inject('$fhcApi')
 
         // Modal 
         let modalRef = ref()
@@ -50,7 +51,7 @@ export const DeadlineIssueDialog = {
         const fetchFristStatus = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenStatus();
+                const res = await fhcApi.factory.Deadline.getFristenStatus();
                 fristStatus.value = res.data;			  
                 isFetching.value = false;                        
             } catch (error) {
@@ -62,7 +63,7 @@ export const DeadlineIssueDialog = {
         const fetchFristEreignisse = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenEreignisseManuell();
+                const res = await fhcApi.factory.Deadline.getFristenEreignisseManuell();
                 fristEreignisse.value = res.data;			  
                 isFetching.value = false;                        
             } catch (error) {
