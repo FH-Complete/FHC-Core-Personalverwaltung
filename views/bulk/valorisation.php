@@ -11,11 +11,11 @@ $this->load->view(
 	'vue3' => true,
 	'primevue3' => true,
 	'customCSSs' => array(
-	    'vendor/vuejs/vuedatepicker_css/main.css',
 	    'public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
 	    'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
 	    'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
-	    'public/css/components/searchbar/searchbar.css'
+	    'public/css/components/searchbar/searchbar.css',
+	    'vendor/vuejs/vuedatepicker_css/main.css'
 	),
 	'customJSs' => array(
 	    'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
