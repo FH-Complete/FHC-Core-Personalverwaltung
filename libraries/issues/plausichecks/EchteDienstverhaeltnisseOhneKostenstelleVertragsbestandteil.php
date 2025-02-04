@@ -71,19 +71,37 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 
 		// there should be no day in Dienstverhaeltnis not covered by a Kostenstelle Vertragsbestandteil
 		$qry = "
-			SELECT
-				DISTINCT person_id, dienstverhaeltnis_id
-			FROM
+			WITH vbs AS
 			(
 				SELECT
-					ben.person_id, dv.dienstverhaeltnis_id, dv.von, dv.bis, COALESCE(datum, dv.von) AS dv_tag
+					vb.dienstverhaeltnis_id, MIN(vb.von) OVER (PARTITION BY dienstverhaeltnis_id) AS erster_vb_start, vertragsbestandteil_id,
+					vb.von, vb.bis, LEAD(vb.von) OVER (PARTITION BY dienstverhaeltnis_id ORDER BY vb.von, vb.bis) AS naechstes_von
 				FROM
-					public.tbl_benutzer ben
-					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
-					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
-					LEFT JOIN generate_series(dv.von, dv.bis, '1 day'::interval) datum ON datum BETWEEN dv.von AND dv.bis
+					hr.tbl_vertragsbestandteil vb
+					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
+					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
 				WHERE
-					dv.vertragsart_kurzbz = 'echterdv'";
+					vb.vertragsbestandteiltyp_kurzbz = 'funktion'
+					AND bf.funktion_kurzbz = 'kstzuordnung'
+
+				ORDER BY
+					dienstverhaeltnis_id, von
+			)
+			SELECT
+				DISTINCT ben.person_id, dv.dienstverhaeltnis_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				LEFT JOIN vbs ON dv.dienstverhaeltnis_id = vbs.dienstverhaeltnis_id
+			WHERE
+				dv.vertragsart_kurzbz = 'echterdv'
+				AND (
+					vbs.vertragsbestandteil_id IS NULL
+					OR vbs.naechstes_von - vbs.bis NOT BETWEEN 0 AND 1 -- there is a gap inbetween
+					OR vbs.erster_vb_start > dv.von -- there is a gap in the beginning
+					OR (vbs.naechstes_von IS NULL AND (COALESCE(vbs.bis, '9999-12-13') < COALESCE(dv.bis, '9999-12-13'))) -- there is a gap at the end
+				)";
 
 		if (isset($person_id))
 		{
@@ -104,25 +122,8 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 		}
 
 		$qry .= "
-			) dvs
-			WHERE NOT EXISTS
-			(
-				SELECT
-					1
-				FROM
-					hr.tbl_vertragsbestandteil vb
-					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
-					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
-				WHERE
-					vb.dienstverhaeltnis_id = dvs.dienstverhaeltnis_id
-					AND vb.vertragsbestandteiltyp_kurzbz = 'funktion'
-					AND bf.funktion_kurzbz = 'kstzuordnung'
-					AND dvs.dv_tag >= vb.von AND (dvs.dv_tag <= vb.bis OR (vb.bis IS NULL))
-			)";
-
-		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id";
+				ben.person_id, dv.dienstverhaeltnis_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}

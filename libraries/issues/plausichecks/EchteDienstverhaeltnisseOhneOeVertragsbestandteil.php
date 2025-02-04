@@ -68,56 +68,59 @@ class EchteDienstverhaeltnisseOhneOeVertragsbestandteil extends PlausiChecker
 
 		// there should be no day in Dienstverhaeltnis not covered by an Organisationseinheit Vertragsbestandteil
 		$qry = "
-			SELECT
-				DISTINCT ON (person_id, dienstverhaeltnis_id) person_id, dienstverhaeltnis_id, vertragsbestandteil_id
-			FROM
+			WITH vbs AS
 			(
 				SELECT
-					ben.person_id, dv.dienstverhaeltnis_id, MIN(vb.von) OVER (PARTITION BY dienstverhaeltnis_id) AS erster_vb_start, vertragsbestandteil_id,
-					vb.von, vb.bis, LEAD(vb.von) OVER (PARTITION BY dienstverhaeltnis_id ORDER BY vb.von, vb.bis) AS naechstes_von,
-					dv.von AS dv_von, dv.bis AS dv_bis
+					vb.dienstverhaeltnis_id, MIN(vb.von) OVER (PARTITION BY dienstverhaeltnis_id) AS erster_vb_start, vertragsbestandteil_id,
+					vb.von, vb.bis, LEAD(vb.von) OVER (PARTITION BY dienstverhaeltnis_id ORDER BY vb.von, vb.bis) AS naechstes_von
 				FROM
-					public.tbl_benutzer ben
-					JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
-					JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
-					JOIN hr.tbl_vertragsbestandteil vb USING (dienstverhaeltnis_id)
+					hr.tbl_vertragsbestandteil vb
 					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
 					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
 				WHERE
-					dv.vertragsart_kurzbz = 'echterdv'
-					AND vb.vertragsbestandteiltyp_kurzbz = 'funktion'
+					vb.vertragsbestandteiltyp_kurzbz = 'funktion'
 					AND bf.funktion_kurzbz = 'oezuordnung'
+
 				ORDER BY
 					dienstverhaeltnis_id, von
-			) vbs
+			)
+			SELECT
+				DISTINCT ben.person_id, dv.dienstverhaeltnis_id
+			FROM
+				public.tbl_benutzer ben
+				JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+				JOIN hr.tbl_dienstverhaeltnis dv USING (mitarbeiter_uid)
+				LEFT JOIN vbs ON dv.dienstverhaeltnis_id = vbs.dienstverhaeltnis_id
 			WHERE
-			(
-				naechstes_von - bis > 1 -- there is a gap inbetween
-				OR erster_vb_start > dv_von -- there is a gap in the beginning
-				OR naechstes_von IS NULL AND (COALESCE(bis, '9999-12-13') < COALESCE(dv_bis, '9999-12-13')) -- there is a gap at the end
-			)";
+				dv.vertragsart_kurzbz = 'echterdv'
+				AND (
+					vbs.vertragsbestandteil_id IS NULL
+					OR vbs.naechstes_von - vbs.bis NOT BETWEEN 0 AND 1 -- there is a gap inbetween
+					OR vbs.erster_vb_start > dv.von -- there is a gap in the beginning
+					OR (vbs.naechstes_von IS NULL AND (COALESCE(vbs.bis, '9999-12-13') < COALESCE(dv.bis, '9999-12-13'))) -- there is a gap at the end
+				)";
 
 		if (isset($person_id))
 		{
-			$qry .= " AND person_id = ?";
+			$qry .= " AND ben.person_id = ?";
 			$params[] = $person_id;
 		}
 
 		if (isset($dienstverhaeltnis_id))
 		{
-			$qry .= " AND dienstverhaeltnis_id = ?";
+			$qry .= " AND dv.dienstverhaeltnis_id = ?";
 			$params[] = $dienstverhaeltnis_id;
 		}
 
 		if (isset($startDate))
 		{
-			$qry .= " AND dv_von >= ?::date";
+			$qry .= " AND dv.von >= ?::date";
 			$params[] = $startDate;
 		}
 
 		$qry .= "
 			ORDER BY
-				person_id, dienstverhaeltnis_id";
+				ben.person_id, dv.dienstverhaeltnis_id";
 
 		return $this->_db->execReadOnlyQuery($qry, $params);
 	}
