@@ -11,7 +11,7 @@ const ContractCountCard = {
         showNew: Boolean
      },
      setup( props ) {
-        const $fhcApi = Vue.inject('$fhcApi');
+        const fhcApi = Vue.inject('$fhcApi');
         const contractDataNew = Vue.ref();
         const currentDate = Vue.ref(new Date());
         const currentMonth = Vue.ref(currentDate.value.getMonth()+1);
@@ -37,10 +37,10 @@ const ContractCountCard = {
         ];
 
         const vertragsarten = Vue.ref([]);
-        Vue.$fhcapi.DV.getVertragsarten().then((resp) => {
+        fhcApi.factory.DV.getVertragsarten().then((resp) => {
             let varts = [];
             let defaultfilter = ['Echter DV', 'Studentische Hilfskraft'];
-            for( let vart of resp.data.retval) {
+            for( let vart of resp.retval) {
                 varts.push(vart.label);
                 if( defaultfilter.includes(vart.label) ) {
                     filters.value.vertragsart.value.push(vart.label);
@@ -86,11 +86,11 @@ const ContractCountCard = {
                 isFetching.value = true;
                 if (!props.showNew) {
                     title.value = "Dienstaustritte";
-                    response = await $fhcApi.factory.Common.getContractExpire(year, month);
+                    response = await fhcApi.factory.Common.getContractExpire(year, month);
                 } else {
-                    response = await $fhcApi.factory.Common.getContractNew(year, month);
+                    response = await fhcApi.factory.Common.getContractNew(year, month);
                 }
-                contractDataNew.value = response.data.retval.map((row) => {
+                contractDataNew.value = response.retval.map((row) => {
                     row.von = (row.von === null) ? null : new Date(row.von);
                     row.bis = (row.bis === null) ? null : new Date(row.bis);
                     return row;

@@ -19,6 +19,7 @@ export const BankData = {
     },
     setup( props ) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(false);
         const { personID } = Vue.toRefs(props);
         const { t } = usePhrasen();
@@ -38,8 +39,8 @@ export const BankData = {
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Person.personBankData(theModel.value.personID || personID.value);                    
-              bankdataList.value = res.data.retval;
+              const res = await fhcApi.factory.Person.personBankData(theModel.value.personID || personID.value);                    
+              bankdataList.value = res.retval;
             } catch (error) {
               console.log(error)              
             } finally {
@@ -122,8 +123,8 @@ export const BankData = {
 
                 isFetching.value = true
                 try {
-                  const res = await Vue.$fhcapi.Person.deletePersonBankData(id);                    
-                  if (res.data.error == 0) {
+                  const res = await fhcApi.factory.Person.deletePersonBankData(id);                    
+                  if (res.error == 0) {
                     delete bankdataList.value[id];
                     showDeletedToast();
                   }
@@ -148,9 +149,9 @@ export const BankData = {
             } else {
 
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonBankData(currentValue.value);                    
-                    if (r.data.error == 0) {
-                        bankdataList.value[r.data.retval[0].bankverbindung_id] = r.data.retval[0];
+                    const r = await fhcApi.factory.Person.upsertPersonBankData(currentValue.value);                    
+                    if (r.error == 0) {
+                        bankdataList.value[r.retval[0].bankverbindung_id] = r.retval[0];
                         console.log('bankdata successfully saved');
                         preservedValue.value = currentValue.value;
                         showToast();

@@ -40,7 +40,7 @@ class FristenAPI extends Auth_Controller
     {
 	$all = filter_var($this->input->get('all'), FILTER_VALIDATE_BOOLEAN);
         $result = $this->FristenLib->getFristenListe($uid, $all);
-        return $this->outputJson($result);
+        return $this->outputJsonSuccess($result);
     }
 
     public function updateFristenListe()
@@ -148,14 +148,20 @@ class FristenAPI extends Auth_Controller
     public function getFristenStatus()
 	{
 		$result = $this->FristenLib->getFristenStatus();
-		return $this->outputJson($result);
+        if ($result !== FALSE) {
+            return $this->outputJsonSuccess($result);
+        } 
+		return $this->outputJsonError('Error fetching frist status');
 	}
 
     public function getFristenEreignisse()
 	{
         $manuell = $this->input->get('manuell', FALSE);
 		$result = $this->FristenLib->getFristenEreignis($manuell);
-		return $this->outputJson($result);
+        if ($result !== FALSE) {
+            return $this->outputJsonSuccess($result);
+        } 
+		return $this->outputJsonError('Error fetching deadline events');
 	}
 
     public function deleteFrist()

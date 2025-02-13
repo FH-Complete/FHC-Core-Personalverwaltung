@@ -35,9 +35,9 @@ export const DvCard = {
               isFetching.value = true;
               const response = await fhcApi.factory.Employee.getCurrentDV(currentUID.value, ts);
               isFetching.value = false;              
-			  console.log(response.data.retval);	  
-              if (response.data.retval.length>0) {
-                dvData.value = response.data.retval;
+			  console.log(response.retval);	  
+              if (response.retval.length>0) {
+                dvData.value = response.retval;
               } else {
                 dvData.value = null;
               }

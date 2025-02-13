@@ -33,6 +33,7 @@ export const DeadlineIssueTable = {
       const confirmDeleteRef = ref();
       const modalContainer = ref();
       const fhcApi = inject('$fhcApi');
+      const fhcAlert = inject('$fhcAlert');
 
       const redirect = (issue_id) => {
         console.log('issue_id', person_id);
@@ -49,14 +50,15 @@ export const DeadlineIssueTable = {
             fristenTable.value.tabulator.dataLoader.alertLoader();
           }
           isFristFetching.value = true;
-          //const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value, deadline_filter_all.value);
-          const res = await fhcApi.factory.Deadline.allByPerson(currentUID.value, deadline_filter_all.value);
-          fristen.value = res.data;			  
-          isFristFetching.value = false;                        
+          fhcApi.factory.Deadline.allByPerson(currentUID.value, deadline_filter_all.value)
+            .then(result => {
+              fristen.value = result.error !== 1 ? result.retval : [];	
+            }).catch(fhcAlert.handleSystemError);  
+          			  
         } catch (error) {
-          console.log(error);
-          isFristFetching.value = false;           
+          console.log(error);         
         } finally {
+            isFristFetching.value = false;   
             if( fristenTable.value?.tabulator !== null ) {
                 fristenTable.value.tabulator.dataLoader.clearAlert();
             }
@@ -66,13 +68,17 @@ export const DeadlineIssueTable = {
       const fetchFristStatus = async () => {
         try {
             isFetching.value = true;
-            const res = await fhcApi.factory.Deadline.getFristenStatus();
-            fristStatus.value = res.data;		
-            isFetching.value = false;                        
+            fhcApi
+			        .factory.Deadline.getFristenStatus()
+			        .then(result => {
+                fristStatus.value = result.error !== 1 ? result.retval : [];				        	
+			        })
+			        .catch(fhcAlert.handleSystemError);              
         } catch (error) {
-            console.log(error);
-            isFetching.value = false;           
-        }	
+            console.log(error);               
+        }	finally {
+            isFetching.value = false;
+        }
       }
 
       
@@ -90,7 +96,7 @@ export const DeadlineIssueTable = {
         try {
             isFetching.value = true;
             const res = await fhcApi.factory.Deadline.getFristenEreignisse();
-            fristEreignisse.value = res.data;			  
+            fristEreignisse.value = res.retval;			  
             isFetching.value = false;                        
         } catch (error) {
             console.log(error);
@@ -134,7 +140,7 @@ export const DeadlineIssueTable = {
 
             try {
                 const res = await fhcApi.factory.Deadline.deleteFrist(id);                    
-                if (res.data.error == 0) {
+                if (res.error == 0) {
                     fristen.value = fristen.value.filter((frist) => frist.frist_id != id);
                     showDeletedToast();
                 }
@@ -309,7 +315,7 @@ export const DeadlineIssueTable = {
           fetchList();
           showToast();     
         } catch (error) {
-            console.log(error);                
+            fhcAlert.handleSystemError(error)
         } finally {
             isFetching.value = false;
         }     

@@ -31,6 +31,7 @@ export const AddressData = {
 
         const confirmDeleteRef = Vue.ref();
 
+        const fhcApi = Vue.inject('$fhcApi');
         const nations = Vue.inject('nations');
         const adressentyp = Vue.inject('adressentyp');
 
@@ -53,8 +54,8 @@ export const AddressData = {
             isFetching.value = true
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personAddressData(personID.value);                    
-                addressList.value = response.data.retval;
+                const response = await fhcApi.factory.Person.personAddressData(personID.value);                    
+                addressList.value = response.retval;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -68,8 +69,8 @@ export const AddressData = {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 try  {
                     isFetching.value = true
-                    const response = await Vue.$fhcapi.Common.getGemeinden(currentAddress.value.plz);     
-                    gemeinden.value = response.data.retval;
+                    const response = await fhcApi.factory.Common.getGemeinden(currentAddress.value.plz);     
+                    gemeinden.value = response.retval;
                 } catch (error) {
                     console.log(error)                    
                 } finally {
@@ -82,8 +83,8 @@ export const AddressData = {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 try  {
                     isFetching.value = true
-                    const response = await Vue.$fhcapi.Common.getOrtschaften(currentAddress.value.plz);     
-                    ortschaften.value = response.data.retval;
+                    const response = await fhcApi.factory.Common.getOrtschaften(currentAddress.value.plz);     
+                    ortschaften.value = response.retval;
                 } catch (error) {
                     console.log(error)                    
                 } finally {
@@ -115,8 +116,8 @@ export const AddressData = {
             if (ok && !currentAddress.value.heimatadresse) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonAddressData(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.Person.deletePersonAddressData(id);                    
+                    if (res.error == 0) {
                         delete addressList.value[id];
                         showDeletedToast();
                     }
@@ -180,9 +181,9 @@ export const AddressData = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonAddressData(currentAddress.value);                    
-                    if (r.data.error == 0) {
-                        addressList.value[r.data.retval[0].adresse_id] = r.data.retval[0];
+                    const r = await fhcApi.factory.Person.upsertPersonAddressData(currentAddress.value);                    
+                    if (r.error == 0) {
+                        addressList.value[r.retval[0].adresse_id] = r.retval[0];
                         console.log('address successfully saved');
                         showToast();
                     }

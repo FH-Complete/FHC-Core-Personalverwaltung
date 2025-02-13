@@ -89,6 +89,9 @@ export const EmployeeContract = {
         const readonly = ref(false);
         const valorisationValid = ref(true);
 
+        const fhcApi = inject('$fhcApi');  
+        const fhcAlert = inject('$fhcAlert');
+
         const convert2UnixTS = (ds) => {
             let d = new Date(ds);
             return Math.round(d.getTime() / 1000)
@@ -171,8 +174,8 @@ export const EmployeeContract = {
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
-                dvList.value = res.data.retval;
+              const res = await fhcApi.factory.Employee.dvByPerson(uid);
+                dvList.value = res.retval;
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
                     if (props.dienstverhaeltnis_id != undefined) {
@@ -226,22 +229,26 @@ export const EmployeeContract = {
         // fetch chart data
         const fetchGBTChartData = async (dv_id, date) => {
             isFetching.value = true
+            let tempData1 = [], tempData2 = [];
             try {
-                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
-                gbtChartData.value = res.data;
-                let tempData1 = [], tempData2 = [];
-                // chartOptions.series[0].data.length = 0;
-                Object.keys(res.data.gesamt).forEach(element => {
-                   tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
-                });
-                res.data.abgerechnet.forEach(element => {
-                    tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
-                });
-                chartOptions.series[0].data = tempData1;
-                chartOptions.series[1].data = tempData2;
+                if (dv_id != null) {
+                    const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                    gbtChartData.value = res.data;
+                    
+                    // chartOptions.series[0].data.length = 0;
+                    Object.keys(res.data.gesamt).forEach(element => {
+                       tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                    });
+                    res.data.abgerechnet.forEach(element => {
+                        tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
+                    });
+                }
+                
             } catch (error) {
                 console.log(error)
             } finally {
+                chartOptions.series[0].data = tempData1;
+                chartOptions.series[1].data = tempData2;
                 isFetching.value = false
             }
 

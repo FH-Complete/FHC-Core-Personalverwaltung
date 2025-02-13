@@ -27,6 +27,7 @@ export const StaleEmployees = {
         const selectedData = ref([]);
 
         const fhcApi = inject('$fhcApi');
+        const fhcAlert = inject('$fhcAlert');
         
         const formatDateISO = (ds) => {
             let padNum = (n) => {
@@ -76,10 +77,16 @@ export const StaleEmployees = {
                 
                 // API call
                 try {
-                    const response = await fhcApi.factory.DV.deactivateDV(payload)                    
-                    if (response.error === 1) {
-                            console.log(response.retval)
-                    }
+                    fhcApi.
+                        factory.DV.deactivateDV(payload)                    
+                        .then(result => {
+                            if (result.error === 1) {
+                                console.log(result)
+                                fhcAlert.handleSystemError(result)
+                            }
+                        })
+                        .catch(fhcAlert.handleSystemError);  	  
+                    
                     
                     if (cancelAction.value) {
                         await fetchData();

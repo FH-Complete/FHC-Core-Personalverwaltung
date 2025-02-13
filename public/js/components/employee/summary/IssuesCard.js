@@ -94,7 +94,7 @@ export const IssuesCard = {
         }
         const getDV = async (dvid) =>  {
             try {
-                let res = await Vue.$fhcapi.DV.getDVByID(dvid)
+                let res = await fhcApi.factory.DV.getDVByID(dvid)
                 console.log(res);
                 return res;
             } catch(error) {
@@ -124,7 +124,7 @@ export const IssuesCard = {
                                     if (!('dvs' in issue.behebung_data)) {
                                         issue.behebung_data['dvs'] = {};
                                     }                            
-                                    issue.behebung_data.dvs[dienstverhaeltnis_id] = vb.data;
+                                    issue.behebung_data.dvs[dienstverhaeltnis_id] = vb;
                                 })
                                 break;
                         case 'vertragsbestandteil_id':
@@ -138,7 +138,7 @@ export const IssuesCard = {
                                 if (!('vbs' in issue.behebung_data)) {
                                     issue.behebung_data['vbs'] = {};
                                 }                            
-                                issue.behebung_data.vbs[vertragsbestandteil_id] = vb.data;
+                                issue.behebung_data.vbs[vertragsbestandteil_id] = vb;
                             })
                             
                             break;

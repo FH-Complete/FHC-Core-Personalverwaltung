@@ -23,6 +23,10 @@ export const JobFunction = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
+        const fhcApi = inject('$fhcApi');
+        const fhcAlert = inject('$fhcAlert');
+
+
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -74,14 +78,14 @@ export const JobFunction = {
  
             // fetch data and map them for easier access
             try {
-                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
-                if(response.data.error === 1) {
+                const response = await fhcApi.factory.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
+                if(response.error === 1) {
                     let rawList = [];
                     tableData.value = [];
                     jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
                 } else {
-                    let rawList = response.data.retval;
-                    tableData.value = response.data.retval;
+                    let rawList = response.retval;
+                    tableData.value = response.retval;
                     jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
                 }
             } catch (error) {
@@ -277,9 +281,9 @@ export const JobFunction = {
             // fetch company
             isFetching.value = true;
             try {
-                const res = await Vue.$fhcapi.Funktion.getCompanyByOrget(currentValue.value.oe_kurzbz);                    
-                if (res.data.error == 0) {
-                    unternehmen.value = res.data.retval[0].oe_kurzbz;
+                const res = await fhcApi.factory.Funktion.getCompanyByOrget(currentValue.value.oe_kurzbz);                    
+                if (res.error == 0) {
+                    unternehmen.value = res.retval[0].oe_kurzbz;
                 } else {
                     console.log('company not found for orget!');
                 }
@@ -300,8 +304,8 @@ export const JobFunction = {
             if (ok) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonJobFunction(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.Person.deletePersonJobFunction(id);                    
+                    if (res.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
                         theModel.value.updateHeader();
@@ -332,10 +336,8 @@ export const JobFunction = {
                     delete payload.funktion_oebezeichnung;
                     delete payload.aktiv;
                     delete payload.funktion_beschreibung;
-                    const r = await Vue.$fhcapi.Person.upsertPersonJobFunction(payload);                    
-                    if (r.data.error == 0) {
-                        //jobfunctionList.value[r.data.retval[0].benutzerfunktion_id] = 
-                        //    {r.data.retval[0]};
+                    const r = await fhcApi.factory.Person.upsertPersonJobFunction(payload);                    
+                    if (r.error == 0) {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
@@ -402,8 +404,8 @@ export const JobFunction = {
             if( unternehmen_kurzbz === '' ) {
                 return;
             }
-            const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(unternehmen_kurzbz);
-            const orgets = response.data.retval;
+            const response = await fhcApi.factory.Funktion.getOrgetsForCompany(unternehmen_kurzbz);
+            const orgets = response.retval;
             orgets.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),
@@ -415,8 +417,8 @@ export const JobFunction = {
             if(unternehmen_kurzbz === '' || uid === '' ) { 
               return;  
             }
-            const response = await Vue.$fhcapi.Funktion.getAllFunctions();
-            const benutzerfunktionen = response.data.retval;
+            const response = await fhcApi.factory.Funktion.getAllFunctions();
+            const benutzerfunktionen = response.retval;
             benutzerfunktionen.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),

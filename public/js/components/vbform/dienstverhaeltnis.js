@@ -66,6 +66,7 @@ export default {
         required: false
     }
   },
+  inject: ['$fhcApi','$fhcAlert'],
   data: function() {
     return {
       'vertragsart_kurzbz': '',
@@ -102,8 +103,8 @@ export default {
       return (optvalue === selvalue);
     },
     getUnternehmen: async function() {
-      const response = await Vue.$fhcapi.DV.getUnternehmen();
-      const unternehmen = response.data.retval;
+      const response = await this.$fhcApi.factory.DV.getUnternehmen();
+      const unternehmen = response.retval;
       unternehmen.unshift({
         value: '',
         label: 'Unternehmen wählen',
@@ -112,8 +113,8 @@ export default {
       this.lists.unternehmen = unternehmen;
     },
     getVertragsarten: async function() {
-      const response = await Vue.$fhcapi.DV.getVertragsarten();
-      const vertragsarten = response.data.retval;
+      const response = await this.$fhcApi.factory.DV.getVertragsarten();
+      const vertragsarten = response.retval;
       vertragsarten.unshift({
         value: '',
         label: 'Vertragsart wählen',
@@ -122,8 +123,8 @@ export default {
       return this.lists.vertragsarten = vertragsarten;
     },
     getDvEndeGruende: async function() {
-      const response = await Vue.$fhcapi.DV.getDvEndeGruende();
-      const dvendegruende = response.data.retval;
+      const response = await this.$fhcApi.factory.DV.getDvEndeGruende();
+      const dvendegruende = response.retval;
       dvendegruende.unshift({
         value: '',
         label: 'Beendigungsgrund wählen',

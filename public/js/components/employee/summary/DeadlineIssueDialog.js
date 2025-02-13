@@ -21,6 +21,7 @@ export const DeadlineIssueDialog = {
         const fristEreignisse = ref([])
         const isFetching = ref(false)
         const fhcApi = inject('$fhcApi')
+        const fhcAlert = inject('$fhcAlert');
 
         // Modal 
         let modalRef = ref()
@@ -50,9 +51,13 @@ export const DeadlineIssueDialog = {
 
         const fetchFristStatus = async () => {
             try {
-                isFetching.value = true;
-                const res = await fhcApi.factory.Deadline.getFristenStatus();
-                fristStatus.value = res.data;			  
+                isFetching.value = true;	
+                fhcApi
+			        .factory.Deadline.getFristenStatus()
+			        .then(result => {
+                        fristStatus.value = result.error !== 1 ? result.retval : [];				        	
+			        })
+			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);
@@ -63,8 +68,12 @@ export const DeadlineIssueDialog = {
         const fetchFristEreignisse = async () => {
             try {
                 isFetching.value = true;
-                const res = await fhcApi.factory.Deadline.getFristenEreignisseManuell();
-                fristEreignisse.value = res.data;			  
+                fhcApi
+			        .factory.Deadline.getFristenEreignisseManuell()
+			        .then(result => {
+                        fristEreignisse.value = result.error !== 1 ? result.retval : [];
+			        })
+			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);

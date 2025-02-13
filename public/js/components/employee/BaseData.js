@@ -18,6 +18,7 @@ export const BaseData = {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(true);
 
         const { personID } = Vue.toRefs(props);
@@ -57,8 +58,8 @@ export const BaseData = {
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Person.personBaseData(theModel.value.personID || personID.value);
-              currentValue.value = res.data.retval[0];
+              const res = await fhcApi.factory.Person.personBaseData(theModel.value.personID || personID.value);
+              currentValue.value = res.retval[0];
             } catch (error) {
               console.log(error)              
             } finally {
@@ -192,9 +193,9 @@ export const BaseData = {
 
                 // submit
                 try {
-                    const response = await Vue.$fhcapi.Person.updatePersonBaseData(currentValue.value);                    
+                    const response = await fhcApi.factory.Person.updatePersonBaseData(currentValue.value);                    
                     showToast();
-                    currentValue.value = response.data.retval[0];
+                    currentValue.value = response.retval[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  
