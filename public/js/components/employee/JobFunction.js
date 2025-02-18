@@ -23,8 +23,8 @@ export const JobFunction = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
-        const fhcApi = inject('$fhcApi');
-        const fhcAlert = inject('$fhcAlert');
+        const fhcApi = Vue.inject('$fhcApi');
+        const fhcAlert = Vue.inject('$fhcAlert');
 
 
         const readonly = Vue.ref(false);
