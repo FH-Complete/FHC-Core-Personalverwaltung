@@ -21,6 +21,8 @@ export const DeadlineIssueTable = {
 
       const current_status_kurzbz = Vue.ref("");
 
+      const fhcApi = Vue.inject('$fhcApi') 
+
       const dateFormatter = (cell) => {
         return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
       }
@@ -39,8 +41,8 @@ export const DeadlineIssueTable = {
             tabulator.value.dataLoader.alertLoader();
           }
           isFetching.value = true;
-          const res = await Vue.$fhcapi.Deadline.all();
-          fristen.value = res.data;
+          const res = await fhcApi.factory.Deadline.all();
+          fristen.value = res;
           isFetching.value = false;
         } catch (error) {const columnsDef = [
           { title: 'Ereignis', field: "ereignis_bezeichnung", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
@@ -80,8 +82,8 @@ export const DeadlineIssueTable = {
       const fetchFristStatus = async () => {
         try {
             isFetching.value = true;
-            const res = await Vue.$fhcapi.Deadline.getFristenStatus();
-            fristStatus.value = res.data;
+            const res = await fhcApi.factory.Deadline.getFristenStatus();
+            fristStatus.value = res.retval;
             isFetching.value = false;
         } catch (error) {
             console.log(error);
@@ -92,7 +94,7 @@ export const DeadlineIssueTable = {
       const updateDeadlines = async () => {
         try {
           isFetching.value = true;
-          const res = await Vue.$fhcapi.Deadline.updateFristenListe();
+          const res = await fhcApi.factory.Deadline.updateFristenListe();
           isFetching.value = false;
           fetchList();
           showRefreshToast();
@@ -213,7 +215,7 @@ export const DeadlineIssueTable = {
           console.log('fristen', fristen)
           try  {
             isFetching.value = true
-            const res = await Vue.$fhcapi.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);
+            const res = await fhcApi.factory.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);
             fetchList();
             showToast();
           } catch (error) {

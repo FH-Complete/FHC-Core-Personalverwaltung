@@ -7,7 +7,7 @@ const BirthdayCountCard = {
      props: {
      },
      setup( ) {
-        const $fhcApi = Vue.inject('$fhcApi');
+        const fhcApi = Vue.inject('$fhcApi');
         const birthdayData = Vue.ref();
         const currentDate = Vue.ref(new Date());
         const currentMonth = Vue.ref(currentDate.value.getMonth()+1);
@@ -30,8 +30,8 @@ const BirthdayCountCard = {
             try {
                 let ts = Math.round(currentDate.value.getTime() / 1000);  // unix timestamp
                 isFetching.value = true;
-                const response = await $fhcApi.factory.Common.getBirthdays(ts);
-                birthdayData.value = response.data.retval;
+                const response = await fhcApi.factory.Common.getBirthdays(ts);
+                birthdayData.value = response.retval;
             } catch (error) {
                 console.log(error);
             } finally {

@@ -47,7 +47,7 @@ class FristenAPI extends Auth_Controller
     {
 		$d = new DateTime();
 		$result = $this->FristenLib->updateFristen($d);
-        return $this->outputJson($result);
+        return $this->outputJsonSuccess($result);
     }
 
     public function updateFristStatus()
