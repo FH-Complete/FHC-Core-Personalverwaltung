@@ -109,59 +109,62 @@ export const IssuesCard = {
 
                 let behebungParam = JSON.parse(issue.behebung_parameter);  // why is it a string?
 
-                const keys = Object.keys(behebungParam);
-                keys.forEach((key, index) => {              
+                if (behebungParam != null) {
 
-                    switch (key) {
-                        case 'dienstverhaeltnis_id':
-                        case 'erste_dienstverhaeltnis_id':
-                        case 'zweite_dienstverhaeltnis_id':
-                                getDV( behebungParam[key] ).then((vb) => {
-                                    let dienstverhaeltnis_id = behebungParam[key] + '';
+                    const keys = Object.keys(behebungParam);
+                    keys.forEach((key, index) => {              
+
+                        switch (key) {
+                            case 'dienstverhaeltnis_id':
+                            case 'erste_dienstverhaeltnis_id':
+                            case 'zweite_dienstverhaeltnis_id':
+                                    getDV( behebungParam[key] ).then((vb) => {
+                                        let dienstverhaeltnis_id = behebungParam[key] + '';
+                                        if (!('behebung_data' in issue)) {
+                                            issue.behebung_data = { dvs: {} };                                
+                                        }
+                                        if (!('dvs' in issue.behebung_data)) {
+                                            issue.behebung_data['dvs'] = {};
+                                        }                            
+                                        issue.behebung_data.dvs[dienstverhaeltnis_id] = vb;
+                                    })
+                                    break;
+                            case 'vertragsbestandteil_id':
+                            case 'erste_vertragsbestandteil_id':
+                            case 'zweite_vertragsbestandteil_id':                            
+                                getVB( behebungParam[key] ).then((vb) => {
+                                    let vertragsbestandteil_id = behebungParam[key] + '';
                                     if (!('behebung_data' in issue)) {
-                                        issue.behebung_data = { dvs: {} };                                
+                                        issue.behebung_data = { vbs: {} };                                
                                     }
-                                    if (!('dvs' in issue.behebung_data)) {
-                                        issue.behebung_data['dvs'] = {};
+                                    if (!('vbs' in issue.behebung_data)) {
+                                        issue.behebung_data['vbs'] = {};
                                     }                            
-                                    issue.behebung_data.dvs[dienstverhaeltnis_id] = vb;
+                                    issue.behebung_data.vbs[vertragsbestandteil_id] = vb;
+                                })
+                                
+                                break;
+                            
+
+                            case 'gehaltsbestandteil_id':
+                                getGB( behebungParam[key] ).then((gb) => {
+                                    let gehaltsbestandteil_id = behebungParam[key] + '';
+                                    if (!('behebung_data' in issue)) {
+                                        issue.behebung_data = { gbs: {} };                                
+                                    }
+                                    if (!('gbs' in issue.behebung_data)) {
+                                        issue.behebung_data['gbs'] = {};
+                                    }                            
+                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb.data;
                                 })
                                 break;
-                        case 'vertragsbestandteil_id':
-                        case 'erste_vertragsbestandteil_id':
-                        case 'zweite_vertragsbestandteil_id':                            
-                            getVB( behebungParam[key] ).then((vb) => {
-                                let vertragsbestandteil_id = behebungParam[key] + '';
-                                if (!('behebung_data' in issue)) {
-                                    issue.behebung_data = { vbs: {} };                                
-                                }
-                                if (!('vbs' in issue.behebung_data)) {
-                                    issue.behebung_data['vbs'] = {};
-                                }                            
-                                issue.behebung_data.vbs[vertragsbestandteil_id] = vb;
-                            })
-                            
-                            break;
                         
-
-                        case 'gehaltsbestandteil_id':
-                            getGB( behebungParam[key] ).then((gb) => {
-                                let gehaltsbestandteil_id = behebungParam[key] + '';
-                                if (!('behebung_data' in issue)) {
-                                    issue.behebung_data = { gbs: {} };                                
-                                }
-                                if (!('gbs' in issue.behebung_data)) {
-                                    issue.behebung_data['gbs'] = {};
-                                }                            
-                                issue.behebung_data.gbs[gehaltsbestandteil_id] = gb.data;
-                            })
-                            break;
-                    
-                        default:
-                            console.log('Behebungsparameter not supported', behebungParam);
-                            break;
-                    }
-                })
+                            default:
+                                console.log('Behebungsparameter not supported', behebungParam);
+                                break;
+                        }
+                    })
+                }
             });
 
             
