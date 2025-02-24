@@ -19,6 +19,7 @@ export const TimeRecording = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -65,11 +66,11 @@ export const TimeRecording = {
             }
             try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
+              const response = await fhcApi.factory.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
               isFetching.value = false;              
-              console.log('zeiterfassung', response.data.retval);	  
-              if (response.data.retval.length>0) {
-                timeRecordList.value = response.data.retval;
+              console.log('zeiterfassung', response.retval);	  
+              if (response.retval.length>0) {
+                timeRecordList.value = response.retval;
               } else {
                 timeRecordList.value = [];
               }

@@ -22,6 +22,7 @@ export const OffTime = {
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
+        const fhcApi = Vue.inject('$fhcApi');
 
         const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
@@ -40,7 +41,6 @@ export const OffTime = {
 
         const offTimeTable = Vue.ref(null); // reference to your table element
         const tabulator = Vue.ref(null); // variable to hold your table
-        const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const route = VueRouter.useRoute();
         const currentValue = Vue.ref();
 
@@ -72,11 +72,11 @@ export const OffTime = {
             }
             try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value);
+              const response = await fhcApi.factory.Zeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value);
               isFetching.value = false;              
-              console.log('abwesenheiten', response.data.retval);	  
-              if (response.data.retval.length>0) {
-                offTimeList.value = response.data.retval;
+              console.log('abwesenheiten', response.retval);	  
+              if (response.retval.length>0) {
+                offTimeList.value = response.retval;
               } else {
                 offTimeList.value = [];
               }
@@ -155,7 +155,6 @@ export const OffTime = {
         }
  
         const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-        const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
 
         return { 
             offTimeList, orgUnitList, 
@@ -163,7 +162,6 @@ export const OffTime = {
             currentValue,
             currentYear,            
             dialogRef,
-            fullPath,
             route,            
             unternehmen,
             tabulator,

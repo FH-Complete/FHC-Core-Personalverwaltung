@@ -19,6 +19,7 @@
 //import {LogsViewerTabulatorEventHandlers} from './TabulatorSetup.js';
 import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../../api/api.js";
+import FhcApi from '../../../../../js/plugin/FhcApi.js';
 
 import {CoreFilterCmpt} from '../../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
@@ -179,7 +180,7 @@ const handyVerwaltungApp = Vue.createApp({
                                         :new-btn-show="false">
                                     </core-filter-cmpt>
                                 </div>
-                            </template>
+                            </template>pv21apifactory
     
                             <template #bottom>
 
@@ -224,6 +225,7 @@ const handyVerwaltungApp = Vue.createApp({
 });
 
 handyVerwaltungApp.use(primevue.config.default);
+handyVerwaltungApp.use(FhcApi, {factory: pv21apifactory});
 handyVerwaltungApp.use(Phrasen).mount('#main');
 handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 
