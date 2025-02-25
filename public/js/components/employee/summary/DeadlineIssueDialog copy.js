@@ -15,8 +15,9 @@ export const DeadlineIssueDialog = {
     },  
     setup(props) {
 
-        const { watch, ref, toRefs, onMounted, defineExpose } = Vue; 
+        const { watch, inject, ref, toRefs, onMounted, defineExpose } = Vue; 
         const { t } = usePhrasen();
+        const fhcApi = inject('$fhcApi');
         const currentUID = toRefs(props).uid
         const frist = ref()
         const fristStatus = ref([])
@@ -51,8 +52,8 @@ export const DeadlineIssueDialog = {
         const fetchFristStatus = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenStatus();
-                fristStatus.value = res.data;			  
+                const res = await fhcApi.factory.Deadline.getFristenStatus();
+                fristStatus.value = res;			  
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);
@@ -63,8 +64,8 @@ export const DeadlineIssueDialog = {
         const fetchFristEreignisse = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenEreignisse();
-                fristEreignisse.value = res.data;			  
+                const res = await fhcApi.factory.Deadline.getFristenEreignisse();
+                fristEreignisse.value = res;			  
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);
@@ -127,7 +128,7 @@ export const DeadlineIssueDialog = {
                 // submit
                 try {
                     _resolve({type: 'CREATED', payload: { frist }})
-                    /* const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
+                    /* const r = await fhcApi.factory.Person.upsertPersonMaterialExpenses(currentValue.value);                    
                     if (r.data.error == 0) {
                         materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
                         console.log('materialdata successfully saved');

@@ -13,6 +13,7 @@ export const ValorisationCheck = {
 		CoreNavigationCmpt,
 		Modal
 	},
+	inject: ['$fhcApi', '$fhcAlert'],
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
@@ -33,21 +34,21 @@ export const ValorisationCheck = {
 			this.getValorisierungCheckData();
 		},
 		getDvData: function() {
-			const res = Vue.$fhcapi.ValorisierungCheck.getDvData(this.dienstverhaeltnis_id)
+			const res = this.$fhcApi.factory.ValorisierungCheck.getDvData(this.dienstverhaeltnis_id)
 				.then((response) => {
-					this.dvData = response.data.data;
+					this.dvData = response.data;
 				})
 				.catch(this.handleErrors);
 		},
 		getValorisierungCheckData: function() {
-			const res = Vue.$fhcapi.ValorisierungCheck.getValorisierungCheckData(this.dienstverhaeltnis_id)
+			const res = this.$fhcApi.factory.ValorisierungCheck.getValorisierungCheckData(this.dienstverhaeltnis_id)
 				.then((response) => {
-					this.valorisierungCheckData = response.data.data;
+					this.valorisierungCheckData = response.data;
 				})
 				.catch(this.handleErrors);
 		},
 		redoValorisation: function() {
-			const res = Vue.$fhcapi.ValorisierungCheck.redoValorisation(this.dienstverhaeltnis_id)
+			const res = this.$fhcApi.factory.ValorisierungCheck.redoValorisation(this.dienstverhaeltnis_id)
 				.then((response) => {
 					this.getAllData();
 				})
@@ -62,7 +63,7 @@ export const ValorisationCheck = {
 		},
 		handleErrors: function(response) {
 			if (response.hasOwnProperty('response') && response.response?.data?.errors) {
-				for (let error of response.response.data.errors) {
+				for (let error of response.response.errors) {
 					this.$fhcAlert.handleSystemError(error);
 				}
 			}

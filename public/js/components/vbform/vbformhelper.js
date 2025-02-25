@@ -32,6 +32,7 @@ export default {
   mixins: [
     presetable
   ],
+  inject: ['$fhcApi','$fhcAlert'],
   data: function() {
     return {
       store: store,
@@ -75,8 +76,8 @@ export default {
       this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
     },
     getFreitexttypen: async function() {
-      const response = await Vue.$fhcapi.Freitext.getFreitexttypen();
-      const freitexttypen = response.data.retval;
+      const response = await this.$fhcApi.factory.Freitext.getFreitexttypen();
+      const freitexttypen = response.retval;
       freitexttypen.unshift({
         value: '',
         label: 'Freitexttyp wählen',
@@ -85,8 +86,8 @@ export default {
       this.lists.freitexttypen = freitexttypen;
     },
     getGehaltstypen: async function() {
-      const response = await Vue.$fhcapi.Gehaltsbestandteil.getGehaltstypen();
-      const gehaltstypen = response.data.retval;
+      const response = await this.$fhcApi.factory.Gehaltsbestandteil.getGehaltstypen();
+      const gehaltstypen = response.retval;
       gehaltstypen.unshift({
         value: '',
         label: 'Gehaltstyp wählen',

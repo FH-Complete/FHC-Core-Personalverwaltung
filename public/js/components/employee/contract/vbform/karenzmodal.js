@@ -44,13 +44,14 @@ export default {
     'infos': infos,
     'errors': errors
   },
+  inject: ['$fhcApi', '$fhcAlert'],
   methods: {
     enddv: function() {
       const payload = this.$refs['vertragsbestandteil_karenzRef'].getPayload();
       
-      Vue.$fhcapi.Karenz.saveKarenz(payload)
+      this.$fhcApi.factory.Karenz.saveKarenz(payload)
       .then((response) => {
-        this.handleKarenzSaved(response.data);
+        this.handleKarenzSaved(response);
       });
     },
     cancel: function() {

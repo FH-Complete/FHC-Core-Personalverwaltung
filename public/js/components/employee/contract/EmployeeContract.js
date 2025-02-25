@@ -200,8 +200,8 @@ export const EmployeeContract = {
         const fetchVertrag = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Vertrag.vertragByDV(dv_id, convert2UnixTS(date));
-                vertragList.value = res.data;
+                const res = await fhcApi.factory.Vertrag.vertragByDV(dv_id, convert2UnixTS(date));
+                vertragList.value = res;
                 getCurrentVertragsbestandteil();
                 //}
             } catch (error) {
@@ -216,8 +216,8 @@ export const EmployeeContract = {
 
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
-                gbtList.value = res.data;
+                const res = await fhcApi.factory.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
+                gbtList.value = res;
             } catch (error) {
                 console.log(error)
             } finally {
@@ -232,14 +232,14 @@ export const EmployeeContract = {
             let tempData1 = [], tempData2 = [];
             try {
                 if (dv_id != null) {
-                    const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
-                    gbtChartData.value = res.data;
+                    const res = await fhcApi.factory.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                    gbtChartData.value = res;
                     
                     // chartOptions.series[0].data.length = 0;
-                    Object.keys(res.data.gesamt).forEach(element => {
-                       tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                    Object.keys(res.gesamt).forEach(element => {
+                       tempData1.push([new Date(element).getTime(), parseFloat(res.gesamt[element])]);
                     });
-                    res.data.abgerechnet.forEach(element => {
+                    res.abgerechnet.forEach(element => {
                         tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                     });
                 }
@@ -257,7 +257,7 @@ export const EmployeeContract = {
         const deleteDV = async (dv_id) => {
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Employee.deleteDV(dv_id);
+                const res = await fhcApi.factory.Employee.deleteDV(dv_id);
                 emit('updateHeader');
             } catch (error) {
                 console.log(error);
@@ -627,8 +627,8 @@ export const EmployeeContract = {
 			if (currentDVID != null && currentDVID.value > 0) {
 				isFetching.value = true
 				try {
-					const res = await Vue.$fhcapi.ValorisierungCheck.checkValorisationValidityOfDv(currentDVID.value);
-					valorisationValid.value = res.data.data;
+					const res = await fhcApi.factory.ValorisierungCheck.checkValorisationValidityOfDv(currentDVID.value);
+					valorisationValid.value = res.data;
 				} catch (error) {
 					console.log(error)
 				} finally {

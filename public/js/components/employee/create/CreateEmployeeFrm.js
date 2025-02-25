@@ -77,16 +77,16 @@ export const CreateEmployeeFrm = {
 
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.CheckPerson.filterPerson(
+                const res = await fhcApi.factory.CheckPerson.filterPerson(
                     { ...currentValue.value, unruly: true},
                     FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
                 );
                 isFetching.value = false;
 
-                if(!res.data.data.retval) return;
+                if(!res.data.retval) return;
                 // fhc api controller in backend but no plugin in pv21
-                // if(!res.data.retval) return;
-                unrulyPersonList.value = res.data.data.retval;
+                // if(!res.retval) return;
+                unrulyPersonList.value = res.data.retval;
 
             } catch (error) {
                 console.log(error);
@@ -164,7 +164,7 @@ export const CreateEmployeeFrm = {
                 // submit
                 isFetching.value = true
                 try {
-                    const response = await Vue.$fhcapi.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
+                    const response = await fhcApi.factory.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
                     redirect2Employee(response.data.retval.person_id, response.data.retval.uid);
                 } catch (error) {
                     console.log(error);                    
@@ -181,9 +181,9 @@ export const CreateEmployeeFrm = {
                                 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await fhcApi.factory.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
                 isFetching.value = false;                
-                personSelectedHandler(person_id, res.data.retval.uid);
+                personSelectedHandler(person_id, res.retval.uid);
 
             } catch (error) {
                 console.log(error);

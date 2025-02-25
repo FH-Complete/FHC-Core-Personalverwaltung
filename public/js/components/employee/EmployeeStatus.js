@@ -66,7 +66,7 @@ export const EmployeeStatus = {
           Promise.all(dvIDs.map((dvID) => fhcApi.factory.Vertragsbestandteil.getCurrentVBs(dvID))).then(
             (allData) => {
               allData.map((item) => {
-                item.data.data.map((vbs => {
+                item.data.map((vbs => {
                   switch (vbs.vertragsbestandteiltyp_kurzbz) {
                     case 'freitext':
                       if (vbs.freitexttyp_kurzbz == 'befristung') {

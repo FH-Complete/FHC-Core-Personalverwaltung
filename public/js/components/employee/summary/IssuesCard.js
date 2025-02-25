@@ -51,9 +51,9 @@ export const IssuesCard = {
               isFetching.value = true;
               const response = await fhcApi.factory.Issue.byPerson(currentPersonID.value);
               isFetching.value = false;              
-			  console.log(response.data.retval);	  
-              if (response.data.retval.length>0) {
-                issues.value = response.data.retval;
+			  console.log(response.retval);	  
+              if (response.retval.length>0) {
+                issues.value = response.retval;
                 getBehebungData(issues.value);
               } else {
                 issues.value = null;
@@ -73,7 +73,7 @@ export const IssuesCard = {
 
         const getVB = async (vbid) =>  {
             try {
-                let res = await Vue.$fhcapi.Vertragsbestandteil.getVB(vbid)
+                let res = await fhcApi.factory.Vertragsbestandteil.getVB(vbid)
                 console.log(res);
                 return res;
             } catch(error) {
@@ -84,7 +84,7 @@ export const IssuesCard = {
 
         const getGB = async (gbid) =>  {
             try {
-                let res = await Vue.$fhcapi.Gehaltsbestandteil.getGB(gbid)
+                let res = await fhcApi.factory.Gehaltsbestandteil.getGB(gbid)
                 console.log(res);
                 return res;
             } catch(error) {

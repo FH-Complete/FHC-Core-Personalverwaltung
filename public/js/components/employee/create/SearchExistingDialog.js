@@ -13,7 +13,8 @@ export const SearchExistingDialog = {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
-
+        const fhcApi = Vue.inject('$fhcApi');
+        
         const currentValue = Vue.reactive({
             surname: "",
             birthdate: "",
@@ -43,10 +44,10 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Employee.filterPerson(currentValue);                
+                const res = await fhcApi.factory.Employee.filterPerson(currentValue);                
                 isFetching.value = false;              
-			    console.log(res.data);	  
-			    personList.value = res.data.retval;
+			    console.log(res);	  
+			    personList.value = res.retval;
 
             } catch (error) {
                 console.log(error);
@@ -68,14 +69,14 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await fhcApi.factory.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
                 isFetching.value = false;    
 
-                if (!res.data.error) {            
-                    personSelectedHandler(person_id, res.data.retval.uid, 'take');
+                if (!res.error) {            
+                    personSelectedHandler(person_id, res.retval.uid, 'take');
                     filterPerson();
                 } else {
-                    console.log("Fehler beim Anlegen: ", res.data.retval);
+                    console.log("Fehler beim Anlegen: ", res.retval);
                 }
 
             } catch (error) {

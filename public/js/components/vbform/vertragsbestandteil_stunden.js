@@ -67,6 +67,7 @@ export default {
     this.getTeilzeittypen();
     this.setDataFromConfig();
   },
+  inject: ['$fhcApi'],
   methods: {
     gueltigkeitchanged: function(payload) {
       console.log(JSON.stringify(payload));  
@@ -93,8 +94,8 @@ export default {
       }
     },
     getTeilzeittypen: async function() {
-      const response = await Vue.$fhcapi.Stunden.getTeilzeittypen();
-      const teilzeittypen = response.data.retval;
+      const response = await this.$fhcApi.factory.Stunden.getTeilzeittypen();
+      const teilzeittypen = response.retval;
       teilzeittypen.unshift({
         value: '',
         label: 'Teilzeittyp wählen',

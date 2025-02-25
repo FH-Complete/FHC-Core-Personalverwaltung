@@ -100,6 +100,7 @@ export default {
     this.getKarenztypen();
     this.setDataFromConfig();
   },
+  inject: ['$fhcApi'],
   methods: {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
@@ -127,8 +128,8 @@ export default {
       }
     },
     getKarenztypen: async function() {
-      const response = await Vue.$fhcapi.Karenz.getKarenztypen();
-      const karenztypen = response.data.retval;
+      const response = await this.$fhcApi.factory.Karenz.getKarenztypen();
+      const karenztypen = response.retval;
       karenztypen.unshift({
         value: '',
         label: 'Karenztyp wählen',

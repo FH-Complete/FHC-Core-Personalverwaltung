@@ -12,6 +12,7 @@ export const ValorisationSelection = {
 			CoreFilterCmpt,
 			Modal
 		},
+		inject: ['$fhcApi', '$fhcAlert'],
 		data() {
 			return 	{
 				searchbaroptions: searchbaroptions,
@@ -43,9 +44,9 @@ export const ValorisationSelection = {
 		},
 		methods: {
 			getValorisierungsInstanzen: function() {
-				const res = Vue.$fhcapi.Valorisierung.getValorisierungsInstanzen()
+				const res = this.$fhcApi.Valorisierung.getValorisierungsInstanzen()
 					.then((response) => {
-						this.alleValorisierungsinstanzen = response.data.data;
+						this.alleValorisierungsinstanzen = response.data;
 						this.valorisierungsdatum = '';
 						if (this.alleValorisierungsinstanzen.length > 0)
 							this.valorisierung_oe_kurzbz = this.alleValorisierungsinstanzen[0].oe_kurzbz;
@@ -63,9 +64,9 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = Vue.$fhcapi.Valorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz)
+				const res = this.$fhcApi.Valorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz)
 					.then((response) => {
-						this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
+						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 					})
 					.catch(this.handleErrors);
@@ -76,7 +77,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = Vue.$fhcapi.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
+				const res = this.$fhcApi.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData([]);
 						this.getValorisierungsInstanzen();
@@ -90,9 +91,9 @@ export const ValorisationSelection = {
 					this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
 					return;
 				}
-				const res = Vue.$fhcapi.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
+				const res = this.$fhcApi.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
 					.then((response) => {
-						this.valorisierungInfoData = response.data.data;
+						this.valorisierungInfoData = response.data;
 						this.$refs.infoModalRef.show();
 					})
 					.catch(this.handleErrors);
@@ -110,7 +111,7 @@ export const ValorisationSelection = {
 			},
 			handleErrors: function(response) {
 				if (response.hasOwnProperty('response') && response.response?.data?.errors) {
-					for (let error of response.response.data.errors) {
+					for (let error of response.response.errors) {
 						this.$fhcAlert.handleSystemError(error);
 					}
 				}

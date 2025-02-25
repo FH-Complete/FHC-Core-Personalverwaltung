@@ -52,14 +52,15 @@ export default {
         this.fetchTmpStoreList();
     }
   },
+  inject: ['$fhcApi'],
   methods: {
     fetchTmpStoreList: function(resetselected) {
       if( typeof resetselected === 'undefined' ) {
           var resetselected = true;
       }  
-      Vue.$fhcapi.TmpStore.listTmpStoreForMA(this.store.mitarbeiter_uid)
+      this.$fhcApi.factory.TmpStore.listTmpStoreForMA(this.store.mitarbeiter_uid)
       .then((response) => {
-        this.tmpstores = response.data.data;
+        this.tmpstores = response.data;
         if(resetselected === true) {
           this.selectedtmpstoreidx = -1;
         } else {
@@ -71,7 +72,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            return Vue.$fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid);
+            return this.$fhcApi.factory.TmpStore.deleteFromTmpStore(tmpstoreid);
         }
         return Promise.resolve('noTmpStoreUsed');
     },
@@ -79,7 +80,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            Vue.$fhcapi.TmpStore.deleteFromTmpStore(tmpstoreid)
+            this.$fhcApi.factory.TmpStore.deleteFromTmpStore(tmpstoreid)
             .then((response) => {
               this.fetchTmpStoreList();
               console.log('deleteFromTmpStore executed.');
@@ -93,11 +94,11 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            Vue.$fhcapi.TmpStore.getTmpStoreById(tmpstoreid)
+            this.$fhcApi.factory.TmpStore.getTmpStoreById(tmpstoreid)
             .then((response) => {
               console.log('loadFromTmpStore executed.');
-              this.store.setTmpStoreId(response.data.data.tmp_store_id);
-              this.$emit('loadedfromtmpstore', response.data.data.formdata);
+              this.store.setTmpStoreId(response.data.tmp_store_id);
+              this.$emit('loadedfromtmpstore', response.data.formdata);
             });
         }
         

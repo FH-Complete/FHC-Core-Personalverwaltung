@@ -8,6 +8,7 @@ const IssuesCountCard = {
      },
      setup( props ) {
         
+        const fhcApi = Vue.inject('$fhcApi');  
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Mitarbeiter*innen mit Issues");
         const issues = Vue.ref([]);
@@ -21,8 +22,8 @@ const IssuesCountCard = {
 
         const getOpenIssues = async () =>  {
             try {
-                let res = await Vue.$fhcapi.Issue.openIssuesPersons();
-                issues.value = res.data.retval;
+                let res = await fhcApi.factory.Issue.openIssuesPersons();
+                issues.value = res.retval;
                 return res;
             } catch(error) {
                 console.log(error);

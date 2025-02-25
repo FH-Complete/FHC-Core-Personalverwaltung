@@ -9,8 +9,9 @@ export const OffTimeCard = {
      },
      setup( props ) {
 
-        const { watch, ref, toRefs, onMounted, inject } = Vue;         
+        const { watch, ref, toRefs, onMounted, inject } = Vue;                 
         const route = VueRouter.useRoute();
+        const fhcApi = inject('$fhcApi');  
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Abwesenheiten");
         const currentPersonID = ref(null);
@@ -30,11 +31,11 @@ export const OffTimeCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personAbwesenheiten(currentUID.value);
+              const response = await fhcApi.factory.Zeit.personAbwesenheiten(currentUID.value);
               isFetching.value = false;              
-			  console.log('abwesenheiten', response.data.retval);	  
-              if (response.data.retval.length>0) {
-                offTimeList.value = response.data.retval;
+			  console.log('abwesenheiten', response.retval);	  
+              if (response.retval.length>0) {
+                offTimeList.value = response.retval;
               } else {
                 offTimeList.value = null;
               }

@@ -30,10 +30,11 @@ export default {
   components: {
     'Modal': Modal
   },
+  inject: ['$fhcApi', '$fhcAlert'],
   methods: {
     deletedv: async function() {  
       try {
-        const res = await Vue.$fhcapi.Employee.deleteDV(this.curdv.dienstverhaeltnisid);
+        const res = await this.$fhcApi.factory.Employee.deleteDV(this.curdv.dienstverhaeltnisid);
         this.$emit('dvdeleted');
         this.$refs['modalRef'].hide();
       } catch (error) {

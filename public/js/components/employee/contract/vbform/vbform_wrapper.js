@@ -78,6 +78,7 @@ export default {
       }
     };
   },
+  inject: ['$fhcApi', '$fhcAlert'],
   emits: [
     "dvsaved"
   ],
@@ -219,9 +220,9 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
+      this.$fhcApi.factory.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
       .then((response) => {
-        that.handleSaved(response.data.data);
+        that.handleSaved(response.data);
       })
       .finally(() => {
           that.spinners.saving = false;
@@ -234,9 +235,9 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
+      this.$fhcApi.factory.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
       .then((response) => {
-        that.handleValidated(response.data.data);
+        that.handleValidated(response.data);
       })
       .finally(() => {
           that.spinners.validating = false;
@@ -246,17 +247,17 @@ export default {
     handlePresetSelected: function(preset) {
       if( this.mode === 'aenderung' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
+        this.$fhcApi.factory.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
-          this.iterateChilds(preset.children, response.data.data, preset);          
+          this.iterateChilds(preset.children, response.data, preset);          
           this.presetselected(preset);
           this.resetTmpStoreHelper();
         });
       } else if( this.mode === 'korrektur' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
+        this.$fhcApi.factory.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
-          this.iterateChilds(preset.children, response.data.data, preset);          
+          this.iterateChilds(preset.children, response.data, preset);          
           this.presetselected(preset);
           this.resetTmpStoreHelper();
         });
@@ -298,9 +299,9 @@ export default {
         mitarbeiter_uid: this.store.mitarbeiter_uid,  
         formdata: formdata
       };
-      Vue.$fhcapi.TmpStore.storeToTmpStore(payload)
+      this.$fhcApi.factory.TmpStore.storeToTmpStore(payload)
       .then((response) => {
-        this.store.setTmpStoreId(response.data.meta.tmpstoreid);
+        this.store.setTmpStoreId(response.meta.tmpstoreid);
         this.$refs['tmpstorehelper'].fetchTmpStoreList(false);
         this.$refs['presetchooserRef'].resetSelectedPreset();
         console.log('storeToTmpStore executed.');

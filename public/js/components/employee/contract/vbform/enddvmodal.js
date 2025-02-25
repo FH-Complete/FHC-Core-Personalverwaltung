@@ -15,7 +15,7 @@ export default {
                 <dienstverhaeltnis ref="dienstverhaeltnisRef" :config="curdv" :showdvcheckoverlap="false"></dienstverhaeltnis>
             </div>
 
-            <input type="checkbox" v-model="unrulyInternal" id="unruly" :disabled="saving" ref="unrulyCheckbox">
+            <input type="checkbox" v-model="unrulyInternal" id="unruly" :disabled="spinners.saving" ref="unrulyCheckbox">
 			<label for="unruly" style="margin-left: 12px;" >{{ $p.t('studierendenantrag', 'mark_person_as_unruly') }}</label>
 
             
