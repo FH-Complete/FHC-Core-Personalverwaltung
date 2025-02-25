@@ -44,7 +44,7 @@ export const ValorisationSelection = {
 		},
 		methods: {
 			getValorisierungsInstanzen: function() {
-				const res = this.$fhcApi.Valorisierung.getValorisierungsInstanzen()
+				const res = this.$fhcApi.factory.Valorisierung.getValorisierungsInstanzen()
 					.then((response) => {
 						this.alleValorisierungsinstanzen = response.data;
 						this.valorisierungsdatum = '';
@@ -64,7 +64,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$fhcApi.Valorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz)
+				const res = this.$fhcApi.factory.Valorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz)
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
@@ -77,7 +77,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$fhcApi.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
+				const res = this.$fhcApi.factory.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData([]);
 						this.getValorisierungsInstanzen();
@@ -91,7 +91,7 @@ export const ValorisationSelection = {
 					this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
 					return;
 				}
-				const res = this.$fhcApi.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
+				const res = this.$fhcApi.factory.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
 					.then((response) => {
 						this.valorisierungInfoData = response.data;
 						this.$refs.infoModalRef.show();

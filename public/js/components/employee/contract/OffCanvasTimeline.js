@@ -87,8 +87,8 @@ export const OffCanvasTimeline = {
                         
             for (const dv of props.alldv){
                 let response = await fhcApi.factory.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
-                console.log('alldv: ',response.data)
-                vbsData.value.push(response.data.data)
+                console.log('alldv: ',response)
+                vbsData.value.push(response.data)
             }            
 
             events.value = generateTimeline(vbsData.value)

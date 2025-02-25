@@ -16,6 +16,7 @@ export const CreateEmployeeFrm = {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();     
+        const fhcApi = Vue.inject('$fhcApi');
         
         const defaultvalRef = Vue.toRef(props, 'defaultval')
 
@@ -165,7 +166,7 @@ export const CreateEmployeeFrm = {
                 isFetching.value = true
                 try {
                     const response = await fhcApi.factory.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
-                    redirect2Employee(response.data.retval.person_id, response.data.retval.uid);
+                    redirect2Employee(response.retval.person_id, response.retval.uid);
                 } catch (error) {
                     console.log(error);                    
                 } finally {
