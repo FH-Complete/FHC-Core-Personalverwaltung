@@ -207,6 +207,7 @@ class SalaryExport extends Auth_Controller
 
 		$qry_live = '
 			SELECT
+				lvexport_sum,
 				gehaltsbestandteil.gehaltsbestandteil_id,gehaltsbestandteil.von, gehaltsbestandteil.bis, 
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
 				dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
@@ -259,8 +260,7 @@ class SalaryExport extends Auth_Controller
 						vertragsbestandteiltyp_kurzbz=\'stunden\'
 						'.$vbs_where.'
 						
-					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id
-					 AND gehaltsbestandteil.vertragsbestandteil_id=vertragsbestandteil_stunden.vertragsbestandteil_id)
+					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id)
 				 
 				LEFT JOIN (
 					SELECT 
@@ -278,7 +278,7 @@ class SalaryExport extends Auth_Controller
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
 				
 			WHERE
-				gehaltstyp.gehaltstyp_kurzbz <> \'lohnausgleichatz\'
+				gehaltstyp.lvexport = true
 				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
 					OR gehaltsbestandteil.bis IS NULL)
 				AND
@@ -300,25 +300,72 @@ class SalaryExport extends Auth_Controller
 
 		$qry_live = $qry_live.$where;
 
-		$qry_history = '
+		/* $qry_history = '
 			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted
 			FROM (select * from ('.$qry_live.') t) live 
 			LEFT JOIN hr.tbl_gehaltshistorie historie using(gehaltsbestandteil_id) 
 			WHERE
 				((historie.datum >= '. $this->_ci->db->escape($von_datestring) .')
-					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')
+					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')			
+			'; */
+
+		$qry_history = '
+			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted
+			FROM (select * FROM ('.$qry_live.') t) live 
+			LEFT JOIN (
+				SELECT * FROM hr.tbl_gehaltshistorie
+				WHERE
+				((datum >= '. $this->_ci->db->escape($von_datestring) .')
+					AND datum <= '. $this->_ci->db->escape($bis_datestring) .')
+				) historie using(gehaltsbestandteil_id)
 			';
 
-		switch ($listType) {
+		$qry_grouped =  "
+			SELECT
+					
+					lvexport_sum,sum(grundbetr_decrypted) as grundbetr_decrypted, sum(betr_valorisiert_decrypted) as betr_valorisiert_decrypted,
+					sum(hbetrag_decrypted) as hbetrag_decrypted,
+					dv_von, dv_bis, 
+					array_agg(gehaltstyp_bezeichnung) as gehaltstyp_bezeichnung, 
+					vertragsart_bezeichnung,mitarbeiter_uid, 
+					personalnummer,name_gesamt,svnr,
+					nachname,vorname,
+					array_agg(freitexttyp_kurzbz) freitexttyp_kurzbz,array_agg(freitext_titel) freitext_titel, array_agg(freitext_anmerkung) as freitext_anmerkung,
+					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
+					stunden_von, stunden_bis, wochenstunden,
+					ksttypbezeichnung, kstorgbezeichnung
+				FROM ($qry_history) as hist
+
+			GROUP BY coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+                    dv_von, dv_bis,
+					vertragsart_bezeichnung,mitarbeiter_uid, 
+					personalnummer,name_gesamt,svnr,
+					nachname,vorname,
+					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
+					stunden_von, stunden_bis, wochenstunden,
+					ksttypbezeichnung, kstorgbezeichnung
+			HAVING ((dv_bis >= ". $this->_ci->db->escape($von_datestring) .")
+							OR dv_bis IS NULL)
+						AND
+						((dv_von <= ". $this->_ci->db->escape($bis_datestring) .")
+							OR dv_von IS NULL)
+		";
+		/* switch ($listType) {
 			case 'live':
-				$qry = $qry_live;
-				$encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
+				//$qry = $qry_live;
+				$qry = $qry_grouped;
+				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+				// $encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
 				break;
 			case 'history': 
-				$qry = $qry_history;
+				$qry = $qry_grouped;
 				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
 				break;
-		};
+		}; */
+
+		$qry = $qry_grouped;
+		$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+
 
 
 		$result = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(

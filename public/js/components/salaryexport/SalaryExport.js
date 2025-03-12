@@ -198,23 +198,28 @@ export const SalaryExport = {
               // merge live and history value into one field 
               let value = null;
               let source = '';
+              let freitext_titel = ''
+
+              
               // helper to select the right value and add the index field
               // priority:
-              // 1. use data from history table
-              // 2. use data from valorisierung table
-              // 3. use data from gehaltsbestandteil ("live data")
+              // 1. use data from history table              
+              // 2. use data from gehaltsbestandteil ("live data")
               const selectValue = (r, index) => {
-                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted !== "") {
+                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted !== null && r.hbetrag_decrypted !== "") {
                     // history data
                     value = r.hbetrag_decrypted
-                    source = 'h'
-                // TODO data from valorisierung table
+                    source = 'h'             
                 } else if (r.betr_valorisiert_decrypted !== "") {
                     // live data
                     value = r.betr_valorisiert_decrypted
                     source = 'l'
                 }
-                return {index, ...r, betrag: value, source}
+                
+                //freitext_titel = removeLeadingComma(r.freitext_titel)
+                freitext_titel = r.freitext_titel.filter(item => item !== null);            
+
+                return {index, ...r, freitext_titel, betrag: value, source}
               }
 
               let list = res.retval.map((row, index) => selectValue(row, index) )
