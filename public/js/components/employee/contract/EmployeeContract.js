@@ -70,7 +70,7 @@ export const EmployeeContract = {
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
 
-        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
 
         const numberFormat = new Intl.NumberFormat();
         const now = ref(truncateDate(new Date()));
@@ -117,10 +117,16 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                    name: 'Gesamtgehalt',
+                    name: 'Gehalt',
                     data: [],
                     color: '#6fcd98',
                     step: 'left' // or 'center' or 'right'
+                },{
+                    name: 'Gehalt (ohne Val.)',
+                    data: [],
+                    color: '#d6af02',
+                    step: 'left', // or 'center' or 'right'
+                    visible: false,
                 },
                 {
                     name: 'Abgerechnet',
@@ -246,16 +252,20 @@ export const EmployeeContract = {
             try {
                 const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
                 gbtChartData.value = res.data;
-                let tempData1 = [], tempData2 = [];
+                let tempData1 = [], tempData2 = [], tempData3 = [];
                 // chartOptions.series[0].data.length = 0;
+                Object.keys(res.data.valorisiert).forEach(element => {
+                    tempData1.push([new Date(element).getTime(), parseFloat(res.data.valorisiert[element])]);
+                 });
                 Object.keys(res.data.gesamt).forEach(element => {
-                   tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                   tempData2.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
                 });
                 res.data.abgerechnet.forEach(element => {
-                    tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
+                    tempData3.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                 });
                 chartOptions.series[0].data = tempData1;
                 chartOptions.series[1].data = tempData2;
+                chartOptions.series[2].data = tempData3;
             } catch (error) {
                 console.log(error)
             } finally {
@@ -1021,7 +1031,7 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(item.bis)">
                                         </div>
 
-                                        <div class="col-md-9">
+                                        <div class="col-md-12">
                                             <label class="form-label" >Text</label>
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.anmerkung">
                                         </div>
@@ -1119,7 +1129,7 @@ export const EmployeeContract = {
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index == 0">SAP Kostenstelle</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung'" :value="item.oe_kurzbz_sap">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" v-if="item.funktion_kurzbz == 'kstzuordnung' && item.oe_kurzbz_sap != null" :value="item.oe_kurzbz_sap">
                                         </div>
 
                                     </template>

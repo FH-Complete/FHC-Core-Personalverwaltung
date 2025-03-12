@@ -423,7 +423,9 @@ class DVAPI extends Auth_Controller
 		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile(
 			$dvid,
 			$today->format('Y-m-d'),
-			$this->VertragsbestandteilLib::INCLUDE_FUTURE);
+			$this->VertragsbestandteilLib::INCLUDE_FUTURE,
+			$this->VertragsbestandteilLib::NOT_WITH_VALORISATION_HISTORY
+		);
 
 		$this->outputJson(
 			array(
@@ -643,6 +645,10 @@ class DVAPI extends Auth_Controller
         // fetch Gesamtgehalt
         $data = $this->gbtChartDataGesamt($now, $dv_id);
 
+        // fetch Gesamtgehalt valorisiert
+        $dataValorisiert = $this->gbtChartDataGesamtValorisiert($now, $dv_id);
+
+
         // loop dates and fetch
         $keys = array_keys($data);
         $from_date = $keys[0];
@@ -656,7 +662,7 @@ class DVAPI extends Auth_Controller
             return;
 	}
 
-        $this->outputJson(array('gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
+        $this->outputJson(array('valorisiert' => $dataValorisiert, 'gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
 
     }
 
@@ -724,6 +730,78 @@ class DVAPI extends Auth_Controller
                 if ($gbt->getVonDateTime() <= $datumDateTime
                     && ($gbt->getBisDateTime() == null || $gbt->getBisDateTime()>=$datumDateTime)) {
                         $data[$datum] += $gbt->getGrundbetrag();
+                }
+            }
+        }
+
+        ksort($data);
+
+        return $data;
+    }
+
+    /**
+     * fetch data for Gesamtgehalt valorisiert (loan valorized)
+     */
+    private function gbtChartDataGesamtValorisiert($now, $dv_id)
+    {
+        $gbtList = $this->GehaltsbestandteilLib->fetchGehaltsbestandteileValorisiertForChart($dv_id, null, false);
+
+        $hasFutureDate = false;
+        $data = array();
+
+        foreach ($gbtList as $value) {
+
+            if (!isset($data[$value->getVon()])) {
+                $data[$value->getVon()] = 0;
+
+                if ($now < $value->getBisDateTime()) {
+                    $hasFutureDate = true;
+                }
+            }
+            if ($value->getBis() != null) {
+
+                $bisDatum = $value->getBisDateTime()->add(new DateInterval("P1D"));
+
+                if (!isset($data[$bisDatum->format("Y-m-d")])) {
+                    $data[$bisDatum->format("Y-m-d")] = 0;
+
+                    if ($now < $value->getBisDateTime()) {
+                        $hasFutureDate = true;
+                    }
+                }
+            }
+        }
+
+        if (!$hasFutureDate) {
+            $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis($dv_id);
+
+            if ($dv->getBis() != null) {
+                $dvBis = new DateTime($dv->getBis());
+                if (!isset($data[$dvBis->format("Y-m-d")])) {
+                    $data[$dvBis->format("Y-m-d")] = 0;
+                }
+            } else {
+                if (!isset($data[$now->format("Y-m-d")])) {
+                    $data[$now->format("Y-m-d")] = 0;
+                }
+            }
+        }
+
+        foreach ($data as $datum => $summe) {
+            $datumDateTime = new DateTimeImmutable($datum);
+
+            foreach ($gbtList as $gbt) {
+
+                if ($gbt->getVonDateTime() <= $datumDateTime
+                    && ($gbt->getBisDateTime() == null || $gbt->getBisDateTime()>=$datumDateTime)) {
+
+                        $data[$datum] += $gbt->getGrundbetrag();
+                        /* if ($gbt->getBetrag_valorisiert() != null) {
+                            $data[$datum] += $gbt->getBetrag_valorisiert();
+                        } else {
+                            $data[$datum] += $gbt->getGrundbetrag();
+                        } */
+                        
                 }
             }
         }
