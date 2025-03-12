@@ -210,7 +210,7 @@ class SalaryExport extends Auth_Controller
 				lvexport_sum,
 				gehaltsbestandteil.gehaltsbestandteil_id,gehaltsbestandteil.von, gehaltsbestandteil.bis, 
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
-				dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
+				dienstverhaeltnis.dienstverhaeltnis_id, dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
 				gehaltstyp.gehaltstyp_kurzbz, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
@@ -310,7 +310,8 @@ class SalaryExport extends Auth_Controller
 			'; */
 
 		$qry_history = '
-			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted
+			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted, 
+				vh.betrag_valorisiert as betrag_valorisiert_historie_decrypted
 			FROM (select * FROM ('.$qry_live.') t) live 
 			LEFT JOIN (
 				SELECT * FROM hr.tbl_gehaltshistorie
@@ -318,13 +319,28 @@ class SalaryExport extends Auth_Controller
 				((datum >= '. $this->_ci->db->escape($von_datestring) .')
 					AND datum <= '. $this->_ci->db->escape($bis_datestring) .')
 				) historie using(gehaltsbestandteil_id)
+			LEFT JOIN 
+				hr.tbl_valorisierung_historie vh ON vh.gehaltsbestandteil_id = live.gehaltsbestandteil_id AND vh.valorisierungsdatum = (
+					SELECT 
+						vi.valorisierungsdatum 
+					FROM 
+						hr.tbl_valorisierung_instanz vi
+					JOIN
+						hr.tbl_dienstverhaeltnis d ON d.dienstverhaeltnis_id = live.dienstverhaeltnis_id 
+						AND d.oe_kurzbz = vi.oe_kurzbz
+					WHERE 
+						'. $this->_ci->db->escape($bis_datestring) .' >= valorisierungsdatum 
+					ORDER BY 
+						valorisierungsdatum DESC 
+					LIMIT 1
+					) 
 			';
 
 		$qry_grouped =  "
 			SELECT
 					
 					lvexport_sum,sum(grundbetr_decrypted) as grundbetr_decrypted, sum(betr_valorisiert_decrypted) as betr_valorisiert_decrypted,
-					sum(hbetrag_decrypted) as hbetrag_decrypted,
+					sum(hbetrag_decrypted) as hbetrag_decrypted,sum(betrag_valorisiert_historie_decrypted) as betrag_valorisiert_historie_decrypted,
 					dv_von, dv_bis, 
 					array_agg(gehaltstyp_bezeichnung) as gehaltstyp_bezeichnung, 
 					vertragsart_bezeichnung,mitarbeiter_uid, 

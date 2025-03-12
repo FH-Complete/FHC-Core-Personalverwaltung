@@ -204,15 +204,20 @@ export const SalaryExport = {
               // helper to select the right value and add the index field
               // priority:
               // 1. use data from history table              
-              // 2. use data from gehaltsbestandteil ("live data")
+              // 2. use data from valorisierung_historie
+              // 3. use data from gehaltsbestandteil
               const selectValue = (r, index) => {
-                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted !== null && r.hbetrag_decrypted !== "") {
+                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted != null && r.hbetrag_decrypted != "") {
                     // history data
                     value = r.hbetrag_decrypted
-                    source = 'h'             
-                } else if (r.betr_valorisiert_decrypted !== "") {
+                    source = 'h'    
+                } else if (r.betrag_valorisiert_historie_decrypted != null && r.betrag_valorisiert_historie_decrypted != "") {
                     // live data
-                    value = r.betr_valorisiert_decrypted
+                    value = r.betrag_valorisiert_historie_decrypted
+                    source = 'v'             
+                } else if (r.betr_valorisiert_decrypted	 != null && r.betr_valorisiert_decrypted != "") {
+                    // live data
+                    value = r.betr_valorisiert_decrypted	
                     source = 'l'
                 }
                 
@@ -378,7 +383,7 @@ export const SalaryExport = {
          // index: 'index', 
           layout: 'fitColumns',
           columns: salaryTableColumnsDef,
-          rowFormatter: rowFormatter,
+        //  rowFormatter: rowFormatter,
           groupBy: "personalnummer",
           groupHeader:function(value, count, data, group) { return data[0].personalnummer + " " + data[0].name_gesamt + " (" + data[0].svnr + ") " },
           initialSort:[
