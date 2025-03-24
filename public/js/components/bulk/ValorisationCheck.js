@@ -216,7 +216,7 @@ export const ValorisationCheck = {
 			</div>
 
 			<div class="col-6 mb-3 text-end fw-bold fs-5">
-				&sum; gespeichert: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.saved) }};
+				&sum; Historie: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.saved) }};
 				&sum; berechnet: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.calculated) }}
 			</div>
 

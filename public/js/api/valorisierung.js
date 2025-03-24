@@ -11,8 +11,16 @@ export default {
     var url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisierungsInstanzen';
     return this.$fhcApi.get(url);
   },
+  getGehaelter: function(gehaelter_stichtag, gehaelter_oe_kurzbz) {
+    var url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getGehaelter';
+    return this.$fhcApi.get(url, {params: {'gehaelter_stichtag': gehaelter_stichtag, 'gehaelter_oe_kurzbz': gehaelter_oe_kurzbz}});
+  },
   getValorisationInfo: function(valorisierunginstanz_kurzbz) {
     var url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisationInfo';
     return this.$fhcApi.get(url, {params: {'valorisierunginstanz_kurzbz': valorisierunginstanz_kurzbz}});
+  },
+  getAllUnternehmen: function() {
+    var url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getAllUnternehmen';
+    return this.$fhcApi.get(url);
   }
 }
