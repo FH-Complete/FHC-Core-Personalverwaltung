@@ -180,7 +180,7 @@ const handyVerwaltungApp = Vue.createApp({
                                         :new-btn-show="false">
                                     </core-filter-cmpt>
                                 </div>
-                            </template>pv21apifactory
+                            </template>
     
                             <template #bottom>
 
