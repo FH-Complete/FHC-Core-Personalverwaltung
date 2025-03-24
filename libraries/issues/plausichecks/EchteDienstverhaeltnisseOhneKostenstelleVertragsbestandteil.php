@@ -24,7 +24,7 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 		if (!isset($startDate) || !$startDate) return success([]);
 
 		// check if start date valid
-		$startDate = DateTime::createFromFormat('Y-m-d', $startDate) ? $startDate : null;
+		$startDate = DateTime::createFromFormat('Y-m-d', $startDate) ? $startDate : '1970-01-01';
 
 		// get employee data
 		$result = $this->_getEchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil(
@@ -67,7 +67,7 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 		$dienstverhaeltnis_id = null,
 		$startDate = null
 	) {
-		$params = array();
+		$params = array($startDate, $startDate, $startDate);
 
 		// there should be no day in Dienstverhaeltnis not covered by a Kostenstelle Vertragsbestandteil
 		$qry = "
@@ -77,7 +77,16 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 					vb.dienstverhaeltnis_id, MIN(vb.von) OVER (PARTITION BY dienstverhaeltnis_id) AS erster_vb_start, vertragsbestandteil_id,
 					vb.von, vb.bis, LEAD(vb.von) OVER (PARTITION BY dienstverhaeltnis_id ORDER BY vb.von, vb.bis) AS naechstes_von
 				FROM
-					hr.tbl_vertragsbestandteil vb
+					(
+						SELECT 
+							vertragsbestandteil_id, 
+							dienstverhaeltnis_id, 
+							GREATEST(?::date, von) as von,
+							bis,
+							vertragsbestandteiltyp_kurzbz
+						from 
+							hr.tbl_vertragsbestandteil
+					) vb
 					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
 					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
 				WHERE
@@ -99,9 +108,10 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 				AND (
 					vbs.vertragsbestandteil_id IS NULL
 					OR vbs.naechstes_von - vbs.bis NOT BETWEEN 0 AND 1 -- there is a gap inbetween
-					OR vbs.erster_vb_start > dv.von -- there is a gap in the beginning
-					OR (vbs.naechstes_von IS NULL AND (COALESCE(vbs.bis, '9999-12-13') < COALESCE(dv.bis, '9999-12-13'))) -- there is a gap at the end
-				)";
+					OR vbs.erster_vb_start > GREATEST(?::date, dv.von) -- there is a gap in the beginning
+					OR (vbs.naechstes_von IS NULL AND (COALESCE(vbs.bis, '9999-12-31') < COALESCE(dv.bis, '9999-12-31'))) -- there is a gap at the end
+				)
+				AND COALESCE('9999-12-31'::date, dv.bis) >= ?::date";
 
 		if (isset($person_id))
 		{
@@ -113,12 +123,6 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 		{
 			$qry .= " AND dv.dienstverhaeltnis_id = ?";
 			$params[] = $dienstverhaeltnis_id;
-		}
-
-		if (isset($startDate))
-		{
-			$qry .= " AND dv.von >= ?::date";
-			$params[] = $startDate;
 		}
 
 		$qry .= "
