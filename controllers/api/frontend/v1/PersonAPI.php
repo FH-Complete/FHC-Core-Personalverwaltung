@@ -830,6 +830,9 @@ class PersonAPI extends Auth_Controller
             if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
                 show_error('mitarbeiter_uid is empty!');
 
+            if (isEmptyString($payload['betrag']))
+				$payload['betrag']=null; 
+
             if ($payload['sachaufwand_id'] == 0)
             {
                 $result = $this->SachaufwandModel->insertPersonSachaufwand($payload);
