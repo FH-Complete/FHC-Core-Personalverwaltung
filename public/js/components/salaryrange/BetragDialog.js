@@ -182,12 +182,6 @@ export const BetragDialog = {
                 // submit
                 try {
                     _resolve({type: 'OK', payload: currentValue.value })
-                    /* const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
-                    if (r.data.error == 0) {
-                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
-                        console.log('materialdata successfully saved');
-                        showToast();
-                    }   */
                 } catch (error) {
                     console.log(error)              
                 } finally {

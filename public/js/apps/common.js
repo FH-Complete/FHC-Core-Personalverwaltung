@@ -1,7 +1,4 @@
-import fhcapifactory from "../../../../js/api/fhcapifactory.js";
 import { CoreFilterAPIs } from '../../../../js/components/filter/API.js';
-
-Vue.$fhcapi = fhcapifactory;
 
 let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	 
 
@@ -156,8 +153,3 @@ export const searchbaroptions = {
         }
     }
 };
-
-export const searchfunction = (searchsettings) =>  {
-    return Vue.$fhcapi.search.search(searchsettings);  
-};
-

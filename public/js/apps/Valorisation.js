@@ -1,4 +1,3 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/api.js";
 import FhcApi from '../../../../js/plugin/FhcApi.js';
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
@@ -7,8 +6,6 @@ import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 //import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationSelection} from "../components/bulk/ValorisationSelection.js";
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;

@@ -1,7 +1,7 @@
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 import {CoreFilterCmpt} from "../../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "../../apps/common.js";
+import {searchbaroptions} from "../../apps/common.js";
 import { Modal } from '../Modal.js';
 import {formatter} from './valorisationformathelper.js';
 
@@ -17,7 +17,7 @@ export const ValorisationSelection = {
 		data() {
 			return 	{
 				searchbaroptions: searchbaroptions,
-				searchfunction: searchfunction,
+				searchfunction: this.$fhcApi.factory.search.search,
 				appSideMenuEntries: {},
 				alleValorisierungsinstanzen: [],
 				valorisierungInfoData: [],
@@ -97,9 +97,9 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = Vue.$fhcapi.Valorisierung.getGehaelter(this.gehaelter_stichtag, this.gehaelter_oe_kurzbz)
+				const res = this.$fhcApi.factory.Valorisierung.getGehaelter(this.gehaelter_stichtag, this.gehaelter_oe_kurzbz)
 					.then((response) => {
-						this.$refs.valorisationTabulator.tabulator.setData(response.data.data);
+						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
 					})
 					.catch(this.handleErrors);
@@ -128,9 +128,9 @@ export const ValorisationSelection = {
 					this.valorisierungsinstanz_kurzbz = valInstanzen[0].value;
 			},
 			getAllUnternehmen: function() {
-				const res = Vue.$fhcapi.Valorisierung.getAllUnternehmen()
+				const res = this.$fhcApi.factory.Valorisierung.getAllUnternehmen()
 					.then((response) => {
-						this.alleUnternehmen = response.data.data;
+						this.alleUnternehmen = response.data;
 						this.gehaelter_oe_kurzbz = '';
 						if (this.alleUnternehmen.length > 0) this.gehaelter_oe_kurzbz = this.alleUnternehmen[0].oe_kurzbz;
 					})
@@ -193,7 +193,7 @@ export const ValorisationSelection = {
 
 					// Column definitions
 					columns: [
-						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
+						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minWidth: 250},
 						{title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
 						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
@@ -385,7 +385,7 @@ export const ValorisationSelection = {
 		<div class="container-fluid">
 		<div class="row">
 
-		<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+		<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
 		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="height:100%">
 

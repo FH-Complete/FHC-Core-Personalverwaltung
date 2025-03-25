@@ -1,4 +1,3 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/api.js";
 import FhcApi from '../../../../js/plugin/FhcApi.js';
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
@@ -13,8 +12,6 @@ import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 var personSelectedRef = { callback: () => {}};
 
