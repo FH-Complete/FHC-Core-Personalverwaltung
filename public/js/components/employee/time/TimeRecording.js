@@ -13,8 +13,8 @@ export const TimeRecording = {
         "datepicker": VueDatePicker
     },
     props: {
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        personID: { type: [Number, null], required: true },
+        personUID: { type: [String, null], required: true },
     },
     emits: ['updateHeader'],
     setup( props, { emit } ) {
