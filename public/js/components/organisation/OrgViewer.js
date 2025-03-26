@@ -1,5 +1,4 @@
 import { Modal } from '../Modal.js';
-import { CoreFilterAPIs } from '../../../../../../public/js/components/filter/API.js';
 
 export const OrgViewer = {
     components: {
@@ -15,10 +14,12 @@ export const OrgViewer = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue;
+        const { toRefs, ref, inject } = Vue;
         let { oe } = toRefs(props);
         const selection = ref({});
         const filters = ref({});
+
+        const fhcApi = inject('$fhcApi');
 
         const nodes = ref({});
         const expandedKeys = ref({});
@@ -132,11 +133,15 @@ export const OrgViewer = {
                 "filterType":"EmployeeViewer",
                 "filterFields":[{"name":"OE Key","operation":"equal","condition":oe_kurzbz}]
             };
-            CoreFilterAPIs.applyFilterFields(filterFields).then(function() {
-                // redirect
+            fhcApi.factory.filter.applyFilterFields(filterFields).then(function() {
                 let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
                 window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;
             });
+            /* CoreFilterAPIs.applyFilterFields(filterFields).then(function() {
+                // redirect
+                let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+                window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;
+            }); */
         }
       
 
