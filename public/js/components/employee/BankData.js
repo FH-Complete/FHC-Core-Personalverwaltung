@@ -12,9 +12,7 @@ export const BankData = {
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
         config: { type: Object, default: () => ({}), required: false},
-        editMode: { type: Boolean, required: true },
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        personID: { type: [Number, null], required: false },
         writePermission: { type: Boolean, required: false },
     },
     setup( props ) {
