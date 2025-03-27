@@ -111,7 +111,7 @@ class EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil extends Plausi
 					OR vbs.erster_vb_start > GREATEST(?::date, dv.von) -- there is a gap in the beginning
 					OR (vbs.naechstes_von IS NULL AND (COALESCE(vbs.bis, '9999-12-31') < COALESCE(dv.bis, '9999-12-31'))) -- there is a gap at the end
 				)
-				AND COALESCE('9999-12-31'::date, dv.bis) >= ?::date";
+				AND COALESCE(dv.bis, '9999-12-31'::date) >= ?::date";
 
 		if (isset($person_id))
 		{
