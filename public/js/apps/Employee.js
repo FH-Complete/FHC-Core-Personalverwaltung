@@ -34,7 +34,7 @@ const router = VueRouter.createRouter(
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
 					{ path: 'contract/:dienstverhaeltnis_id',
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })
 					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
