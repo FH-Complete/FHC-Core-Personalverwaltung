@@ -512,7 +512,7 @@ export const EmployeeContract = {
 
         // event hander for vertragshistorie
         const dateSelectedHandler = (d) => {
-            currentDate.value = new Date(d);
+            currentDate.value = truncateDate(new Date(d));
         }
 
         const setDate2BisDatum = () => {
@@ -520,7 +520,7 @@ export const EmployeeContract = {
         }
 
         const setDate2VonDatum = () => {
-            currentDate.value = new Date(currentDV.value.von);
+            currentDate.value = truncateDate(new Date(currentDV.value.von));
         }
 
         const getCurrentVertragsbestandteil = () => {
@@ -720,6 +720,9 @@ export const EmployeeContract = {
                                     format="dd.MM.yyyy"
                                     model-type="yyyy-MM-dd"
                                     input-class-name="dp-custom-input"
+									:config="{ keepActionRow: true }"
+									:action-row="{ showNow: true, showSelect: false, showCancel: false }"
+									now-button-label="Heute"
                                     style="max-width:140px;min-width:140px" ></datepicker>
                             </div>
                         </div>
