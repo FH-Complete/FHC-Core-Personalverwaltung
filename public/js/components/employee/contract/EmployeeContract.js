@@ -1158,7 +1158,6 @@ export const EmployeeContract = {
 
     </div>
 
-    <!--DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog-->
     <vbform_wrapper
         id="vbFormWrapper"
         ref="VbformWrapperRef"
