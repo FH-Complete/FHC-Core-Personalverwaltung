@@ -10,6 +10,7 @@ import Phrasen from '../../../../../../../js/mixins/Phrasen.js';
 import savedpayloadchecker from '../../../../helpers/vbform/savedpayloadchecker.js';
 
 export default {
+  name: 'VbFormWrapper',
   template: `
     <Modal :title="getTitle" ref="modalRef" 
            :class="'vbformModal'" id="vbformModal" :noscroll="true">

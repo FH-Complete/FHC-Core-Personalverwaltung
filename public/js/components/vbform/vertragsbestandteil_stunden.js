@@ -5,6 +5,7 @@ import errors from './errors.js';
 import infos from './infos.js';
 
 export default {
+  name: 'VertragsbestandteilStunden',
   template: `
   <div class="card card-body my-2">
     <div class="py-0">

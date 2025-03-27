@@ -5,6 +5,7 @@ import {Modal} from '../Modal.js';
 import {formatter} from './valorisationformathelper.js';
 
 export const ValorisationCheck = {
+	name: 'ValorisationCheck',
 	props: {
 		dienstverhaeltnis_id: { type: Number, required: true }
 	},
