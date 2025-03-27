@@ -64,7 +64,7 @@ class EchteDienstverhaeltnisseOhneOeVertragsbestandteil extends PlausiChecker
 	 */
 	private function _getEchteDienstverhaeltnisseOhneOeVertragsbestandteil($person_id = null, $dienstverhaeltnis_id = null, $startDate = null)
 	{
-		$params = array($startDate, $startDate, $startDate);
+		$params = array($startDate, $startDate, $startDate, $startDate);
 
 		// there should be no day in Dienstverhaeltnis not covered by an Organisationseinheit Vertragsbestandteil
 		$qry = "
@@ -83,6 +83,9 @@ class EchteDienstverhaeltnisseOhneOeVertragsbestandteil extends PlausiChecker
 							vertragsbestandteiltyp_kurzbz
 						from 
 							hr.tbl_vertragsbestandteil
+						where
+							COALESCE(bis, '9999-12-31'::date) >= ?::date
+							
 					) vb
 					JOIN hr.tbl_vertragsbestandteil_funktion vbf USING (vertragsbestandteil_id)
 					JOIN public.tbl_benutzerfunktion bf USING (benutzerfunktion_id)
@@ -108,7 +111,7 @@ class EchteDienstverhaeltnisseOhneOeVertragsbestandteil extends PlausiChecker
 					OR vbs.erster_vb_start > GREATEST(?::date, dv.von) -- there is a gap in the beginning
 					OR (vbs.naechstes_von IS NULL AND (COALESCE(vbs.bis, '9999-12-31') < COALESCE(dv.bis, '9999-12-31'))) -- there is a gap at the end
 				)
-				AND COALESCE('9999-12-31'::date, dv.bis) >= ?::date";
+				AND COALESCE(dv.bis, '9999-12-31'::date) >= ?::date";
 
 		if (isset($person_id))
 		{
