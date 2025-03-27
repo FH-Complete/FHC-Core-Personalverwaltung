@@ -344,7 +344,7 @@ export const BaseData = {
                     <select v-if="!readonly" id="geschlecht" v-model="currentValue.geschlecht" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option value="w">weiblich</option>
                         <option value="m">männlich</option>
-                        <option val4e="x">divers</option>
+                        <option value="x">divers</option>
                         <option value="u">unbekannt</option>
                     </select>
                     <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="geschlecht" :value="GESCHLECHT[currentValue.geschlecht]">
