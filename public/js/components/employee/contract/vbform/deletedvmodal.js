@@ -1,6 +1,7 @@
 import {Modal} from '../../../Modal.js';
 
 export default {
+  name: 'DeleteDvModal',
   template: `
     <Modal :title="'Dienstverhältnis löschen'" :noscroll="true" ref="modalRef" 
            id="deleteDvModal">
