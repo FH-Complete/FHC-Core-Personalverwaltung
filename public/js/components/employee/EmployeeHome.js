@@ -12,6 +12,7 @@ import { Toast } from '../Toast.js';
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 export default {
+	name: 'EmployeeHome',
     components: {
 		Sidebar,
 		CoreNavigationCmpt,

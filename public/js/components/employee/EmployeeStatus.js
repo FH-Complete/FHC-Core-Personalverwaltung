@@ -1,4 +1,5 @@
 export const EmployeeStatus = {
+	name: 'EmployeeStatus',
     props: {
       tags: {
           default: [],

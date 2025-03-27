@@ -4,6 +4,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 
 export const EmployeeData= {
+	name: 'EmployeeData',
     components: {
         ModalDialog,
         Toast,

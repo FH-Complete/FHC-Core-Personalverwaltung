@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { CoreFilterAPIs } from '../../../../../../public/js/components/filter/API.js';
 
 export const OrgViewer = {
+	name: 'OrgViewer',
     components: {
         "p-treetable": primevue.treetable,
         "p-column": primevue.column,

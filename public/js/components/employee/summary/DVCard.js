@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const DvCard = {
+	name: 'DvCard',
      props: {
         uid: String,
         date: Date,

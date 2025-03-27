@@ -3,6 +3,7 @@ import { EmailTelData } from "./EmailTelData.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const ContactData = {
+	name: 'ContactData',
     components: {
         AddressData,
 		EmailTelData,

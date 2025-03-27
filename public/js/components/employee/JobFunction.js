@@ -5,6 +5,7 @@ import {OrgChooser} from "../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const JobFunction = {
+	name: 'JobFunction',
     components: {
         Modal,
         ModalDialog,

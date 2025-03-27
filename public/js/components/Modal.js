@@ -1,4 +1,5 @@
 export const Modal = {
+	name: 'Modal',
     props: {
         type: String,
         title: String,

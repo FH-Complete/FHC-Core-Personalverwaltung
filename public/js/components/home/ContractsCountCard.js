@@ -1,4 +1,5 @@
 const ContractCountCard = {
+	name: 'ContractCountCard',
      components: {
         "p-overlaypanel": primevue.overlaypanel,
         "p-datatable": primevue.datatable,

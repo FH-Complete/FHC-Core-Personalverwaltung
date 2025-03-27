@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const IssuesCard = {
+	name: 'IssuesCard',
      components: {
         
      },

@@ -9,6 +9,7 @@ import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeContract = {
+	name: 'EmployeeContract',
     components: {
         'vbform_wrapper': vbform_wrapper,
         'enddvmodal': enddvmodal,

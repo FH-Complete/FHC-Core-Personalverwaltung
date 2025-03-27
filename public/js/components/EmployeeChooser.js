@@ -2,6 +2,7 @@
  * @deprecated replaced by filter widget
  */
 const EmployeeChooser = {
+  name: 'EmployeeChooser',
   props: {
     placeholder: String,
   },

@@ -5,6 +5,7 @@ import { validSVNR } from "../../../helpers/validation/svnr.js";
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 export const CreateEmployeeFrm = {
+	name: 'CreateEmployeeFrm',
     components: {
         "datepicker": VueDatePicker
     },

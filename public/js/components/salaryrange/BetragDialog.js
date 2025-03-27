@@ -4,6 +4,7 @@ import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BetragDialog = {
+	name: 'BetragDialog',
     components: {
         Modal,
         ModalDialog,

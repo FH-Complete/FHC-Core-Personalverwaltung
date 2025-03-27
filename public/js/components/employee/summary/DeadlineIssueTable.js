@@ -8,6 +8,7 @@ import { CoreFilterCmpt } from "../../../../../../js/components/filter/Filter.js
 
 
 export const DeadlineIssueTable = {    
+  name: 'DeadlineIssueTable',
   components: {
     ModalDialog,
     Toast,
