@@ -4,6 +4,7 @@ import {searchbaroptions} from "./common.js";
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21Report',
 	components: {
 		searchbar,	
 		Sidebar,

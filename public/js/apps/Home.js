@@ -7,6 +7,7 @@ import Phrasen from '../../../../js/plugin/Phrasen.js';
 import { DeadlineIssueTable } from '../components/home/DeadlineIssueTable.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21Home',
 	components: {
 		CoreNavigationCmpt,	
 		ContractCountCard,

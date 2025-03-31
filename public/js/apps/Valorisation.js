@@ -21,6 +21,7 @@ const router = VueRouter.createRouter(
 );
 
 const valApp = Vue.createApp({
+	name: 'PV21Valorisation'
 }).use(router);
 
 valApp.use(primevue.config.default);

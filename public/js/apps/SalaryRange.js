@@ -7,6 +7,7 @@ import {searchbaroptions} from "./common.js";
 import {SalaryRange} from '../components/salaryrange/SalaryRange.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21SalaryRange',
 	components: {
 		searchbar,			
 		CoreNavigationCmpt,

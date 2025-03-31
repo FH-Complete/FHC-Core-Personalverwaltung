@@ -7,6 +7,7 @@ import {searchbaroptions} from "./common.js";
 import {StaleEmployees} from '../components/bulk/StaleEmployees.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21Bulk',
 	components: {
 		searchbar,			
 		CoreNavigationCmpt,

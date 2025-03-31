@@ -56,6 +56,7 @@ Highcharts.setOptions({
   })
 
 const pvApp = Vue.createApp({
+	name: 'PV21Employee',
 	setup() {
 
 		// init shared data

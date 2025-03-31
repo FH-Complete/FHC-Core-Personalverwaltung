@@ -7,6 +7,7 @@ import {searchbaroptions } from "./common.js";
 import {SalaryExport} from '../components/salaryexport/SalaryExport.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21SalaryExport',
 	components: {
 		searchbar,			
 		CoreNavigationCmpt,

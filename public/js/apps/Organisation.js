@@ -9,6 +9,7 @@ import {OrgViewer} from '../components/organisation/OrgViewer.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21Organisation',
 	components: {	
 		searchbar,	
 		OrgChooser,
