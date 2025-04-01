@@ -45,7 +45,7 @@ export const EmployeeContractInfo = {
             isFetching.value = true
             try {
                 const res = await fhcApi.factory.Employee.dvInfoByPerson(uid);
-                dvList.value = res.data.retval.dvList;          
+                dvList.value = res.retval.dvList;
                 isFetching.value = false;                   
             } catch (error) {
                 console.log(error)
