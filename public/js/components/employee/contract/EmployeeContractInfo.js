@@ -1,6 +1,7 @@
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeContractInfo = {
+	name: 'EmployeeContractInfo',
     components: {
 
     
@@ -33,6 +34,7 @@ export const EmployeeContractInfo = {
 
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
+		const fhcApi = inject('$fhcApi');
 
         const fetchData = async (uid) => {
             if (uid == null) {
@@ -42,7 +44,7 @@ export const EmployeeContractInfo = {
             }
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Employee.dvInfoByPerson(uid);
+                const res = await fhcApi.factory.Employee.dvInfoByPerson(uid);
                 dvList.value = res.data.retval.dvList;          
                 isFetching.value = false;                   
             } catch (error) {

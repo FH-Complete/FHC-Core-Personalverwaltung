@@ -1,4 +1,5 @@
 export const EmployeeStatus = {
+	name: 'EmployeeStatus',
     props: {
       tags: {
           default: [],
@@ -20,6 +21,7 @@ export const EmployeeStatus = {
         const vertragsarten = inject('vertragsarten');
         const karenztypen = inject('karenztypen');
         const teilzeittypen = inject('teilzeittypen');
+        const fhcApi = inject('$fhcApi')   
         
         const formatVertragsart = (item) => {
           let va = vertragsarten.value.find(kt => kt.value == item);
@@ -62,10 +64,10 @@ export const EmployeeStatus = {
             statusList.value.unshift({text: 'derzeit kein aktives DV', description:'', css: 'bg-dv rounded-0'});
           }
           console.log("dvIDs", dvIDs)
-          Promise.all(dvIDs.map((dvID) => Vue.$fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
+          Promise.all(dvIDs.map((dvID) => fhcApi.factory.Vertragsbestandteil.getCurrentVBs(dvID))).then(
             (allData) => {
               allData.map((item) => {
-                item.data.data.map((vbs => {
+                item.data.map((vbs => {
                   switch (vbs.vertragsbestandteiltyp_kurzbz) {
                     case 'freitext':
                       if (vbs.freitexttyp_kurzbz == 'befristung') {
@@ -102,8 +104,8 @@ export const EmployeeStatus = {
           }
           isFetching.value = true
           try {
-            const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
-              dvList.value = res.data.retval;          
+            const res = await fhcApi.factory.Employee.dvByPerson(uid);
+              dvList.value = res.retval;          
               isFetching.value = false;
               generateStatusList();           
           } catch (error) {

@@ -2,6 +2,7 @@ import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 
 export default {
+  name: 'DvAenderung',
   template: `
   <div class="col-7">Aenderung</div>
     <gueltigkeit ref="gueltigkeit" :initialsharedstatemode="'set'" :config="getgueltigkeit"></gueltigkeit>

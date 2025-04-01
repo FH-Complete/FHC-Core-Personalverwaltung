@@ -8,6 +8,7 @@ import { Toast } from '../Toast.js';
 
 
 export const SalaryRange = {
+	name: 'SalaryRange',
     components: {
         "datepicker": VueDatePicker,
         "p-skeleton": primevue.skeleton,
