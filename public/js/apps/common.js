@@ -1,11 +1,9 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import { CoreFilterAPIs } from '../../../../js/components/filter/API.js';
-
-Vue.$fhcapi = fhcapifactory;
 
 let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	 
 
 export const searchbaroptions = {
+    cssclass: "position-relative",
     types: [
         "person",
         "raum",
@@ -46,32 +44,50 @@ export const searchbaroptions = {
                 }
             ]
         },
-        raum: {
-            defaultaction: {
-                type: "function",
-                action: function(data) { 
-                    alert('raum defaultaction ' + JSON.stringify(data)); 
-                }
-            },
-            childactions: [                      
-               {
-                    label: "Rauminformation",
-                    icon: "fas fa-info-circle",
-                    type: "link",
-                    action: function(data) { 
-                        return data.infolink;
-                    }
-                },
-                {
-                    label: "Raumreservierung",
-                    icon: "fas fa-bookmark",
-                    type: "link",
-                    action: function(data) { 
-                        return data.booklink;
-                    }
-                }
-            ]
-        },
+		raum: {
+			defaultaction: {
+				type: "link",
+				renderif: function(data) {
+					if(data.content_id === "N/A"){
+						return false;
+					}
+					return true;
+				},
+				action: function(data) { 
+					const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+						'cms/content.php?content_id=' + data.content_id;
+					return link;
+				}
+			},
+			childactions: [
+				{
+					label: "LV-Plan",
+					icon: "fas fa-bookmark",
+					type: "link",
+					action: function(data) {
+						const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+							'cis/private/lvplan/stpl_week.php?type=ort&ort_kurzbz=' + data.ort_kurzbz;
+						return link;
+					}
+				},
+				{
+					label: "Rauminformation",
+					icon: "fas fa-info-circle",
+					type: "link",
+					renderif: function(data) {
+						if(data.content_id === "N/A"){
+							return false;
+						}
+						return true;
+					},
+					action: function(data) {
+					const link= FHC_JS_DATA_STORAGE_OBJECT.app_root +
+						'cms/content.php?content_id=' + data.content_id;
+						return link;
+					}
+				},
+			]
+		},
         employee: {
             defaultaction: {
                 type: "link",
@@ -126,9 +142,9 @@ export const searchbaroptions = {
                         "filterType":"EmployeeViewer",
                         "filterFields":[{"name":"OE Key","operation":"equal","condition":data.oe_kurzbz}]
                     };
-                    CoreFilterAPIs.applyFilterFields(filterFields).then(function() {
+					let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+					axios.post(protocol_host + '/api/frontend/v1/filter/applyFilterFields', filterFields).then(function() {
                         // redirect
-                        let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
                         window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;
                     });
                 }
@@ -136,12 +152,4 @@ export const searchbaroptions = {
             childactions: []
         }
     }
-};
-
-export const searchfunction = (searchsettings) =>  {
-    return Vue.$fhcapi.Search.search(searchsettings);  
-};
-
-export const searchfunctiondummy = (searchsettings) => {
-    return Vue.$fhcapi.Search.searchdummy(searchsettings);  
 };

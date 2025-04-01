@@ -11,6 +11,7 @@ import errors from './errors.js';
 import infos from './infos.js';
 
 export default {
+  name: 'VertragsbestandteilList',
   template: `
       <div class="card card-body mb-3">
         <div class="row g-2 py-1">

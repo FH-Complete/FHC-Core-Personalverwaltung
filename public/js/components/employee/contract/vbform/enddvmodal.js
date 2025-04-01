@@ -5,6 +5,7 @@ import errors from '../../../vbform/errors.js';
 import infos from '../../../vbform/infos.js';
 
 export default {
+  name: 'EndDvModal',
   template: `
     <Modal :title="'Dienstverhältnis beenden'" :noscroll="true" ref="modalRef" 
            :class="'vbformModal'" id="endDvModal">
@@ -14,6 +15,11 @@ export default {
             <div class="row g-2 py-2 border-bottom mb-3">
                 <dienstverhaeltnis ref="dienstverhaeltnisRef" :config="curdv" :showdvcheckoverlap="false"></dienstverhaeltnis>
             </div>
+
+            <input type="checkbox" v-model="unrulyInternal" id="unruly" :disabled="spinners.saving" ref="unrulyCheckbox">
+			<label for="unruly" style="margin-left: 12px;" >{{ $p.t('studierendenantrag', 'mark_person_as_unruly') }}</label>
+
+            
         </template>
         <template #footer>
          <div class="btn-toolbar" role="toolbar" aria-label="TmpStore Toolbar">
@@ -40,12 +46,14 @@ export default {
       errors: [],
       spinners: {
         saving: false
-      }
+      },
+      unrulyInternal: false
     };
   },
   emits: [
-    "dvended"
+    "dvended", "updateunruly"
   ],
+  inject: ['$fhcApi', '$fhcAlert'],
   components: {
     'Modal': Modal,
     'dienstverhaeltnis': dienstverhaeltnis,
@@ -58,9 +66,20 @@ export default {
       this.store.showmsgs = false;
       const payload = this.$refs['dienstverhaeltnisRef'].getPayload();
       
-      Vue.$fhcapi.DV.endDV(payload)
+      this.$fhcApi.factory.DV.endDV(payload)
       .then((response) => {
-        this.handleDVEnded(response.data);
+        this.handleDVEnded(response);
+      }).then(() => {
+        if(!this.unrulyInternal) return
+
+        // TODO maybe add updateUnruly into pv21 api for concurrency reasons
+        this.$fhcapi.factory.Person.updatePersonUnruly({
+          person_id: this.curdv.person_id,
+          unruly: this.unrulyInternal
+        }).then((response) => {
+          this.$emit('updateunruly', this.unrulyInternal);
+        })
+
       })
       .finally(() => {
           this.spinners.saving = false;
@@ -83,6 +102,25 @@ export default {
     showModal: function() {
         this.store.mode = 'korrektur';
         this.$refs['modalRef'].show();
+    },
+    saveUnrulyPerson: function () {
+        this.spinners.saving = true;
+        this.store.showmsgs = false;
+
+        this.$fhcapi.factory.Person.updatePersonUnruly({
+          person_id: this.curdv.person_id,
+          unruly: this.unrulyInternal
+        }).then((response) => {
+          this.$emit('updateunruly', this.unrulyInternal);
+        }).finally(() => {
+          this.spinners.saving = false;
+          this.store.showmsgs = true;
+        });
+    }
+  },
+  watch: {
+    curdv(newVal) {
+      this.unrulyInternal = newVal.unruly
     }
   },
   expose: ['showModal']

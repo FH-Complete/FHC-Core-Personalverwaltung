@@ -4,6 +4,7 @@ import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const MaterialExpensesData = {
+	name: 'MaterialExpensesData',
     components: {
         Modal,
         ModalDialog,
@@ -17,6 +18,7 @@ export const MaterialExpensesData = {
     },
     setup( props ) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -51,8 +53,8 @@ export const MaterialExpensesData = {
  
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
-                materialdataList.value = response.data.retval;
+                const response = await fhcApi.factory.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
+                materialdataList.value = response.retval;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -134,8 +136,8 @@ export const MaterialExpensesData = {
             if (ok) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonMaterialExpenses(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.Person.deletePersonMaterialExpenses(id);                    
+                    if (res.error == 0) {
                         delete materialdataList.value[id];
                         showDeletedToast();
                     }
@@ -158,9 +160,9 @@ export const MaterialExpensesData = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
-                    if (r.data.error == 0) {
-                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
+                    const r = await fhcApi.factory.Person.upsertPersonMaterialExpenses(currentValue.value);                    
+                    if (r.error == 0) {
+                        materialdataList.value[r.retval[0].sachaufwand_id] = r.retval[0];
                         console.log('materialdata successfully saved');
                         showToast();
                     }  

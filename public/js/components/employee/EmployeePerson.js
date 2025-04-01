@@ -9,6 +9,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import FhcTabs from '../../../../../../public/js/components/Tabs.js';
 
 export const EmployeePerson = {
+	name: 'EmployeePerson',
     components: {
 		BaseData,
 		EmployeeData,
@@ -28,7 +29,7 @@ export const EmployeePerson = {
 
         const { t } = usePhrasen();
         const theModel = Vue.reactive({personID: null, personUID: null,editmode: true, updateHeader: () => emit('updateHeader')});
-        const path = Vue.ref("/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/Stammdaten")
+        const path = Vue.ref("/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/TabsConfigAPI/Stammdaten")
 
         theModel.personID = props.id
         theModel.personUID = props.uid

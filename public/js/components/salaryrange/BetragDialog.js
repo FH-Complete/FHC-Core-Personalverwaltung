@@ -4,6 +4,7 @@ import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BetragDialog = {
+	name: 'BetragDialog',
     components: {
         Modal,
         ModalDialog,
@@ -14,10 +15,12 @@ export const BetragDialog = {
     },  
     setup(props) {
 
-        const { watch, ref, toRefs, onMounted, defineExpose, toRaw, reactive } = Vue; 
+        const { watch, ref, inject, toRefs, onMounted, defineExpose, toRaw, reactive } = Vue; 
         const { t } = usePhrasen();
         const salaryRangeList = ref([])        
         const isFetching = ref(false)
+
+        const fhcApi = inject('$fhcApi');
 
         // Modal 
         let modalRef = ref()
@@ -64,8 +67,8 @@ export const BetragDialog = {
         const fetchSalaryRangeList = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.SalaryRange.getSalaryRangeList();
-                salaryRangeList.value = res.data.error !== 1 ? res.data.retval : [] 
+                const res = await fhcApi.factory.SalaryRange.getSalaryRangeList();  
+                salaryRangeList.value = res.error !== 1 ? res.retval : [] 
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);
@@ -73,17 +76,6 @@ export const BetragDialog = {
             }	
           }
     
-        const fetchBetraege = async () => {
-            try {
-                isFetching.value = true;
-                const res = await Vue.$fhcapi.SalaryRange.getBetraege();
-                fristEreignisse.value = res.data;			  
-                isFetching.value = false;                        
-            } catch (error) {
-                console.log(error);
-                isFetching.value = false;           
-            }	
-        }
 
         onMounted(async () => {
             fetchSalaryRangeList()
@@ -102,8 +94,7 @@ export const BetragDialog = {
         const validInput = (input) => {
             if (input === undefined || input === '')
                 return false;
-            else
-                return true;
+            return true;
         }
 
         const validBezeichnung = (n) => {
@@ -192,12 +183,6 @@ export const BetragDialog = {
                 // submit
                 try {
                     _resolve({type: 'OK', payload: currentValue.value })
-                    /* const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
-                    if (r.data.error == 0) {
-                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
-                        console.log('materialdata successfully saved');
-                        showToast();
-                    }   */
                 } catch (error) {
                     console.log(error)              
                 } finally {

@@ -14,7 +14,7 @@
 			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',       
-                       'public/css/components/searchbar.css',
+                       'public/css/components/searchbar/searchbar.css',
 					   'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css'],
       'customJSs' => [
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
@@ -60,7 +60,7 @@
 <div class="container-fluid">
   <div class="row">
 
-  <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+  <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" :hide-top-menu="true" left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 

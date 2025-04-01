@@ -3,6 +3,7 @@ import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const BaseData = {
+	name: 'BaseData',
     components: {
         ModalDialog,
         Toast,
@@ -18,6 +19,7 @@ export const BaseData = {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(true);
 
         const { personID } = Vue.toRefs(props);
@@ -57,8 +59,8 @@ export const BaseData = {
             }
             isFetching.value = true
             try {
-              const res = await Vue.$fhcapi.Person.personBaseData(theModel.value.personID || personID.value);
-              currentValue.value = res.data.retval[0];
+              const res = await fhcApi.factory.Person.personBaseData(theModel.value.personID || personID.value);
+              currentValue.value = res.retval[0];
             } catch (error) {
               console.log(error)              
             } finally {
@@ -192,9 +194,9 @@ export const BaseData = {
 
                 // submit
                 try {
-                    const response = await Vue.$fhcapi.Person.updatePersonBaseData(currentValue.value);                    
+                    const response = await fhcApi.factory.Person.updatePersonBaseData(currentValue.value);                    
                     showToast();
-                    currentValue.value = response.data.retval[0];
+                    currentValue.value = response.retval[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  
@@ -220,6 +222,10 @@ export const BaseData = {
             toastRef.value.show();
         }
 
+        const readonlyBlocker = (e) => {
+            if (readonly.value) e.preventDefault();
+        }
+
         return {
             
             currentValue,
@@ -232,8 +238,8 @@ export const BaseData = {
             sprache,
             GESCHLECHT,
             nations,  
-            theModel,          
-
+            theModel,
+            readonlyBlocker,
             save,
             toggleMode,  
             validNachname,    
@@ -281,7 +287,7 @@ export const BaseData = {
                     <label for="titelPost" class="form-label">{{ $p.t('person', 'titelpost' )}}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
                 </div>
-                <div class="col-lg-6"></div>
+                <div class="col-lg-4"></div>
                 <!--Name -->
                 <div class="col-lg-3 col-md-4">
                     <label for="nachname" class="required form-label">{{ $p.t('person','nachname') }}</label>
@@ -338,7 +344,7 @@ export const BaseData = {
                     <select v-if="!readonly" id="geschlecht" v-model="currentValue.geschlecht" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option value="w">weiblich</option>
                         <option value="m">männlich</option>
-                        <option val4e="x">divers</option>
+                        <option value="x">divers</option>
                         <option value="u">unbekannt</option>
                     </select>
                     <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="geschlecht" :value="GESCHLECHT[currentValue.geschlecht]">

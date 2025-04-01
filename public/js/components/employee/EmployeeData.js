@@ -4,6 +4,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 
 export const EmployeeData= {
+	name: 'EmployeeData',
     components: {
         ModalDialog,
         Toast,
@@ -18,6 +19,7 @@ export const EmployeeData= {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(true);
         const { t } = usePhrasen();
 
@@ -45,8 +47,8 @@ export const EmployeeData= {
             }
             isFetching.value = true;
             try {
-              const res = await Vue.$fhcapi.Person.personEmployeeData(theModel.value.personID || personID.value);                    
-              currentValue.value = res.data.retval[0];
+              const res = await fhcApi.factory.Person.personEmployeeData(theModel.value.personID || personID.value);                    
+              currentValue.value = res.retval[0];
             } catch (error) {
               console.log(error)              
             } finally {
@@ -150,11 +152,11 @@ export const EmployeeData= {
                     isFetching.value = true;
 
                     try {
-                        Vue.$fhcapi.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
-                            if (res.data.error == 1) {
-                                console.error("error checking kurzbz", res.data.msg)
+                        fhcApi.factory.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
+                            if (res.error == 1) {
+                                console.error("error checking kurzbz", res.msg)
                             } else {                                
-                                validKurzbz.value = !res.data.retval
+                                validKurzbz.value = !res.retval
                             }
                         })
                         
@@ -188,9 +190,9 @@ export const EmployeeData= {
 
                 // submit
                 try {
-                    const response = await Vue.$fhcapi.Person.updatePersonEmployeeData(currentValue.value);                    
+                    const response = await fhcApi.factory.Person.updatePersonEmployeeData(currentValue.value);                    
                     showToast();
-                    currentValue.value = response.data.retval[0];
+                    currentValue.value = response.retval[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  

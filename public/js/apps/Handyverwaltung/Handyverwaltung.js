@@ -15,10 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-//import {LogsViewerTabulatorOptions} from './TabulatorSetup.js';
-//import {LogsViewerTabulatorEventHandlers} from './TabulatorSetup.js';
-import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../../api/vbform/api.js";
+import pv21apifactory from "../../api/api.js";
+import FhcApi from '../../../../../js/plugin/FhcApi.js';
 
 import {CoreFilterCmpt} from '../../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
@@ -33,11 +31,9 @@ import { EmployeeContractInfo } from "../../components/employee/contract/Employe
 
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
-import karenz from "../../api/vbform/karenz.js";
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 const handyVerwaltungApp = Vue.createApp({
+	name: 'Handyverwaltung',
 	data: function() {
 		return {
                     personid: null,
@@ -224,6 +220,7 @@ const handyVerwaltungApp = Vue.createApp({
 });
 
 handyVerwaltungApp.use(primevue.config.default);
+handyVerwaltungApp.use(FhcApi, {factory: pv21apifactory});
 handyVerwaltungApp.use(Phrasen).mount('#main');
 handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 

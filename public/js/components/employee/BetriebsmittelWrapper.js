@@ -2,6 +2,7 @@
 import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebsmittel.js";
 
 export const BetriebsmittelWrapper = {
+	name: 'BetriebsmittelWrapper',
     components: {
         Betriebsmittel,
     },

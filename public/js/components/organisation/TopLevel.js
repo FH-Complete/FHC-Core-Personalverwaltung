@@ -1,4 +1,5 @@
 const TopLevel = {
+	name: 'TopLevel',
     components: {
         Modal,
         ModalDialog,
