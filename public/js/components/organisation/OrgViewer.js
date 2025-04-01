@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { CoreFilterAPIs } from '../../../../../../public/js/components/filter/API.js';
 
 export const OrgViewer = {
+	name: 'OrgViewer',
     components: {
         "p-treetable": primevue.treetable,
         "p-column": primevue.column,
@@ -125,7 +126,7 @@ export const OrgViewer = {
                 "filterType":"EmployeeViewer",
                 "filterFields":[{"name":"OE Key","operation":"equal","condition":oe_kurzbz}]
             };
-            CoreFilterAPIs.applyFilterFields(filterFields).then(function() {
+            fhcApi.factory.filter.applyFilterFields(filterFields).then(function() {
                 // redirect
                 let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
                 window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;

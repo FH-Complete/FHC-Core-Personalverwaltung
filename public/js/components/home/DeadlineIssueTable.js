@@ -3,6 +3,7 @@ import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 
 export const DeadlineIssueTable = {
+  name: 'DeadlineIssueTable',
   components: {
     Toast,
   },

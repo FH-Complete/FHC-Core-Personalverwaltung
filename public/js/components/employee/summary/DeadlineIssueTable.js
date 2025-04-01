@@ -8,6 +8,7 @@ import { CoreFilterCmpt } from "../../../../../../js/components/filter/Filter.js
 
 
 export const DeadlineIssueTable = {    
+  name: 'DeadlineIssueTable',
   components: {
     ModalDialog,
     Toast,
@@ -158,12 +159,12 @@ export const DeadlineIssueTable = {
         () => {
           fetchList();
         }
-      )
+      );
   
-      onMounted(() => {
-        fetchFristStatus()
-        fetchFristEreignisse()
-      })
+      (async () => {
+        await fetchFristStatus();
+        await fetchFristEreignisse();
+      })();
 
       const onPersonSelect = (uid, person_id) => {
         let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
@@ -430,16 +431,16 @@ export const DeadlineIssueTable = {
             event: 'tableBuilt',
             handler: () => {
                 fetchList();
+
+				Vue.watch(fristen, (newVal, oldVal) => {
+				  console.log('fristenList changed');
+				  if( fristenTable.value?.tabulator !== null ) {
+					  fristenTable.value.tabulator.setData(fristen.value);
+				  }
+				}, {deep: true})
             }
         }
       ]);
-
-      Vue.watch(fristen, (newVal, oldVal) => {
-        console.log('fristenList changed');
-        if( fristenTable.value?.tabulator !== null ) {
-            fristenTable.value.tabulator.setData(fristen.value);
-        }
-      }, {deep: true})
 
     /*   Vue.watch(fristStatusList, (newVal, oldVal) => {
         let colDefs = fristenTable.value?.tabulator.getColumnDefinitions()

@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const OffTimeCard = {
+	name: 'OffTimeCard',
      components: {
         
      },

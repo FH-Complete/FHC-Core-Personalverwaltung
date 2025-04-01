@@ -2,13 +2,14 @@
 import FhcApi from '../../../../js/plugin/FhcApi.js';
 import pv21apifactory from "../api/api.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "./common.js";
+import {searchbaroptions} from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import {OrgViewer} from '../components/organisation/OrgViewer.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21Organisation',
 	components: {	
 		searchbar,	
 		OrgChooser,

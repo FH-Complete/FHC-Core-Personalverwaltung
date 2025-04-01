@@ -1,10 +1,11 @@
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "../../apps/common.js";
+import {searchbaroptions} from "../../apps/common.js";
 import {Modal} from '../Modal.js';
 import {formatter} from './valorisationformathelper.js';
 
 export const ValorisationCheck = {
+	name: 'ValorisationCheck',
 	props: {
 		dienstverhaeltnis_id: { type: Number, required: true }
 	},
@@ -17,7 +18,7 @@ export const ValorisationCheck = {
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
-			searchfunction: searchfunction,
+			searchfunction: this.$fhcApi.factory.search.search,
 			appSideMenuEntries: {},
 			valorisierungCheckData: {},
 			dvData: {},
@@ -177,14 +178,14 @@ export const ValorisationCheck = {
 			<li><a class="dropdown-item" href="#">Another action</a></li>
 			<li><a class="dropdown-item" href="#">Something else here</a></li>
 		</ul>
-		</div>
+		</div>noheader
 	</div>
 	</header>
 
 	<div class="container-fluid">
 	<div class="row">
 
-	<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+	<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
 	<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="height:100%">
 
@@ -216,7 +217,7 @@ export const ValorisationCheck = {
 			</div>
 
 			<div class="col-6 mb-3 text-end fw-bold fs-5">
-				&sum; gespeichert: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.saved) }};
+				&sum; Historie: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.saved) }};
 				&sum; berechnet: {{ this.formatter.formatCurrencyGerman(dienstverhaeltnisSums.calculated) }}
 			</div>
 

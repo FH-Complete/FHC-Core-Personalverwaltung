@@ -1,4 +1,5 @@
 const BirthdayCountCard = {
+	name: 'BirthdayCountCard',
     components: {
         "p-overlaypanel": primevue.overlaypanel,
         "p-datatable": primevue.datatable,

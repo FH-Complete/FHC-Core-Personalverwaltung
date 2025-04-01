@@ -3,6 +3,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 
 export const StaleEmployees = {
+	name: 'StaleEmployees',
     components: {
         "datepicker": VueDatePicker,
         "p-skeleton": primevue.skeleton,

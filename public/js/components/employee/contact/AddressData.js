@@ -4,6 +4,7 @@ import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const AddressData = {
+	name: 'AddressData',
     components: {
         Modal,
         ModalDialog,

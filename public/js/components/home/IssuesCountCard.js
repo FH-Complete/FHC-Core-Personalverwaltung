@@ -1,4 +1,5 @@
 const IssuesCountCard = {
+	name: 'IssuesCountCard',
      components: {
         "p-overlaypanel": primevue.overlaypanel,
         "p-datatable": primevue.datatable,

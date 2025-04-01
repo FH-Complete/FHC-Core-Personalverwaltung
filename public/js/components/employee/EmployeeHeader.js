@@ -4,6 +4,7 @@ import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
 
 export const EmployeeHeader = {
+	name: 'EmployeeHeader',
     components: {
         Toast,
 		Modal,

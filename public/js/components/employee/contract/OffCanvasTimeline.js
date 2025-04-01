@@ -2,6 +2,7 @@ import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 
 export const OffCanvasTimeline = {
+	name: 'OffCanvasTimeline',
      components: {
         "p-timeline": primevue.timeline,
         "p-multiselect": primevue.multiselect,

@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const LehreCard = {
+	name: 'LehreCard',
      props: {
         uid: String,
         date: Date,

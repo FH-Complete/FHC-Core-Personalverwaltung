@@ -17,6 +17,8 @@ class IssueProducer extends PlausiIssueProducer_Controller
 			'paralelleDienstverhaeltnisseEinUnternehmen' => 'ParalelleDienstverhaeltnisseEinUnternehmen',
 			'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis',
 			'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil',
+			'echteDienstverhaeltnisseOhneOeVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneOeVertragsbestandteil',
+			'echteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil',
 			'fehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe' => 'FehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe',
 			'fehlendesDienstverhaeltnisFuerAktivenMitarbeiter' => 'FehlendesDienstverhaeltnisFuerAktivenMitarbeiter',
 			'vertragsbestandteilStartBeforeDienstverhaeltnis' => 'VertragsbestandteilStartBeforeDienstverhaeltnis',

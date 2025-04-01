@@ -5,6 +5,7 @@ import errors from '../../../vbform/errors.js';
 import infos from '../../../vbform/infos.js';
 
 export default {
+  name: 'KarenzModal',
   template: `
     <Modal :title="'Karenz verwalten'" :noscroll="true" ref="modalRef" 
            :class="'vbformModal'" id="karenzModal">

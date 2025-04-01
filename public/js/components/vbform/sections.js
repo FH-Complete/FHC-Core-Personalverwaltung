@@ -1,4 +1,5 @@
 export default {
+  name: 'Sections',
   props: [
     'preset'
   ],

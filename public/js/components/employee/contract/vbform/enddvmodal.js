@@ -5,6 +5,7 @@ import errors from '../../../vbform/errors.js';
 import infos from '../../../vbform/infos.js';
 
 export default {
+  name: 'EndDvModal',
   template: `
     <Modal :title="'Dienstverhältnis beenden'" :noscroll="true" ref="modalRef" 
            :class="'vbformModal'" id="endDvModal">

@@ -2,6 +2,7 @@ import presetable from '../../mixins/vbform/presetable.js';
 import vertragsbestandteillist from '../../components/vbform/vertragsbestandteillist.js';
 
 export default {
+  name: 'VbListGroup',
   template: `
   <div class="row h-100 overflow-hidden">
     <div class="col-12 h-100">

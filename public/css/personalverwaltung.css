@@ -20,6 +20,11 @@ label.required.form-label:after {
     background-color: white;
 }
 
+.tabulator-tooltip.tabulator-popup-container {
+    background-color: #000;
+	color: #fff;
+}
+
 .tabulator-edit-list .tabulator-edit-list-item:hover {
     color: #fff;
     background: #666;

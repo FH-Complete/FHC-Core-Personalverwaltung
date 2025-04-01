@@ -15,9 +15,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-//import {LogsViewerTabulatorOptions} from './TabulatorSetup.js';
-//import {LogsViewerTabulatorEventHandlers} from './TabulatorSetup.js';
-import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../../api/api.js";
 import FhcApi from '../../../../../js/plugin/FhcApi.js';
 
@@ -34,11 +31,9 @@ import { EmployeeContractInfo } from "../../components/employee/contract/Employe
 
 import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
-import karenz from "../../api/karenz.js";
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 const handyVerwaltungApp = Vue.createApp({
+	name: 'Handyverwaltung',
 	data: function() {
 		return {
                     personid: null,
@@ -180,7 +175,7 @@ const handyVerwaltungApp = Vue.createApp({
                                         :new-btn-show="false">
                                     </core-filter-cmpt>
                                 </div>
-                            </template>pv21apifactory
+                            </template>
     
                             <template #bottom>
 

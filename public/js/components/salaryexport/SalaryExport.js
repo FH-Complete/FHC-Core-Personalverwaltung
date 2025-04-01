@@ -10,6 +10,7 @@ import { Toast } from '../Toast.js';
 
 
 export const SalaryExport = {
+	name: 'SalaryExport',
     components: {
         "datepicker": VueDatePicker,
         "p-skeleton": primevue.skeleton,

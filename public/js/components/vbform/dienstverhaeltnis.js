@@ -3,6 +3,7 @@ import configurable from '../../mixins/vbform/configurable.js';
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'Dienstverhaeltnis',
   template: `
   <div class="col-3">
     <select v-model="store.unternehmen" :disabled="isaenderung && isconfigured('unternehmen')" class="form-select form-select-sm" aria-label=".form-select-sm example">

@@ -1,4 +1,5 @@
 const OrgViewer = {
+	name: 'OrgViewerPV',
     components: {
         Modal,
         "p-organizationchart": primevue.organizationchart,

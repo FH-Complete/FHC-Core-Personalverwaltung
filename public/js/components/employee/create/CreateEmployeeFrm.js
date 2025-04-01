@@ -5,6 +5,7 @@ import { validSVNR } from "../../../helpers/validation/svnr.js";
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 export const CreateEmployeeFrm = {
+	name: 'CreateEmployeeFrm',
     components: {
         "datepicker": VueDatePicker
     },
@@ -55,7 +56,9 @@ export const CreateEmployeeFrm = {
         }
 
         Vue.watch(props, () => {
-            currentValue.value.nachname = props.defaultval.surname.charAt(0).toUpperCase() + props.defaultval.surname.slice(1)
+			currentValue.value.nachname = (props.defaultval.surname !== null)
+				? props.defaultval.surname.charAt(0).toUpperCase() + props.defaultval.surname.slice(1)
+				: '';
             currentValue.value.gebdatum = props.defaultval.birthdate
           })
 

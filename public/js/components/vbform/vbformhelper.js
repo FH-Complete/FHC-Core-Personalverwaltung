@@ -10,6 +10,7 @@ import tabsspacer from './tabsspacer.js';
 import vblistgroupspacer from './vblistgroupspacer.js';
 
 export default {
+  name: 'VbFormHelper',
   template: `
     <div class="vbformhelper flex-shrink-1 flex-grow-1 d-flex flex-column overflow-hidden">
       <div class="py-1 mb-1">

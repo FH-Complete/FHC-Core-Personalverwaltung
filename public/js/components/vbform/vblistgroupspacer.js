@@ -2,6 +2,7 @@ import presetable from '../../mixins/vbform/presetable.js';
 import dv from './dv.js';
 
 export default {
+  name: 'VbListGroupSpacer',
   template: `
     <div class="row mb-2">
       <div class="col-12">

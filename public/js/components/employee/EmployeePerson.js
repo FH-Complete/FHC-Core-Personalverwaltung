@@ -9,6 +9,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import FhcTabs from '../../../../../../public/js/components/Tabs.js';
 
 export const EmployeePerson = {
+	name: 'EmployeePerson',
     components: {
 		BaseData,
 		EmployeeData,

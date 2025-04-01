@@ -2,6 +2,7 @@
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 export const SearchExistingDialog = {
+	name: 'SearchExistingDialog',
     components: {
         "datepicker": VueDatePicker,
     },

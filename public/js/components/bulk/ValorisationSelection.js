@@ -1,46 +1,52 @@
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 import {CoreFilterCmpt} from "../../../../../js/components/filter/Filter.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "../../apps/common.js";
+import {searchbaroptions} from "../../apps/common.js";
 import { Modal } from '../Modal.js';
 import {formatter} from './valorisationformathelper.js';
 
 export const ValorisationSelection = {
+	name: 'ValorisationSelection',
 	components: {
 			searchbar,
 			CoreNavigationCmpt,
 			CoreFilterCmpt,
-			Modal
+			Modal,
+			datepicker: VueDatePicker
 		},
 		inject: ['$fhcApi', '$fhcAlert'],
 		data() {
 			return 	{
 				searchbaroptions: searchbaroptions,
-				searchfunction: searchfunction,
+				searchfunction: this.$fhcApi.factory.search.search,
 				appSideMenuEntries: {},
 				alleValorisierungsinstanzen: [],
 				valorisierungInfoData: [],
+				alleUnternehmen: [],
 				valorisierungsinstanz_kurzbz: '',
 				valorisierung_oe_kurzbz: '',
 				valorisierungsdatum: '',
+				gehaelter_oe_kurzbz: '',
+				gehaelter_stichtag: '',
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
-						FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-						'/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/calculateValorisation',
+					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+					'/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/calculateValorisation',
 				formatter: formatter,
-                                downloadconfig: {
-                                    'csv': {
-                                        formatter:'csv',
-                                        file: 'pv21_valorisation.csv',
-                                        options: {
-                                            delimiter: ';',
-                                            bom: true
-                                        }
-                                    }
-                                }
+				downloadconfig: {
+					'csv': {
+						formatter:'csv',
+						file: 'pv21_valorisation.csv',
+						options: {
+							delimiter: ';',
+							bom: true
+						}
+					}
+				}
 			};
 		},
 		created: function() {
 			this.getValorisierungsInstanzen();
+			this.getAllUnternehmen();
 		},
 		methods: {
 			getValorisierungsInstanzen: function() {
@@ -86,6 +92,19 @@ export const ValorisationSelection = {
 					})
 					.catch(this.handleErrors);
 			},
+			getGehaelter: function() {
+				if( this.gehaelter_stichtag === '' ) {
+					this.$fhcAlert.alertWarning('Kein Stichtagsdatum ausgewählt.');
+					return;
+				}
+				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
+				const res = this.$fhcApi.factory.Valorisierung.getGehaelter(this.gehaelter_stichtag, this.gehaelter_oe_kurzbz)
+					.then((response) => {
+						this.$refs.valorisationTabulator.tabulator.setData(response.data);
+						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
+					})
+					.catch(this.handleErrors);
+			},
 			getValorisationInfo: function() {
 				if( this.valorisierungsinstanz_kurzbz === '' ) {
 					this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
@@ -108,6 +127,15 @@ export const ValorisationSelection = {
 				// set Valorisierungsinstanz to first in list when datum is changed
 				if (valInstanzen.length > 0)
 					this.valorisierungsinstanz_kurzbz = valInstanzen[0].value;
+			},
+			getAllUnternehmen: function() {
+				const res = this.$fhcApi.factory.Valorisierung.getAllUnternehmen()
+					.then((response) => {
+						this.alleUnternehmen = response.data;
+						this.gehaelter_oe_kurzbz = '';
+						if (this.alleUnternehmen.length > 0) this.gehaelter_oe_kurzbz = this.alleUnternehmen[0].oe_kurzbz;
+					})
+					.catch(this.handleErrors);
 			},
 			handleErrors: function(response) {
 				if (response.hasOwnProperty('response') && response.response?.data?.errors) {
@@ -135,29 +163,39 @@ export const ValorisationSelection = {
 					precision: 2
 				};
 
-                                const sumsDownload = function(value, data, type, params, column){
-                                    return value.toString().replace('.', ',');
-                                }
+				const sumsDownload = function(value, data, type, params, column){
+					return value.toString().replace('.', ',');
+				}
 
 				const formatDate = function(cell, formatterParams, onRendered) {
 					return formatter.formatDateGerman(cell.getValue());
 				};
 
+				const nullValueFormatter = function(row) {
+					const rowData = row.getData();
+
+					for (let column in rowData) {
+						rowData[column] = rowData[column] ?? '-';
+					}
+				};
+
 				return {
-						height: '75vh',
-						// Unique ID
-						index: 'dienstverhaeltnis_id',
+					height: '75vh',
+					// Unique ID
+					index: 'dienstverhaeltnis_id',
 
-						// @see: https://tabulator.info/docs/5.2/layout#layout
-						// This is the default option and can be omitted.
-						layout: 'fitDataStretch',
+					// @see: https://tabulator.info/docs/5.2/layout#layout
+					// This is the default option and can be omitted.
+					layout: 'fitDataStretch',
 
-						footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; vor Valorisierung: <span id="sumpreval"></span></p><p>&sum; nach Valorisierung: <span id="sumpostval"></span></p><p>Differenz: <span id="valdifferenz"></span></p></div>',
+					footerElement: '<div><p><span id="filteredrows_count"></span> von <span id="totalrows_count"></span></p><p>&sum; <span id="label_gehaelter_before"></span>: <span id="sumpreval"></span></p><p id="sumpostval_text">&sum; nach Valorisierung: <span id="sumpostval"></span></p><p id="differenz_text">Differenz: <span id="valdifferenz"></span></p></div>',
 
-						// Column definitions
-						columns: [
-						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minwidth: 250},
-                                                {title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
+					rowFormatter: nullValueFormatter,
+
+					// Column definitions
+					columns: [
+						{title: 'Mitarbeiter', field: 'mitarbeiter', headerFilter: true, frozen: true, minWidth: 250},
+						{title: 'Personalnummer', field: 'personalnummer', visible: false, download:true},
 						{title: 'Summe Gehalt vor Valorisierung', field: 'sumsalarypreval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Summe Gehalt nach Valorisierung', field: 'sumsalarypostval', headerFilter: true, hozAlign: 'right', sorter: 'number', formatter:"money", formatterParams: moneyformatterparams, accessorDownload: sumsDownload},
 						{title: 'Valorisierungs-Methode', field: 'valorisierungmethode', headerFilter: true},
@@ -189,11 +227,25 @@ export const ValorisationSelection = {
 							var elvaldifferenz = document.getElementById("valdifferenz");
 							var sumpreval = 0;
 							var sumpostval = 0;
+							// if no valorisation is calculated: there is no salary postval
+							var noSalaryPostval = true;
 
 							for( var row of rows ) {
-								sumpreval += row.getData().sumsalarypreval;
-								sumpostval += row.getData().sumsalarypostval;
+								var rowData = row.getData();
+								sumpreval += rowData.sumsalarypreval;
+								if (rowData.sumsalarypostval != null 
+									&& false === isNaN(rowData.sumsalarypostval)) {
+									sumpostval += rowData.sumsalarypostval;
+									noSalaryPostval = false;
+								}
 							}
+
+							// hide salary after valorisation, if it doesn't exist
+							document.getElementById('sumpostval_text').style.display = noSalaryPostval ? 'none' : 'block';
+							document.getElementById('differenz_text').style.display = noSalaryPostval ? 'none' : 'block';
+
+							// and use correct text (with/without valorisation)
+							document.getElementById('label_gehaelter_before').textContent = noSalaryPostval ? 'Gehaelter' : 'vor Valorisierung';
 
 							const moneyformatter = this.modules.format.getFormatter('money');
 							const moneyformatterparams = {
@@ -230,11 +282,11 @@ export const ValorisationSelection = {
 						}
 					},
 					{
-							event: "dataLoaded",
-							handler: function(data) {
-								var el = document.getElementById("totalrows_count");
-								el.innerHTML = (false !== data && typeof data != 'undefined') ? data.length : 0;
-							}
+						event: "dataLoaded",
+						handler: function(data) {
+							var el = document.getElementById("totalrows_count");
+							el.innerHTML = (false !== data && typeof data != 'undefined') ? data.length : 0;
+						}
 					}
 				];
 			},
@@ -334,7 +386,7 @@ export const ValorisationSelection = {
 		<div class="container-fluid">
 		<div class="row">
 
-		<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu  noheader left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+		<core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
 		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="height:100%">
 
@@ -350,47 +402,90 @@ export const ValorisationSelection = {
 			<div class="mh-100 pb-5" >
 				<core-filter-cmpt
 					ref="valorisationTabulator"
-                                        :download="downloadconfig"
+					:download="downloadconfig"
 					table-only
 					:side-menu="false"
 					:tabulator-options="tabulatorOptions"
-								:tabulator-events="tabulatorEvents">
+					:tabulator-events="tabulatorEvents">
 					<template #actions>
-						<div class="d-flex gap-2 align-items-baseline mb-4">
-							<select v-model="valorisierung_oe_kurzbz" class="form-select w-auto" aria-label="ValorisierungsOe" @change="oeChanged">
-								<option
-									v-for="vo in valorisierungsOrganisationseinheiten"
-									:value="vo.value"
-									:disabled="vo.disabled">
-									{{ vo.label }}
-								</option>
-							</select>
-							<select v-model="valorisierungsdatum" class="form-select w-auto" aria-label="ValorisierungsDatum" @change="datumChanged">
-								<option
-									v-for="vd in valorisierungsDates"
-									:value="vd.value"
-									:disabled="vd.disabled">
-									{{ vd.label }}
-								</option>
-							</select>
-							<div v-show="valorisierungsdatum != ''">
-								<div class="input-group mb-3">
-								<select v-model="valorisierungsinstanz_kurzbz" class="form-select w-auto" aria-label="ValorisierungsInstanz">
-									<option
-										v-for="vi in datumValorisierungsinstanzen"
-										:value="vi.value"
-										:disabled="vi.disabled">
-										{{ vi.label }}
-									</option>
-								</select>
-								<button class="btn btn-outline-secondary" type="button" @click="getValorisationInfo">
-									<i class="fa fa-info"></i>
-								</button>
-								</div>
-							</div>
-						</div>
-						<button class="btn btn-primary" @click="calculateValorisation">Valorisierung berechnen</button>
-						<button class="btn btn-primary ms-5" @click="doValorisation">Gewählte Valorisierung abschließen</button>
+						<table class="table table-borderless">
+							<tbody>
+								<tr>
+									<td>
+										<select v-model="valorisierung_oe_kurzbz" class="form-select" aria-label="ValorisierungsOe" @change="oeChanged">
+											<option
+												v-for="vo in valorisierungsOrganisationseinheiten"
+												:value="vo.value"
+												:disabled="vo.disabled">
+												{{ vo.label }}
+											</option>
+										</select>
+									</td>
+									<td>
+										<select v-model="valorisierungsdatum" class="form-select" aria-label="ValorisierungsDatum" @change="datumChanged">
+											<option
+												v-for="vd in valorisierungsDates"
+												:value="vd.value"
+												:disabled="vd.disabled">
+												{{ vd.label }}
+											</option>
+										</select>
+									</td>
+									<td v-show="valorisierungsdatum != ''">
+										<div class="input-group">
+										<select v-model="valorisierungsinstanz_kurzbz" class="form-select" aria-label="ValorisierungsInstanz">
+											<option
+												v-for="vi in datumValorisierungsinstanzen"
+												:value="vi.value"
+												:disabled="vi.disabled">
+												{{ vi.label }}
+											</option>
+										</select>
+										<button class="btn btn-outline-secondary" type="button" @click="getValorisationInfo">
+											<i class="fa fa-info"></i>
+										</button>
+										</div>
+									</td>
+									<td>
+										<button class="btn btn-primary me-5" @click="calculateValorisation">Valorisierung berechnen</button>
+										<button class="btn btn-primary" @click="doValorisation">Gewählte Valorisierung abschließen</button>
+									</td>
+								</tr>
+								<tr>
+								<td colspan="4">
+									<hr class="hr m-0" />
+								</td>
+								</tr>
+								<tr>
+									<td>
+										<select v-model="gehaelter_oe_kurzbz" class="form-select" aria-label="GehaelterOe">
+											<option
+												v-for="unt in alleUnternehmen"
+												:value="unt.oe_kurzbz"
+												:disabled="unt.disabled">
+												{{ unt.bezeichnung }}
+											</option>
+										</select>
+									</td>
+									<td>
+										<datepicker id="stichtagSelect"
+											v-model="gehaelter_stichtag"
+											v-bind:enable-time-picker="false"
+											v-bind:placeholder="'Stichtag wählen'"
+											v-bind:text-input="true"
+											auto-apply
+											locale="de"
+											format="dd.MM.yyyy"
+											model-type="yyyy-MM-dd"
+											style="width: 100%;" >
+										</datepicker>
+									</td>
+									<td>
+										<button class="btn btn-primary" @click="getGehaelter">Gehälter zum Stichtag anzeigen</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
 					</template>
 				</core-filter-cmpt>
 			</div>

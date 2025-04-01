@@ -5,6 +5,7 @@ import infos from './infos.js';
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'VertragsbestandteilKarenz',
   template: `
   <div class="py-0 my-2">
    <div class="py-0">

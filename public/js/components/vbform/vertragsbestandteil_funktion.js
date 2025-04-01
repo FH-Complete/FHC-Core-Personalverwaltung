@@ -6,6 +6,7 @@ import infos from './infos.js';
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'VertragsbestandteilFunktion',
   template: `
   <div class="card card-body my-2" :class="canhavegehaltsbestandteile ? '' : 'border-white py-0'">
     <div class="py-0">

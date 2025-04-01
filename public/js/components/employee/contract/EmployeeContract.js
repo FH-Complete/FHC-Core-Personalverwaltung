@@ -9,6 +9,7 @@ import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeContract = {
+	name: 'EmployeeContract',
     components: {
         'vbform_wrapper': vbform_wrapper,
         'enddvmodal': enddvmodal,
@@ -70,7 +71,7 @@ export const EmployeeContract = {
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
 
-        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
 
         const numberFormat = new Intl.NumberFormat();
         const now = ref(truncateDate(new Date()));
@@ -112,10 +113,16 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                    name: 'Gesamtgehalt',
+                    name: 'Gehalt',
                     data: [],
                     color: '#6fcd98',
                     step: 'left' // or 'center' or 'right'
+                },{
+                    name: 'Gehalt (ohne Val.)',
+                    data: [],
+                    color: '#d6af02',
+                    step: 'left', // or 'center' or 'right'
+                    visible: false,
                 },
                 {
                     name: 'Abgerechnet',
@@ -229,26 +236,29 @@ export const EmployeeContract = {
         // fetch chart data
         const fetchGBTChartData = async (dv_id, date) => {
             isFetching.value = true
-            let tempData1 = [], tempData2 = [];
+            let tempData1 = [], tempData2 = [], tempData3 = [];
             try {
                 if (dv_id != null) {
                     const res = await fhcApi.factory.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
                     gbtChartData.value = res;
                     
                     // chartOptions.series[0].data.length = 0;
+					Object.keys(res.valorisiert).forEach(element => {
+						tempData1.push([new Date(element).getTime(), parseFloat(res.valorisiert[element])]);
+					});
                     Object.keys(res.gesamt).forEach(element => {
-                       tempData1.push([new Date(element).getTime(), parseFloat(res.gesamt[element])]);
+                       tempData2.push([new Date(element).getTime(), parseFloat(res.gesamt[element])]);
                     });
                     res.abgerechnet.forEach(element => {
-                        tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
+                        tempData3.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                     });
                 }
-                
             } catch (error) {
                 console.log(error)
             } finally {
                 chartOptions.series[0].data = tempData1;
                 chartOptions.series[1].data = tempData2;
+				chartOptions.series[2].data = tempData3;
                 isFetching.value = false
             }
 
@@ -502,7 +512,7 @@ export const EmployeeContract = {
 
         // event hander for vertragshistorie
         const dateSelectedHandler = (d) => {
-            currentDate.value = new Date(d);
+            currentDate.value = truncateDate(new Date(d));
         }
 
         const setDate2BisDatum = () => {
@@ -510,7 +520,7 @@ export const EmployeeContract = {
         }
 
         const setDate2VonDatum = () => {
-            currentDate.value = new Date(currentDV.value.von);
+            currentDate.value = truncateDate(new Date(currentDV.value.von));
         }
 
         const getCurrentVertragsbestandteil = () => {
@@ -710,6 +720,9 @@ export const EmployeeContract = {
                                     format="dd.MM.yyyy"
                                     model-type="yyyy-MM-dd"
                                     input-class-name="dp-custom-input"
+									:config="{ keepActionRow: true }"
+									:action-row="{ showNow: true, showSelect: false, showCancel: false }"
+									now-button-label="Heute"
                                     style="max-width:140px;min-width:140px" ></datepicker>
                             </div>
                         </div>
@@ -1145,7 +1158,6 @@ export const EmployeeContract = {
 
     </div>
 
-    <!--DVDialog ref="dienstverhaeltnisDialogRef" id="dvDialog"></DVDialog-->
     <vbform_wrapper
         id="vbFormWrapper"
         ref="VbformWrapperRef"

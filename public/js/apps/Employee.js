@@ -1,4 +1,3 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/api.js";
 import FhcApi from '../../../../js/plugin/FhcApi.js';
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
@@ -13,8 +12,6 @@ import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 var personSelectedRef = { callback: () => {}};
 
@@ -37,7 +34,7 @@ const router = VueRouter.createRouter(
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
 					{ path: 'contract/:dienstverhaeltnis_id',
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })
 					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
@@ -59,6 +56,7 @@ Highcharts.setOptions({
   })
 
 const pvApp = Vue.createApp({
+	name: 'PV21Employee',
 	setup() {
 
 		// init shared data
