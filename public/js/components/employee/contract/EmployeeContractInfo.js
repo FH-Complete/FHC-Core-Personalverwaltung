@@ -34,6 +34,7 @@ export const EmployeeContractInfo = {
 
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
+		const fhcApi = inject('$fhcApi');
 
         const fetchData = async (uid) => {
             if (uid == null) {

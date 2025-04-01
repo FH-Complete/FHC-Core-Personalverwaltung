@@ -33,6 +33,7 @@ import Phrasen from '../../../../../js/plugin/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
 
 const handyVerwaltungApp = Vue.createApp({
+	name: 'Handyverwaltung',
 	data: function() {
 		return {
                     personid: null,
