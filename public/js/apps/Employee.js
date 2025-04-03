@@ -42,7 +42,7 @@ const router = VueRouter.createRouter(
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: true}
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: route => ({ dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })}
 		],
 	}
 );

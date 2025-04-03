@@ -64,7 +64,7 @@ export const ValorisationCheck = {
 		},
 		handleErrors: function(response) {
 			if (response.hasOwnProperty('response') && response.response?.data?.errors) {
-				for (let error of response.response.errors) {
+				for (let error of response.response.data.errors) {
 					this.$fhcAlert.handleSystemError(error);
 				}
 			}
@@ -74,6 +74,9 @@ export const ValorisationCheck = {
 		}
 	},
 	computed: {
+		getFHCUrl: function() {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+		},
 		valorisierungCheckDataArr: function() {
 			let dataArr = [];
 			for (let gehaltsbestandteil_id in this.valorisierungCheckData)
