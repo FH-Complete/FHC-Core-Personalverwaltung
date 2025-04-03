@@ -10,7 +10,7 @@ class Api_model extends DB_Model
     public function getUID($person_id)
 	{
         $qry = "
-        SELECT tbl_benutzer.uid       
+        SELECT tbl_benutzer.uid
         FROM tbl_mitarbeiter
             JOIN tbl_benutzer ON tbl_mitarbeiter.mitarbeiter_uid::text = tbl_benutzer.uid::text
             JOIN tbl_person USING (person_id)
@@ -55,6 +55,125 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, array($person_id));
     }
 
+    function getEmployeesWithoutContract()
+    {
+        $qry="SELECT
+        vorname, nachname, person_id, uid, campus.vw_mitarbeiter.personalnummer, campus.vw_mitarbeiter.insertamum,anmerkung,
+        (
+            SELECT studiensemester_kurzbz FROM (
+                SELECT
+                    studiensemester_kurzbz, tbl_studiensemester.start
+                FROM
+                    lehre.tbl_lehreinheitmitarbeiter
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                    JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+                WHERE
+                    tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+                UNION
+                SELECT
+                    studiensemester_kurzbz, tbl_studiensemester.start
+                FROM
+                    lehre.tbl_projektbetreuer
+                    JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+                    JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+                    JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+                WHERE
+                    tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+            ) a
+            ORDER BY start DESC
+            LIMIT 1
+        ) as letzter_lehrauftrag,
+        dv.dienstverhaeltnis_id, dv.von, dv.bis, dv.oe_kurzbz,  un.bezeichnung AS dv_unternehmen
+    FROM
+        campus.vw_mitarbeiter
+        LEFT JOIN
+            hr.tbl_dienstverhaeltnis as dv on (campus.vw_mitarbeiter.uid=dv.mitarbeiter_uid)
+        LEFT JOIN
+            public.tbl_organisationseinheit un ON dv.oe_kurzbz = un.oe_kurzbz
+    WHERE
+        campus.vw_mitarbeiter.aktiv = true
+        AND fixangestellt = false
+        AND lektor = true
+        AND bismelden = true
+        AND personalnummer > 0
+		AND dv.bis is null
+		AND dv.von <= now() - '5 months'::interval
+		AND dv.vertragsart_kurzbz in('externerlehrender')
+        AND (campus.vw_mitarbeiter.insertamum <= now() - '5 months'::interval OR campus.vw_mitarbeiter.insertamum is null)
+
+		-- Kein Lehrauftrag in den letzten 3 Semestern
+        AND NOT EXISTS(
+            SELECT
+                1
+            FROM
+                lehre.tbl_lehreinheitmitarbeiter
+                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+            WHERE
+                tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+                AND tbl_lehreinheit.studiensemester_kurzbz IN(
+                        SELECT
+                            studiensemester_kurzbz
+                        FROM
+                            public.tbl_studiensemester
+                        WHERE start <= now()
+                        ORDER BY start DESC
+                        LIMIT 3)
+            UNION
+            SELECT
+                1
+            FROM
+                lehre.tbl_projektbetreuer
+                JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+            WHERE
+                tbl_lehreinheit.studiensemester_kurzbz IN(SELECT
+                        studiensemester_kurzbz
+                    FROM
+                        public.tbl_studiensemester
+                    WHERE start <= now()
+                    ORDER BY start DESC
+                    LIMIT 3)
+                AND tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+            )
+
+			-- Kein Lehrauftrag in er Zukunft
+			AND NOT EXISTS(
+	            SELECT
+	                1
+	            FROM
+	                lehre.tbl_lehreinheitmitarbeiter
+	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+	            WHERE
+	                tbl_lehreinheitmitarbeiter.mitarbeiter_uid = vw_mitarbeiter.uid
+	                AND tbl_lehreinheit.studiensemester_kurzbz IN(
+	                        SELECT
+	                            studiensemester_kurzbz
+	                        FROM
+	                            public.tbl_studiensemester
+	                        WHERE start >= now()
+	                        )
+	            UNION
+	            SELECT
+	                1
+	            FROM
+	                lehre.tbl_projektbetreuer
+	                JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+	                JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+	            WHERE
+	                tbl_lehreinheit.studiensemester_kurzbz IN(SELECT
+	                        studiensemester_kurzbz
+	                    FROM
+	                        public.tbl_studiensemester
+	                    WHERE start >= now()
+	                    )
+	                AND tbl_projektbetreuer.person_id=vw_mitarbeiter.person_id
+	            )
+
+			";
+
+        return $this->execQuery($qry);
+    }
+
     function getPersonHeaderData($person_id)
     {
         $qry = "
@@ -77,7 +196,8 @@ class Api_model extends DB_Model
             p.anmerkung,
             p.homepage,
             p.foto,
-            p.updateamum AS lastupdate
+            p.updateamum AS lastupdate,
+			p.unruly
         FROM tbl_person p
              JOIN tbl_benutzer ON (p.person_id=tbl_benutzer.person_id)
              JOIN tbl_mitarbeiter ON tbl_benutzer.uid::text = tbl_mitarbeiter.mitarbeiter_uid::text
@@ -98,7 +218,7 @@ class Api_model extends DB_Model
                 bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
                 oe.oe_kurzbz,oe.oe_parent_kurzbz,oe.bezeichnung,oe.organisationseinheittyp_kurzbz,oe.aktiv,oe.mailverteiler,oe.freigabegrenze,oe.kurzzeichen,oe.lehre,oe.standort,oe.warn_semesterstunden_frei,oe.warn_semesterstunden_fix,oe.standort_id
             FROM tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
-            WHERE uid = ? AND funktion_kurzbz='oezuordnung' 
+            WHERE uid = ? AND funktion_kurzbz='oezuordnung'
                 AND datum_von<=now() AND (datum_bis is null OR datum_bis>=now())
         ";
 
@@ -109,8 +229,8 @@ class Api_model extends DB_Model
     {
         $qry = "
             SELECT bf.benutzerfunktion_id,bf.fachbereich_kurzbz,bf.uid,bf.funktion_kurzbz,bf.updateamum,bf.updatevon,bf.insertamum,bf.insertvon,bf.ext_id,bf.semester,bf.oe_kurzbz,bf.datum_von,bf.datum_bis,bf.bezeichnung,bf.wochenstunden,
-                p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost 
-            FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz) 
+                p.person_id, p.vorname,p.nachname,p.titelpre,p.titelpost
+            FROM public.tbl_benutzerfunktion bf JOIN public.tbl_organisationseinheit oe USING(oe_kurzbz)
             JOIN public.tbl_benutzer b USING (uid) JOIN public.tbl_mitarbeiter ma ON(b.uid=ma.mitarbeiter_uid)
             JOIN public.tbl_person p  USING(person_id)
             WHERE funktion_kurzbz='Leitung' AND oe.oe_kurzbz = ?
@@ -167,20 +287,31 @@ class Api_model extends DB_Model
 
         $startDate = \DateTime::createFromFormat("Y-m-d", "$year-$month-1")->format("Y-m-d");
         $endDate = \DateTime::createFromFormat("Y-m-d", "$year-$month-1")->format("Y-m-t");
-        
-        $where = "where bv.ende>='$startDate' and bv.ende<='$endDate' ";
-        $order = "order by ende asc";
+
+        $where = "where dv.bis>='$startDate' and dv.bis<='$endDate' ";
+        $order = "order by bis asc";
 
         if (!$expire)
         {
-            $where = "where bv.beginn>='$startDate' and bv.beginn<='$endDate' ";
-            $order = "order by beginn asc";
+            $where = "where dv.von>='$startDate' and dv.von<='$endDate' ";
+            $order = "order by von asc";
         }
 
         $qry="
-        select m.personalnummer, b.uid, p.nachname || ', ' || coalesce(p.vorname,'') || ' ' || coalesce(p.titelpre,'') as name,bv.mitarbeiter_uid,bv.beginn,bv.ende, m.fixangestellt, bv.vertragsstunden,bv.dv_art,bv.hauptberuflich
-        from bis.tbl_bisverwendung bv join public.tbl_benutzer b on  (bv.mitarbeiter_uid=b.uid)  join public.tbl_person p using(person_id)
-        join public.tbl_mitarbeiter m  on (b.uid=m.mitarbeiter_uid)
+		SELECT
+			m.personalnummer, p.person_id, b.uid, p.nachname, p.vorname,
+			p.nachname || ', ' || COALESCE(p.vorname,'') || ' ' || COALESCE(p.titelpre,'') AS name,
+			dv.mitarbeiter_uid, dv.von, dv.bis, dv.vertragsart_kurzbz, va.bezeichnung AS vertragsart
+		FROM
+			hr.tbl_dienstverhaeltnis dv
+		JOIN
+			hr.tbl_vertragsart va USING(vertragsart_kurzbz)
+		JOIN
+			public.tbl_benutzer b ON (dv.mitarbeiter_uid=b.uid)
+		JOIN
+			public.tbl_person p USING(person_id)
+		JOIN
+			public.tbl_mitarbeiter m  ON (b.uid=m.mitarbeiter_uid)
         $where
         $order
         ";
@@ -196,11 +327,71 @@ class Api_model extends DB_Model
 				   WHERE date_part('month',gebdatum)=? and date_part('day',gebdatum)=? and aktiv=true
 				ORDER BY nachname, vorname";
 
-        $currentTime = DateTime::createFromFormat( 'U', $dateAsUnixTS );   
-        $month = $currentTime->format('m');        
-        $day = $currentTime->format('d');        
+        $currentTime = DateTime::createFromFormat( 'U', $dateAsUnixTS );
+        $month = $currentTime->format('m');
+        $day = $currentTime->format('d');
 
 		return $this->execQuery($query, array($month, $day));
+    }
+
+    public function getCovidDate($person_id, $dateAsUnixTS)
+    {
+        $date = DateTime::createFromFormat( 'U', $dateAsUnixTS );
+        $datestring = $date->format("Y-m-d");
+
+        $query="SELECT (p.udf_values -> 'udf_3gvalid')::text::date covid_date, CASE
+            WHEN (p.udf_values -> 'udf_3gvalid')::text::date >= ? THEN 1
+            WHEN (p.udf_values -> 'udf_3gvalid')::text::date < ? THEN 0
+            ELSE -1
+            END AS covidvalid
+            FROM tbl_person p
+            WHERE p.person_id = ?";
+
+        return $this->execQuery($query, array($datestring, $datestring, $person_id));
+    }
+
+    public function getOffTimeList($person_uid, $year = 0)
+    {
+
+        $year_filter = " AND z.vondatum>=now()";
+        $query_parameter = array($person_uid);
+
+        if ($year > 0)
+        {
+            $year_filter = " AND date_part('year',vondatum)>=? AND date_part('year',bisdatum)<=? ";
+            $query_parameter[] = $year;
+            $query_parameter[] = $year;
+        }
+
+        $qry = "
+        SELECT
+            z.zeitsperre_id,
+            z.zeitsperretyp_kurzbz,
+            t.beschreibung as zeitsperretyp,
+            z.mitarbeiter_uid,
+            z.bezeichnung,
+            z.vondatum,
+            z.vonstunde,
+            z.bisdatum,
+            z.bisstunde,
+            z.vertretung_uid,
+            z.updateamum,
+            z.updatevon,
+            z.insertamum,
+            z.insertvon,
+            z.erreichbarkeit_kurzbz,
+            e.beschreibung as erreichbarkeit,
+            z.freigabeamum,
+            z.freigabevon
+
+        FROM campus.tbl_zeitsperre z
+            LEFT JOIN campus.tbl_zeitsperretyp t using(zeitsperretyp_kurzbz)
+            LEFT JOIN campus.tbl_erreichbarkeit e using(erreichbarkeit_kurzbz)
+        WHERE z.mitarbeiter_uid=? $year_filter
+        ";
+
+        return $this->execQuery($qry, $query_parameter);
+
     }
 
     function runReport($sql, $filter)
@@ -236,8 +427,8 @@ class Api_model extends DB_Model
             p.nachname,
             p.vorname,
             p.vornamen,
-            p.sprache,
             p.geschlecht,
+            p.sprache,
             p.gebdatum,
             p.svnr,
             p.anmerkung,
@@ -247,7 +438,8 @@ class Api_model extends DB_Model
             p.insertamum,
             p.insertvon,
             p.updatevon,
-            p.updateamum
+            p.updateamum,
+            p.unruly
         FROM tbl_person p
             LEFT JOIN tbl_benutzer on(p.person_id=tbl_benutzer.person_id)
             LEFT JOIN tbl_mitarbeiter on(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
@@ -302,30 +494,80 @@ class Api_model extends DB_Model
         unset($personJson['updateamum']);
         unset($personJson['updatevon']);
         // set empty values to null
-        if ($personJson['sprache'] == '')
+        if (isset($personJson['sprache']) && $personJson['sprache'] == '')
         {
             $personJson['sprache'] = null;
         }
-        if ($personJson['geburtsnation'] == '')
+        if (isset($personJson['geburtsnation']) && $personJson['geburtsnation'] == '')
         {
             $personJson['geburtsnation'] = null;
         }
-        if ($personJson['staatsbuergerschaft'] == '')
+        if (isset($personJson['staatsbuergerschaft']) && $personJson['staatsbuergerschaft'] == '')
         {
             $personJson['staatsbuergerschaft'] = null;
+        }
+        if (isset($personJson['svnr']) && $personJson['svnr'] == '')
+        {
+            $personJson['svnr'] = null;
         }
 
         $personJson['insertvon'] = getAuthUID();
         $personJson['insertamum'] = $this->escape('NOW()');
 
-        $result = $this->PersonModel->insert($personJson['person_id'], $personJson);
+        $result = $this->PersonModel->insert($personJson);
 
         if (isError($result))
         {
             return error($result->msg, EXIT_ERROR);
         }
 
-        return success($personJson['person_id']);
+        $person_id = $result->retval;
+
+        return success($person_id);
+    }
+
+    private function generateEmployeeUID($personalnummer)
+    {
+        /* did not work out:
+        $string = $person_id - 10000;
+        $uid = strlen($string) < 4 ? 'ma0'. $string: 'ma'. $string;
+        return $uid;
+        */
+        //$qry = "select max(substr(uid,3)::integer) uid from tbl_benutzer where uid~'^ma[0-9]+'";
+
+        $uid = sprintf('ma%05d',  $personalnummer);
+
+        return $uid;
+    }
+
+    function generatePersonalnummer()
+    {
+        $qry = "select nextval('tbl_mitarbeiter_personalnummer_seq') pnr";
+
+        $result = $this->execQuery($qry);
+
+        return $result->retval[0]->pnr;
+    }
+
+    function insertUser($userJson)
+    {
+
+        unset($userJson['updateamum']);
+        unset($userJson['updatevon']);
+        $userJson['aktiv'] = true;
+		$userJson['aktivierungscode'] = md5(generateToken(64));
+
+        $userJson['insertvon'] = getAuthUID();
+        $userJson['insertamum'] = $this->escape('NOW()');
+
+        $result = $this->BenutzerModel->insert($userJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($userJson['uid']);
     }
 
     // -------------------------------------
@@ -346,6 +588,7 @@ class Api_model extends DB_Model
             p.telefonklappe,
             p.kurzbz,
             p.lektor,
+            p.habilitation,
             p.fixangestellt,
             p.stundensatz,
             p.ausbildungcode,
@@ -362,6 +605,7 @@ class Api_model extends DB_Model
             p.updatevon,
             p.updateamum
         FROM tbl_mitarbeiter p join tbl_benutzer b on (p.mitarbeiter_uid=b.uid)
+        	JOIN tbl_person pp on (b.person_id=pp.person_id)
         WHERE b.person_id=?
         ";
 
@@ -417,6 +661,29 @@ class Api_model extends DB_Model
 
         return $result;
         //return success($employeeDataJson['mitarbeiter_uid']);
+    }
+
+    function insertEmployee($employeeJson)
+    {
+
+        $employeeJson['insertvon'] = getAuthUID();
+        $employeeJson['insertamum'] = $this->escape('NOW()');
+
+        if (isset($employeeJson['standort_id'])
+			&& $employeeJson['standort_id'] == 0)
+        {
+            $employeeJson['standort_id'] = null;
+        }
+
+        $result = $this->EmployeeModel->insert($employeeJson);
+
+        if (isError($result))
+        {
+            return error($result->msg, EXIT_ERROR);
+        }
+
+        return success($employeeJson['personalnummer']);
+        //return success($employeeJson['mitarbeiter_uid']);
     }
 
 
@@ -592,7 +859,8 @@ class Api_model extends DB_Model
         $contactDataJson['insertvon'] = getAuthUID();
         $contactDataJson['insertamum'] = $this->escape('NOW()');
 
-        if ($contactDataJson['standort_id'] == 0)
+        if ( isset($contactDataJson['standort_id'])
+			&& $contactDataJson['standort_id'] == 0)
         {
             $contactDataJson['standort_id'] = null;
         }
@@ -713,6 +981,70 @@ class Api_model extends DB_Model
         return $this->execQuery($qry, $parametersArray);
     }
 
+    /**
+     * search person (used by employee create dialog)
+     */
+    function filterPerson($nachname, $vorname = null, $birthdate=null, $filterUnruly=null)
+    {
+
+        $parametersArray = array($nachname);
+        $where ="p.nachname~* ? ";
+        if (mb_strlen($nachname) == 2)
+        {
+            $where = "p.nachname=? ";
+        }
+
+		if(isset($vorname) && $vorname != '')
+		{
+			$where.= " AND p.vorname~*?";
+			$parametersArray[] = $vorname;
+		}
+
+        if(isset($birthdate) && $birthdate != '')
+        {
+			$where.=" AND p.gebdatum=?";
+            $parametersArray[] = $birthdate;
+        }
+
+		if(isset($filterUnruly))
+		{
+			$where.=" AND p.unruly=?";
+			$parametersArray[] = $filterUnruly;
+		}
+
+        $qry='
+            SELECT
+                p.person_id,
+                b.uid,
+                p.svnr,
+                p.titelpost,
+                p.titelpre,
+                p.nachname,
+                p.vorname,
+                p.vornamen,
+                p.geschlecht,
+                p.gebdatum,
+                p.unruly,
+                ma.personalnummer,
+                s.matrikelnr,
+                CASE WHEN ma.personalnummer is not null THEN \'Mitarbeiter\'
+                     WHEN s.matrikelnr is not null THEN \'Student\'
+                     ELSE \'-\'
+                END AS status,
+                exists (select 1 from public.tbl_benutzer tb join public.tbl_mitarbeiter tm on(tb.uid=tm.mitarbeiter_uid) where person_id=p.person_id) as taken,
+                array(select kontakt from tbl_kontakt k where k.person_id=p.person_id and k.kontakttyp=\'email\') emails
+            FROM
+                public.tbl_person p LEFT JOIN
+                public.tbl_benutzer b ON (p.person_id=b.person_id)  LEFT JOIN
+                public.tbl_mitarbeiter ma ON (b.uid=ma.mitarbeiter_uid) LEFT JOIN
+                public.tbl_student s ON (b.uid=s.student_uid)
+            WHERE '.$where.'
+            ORDER BY p.nachname, p.vorname, status
+        ';
+
+        return $this->execQuery($qry, $parametersArray);
+    }
+
     // -----------------------------------
     // Foto
     // -----------------------------------
@@ -799,10 +1131,27 @@ class Api_model extends DB_Model
         return $this->execQuery($qry);
     }
 
-    function getBankverbindung($person_id)
+
+    // -----------------------------------------
+    // DV
+    // -----------------------------------------
+    function insertDV($contractDataJSON)
     {
+        $dvDataJson['insertvon'] = getAuthUID();
+        $dvDataJson['insertamum'] = $this->escape('NOW()');
 
+        $result = $this->DVModel->insert($dvDataJson);
+        $dvData = $this->KontaktModel->load($result->retval);
+
+        // create contract details (Vertragsbestandteile)
+
+        // Stunden
+
+        // Befristung
+
+
+
+        return $dvData;
     }
-
 
 }

@@ -1,5 +1,5 @@
 const chartdemo = {
-
+	name: 'ChartDemo',
     data () {
         return {
           title: '',

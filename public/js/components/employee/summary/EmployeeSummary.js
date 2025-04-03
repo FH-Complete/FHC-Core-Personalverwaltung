@@ -1,110 +1,104 @@
 
-export const EmployeeSummary = {
-    setup() {
-        const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(null);
+import { CovidCard } from './CovidCard.js';
+import { DvCard } from './DVCard.js';
+import { LehreCard } from './LehreCard.js';
+import { IssuesCard } from './IssuesCard.js';
+import { OffTimeCard } from './OffTimeCard.js';
+import { DeadlineIssueTable } from './DeadlineIssueTable.js'
 
-        Vue.onMounted(() => {
-            console.log('contract mounted');
-            currentPersonID.value = route.params.id;
+
+export const EmployeeSummary = {
+	name: 'EmployeeSummary',
+    components: {
+        CovidCard,
+        DvCard,
+        LehreCard,
+        IssuesCard,
+        OffTimeCard,
+        DeadlineIssueTable,
+        
+    },
+    props: {
+        date: Date,
+    },
+    setup() {
+
+
+        const route = VueRouter.useRoute();
+        const { watch, ref, onMounted } = Vue; 
+        const currentPersonID = ref(null);
+        const currentUID = ref(null);
+        const isFetching = ref(false);
+
+        onMounted(() => {
+            currentPersonID.value = parseInt(route.params.id);
+            currentUID.value = route.params.uid;
         })
 
-        Vue.watch(
+        watch(
 			() => route.params.id,
 			newId => {
-				currentPersonID.value = newId;
+				currentPersonID.value = parseInt(newId);
 			}
 		)
 
-        return {currentPersonID}
+        watch(
+			() => route.params.uid,
+			newId => {
+				currentUID.value = newId;
+			}
+		)
+
+       /* watch(
+			() => route.query.d,
+			newDate => {
+				date = newDate;
+			}
+		)*/
+
+        return {currentPersonID, currentUID, isFetching}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
-      <div class="container-fluid px-0">
+      <div class="container-fluid px-1">
 
-            <div class="row">
-
-                <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                    <Toast ref="toastRef">
-                        <template #body><h4>Vertrag gespeichert.</h4></template>
-                    </Toast>
-                </div>
+            <div class="row">                
 
                 <div class="row pt-md-4">
 
                     <div class="col">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Dienstverhältnis</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                <div v-if="isFetching" class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>            
-                                <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                                von - bis<br>
-                                Funktion<br>
-                                Gehalt
-                            </div>
-                        </div>
-
+                        
+                        <dv-card :uid="currentUID" :date="date" ></dv-card>                        
+            
                     </div>          
 
                     <div class="col">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">COVID Zertifikat</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                <div v-if="isFetching" class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>            
-                                <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                            </div>
-                        </div>
+                        
+                        <!--covid-card :personID="currentPersonID" :date="date"></covid-card-->
 
-                        <br/>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Home Office</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                <div v-if="isFetching" class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>            
-                                <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                            </div>
-                        </div>
+                        <issues-card></issues-card>
+                       
                     </div>
 
                     <div class="col">
                         
-                        <div class="card-header">
-                            <h5 class="mb-0">Lehre</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                            <div v-if="isFetching" class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>            
-                            <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                        </div>
+                        <lehre-card :uid="currentUID" :date="date"></lehre-card>
 
-                        <div class="card-header">
-                            <h5 class="mb-0">Urlaub/Krankenstand</h5>
-                            </div>
-                            <div class="card-body" style="text-align:center">
-                            <div v-if="isFetching" class="spinner-border" role="status">
-                                <span class="visually-hidden">Loading...</span>
-                            </div>            
-                            <h3 v-if="!isFetching">{{ birthdayData?.length }}</h3>
-                        </div>
+                        <br/>
+
+                        <off-time-card :uid="currentUID"></off-time-card> 
 
                     </div>
+
+                    <deadline-issue-table :uid="currentUID"></deadline-issue-table>
 
                 </div>            
 
             </div>                      
         </div>
+
+    </div>
+
 
     `
 }

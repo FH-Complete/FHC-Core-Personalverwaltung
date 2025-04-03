@@ -1,6 +1,7 @@
 import { Modal } from '../Modal.js';
 
 export const OrgViewer = {
+	name: 'OrgViewer',
     components: {
         "p-treetable": primevue.treetable,
         "p-column": primevue.column,
@@ -14,7 +15,7 @@ export const OrgViewer = {
     },
     setup( props, context ) {
 
-        const { toRefs, ref } = Vue;
+        const { toRefs, ref, inject } = Vue;
         let { oe } = toRefs(props);
         const selection = ref({});
         const filters = ref({});
@@ -25,36 +26,30 @@ export const OrgViewer = {
         const currentValue = ref({});
         const currentPersons = ref([]);
 
-        const fetchOrg = async (oe) => {
-            try {
-       
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
+        const fhcApi = inject('$fhcApi');
 
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrgStructure?oe=${oe}`;
-        
-              isFetching.value = true  
-              const res = await fetch(url)
-              let response = await res.json()    
-              isFetching.value = false                          
-              return { response };
-            } catch (error) {
-              console.log(error)        
-              isFetching.value = false        
-            }	
-        }  
-        
-        const fetchPersons = async (oe) => {
+        const fetchOrg = async (oe) => {
+            isFetching.value = true
             try {
-       
-              let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                 
-              const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getOrgPersonen?oe=${oe}`;        
-              const res = await fetch(url)
-              let response = await res.json()    
-              return { response };
+              const res = await fhcApi.factory.OrgViewer.getOrgStructure(oe);
+              return res;
             } catch (error) {
-              console.log(error)        
-              isFetching.value = false        
-            }	
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }
+        }
+
+        const fetchPersons = async (oe) => {
+            isFetching.value = true
+            try {
+              const res = await fhcApi.factory.OrgViewer.getOrgPersonen(oe);
+              return res;
+            } catch (error) {
+              console.log(error)              
+            } finally {
+                isFetching.value = false
+            }
         }
 
         const expandAll = () => {
@@ -87,8 +82,7 @@ export const OrgViewer = {
             currentValue.value = d;
             modalRef.value.show();
             const result = fetchPersons(d.oe_kurzbz).then((data) => {
-                console.log(data.response);
-                currentPersons.value = data.response.retval;
+                currentPersons.value = data.retval;
             })
         }
 
@@ -104,8 +98,8 @@ export const OrgViewer = {
  
 
         Vue.watch(oe, (currentVal, oldVal) => {            
-            const result = fetchOrg(currentVal).then((data) => {
-                nodes.value = [data.response];
+            fetchOrg(currentVal).then((data) => {
+                nodes.value = [data];
                 expandedKeys.value[nodes.value[0].key] = true;
                 
               }
@@ -113,14 +107,29 @@ export const OrgViewer = {
             
         });
 
-        const redirect2person = ( person_id ) => {
+        const redirect2person = ( person_id, uid ) => {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
-            window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
+            window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}`;
         }
 
-        const getLink = ( person_id ) => {
+        const getLink = ( person_id, uid ) => {
             let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
-            return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}`;
+            return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${person_id}/${uid}`;
+        }
+
+        const filterOrg = ( oe_kurzbz ) => {
+            console.log('filter oe: ', oe_kurzbz);
+            // note: this only works if the filter contains a field with the name 'Standardkst.Kurz'
+            const filterFields = {
+                "filterUniqueId":"extensions/FHC-Core-Personalverwaltung/Employees/index",
+                "filterType":"EmployeeViewer",
+                "filterFields":[{"name":"OE Key","operation":"equal","condition":oe_kurzbz}]
+            };
+            fhcApi.factory.filter.applyFilterFields(filterFields).then(function() {
+                // redirect
+                let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+                window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;
+            });
         }
       
 
@@ -131,35 +140,38 @@ export const OrgViewer = {
         context.expose({ expandAll, collapseAll })
         
         return { nodes, selection, filters, expandedKeys, expandAll, collapseAll, isFetching,
-            showModal, hideModal, modalRef, okHandler, currentValue, currentPersons, redirect2person, getLink }
+            showModal, hideModal, modalRef, okHandler, currentValue, currentPersons, redirect2person, getLink, filterOrg }
     },
     template: `    
     
     <p-treetable :value="nodes" :filters="filters"  :expandedKeys="expandedKeys" class="p-treetable-sm" filterMode="strict" >
         <p-column field="bezeichnung" header="Bezeichnung" :expander="true" style="width:450px" filterMatchMode="contains" >
             <template #filter>
-                <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter" placeholder="Filter Bezeichnung"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['bezeichnung']" class="p-column-filter"></p-inputtext>
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton style="display: inline-block; width:80%"></p-skeleton>
             </template>
+            <template #body="slotProps" v-if="!isFetching">          
+                <a href="#" @click="filterOrg(slotProps.node.data.oe_kurzbz)">{{ slotProps.node.data.bezeichnung }}</a>
+            </template>
         </p-column>
         <p-column field="organisationseinheittyp_kurzbz" header="Typ" style="width:150px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" placeholder="Filter Typ" style="width:150px"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['organisationseinheittyp_kurzbz']" class="p-column-filter" style="width:150px"></p-inputtext>
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
-            </template>
+            </template>            
         </p-column>
         <p-column field="leitung" header="Leitung" style="width:300px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter" placeholder="Filter Leitung"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['leitung']" class="p-column-filter"></p-inputtext>
             </template>
-            <template #body="slotProps" v-if"!isFetching">
+            <template #body="slotProps" v-if="!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.leitung_array.data">
                     <span v-if="index!=0"> | </span>
-                    <a :href="getLink(item.person_id)">{{ item.name }}</a>
+                    <a :href="getLink(item.person_id, item.uid)">{{ item.name }}</a>
                 </span>
             </template>
             <template #body  v-if="isFetching">
@@ -168,15 +180,15 @@ export const OrgViewer = {
         </p-column>
         <p-column field="assistenz" header="Assistenz" style="width:250px" filterMatchMode="contains">
             <template #filter>
-                <p-inputtext type="text" v-model="filters['assistenz']" class="p-column-filter" placeholder="Filter Assistenz"></p-inputtext>
+                <p-inputtext type="text" v-model="filters['assistenz']" class="p-column-filter"></p-inputtext>
             </template>
             <template #body  v-if="isFetching">
                 <p-skeleton></p-skeleton>
             </template>
-            <template #body="slotProps" v-if"!isFetching">
+            <template #body="slotProps" v-if="!isFetching">
                 <span v-for="(item, index) in slotProps.node.data.assistenz_array.data">
                     <span v-if="index!=0"> | </span>
-                    <a :href="getLink(item.person_id)">{{ item.name }}</a>
+                    <a :href="getLink(item.person_id,item.uid)">{{ item.name }}</a>
                 </span>
             </template>
         </p-column>
@@ -184,7 +196,7 @@ export const OrgViewer = {
                 <template #header>                    
                 </template>
                 <template #body="slotProps">  
-                    <button type="button" class="btn btn-outline-dark "  @click="showModal(slotProps.node.data)">
+                    <button type="button" class="btn btn-outline-secondary"  @click="showModal(slotProps.node.data)">
                             <i class="fa fa-info"></i>
                     </button>
                 </template>
@@ -209,7 +221,7 @@ export const OrgViewer = {
                             <label for="typ" class="form-label">Mitarbeiter</label>
                             <table  class="table  table-hover">
                                 <tbody>
-                                    <tr v-for="p in currentPersons" @click="redirect2person(p.person_id)">
+                                    <tr v-for="p in currentPersons" @click="redirect2person(p.person_id,p.uid)">
                                         <td><b>{{ p.nachname }}</b>, {{ p.vorname }} {{ p.titelpre}} {{ p.titelpost }}</td>
                                         <td>{{ p.funktionen.join(', ') }} </td>
                                     </tr>

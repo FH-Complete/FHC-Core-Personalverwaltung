@@ -1,8 +1,10 @@
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "./common.js";
+import {searchbaroptions} from "./common.js";
+import Phrasen from '../../../../js/plugin/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
+	name: 'PV21Report',
 	components: {
 		searchbar,	
 		Sidebar,
@@ -15,7 +17,7 @@ const pvApp = Vue.createApp(	{
 			currentPersonID: null,	
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
-			searchfunction: searchfunction,
+			searchfunction: this.$fhcApi.factory.search.search,
 			appSideMenuEntries: {},
 		}
 	},
@@ -29,9 +31,10 @@ const pvApp = Vue.createApp(	{
 	},
 });
 
-// 	pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(primevue.config.default);
-pvApp.use(primevue.toastservice);
+pvApp.use(Phrasen);
+//pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+//pvApp.use(primevue.toastservice);
 
 
 pvApp.mount('#wrapper');

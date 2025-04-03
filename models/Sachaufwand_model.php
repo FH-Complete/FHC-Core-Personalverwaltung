@@ -16,8 +16,9 @@ class Sachaufwand_model extends DB_Model
 	{
 		$result = null;
 
-		$this->db->select("hr.tbl_sachaufwand.*");
+		$this->db->select("hr.tbl_sachaufwand.*, hr.tbl_sachaufwandtyp.bezeichnung");
 		$this->addJoin('public.tbl_benutzer', 'uid=mitarbeiter_uid', 'LEFT');
+		$this->addJoin('hr.tbl_sachaufwandtyp', 'hr.tbl_sachaufwand.sachaufwandtyp_kurzbz=hr.tbl_sachaufwandtyp.sachaufwandtyp_kurzbz', 'LEFT');
 	
 		$parametersArray = array();
 
