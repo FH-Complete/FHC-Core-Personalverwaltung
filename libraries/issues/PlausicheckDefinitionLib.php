@@ -10,21 +10,23 @@ class PlausicheckDefinitionLib
 	// set fehler for core plausichecks
 	// structure: fehler_kurzbz => class (library) name for resolving
 	private $_fehlerLibMappings = array(
-		'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil', 
-		'fehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe' => 'FehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe', 
-		'funktionFaelltNichtInVertragsbestandteilZeitraum' => 'FunktionFaelltNichtInVertragsbestandteilZeitraum', 
-		'funktionUidUngleichDienstverhaeltnisUid' => 'FunktionUidUngleichDienstverhaeltnisUid', 
-		'gehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich' => 'GehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich', 
-		'gehaltsbestandteilNichtImVertragsbestandteilDatumsbereich' => 'GehaltsbestandteilNichtImVertragsbestandteilDatumsbereich', 
-		'grundgehaltKeinemStundenVertragsbestandteilZugewiesen' => 'GrundgehaltKeinemStundenVertragsbestandteilZugewiesen', 
-		'paralelleDienstverhaeltnisseEinUnternehmen' => 'ParalelleDienstverhaeltnisseEinUnternehmen', 
-		'ueberlappendeFreitextVertragsbestandteile' => 'UeberlappendeFreitextVertragsbestandteile', 
-		'ueberlappendeVertragsbestandteile' => 'UeberlappendeVertragsbestandteile', 
-		'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis', 
-		'verschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil' => 'VerschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil', 
-		'vertragsbestandteilEndAfterDienstverhaeltnis' => 'VertragsbestandteilEndAfterDienstverhaeltnis', 
-		'vertragsbestandteilFalscheZusatztabelle' => 'VertragsbestandteilFalscheZusatztabelle', 
-		'vertragsbestandteilOhneZusatztabelle' => 'VertragsbestandteilOhneZusatztabelle', 
+		'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil',
+		'echteDienstverhaeltnisseOhneOeVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneOeVertragsbestandteil',
+		'echteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil',
+		'fehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe' => 'FehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe',
+		'funktionFaelltNichtInVertragsbestandteilZeitraum' => 'FunktionFaelltNichtInVertragsbestandteilZeitraum',
+		'funktionUidUngleichDienstverhaeltnisUid' => 'FunktionUidUngleichDienstverhaeltnisUid',
+		'gehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich' => 'GehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich',
+		'gehaltsbestandteilNichtImVertragsbestandteilDatumsbereich' => 'GehaltsbestandteilNichtImVertragsbestandteilDatumsbereich',
+		'grundgehaltKeinemStundenVertragsbestandteilZugewiesen' => 'GrundgehaltKeinemStundenVertragsbestandteilZugewiesen',
+		'paralelleDienstverhaeltnisseEinUnternehmen' => 'ParalelleDienstverhaeltnisseEinUnternehmen',
+		'ueberlappendeFreitextVertragsbestandteile' => 'UeberlappendeFreitextVertragsbestandteile',
+		'ueberlappendeVertragsbestandteile' => 'UeberlappendeVertragsbestandteile',
+		'undurchgaengigesDienstverhaeltnis' => 'UndurchgaengigesDienstverhaeltnis',
+		'valorisierungsBetragAbweichendVonBerechnung' => 'ValorisierungsBetragAbweichendVonBerechnung',
+		'vertragsbestandteilEndAfterDienstverhaeltnis' => 'VertragsbestandteilEndAfterDienstverhaeltnis',
+		'vertragsbestandteilFalscheZusatztabelle' => 'VertragsbestandteilFalscheZusatztabelle',
+		'vertragsbestandteilOhneZusatztabelle' => 'VertragsbestandteilOhneZusatztabelle',
 		'vertragsbestandteilStartBeforeDienstverhaeltnis' => 'VertragsbestandteilStartBeforeDienstverhaeltnis'
 	);
 

@@ -4,6 +4,7 @@ import dv from './dv.js';
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'Tabs',
   template: `
     <div class="row h-100 overflow-hidden">
       <div class="col-2 h-100">  

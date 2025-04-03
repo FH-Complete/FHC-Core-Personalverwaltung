@@ -1,4 +1,5 @@
 export default {
+  name: 'Errors',
   template: `
   <div v-if="errors.length > 0" class="row g-2">
     <div v-if="padleft" class="col-1">&nbsp;</div>    

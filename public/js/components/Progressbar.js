@@ -1,4 +1,5 @@
 export const progressbar = {
+	name: 'ProgressBar',
     props: {
         percent: {
             type: Number, 

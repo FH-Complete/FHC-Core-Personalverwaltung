@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const CovidCard = {
+	name: 'CovidCard',
      props: {
         personID: Number,
         date: Date,

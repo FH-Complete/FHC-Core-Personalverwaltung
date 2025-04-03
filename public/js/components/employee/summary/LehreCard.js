@@ -1,12 +1,14 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const LehreCard = {
+	name: 'LehreCard',
      props: {
         uid: String,
         date: Date,
      },
      setup( props ) {
         
+        const fhcApi = Vue.inject('$fhcApi');  
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Lehre/Betreuung");
@@ -111,14 +113,14 @@ export const LehreCard = {
         const fetchAllCourseHours = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await Vue.$fhcapi.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
-                gbtChartData.value = res.data;
+                const res = await fhcApi.factory.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                gbtChartData.value = res;
                 let tempData1 = [], tempData2 = [];
                 // chartOptions.series[0].data.length = 0;
-                Object.keys(res.data.gesamt).forEach(element => {
-                   tempData1.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                Object.keys(res.gesamt).forEach(element => {
+                   tempData1.push([new Date(element).getTime(), parseFloat(res.gesamt[element])]);
                 });
-                res.data.abgerechnet.forEach(element => {
+                res.abgerechnet.forEach(element => {
                     tempData2.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                 });
                 chartOptions.series[0].data = tempData1;
@@ -137,7 +139,7 @@ export const LehreCard = {
             }
 			try {
 			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getAllCourseHours?uid=${currentUID.value}`;
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllCourseHours?uid=${currentUID.value}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();
@@ -160,7 +162,7 @@ export const LehreCard = {
             }
 			try {
 			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/getAllSupportHours?uid=${currentUID.value}`;
+			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllSupportHours?uid=${currentUID.value}`;
               isFetching.value = true;
 			  const res = await fetch(url)
 			  let response = await res.json();
