@@ -26,11 +26,12 @@ export const EmployeeContract = {
         id: Number,
         uid: String,
         dienstverhaeltnis_id: {type: Number, required: false},
+        openhistory: {type: Boolean, required: false},
     },
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
-        const { watch, ref, reactive, computed, inject } = Vue;
+        const { watch, ref, reactive, computed, inject, onMounted } = Vue;
         const route = VueRouter.useRoute();
         const router = VueRouter.useRouter();
         const { t } = usePhrasen();
@@ -70,6 +71,7 @@ export const EmployeeContract = {
 
         const karenzmodalRef = ref();
         const curKarenz = ref(null);
+        const openhistoryFlag = ref(props.openhistory);
 
         const truncateDate = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
 
@@ -170,8 +172,7 @@ export const EmployeeContract = {
 
 
 
-        })
-
+        })        
 
         const fetchData = async (uid) => {
             if (uid == null) {
@@ -192,6 +193,7 @@ export const EmployeeContract = {
                         currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
                         currentDV.value = dvList.value[0];
                     }
+                    
                 } else {
                     currentDVID.value = null;
                     currentDV.value = null;
@@ -310,6 +312,13 @@ export const EmployeeContract = {
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
                 checkValorisation();
+                if (openhistoryFlag.value) {
+                    console.log('*** watch currentDVID ***');
+                    Vue.nextTick().then(() => {
+                        showOffCanvas();
+                        openhistoryFlag.value = false;
+                    })
+                }
             }
         )
         watch(
@@ -459,6 +468,8 @@ export const EmployeeContract = {
         const showOffCanvas = () => {
             offCanvasRef.value.show();
         }
+
+        
 
         const handleDvSaved = async () => {
             fetchData(props.uid).then(() => {

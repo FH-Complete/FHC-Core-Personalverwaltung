@@ -112,6 +112,14 @@ export const searchbaroptions = {
                         return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}`;
                     }
                 },
+                {
+                    label: "Vertragshistorie",
+                    icon: "fas fa-address-book",
+                    type: "link",
+                    action: function(data) {
+                        return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}/contract#dvhistory`;
+                    }
+                },
 /*
                 {
                     label: "testchildaction3",
