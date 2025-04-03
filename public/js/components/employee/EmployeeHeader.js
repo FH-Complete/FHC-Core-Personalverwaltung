@@ -152,7 +152,7 @@ export const EmployeeHeader = {
             try  {
                 isFetching.value = true
                 const res = await fhcApi.factory.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);
-                if (res.data.error !== 0)
+                if (res.error !== 0)
                 {
                     toastRefVal.value = res.data.retval;
                 }
