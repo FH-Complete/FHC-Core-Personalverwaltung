@@ -114,10 +114,18 @@ export const EmployeeHeader = {
                 fetchHeaderData(props.personID, props.personUID);
                 fetchOpenIssuesCount(props.personID);
             }
+
+            if (modalRef.value)
+            {
+                modalRef.value.$el.addEventListener("hidden.bs.modal", () => {
+                    resetPreview();
+                });
+            }
         })
 
         // Toast
         const toastRef = ref();
+        const toastRefVal = ref();
         const toastDeleteRef = ref();
 
         const showToast = () => {
@@ -144,6 +152,13 @@ export const EmployeeHeader = {
             try  {
                 isFetching.value = true
                 const res = await fhcApi.factory.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);
+                if (res.error !== 0)
+                {
+                    toastRefVal.value = res.data.retval;
+                }
+                else
+                    toastRefVal.value = 'Foto gespeichert.'
+
                 fetchHeaderData(props.personID, props.personUID);
                 showToast();
             } catch (error) {
@@ -195,6 +210,11 @@ export const EmployeeHeader = {
             hideModal();
         }
 
+        const resetPreview = () => {
+            previewImage.value = null;
+            fileInput.value.value = null;
+        }
+
         const redirect = (person_id, uid) => {
             emit('personSelected', { person_id, uid });
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
@@ -227,13 +247,16 @@ export const EmployeeHeader = {
         return {
             showModal,
             hideModal,
+            resetPreview,
             modalRef,
             showDeleteModal,
             confirmDeleteRef,
             pickFile,
             okHandler,
             statusRef,
-            toastRef,toastDeleteRef,
+            toastRef,
+            toastRefVal,
+            toastDeleteRef,
             redirect,
             FHC_JS_CONFIG,
             getStatusTags,
@@ -256,7 +279,7 @@ export const EmployeeHeader = {
     template: `
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="toastRef">
-                <template #body><h4>Foto gespeichert.</h4></template>
+                <template #body><h4>{{toastRefVal}}</h4></template>
             </Toast>
 
             <Toast ref="toastDeleteRef">
