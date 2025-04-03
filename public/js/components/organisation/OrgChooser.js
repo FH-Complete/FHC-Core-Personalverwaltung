@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../js/RESTClient.js';
 
 export const OrgChooser = {
+	name: 'OrgChooser',
     props: {
       placeholder: String,
       customClass: String,

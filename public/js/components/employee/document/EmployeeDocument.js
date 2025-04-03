@@ -1,6 +1,7 @@
 
 
 export const EmployeeDocument = {
+	name: 'EmployeeDocument',
     components: {
  
     },

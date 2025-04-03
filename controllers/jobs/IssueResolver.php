@@ -37,6 +37,8 @@ class IssueResolver extends IssueResolver_Controller
 		// structure: fehlercode => class (library) name for resolving in "plausichecks" folder
 		$this->_codeProducerLibMappings = array(
 			'PERSONALVERWALTUNG_GEHALT_0005' => 'ValorisierungsBetragAbweichendVonBerechnung',
+			'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0006' => 'EchteDienstverhaeltnisseOhneOeVertragsbestandteil',
+			'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0007' => 'EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil'
 		);
 	}
 }

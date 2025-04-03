@@ -3,6 +3,7 @@ import vertragsbestandteillist from '../../components/vbform/vertragsbestandteil
 import dv from './dv.js';
 
 export default {
+  name: 'Tab',
   template: `
   <div class="tab-pane h-100 overflow-hidden position-relative fade mt-2" :class="(activetab === preset.guioptions.id) ? 'active show' : ''"
        :id="'v-pills-' + preset.guioptions.id"

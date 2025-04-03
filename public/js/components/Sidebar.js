@@ -1,4 +1,5 @@
 const Sidebar = {
+	name: 'Sidebar',
     props: {
       active: Number,
     },

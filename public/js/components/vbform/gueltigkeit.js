@@ -2,6 +2,7 @@ import configurable from '../../mixins/vbform/configurable.js';
 import sharedstate from './vbsharedstate.js';
 
 export default {
+  name: 'Gueltigkeit',
   template: `
   <div class="col-4 vbform_gueltigkeit">
     <div class="input-group input-group-sm">

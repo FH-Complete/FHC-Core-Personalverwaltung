@@ -838,13 +838,31 @@ class PersonAPI extends Auth_Controller
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
-                show_error('sachaufwand_id is not numeric!');
+			{
+                $this->outputJsonError('sachaufwand_id is not numeric!');
+				exit();
+			}
 
             if (!isset($payload['sachaufwandtyp_kurzbz']) || (isset($payload['sachaufwandtyp_kurzbz']) && $payload['sachaufwandtyp_kurzbz'] == ''))
-                show_error('sachaufwandtyp_kurzbz is empty!');
+			{
+                $this->outputJsonError('sachaufwandtyp_kurzbz is empty!');
+				exit();
+			}
 
             if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
-                show_error('mitarbeiter_uid is empty!');
+			{
+                $this->outputJsonError('mitarbeiter_uid is empty!');
+				exit();
+			}
+
+            if (isEmptyString($payload['betrag']))
+				$payload['betrag']=null; 
+
+			if( $payload['betrag'] !== null && !is_numeric($payload['betrag']) )
+			{
+				$this->outputJsonError('betrag is not numeric!');
+				exit();
+			}
 
             if ($payload['sachaufwand_id'] == 0)
             {

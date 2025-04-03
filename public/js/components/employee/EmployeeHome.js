@@ -3,8 +3,7 @@ import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Naviga
 
 import verticalsplit from "../../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
-import {searchbaroptions, searchfunction } from "../../apps/common.js";
-import fhcapifactory from "../../../../../js/apps/api/fhcapifactory.js";
+import {searchbaroptions} from "../../apps/common.js";
 import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
 import { Toast } from '../Toast.js';
@@ -13,10 +12,11 @@ import { Toast } from '../Toast.js';
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 export default {
+	name: 'EmployeeHome',
     components: {
 		Sidebar,
 		CoreNavigationCmpt,
-                CoreFilterCmpt,
+        CoreFilterCmpt,
 		EmployeeEditor,		
 		verticalsplit,
 		searchbar,
@@ -25,7 +25,7 @@ export default {
 	},
     setup() {
 
-		const { watch, ref } = Vue;
+		const { watch, ref, inject } = Vue;
 		const router = VueRouter.useRouter();
 		const route = VueRouter.useRoute();
 		const isEditorOpen = ref(false);
@@ -37,6 +37,7 @@ export default {
 		const toastEmployeeCreatedRef = ref();
 		const toastEmployeeCreateFailedRef = ref();
 		const currentDate = ref(null);
+		const $fhcApi = inject("$fhcApi");
 
 		watch(
 			() => route.params,
@@ -190,6 +191,8 @@ export default {
                         return personSelectedHandler(data.person_id, data.uid);
                     }
                 };
+				
+				const searchfunction = $fhcApi.factory.search.search;
 
 		return {
 			personSelectedHandler,
