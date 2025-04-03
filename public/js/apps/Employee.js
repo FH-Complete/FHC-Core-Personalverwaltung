@@ -31,7 +31,7 @@ const router = VueRouter.createRouter(
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid })  },
 					{ path: 'contract',
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, openhistory: location.href.indexOf("#dvhistory") != -1}) },
 					{ path: 'contract/:dienstverhaeltnis_id',
 					  component: EmployeeContract,
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })
@@ -42,7 +42,7 @@ const router = VueRouter.createRouter(
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: true}
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: route => ({ dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })}
 		],
 	}
 );

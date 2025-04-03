@@ -1,5 +1,4 @@
 import { Modal } from '../Modal.js';
-import { CoreFilterAPIs } from '../../../../../../public/js/components/filter/API.js';
 
 export const OrgViewer = {
 	name: 'OrgViewer',
