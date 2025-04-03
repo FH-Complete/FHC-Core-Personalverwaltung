@@ -5,6 +5,7 @@ import Step from './stepper/Step.js'
 import Steps from './stepper/Steps.js';
 
 export const CreateWizard = {
+	name: 'CreateWizard',
     components: {
         Modal,
         Steps,
@@ -118,8 +119,6 @@ export const CreateWizard = {
                     </Step>                    
                 </Steps>
 
-                
-
             </template>
             <template #footer>
                 <div class="float-start">
@@ -138,8 +137,4 @@ export const CreateWizard = {
             </template>
 
         </Modal>`
-
-
 }
-
-

@@ -6,14 +6,15 @@
 			'bootstrap5' => true,
 			'fontawesome6' => true,
       'axios027' => true,
-			'restclient' => true,      
+			'restclient' => true,
+      'tabulator5' => true,
       'vue3' => true,
       'primevue3' => true,
 			'navigationcomponent' => true, 
 			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',       
-                       'public/css/components/searchbar.css',
+                       'public/css/components/searchbar/searchbar.css',
 					   'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css'],
       'customJSs' => [
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
@@ -22,7 +23,7 @@
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/home/IssuesCountCard.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
+                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
                       ],
       'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'),
        
@@ -59,7 +60,7 @@
 <div class="container-fluid">
   <div class="row">
 
-  <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" hide-top-menu=true  left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
+  <core-navigation-cmpt :add-side-menu-entries="appSideMenuEntries" :hide-top-menu="true" left-nav-css-classes="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse"></core-navigation-cmpt>
 
     <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
 
@@ -129,8 +130,6 @@
 </div>  
 
 
-
-</script>
 
 <script>
 (function () {

@@ -5,6 +5,7 @@ import {OrgChooser} from "../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const JobFunction = {
+	name: 'JobFunction',
     components: {
         Modal,
         ModalDialog,
@@ -15,7 +16,7 @@ export const JobFunction = {
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
         config: { type: Object, default: () => ({}), required: false},
-        editMode: { type: Boolean, required: false },
+        readonlyMode: { type: Boolean, required: false, default: false },
         personID: { type: Number, required: false },
         personUID: { type: String, required: false },
         writePermission: { type: Boolean, required: false },
@@ -23,11 +24,17 @@ export const JobFunction = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
+        const fhcApi = Vue.inject('$fhcApi');
+        const fhcAlert = Vue.inject('$fhcAlert');
+
+
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
 
-        const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        //const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
+        const currentPersonID = Vue.computed(() => { return props.personID });
+        const currentPersonUID = Vue.computed(() => { return props.personUID });
 
         const dialogRef = Vue.ref();
 
@@ -51,7 +58,7 @@ export const JobFunction = {
 
 
         const full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-        const route = VueRouter.useRoute();
+        const route = ( props.readonlyMode !== true ) ? VueRouter.useRoute() : null;
 
         const convertArrayToObject = (array, key) => {
             const initialValue = {};
@@ -72,10 +79,16 @@ export const JobFunction = {
  
             // fetch data and map them for easier access
             try {
-                const response = await Vue.$fhcapi.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
-                let rawList = response.data.retval;
-                tableData.value = response.data.retval;
-                jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
+                const response = await fhcApi.factory.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
+                if(response.error === 1) {
+                    let rawList = [];
+                    tableData.value = [];
+                    jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
+                } else {
+                    let rawList = response.retval;
+                    tableData.value = response.retval;
+                    jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
+                }
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -137,6 +150,9 @@ export const JobFunction = {
             }
 
             const dvFormatter = (cell) => {
+                if( props.readonlyMode === true ) {
+                    return (cell.getValue() != null) ? cell.getValue() : '';
+                }
                 const url = fullPath + route.params.id + '/' + route.params.uid + '/contract/' + cell.getRow().getData().dienstverhaeltnis_id;
                 return cell.getValue() != null ? `<a href="${url}">` + cell.getValue() + '</a>' : '';
             }
@@ -183,9 +199,12 @@ export const JobFunction = {
                 { title: t('person','wochenstunden'), field: "wochenstunden", hozAlign: "right", width: 140, headerFilter:true },
                 { title: t('ui','from'), field: "datum_von", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },                
                 { title: t('global','bis'), field: "datum_bis", hozAlign: "center", formatter: dateFormatter, width: 140, sorter:"string", headerFilter:true, headerFilterFunc:customHeaderFilter },
-                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true }
+                { title: t('ui','bezeichnung'), field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} }
               ];
+
+            if( props.readonlyMode === false) {
+                columnsDef.push({ title: "", field: "benutzerfunktion_id", formatter: btnFormatter, hozAlign: "right", width: 100, headerSort: false, frozen: true });
+            }
 
             let tabulatorOptions = {
 				height: "100%",
@@ -263,9 +282,9 @@ export const JobFunction = {
             // fetch company
             isFetching.value = true;
             try {
-                const res = await Vue.$fhcapi.Funktion.getCompanyByOrget(currentValue.value.oe_kurzbz);                    
-                if (res.data.error == 0) {
-                    unternehmen.value = res.data.retval[0].oe_kurzbz;
+                const res = await fhcApi.factory.Funktion.getCompanyByOrget(currentValue.value.oe_kurzbz);                    
+                if (res.error == 0) {
+                    unternehmen.value = res.retval[0].oe_kurzbz;
                 } else {
                     console.log('company not found for orget!');
                 }
@@ -286,8 +305,8 @@ export const JobFunction = {
             if (ok) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonJobFunction(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.Person.deletePersonJobFunction(id);                    
+                    if (res.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
                         theModel.value.updateHeader();
@@ -318,10 +337,8 @@ export const JobFunction = {
                     delete payload.funktion_oebezeichnung;
                     delete payload.aktiv;
                     delete payload.funktion_beschreibung;
-                    const r = await Vue.$fhcapi.Person.upsertPersonJobFunction(payload);                    
-                    if (r.data.error == 0) {
-                        //jobfunctionList.value[r.data.retval[0].benutzerfunktion_id] = 
-                        //    {r.data.retval[0]};
+                    const r = await fhcApi.factory.Person.upsertPersonJobFunction(payload);                    
+                    if (r.error == 0) {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
@@ -388,8 +405,8 @@ export const JobFunction = {
             if( unternehmen_kurzbz === '' ) {
                 return;
             }
-            const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(unternehmen_kurzbz);
-            const orgets = response.data.retval;
+            const response = await fhcApi.factory.Funktion.getOrgetsForCompany(unternehmen_kurzbz);
+            const orgets = response.retval;
             orgets.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),
@@ -401,8 +418,8 @@ export const JobFunction = {
             if(unternehmen_kurzbz === '' || uid === '' ) { 
               return;  
             }
-            const response = await Vue.$fhcapi.Funktion.getAllFunctions();
-            const benutzerfunktionen = response.data.retval;
+            const response = await fhcApi.factory.Funktion.getAllFunctions();
+            const benutzerfunktionen = response.retval;
             benutzerfunktionen.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),
@@ -442,7 +459,7 @@ export const JobFunction = {
          }
     },
     template: `
-    <div class="row">
+    <div class="row" v-if="readonlyMode === false">
 
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
           <Toast ref="toastRef">
@@ -464,7 +481,7 @@ export const JobFunction = {
                 </div>
 
                 <div class="card-body">
-                    <div class="d-grid d-md-flex justify-content-between pt-2 pb-3">
+                    <div class="d-grid d-md-flex justify-content-between pt-2 pb-3" v-if="readonlyMode === false">
                         <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
                             <i class="fa fa-plus"></i> {{ t('person','funktion') }}
                         </button>
@@ -484,7 +501,7 @@ export const JobFunction = {
             
 
     <!-- detail modal -->
-    <Modal :title="t('person','funktion')" ref="modalRef">
+    <Modal :title="t('person','funktion')" ref="modalRef" v-if="readonlyMode === false">
         <template #body>
             <form class="row g-3" ref="jobFunctionFrm">
                             
@@ -581,13 +598,13 @@ export const JobFunction = {
 
     </Modal>
 
-    <ModalDialog :title="t('global','warnung')" ref="dialogRef">
+    <ModalDialog :title="t('global','warnung')" ref="dialogRef" v-if="readonlyMode === false">
       <template #body>
         {{ t('person','funktionNochNichtGespeichert') }}
       </template>
     </ModalDialog>
 
-    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
+    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef" v-if="readonlyMode === false">
         <template #body>
             {{ t('person','funktion') }} '{{ currentValue?.funktion_kurzbz }} ({{ currentValue?.datum_von }}-{{ currentValue?.datum_bis }})' {{ t('person', 'wirklichLoeschen') }}?
         </template>

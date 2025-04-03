@@ -10,6 +10,7 @@ import Phrasen from '../../../../../../../js/mixins/Phrasen.js';
 import savedpayloadchecker from '../../../../helpers/vbform/savedpayloadchecker.js';
 
 export default {
+  name: 'VbFormWrapper',
   template: `
     <Modal :title="getTitle" ref="modalRef" 
            :class="'vbformModal'" id="vbformModal" :noscroll="true">
@@ -78,6 +79,7 @@ export default {
       }
     };
   },
+  inject: ['$fhcApi', '$fhcAlert'],
   emits: [
     "dvsaved"
   ],
@@ -98,11 +100,13 @@ export default {
     this.store.mitarbeiter_uid = this.mitarbeiter_uid;
   },
   watch: {
-    changedModeOrCurDV: function(oldval, newval) {
+    changedModeOrCurDV: function(newval, oldval) {
       this.resetTmpStoreHelper();
       this.resetStoreDV();
       if( oldval[0] === newval[0] ) {
+        this.$nextTick(() => {
           this.$refs['presetchooserRef'].selectmode();
+        });
       } else {
         this.store.setMode(this.mode);
       }
@@ -142,6 +146,8 @@ export default {
         preset.dv.data.dienstverhaeltnisid = preset.dv.data.dienstverhaeltnisid ?? this.curdv.dienstverhaeltnis_id;
         preset.dv.data.unternehmen = (preset.dv.data.unternehmen !== '') ? preset.dv.data.unternehmen : this.curdv.oe_kurzbz;
         preset.dv.data.vertragsart_kurzbz = preset.dv.data.vertragsart_kurzbz ?? this.curdv.vertragsart_kurzbz;
+        preset.dv.data.dvendegrund_kurzbz = (preset.dv.data?.dvendegrund_kurzbz === undefined) ? this.curdv.dvendegrund_kurzbz : preset.dv.data.dvendegrund_kurzbz;
+        preset.dv.data.dvendegrund_anmerkung = (preset.dv.data?.dvendegrund_anmerkung === undefined) ? this.curdv.dvendegrund_anmerkung : preset.dv.data.dvendegrund_anmerkung;
         preset.dv.data.gueltigkeit.data = {
             gueltig_ab: (preset.dv.data.gueltigkeit?.data?.gueltig_ab !== undefined) ? preset.dv.data.gueltigkeit.data.gueltig_ab : this.curdv.von,
             gueltig_bis: (preset.dv.data.gueltigkeit?.data?.gueltig_bis !== undefined) ? preset.dv.data.gueltigkeit.data.gueltig_bis : this.curdv.bis
@@ -215,9 +221,9 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
+      this.$fhcApi.factory.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
       .then((response) => {
-        that.handleSaved(response.data.data);
+        that.handleSaved(response.data);
       })
       .finally(() => {
           that.spinners.saving = false;
@@ -230,9 +236,9 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      Vue.$fhcapi.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
+      this.$fhcApi.factory.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
       .then((response) => {
-        that.handleValidated(response.data.data);
+        that.handleValidated(response.data);
       })
       .finally(() => {
           that.spinners.validating = false;
@@ -242,17 +248,17 @@ export default {
     handlePresetSelected: function(preset) {
       if( this.mode === 'aenderung' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
+        this.$fhcApi.factory.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
-          this.iterateChilds(preset.children, response.data.data, preset);          
+          this.iterateChilds(preset.children, response.data, preset);          
           this.presetselected(preset);
           this.resetTmpStoreHelper();
         });
       } else if( this.mode === 'korrektur' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        Vue.$fhcapi.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
+        this.$fhcApi.factory.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
         .then((response) => {          
-          this.iterateChilds(preset.children, response.data.data, preset);          
+          this.iterateChilds(preset.children, response.data, preset);          
           this.presetselected(preset);
           this.resetTmpStoreHelper();
         });
@@ -279,6 +285,7 @@ export default {
       this.$refs['presetchooserRef'].resetSelectedPreset();
     },
     showModal: function() {
+        this.store.setMode(this.mode);
         this.$refs['modalRef'].show();
     },
     resetTmpStoreHelper: function() {
@@ -293,9 +300,9 @@ export default {
         mitarbeiter_uid: this.store.mitarbeiter_uid,  
         formdata: formdata
       };
-      Vue.$fhcapi.TmpStore.storeToTmpStore(payload)
+      this.$fhcApi.factory.TmpStore.storeToTmpStore(payload)
       .then((response) => {
-        this.store.setTmpStoreId(response.data.meta.tmpstoreid);
+        this.store.setTmpStoreId(response.meta.tmpstoreid);
         this.$refs['tmpstorehelper'].fetchTmpStoreList(false);
         this.$refs['presetchooserRef'].resetSelectedPreset();
         console.log('storeToTmpStore executed.');

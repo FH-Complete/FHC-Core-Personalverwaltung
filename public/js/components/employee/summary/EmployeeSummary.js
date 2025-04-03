@@ -4,14 +4,19 @@ import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
 import { IssuesCard } from './IssuesCard.js';
 import { OffTimeCard } from './OffTimeCard.js';
+import { DeadlineIssueTable } from './DeadlineIssueTable.js'
+
 
 export const EmployeeSummary = {
+	name: 'EmployeeSummary',
     components: {
         CovidCard,
         DvCard,
         LehreCard,
         IssuesCard,
         OffTimeCard,
+        DeadlineIssueTable,
+        
     },
     props: {
         date: Date,
@@ -63,7 +68,7 @@ export const EmployeeSummary = {
 
                     <div class="col">
                         
-                        <dv-card :uid="currentUID" :date="date" ></dv-card>
+                        <dv-card :uid="currentUID" :date="date" ></dv-card>                        
             
                     </div>          
 
@@ -72,18 +77,7 @@ export const EmployeeSummary = {
                         <!--covid-card :personID="currentPersonID" :date="date"></covid-card-->
 
                         <issues-card></issues-card>
-
-                        <br/>
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="mb-0">Home Office</h5>
-                                </div>
-                                <div class="card-body" style="text-align:center">
-                                    <div v-if="isFetching" class="spinner-border" role="status">
-                                        <span class="visually-hidden">Loading...</span>
-                                    </div>            
-                            </div>
-                        </div>
+                       
                     </div>
 
                     <div class="col">
@@ -96,12 +90,15 @@ export const EmployeeSummary = {
 
                     </div>
 
+                    <deadline-issue-table :uid="currentUID"></deadline-issue-table>
+
                 </div>            
 
             </div>                      
         </div>
 
     </div>
+
 
     `
 }

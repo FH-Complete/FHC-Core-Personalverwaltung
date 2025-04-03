@@ -1,5 +1,5 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
-import pv21apifactory from "../api/vbform/api.js";
+import pv21apifactory from "../api/api.js";
+import FhcApi from '../../../../js/plugin/FhcApi.js';
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
@@ -10,8 +10,8 @@ import { EmployeeDocument } from "../components/employee/document/EmployeeDocume
 import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
+import * as typeDefinition from '../helpers/typeDefinition/loader.js';
+import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 
 var personSelectedRef = { callback: () => {}};
 
@@ -23,17 +23,26 @@ const router = VueRouter.createRouter(
 		history: VueRouter.createWebHistory(),
 		routes: [
 			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees`, component: EmployeeHome }, // /index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome,
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/:id/:uid`, component: EmployeeHome, name: 'Employee',
 				children: [					
-					{ path: '', component: EmployeePerson, name: 'person' },
-					{ path: 'contract', component: EmployeeContract },
-					{ path: 'contract/:dienstverhaeltnis_id', component: EmployeeContract },
+					{ path: '', 
+					  component: EmployeePerson, 
+					  name: 'person',
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid })  },
+					{ path: 'contract',
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, openhistory: location.href.indexOf("#dvhistory") != -1}) },
+					{ path: 'contract/:dienstverhaeltnis_id',
+					  component: EmployeeContract,
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })
+					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
 					{ path: 'document', component: EmployeeDocument, name: 'document' },
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: route => ({ dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })}
 		],
 	}
 );
@@ -42,11 +51,12 @@ Highcharts.setOptions({
 	lang: {
 		thousandsSep: '.',
 		decimalPoint: ',',
-		dateFormat: 'dd.mm.YYYY', 
+		dateFormat: 'dd.mm.YYYY'
 	}
   })
 
 const pvApp = Vue.createApp({
+	name: 'PV21Employee',
 	setup() {
 
 		// init shared data
@@ -66,72 +76,75 @@ const pvApp = Vue.createApp({
 		const gehaltstypen = Vue.ref([]);
 		const hourlyratetypes = Vue.ref([]);
 		const unternehmen = Vue.ref([]);
+		const beendigungsgruende = Vue.ref([]);
 
 		const currentDate = Vue.ref('2022-03-04');
 
-		fetchSprache().then((r) => {
+		typeDefinition.fetchSprache().then((r) => {
 			sprache.value = r;
 		})
 
-		fetchNations().then((r) => {
+		typeDefinition.fetchNations().then((r) => {
 			nations.value = r;
 		})
 
-		fetchAusbildung().then((r) => {
+		typeDefinition.fetchAusbildung().then((r) => {
 			ausbildung.value = r;
 		})
 
-		fetchOrte().then((r) => {
+		typeDefinition.fetchOrte().then((r) => {
 			orte.value = r;
 		})
 
-		fetchStandorteIntern().then((r) => {
+		typeDefinition.fetchStandorteIntern().then((r) => {
 			standorte.value = r;
 		})
 
-
-		fetchKontakttyp().then((r) => {
+		typeDefinition.fetchKontakttyp().then((r) => {
 			kontakttyp.value = r;
 		})
 
-		fetchAdressentyp().then((r) => {
+		typeDefinition.fetchAdressentyp().then((r) => {
 			adressentyp.value = r;
 		})
 
-		fetchSachaufwandTyp().then((r) => {
+		typeDefinition.fetchSachaufwandTyp().then((r) => {
 			sachaufwandtyp.value = r;
 		})
 
-		fetchKarenztypen().then((r) => {
+		typeDefinition.fetchKarenztypen().then((r) => {
 			karenztypen.value = r;
 		})
 
-		fetchTeilzeittypen().then((r) => {
+		typeDefinition.fetchTeilzeittypen().then((r) => {
 			teilzeittypen.value = r;
 		})
 
-		fetchVertragsarten().then((r) => {
+		typeDefinition.fetchVertragsarten().then((r) => {
 			vertragsarten.value = r;
 		})
 
-		fetchGehaltstypen().then((r) => {
+		typeDefinition.fetchGehaltstypen().then((r) => {
 			gehaltstypen.value = r;
 		})
 
-		fetchVertragsbestandteiltypen().then((r) => {
+		typeDefinition.fetchVertragsbestandteiltypen().then((r) => {
 			vertragsbestandteiltypen.value = r;
 		})
 
-		fetchFreitexttypen().then((r) => {
+		typeDefinition.fetchFreitexttypen().then((r) => {
 			freitexttypen.value = r;
 		})
 
-		fetchHourlyratetypes().then((r) => {
+		typeDefinition.fetchHourlyratetypes().then((r) => {
 			hourlyratetypes.value = r;
 		})
 
-		fetchUnternehmen().then((r) => {
+		typeDefinition.fetchUnternehmen().then((r) => {
 			unternehmen.value = r;
+		})
+		fetchBeendigungsgruende().then((r) => {
+			beendigungsgruende.value = r;
 		})
 
 		Vue.provide("sprache",sprache);
@@ -150,6 +163,7 @@ const pvApp = Vue.createApp({
 		Vue.provide("freitexttypen",freitexttypen);
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
+		Vue.provide('beendigungsgruende',beendigungsgruende);
 	}
 }).use(router);
 
@@ -157,97 +171,103 @@ const pvApp = Vue.createApp({
 
 const fetchNations = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getNations');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getNations');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchSachaufwandTyp = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getSachaufwandtyp');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getSachaufwandtyp');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchKontakttyp = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getKontakttyp');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getKontakttyp');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchAdressentyp = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getAdressentyp');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAdressentyp');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchSprache = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getSprache');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getSprache');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchAusbildung = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getAusbildung');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAusbildung');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchStandorteIntern = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getStandorteIntern');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getStandorteIntern');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchOrte = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getOrte');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getOrte');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchKarenztypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getKarenztypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getKarenztypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchGehaltstypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getGehaltstypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltstypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchVertragsarten = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getVertragsarten');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsarten');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchVertragsbestandteiltypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getVertragsbestandteiltypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsbestandteiltypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchTeilzeittypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getTeilzeittypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getTeilzeittypen');
 	return CoreRESTClient.getData(res.data);
 }
 const fetchFreitexttypen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getFreitexttypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getFreitexttypen');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchHourlyratetypes = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getStundensatztypen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getStundensatztypen');
 	return CoreRESTClient.getData(res.data);
 }
 
 const fetchUnternehmen = async () => {
 	const res = await CoreRESTClient.get(
-		'extensions/FHC-Core-Personalverwaltung/api/getUnternehmen');
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getUnternehmen');
+	return CoreRESTClient.getData(res.data);
+}
+
+const fetchBeendigungsgruende = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/DVAPI/getDvEndeGruende');
 	return CoreRESTClient.getData(res.data);
 }
 
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+pvApp.use(FhcApi, {factory: pv21apifactory});
 pvApp.use(Phrasen);
 pvApp.use(FhcAlert);
 pvApp.mount('#wrapper');
-

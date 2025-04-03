@@ -9,6 +9,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import FhcTabs from '../../../../../../public/js/components/Tabs.js';
 
 export const EmployeePerson = {
+	name: 'EmployeePerson',
     components: {
 		BaseData,
 		EmployeeData,
@@ -20,34 +21,21 @@ export const EmployeePerson = {
         FhcTabs,
 	},
     props: {
-        // personid: { type: Number, default: 0 }
+        id: Number,
+        uid: String,
     },
     emits: ['updateHeader'],
-    setup(_, { emit }) {
+    setup(props, { emit }) {
 
-        const route = VueRouter.useRoute();
-        const currentPersonID = Vue.ref(0);
-        const currentPersonUID = Vue.ref(null);
         const { t } = usePhrasen();
-        const items = ["base", "employee", "contact", "bank", "material", "hourly", "funktion"];
-        const activeItem = Vue.ref("base");
         const theModel = Vue.reactive({personID: null, personUID: null,editmode: true, updateHeader: () => emit('updateHeader')});
+        const path = Vue.ref("/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/TabsConfigAPI/Stammdaten")
 
-        const isActive = (menuItem) => {
-             return activeItem.value === menuItem;
-        };
+        theModel.personID = props.id
+        theModel.personUID = props.uid
+        theModel.restricted = props.restricted
 
-        const setActive = (menuItem) => {
-            activeItem.value = menuItem;
-            console.log("activeItem: ", menuItem);
-        };
-
-        currentPersonID.value = parseInt(route.params.id);
-        currentPersonUID.value = route.params.uid;
-        theModel.personID = parseInt(route.params.id);
-        theModel.personUID = route.params.uid;
-
-        return { items, isActive, setActive, currentPersonID, currentPersonUID, t, theModel }
+        return { t, theModel, path }
 
     },
     template: `
@@ -55,7 +43,7 @@ export const EmployeePerson = {
       <div class="container-fluid">
     
         <fhc-tabs 
-            config="/extensions/FHC-Core-Personalverwaltung/apis/TabsConfig/Stammdaten" 
+            :config="path" 
             style="flex: 1 1 0%; height: 0%"
             :vertical="true"
             v-model="theModel">

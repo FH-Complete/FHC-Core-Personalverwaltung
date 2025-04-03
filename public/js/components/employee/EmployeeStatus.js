@@ -1,5 +1,13 @@
 export const EmployeeStatus = {
-    setup() {
+	name: 'EmployeeStatus',
+    props: {
+      tags: {
+          default: [],
+          type: Array
+      }
+    },
+    expose: ['refresh'],
+    setup( props ) {
 
         const { watch, ref, reactive, computed, onMounted, inject } = Vue;
         const route = VueRouter.useRoute();
@@ -13,6 +21,7 @@ export const EmployeeStatus = {
         const vertragsarten = inject('vertragsarten');
         const karenztypen = inject('karenztypen');
         const teilzeittypen = inject('teilzeittypen');
+        const fhcApi = inject('$fhcApi')   
         
         const formatVertragsart = (item) => {
           let va = vertragsarten.value.find(kt => kt.value == item);
@@ -31,6 +40,8 @@ export const EmployeeStatus = {
 
         let statusList = Vue.ref([]);    
 
+        const statusTags = Vue.ref(props.tags)
+
         const generateStatusList = () => {
           let anzDV = 0;
           let dvIDs = [];
@@ -39,12 +50,12 @@ export const EmployeeStatus = {
              let von = new Date(dv.von);
              let bis = dv.bis != null ? new Date(dv.bis) : null;
              if (currentDate.value >= von && (bis == null || bis >= currentDate.value)) {
-              anzDV++;
-              let vaExists = statusList.value.find((item) => item.text == formatVertragsart(dv.vertragsart_kurzbz))
-              if (!vaExists) {
-                statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: '', css: 'bg-dv rounded-0'})
-              }
-              dvIDs.push(dv.dienstverhaeltnis_id)
+                 anzDV++;
+                 let vaExists = statusList.value.find((item) => item.text == formatVertragsart(dv.vertragsart_kurzbz))
+                 if (!vaExists) {
+                     statusList.value.push({text: formatVertragsart(dv.vertragsart_kurzbz), description: '', css: 'bg-dv rounded-0'})
+                 }
+                 dvIDs.push(dv.dienstverhaeltnis_id)
              }
           })
           if (anzDV > 1) {
@@ -53,10 +64,10 @@ export const EmployeeStatus = {
             statusList.value.unshift({text: 'derzeit kein aktives DV', description:'', css: 'bg-dv rounded-0'});
           }
           console.log("dvIDs", dvIDs)
-          Promise.all(dvIDs.map((dvID) => Vue.$fhcapi.Vertragsbestandteil.getCurrentVBs(dvID))).then(
+          Promise.all(dvIDs.map((dvID) => fhcApi.factory.Vertragsbestandteil.getCurrentVBs(dvID))).then(
             (allData) => {
               allData.map((item) => {
-                item.data.data.map((vbs => {
+                item.data.map((vbs => {
                   switch (vbs.vertragsbestandteiltyp_kurzbz) {
                     case 'freitext':
                       if (vbs.freitexttyp_kurzbz == 'befristung') {
@@ -93,8 +104,8 @@ export const EmployeeStatus = {
           }
           isFetching.value = true
           try {
-            const res = await Vue.$fhcapi.Employee.dvByPerson(uid);
-              dvList.value = res.data.retval;          
+            const res = await fhcApi.factory.Employee.dvByPerson(uid);
+              dvList.value = res.retval;          
               isFetching.value = false;
               generateStatusList();           
           } catch (error) {
@@ -104,7 +115,7 @@ export const EmployeeStatus = {
         }
 
         onMounted(async () => {
-          await router.isReady() 
+          await router.isReady()
           console.log('route.path', route.path)
           currentPersonID.value = route.params.id
           currentPersonUID.value = route.params.uid         
@@ -122,13 +133,28 @@ export const EmployeeStatus = {
           }
         )
 
-        return {statusList};
+        watch(
+            () => props.tags,
+            (newVal) => {
+                statusTags.value = newVal
+            },
+            { deep: true }
+        )
+
+        const refresh = () => {
+          fetchData(currentPersonUID.value);
+        }
+
+        return {statusList, statusTags, refresh};
     },
     template: `
     <div class="d-flex align-items-start ms-sm-auto col-lg-12  gap-2 mt-auto" >
-      <template v-for="item in statusList">
-        <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary rounded-0'" >{{ item.text }}</span>
-      </template>
+        <template v-for="item in statusTags">
+            <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary rounded-0'" >{{ item.text }}</span>
+        </template>
+        <template v-for="item in statusList">
+            <span class="badge" :class="(item?.css != undefined) ? item.css : 'bg-secondary rounded-0'" >{{ item.text }}</span>
+        </template>
     </div>   
    `
 }

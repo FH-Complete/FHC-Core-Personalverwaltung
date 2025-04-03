@@ -2,6 +2,7 @@
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
 export const SearchExistingDialog = {
+	name: 'SearchExistingDialog',
     components: {
         "datepicker": VueDatePicker,
     },
@@ -13,7 +14,8 @@ export const SearchExistingDialog = {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
-
+        const fhcApi = Vue.inject('$fhcApi');
+        
         const currentValue = Vue.reactive({
             surname: "",
             birthdate: "",
@@ -43,10 +45,10 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Employee.filterPerson(currentValue);                
+                const res = await fhcApi.factory.Employee.filterPerson(currentValue);                
                 isFetching.value = false;              
-			    console.log(res.data);	  
-			    personList.value = res.data.retval;
+			    console.log(res);	  
+			    personList.value = res.retval;
 
             } catch (error) {
                 console.log(error);
@@ -68,14 +70,14 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await fhcApi.factory.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
                 isFetching.value = false;    
 
-                if (!res.data.error) {            
-                    personSelectedHandler(person_id, res.data.retval.uid, 'take');
+                if (!res.error) {            
+                    personSelectedHandler(person_id, res.retval.uid, 'take');
                     filterPerson();
                 } else {
-                    console.log("Fehler beim Anlegen: ", res.data.retval);
+                    console.log("Fehler beim Anlegen: ", res.retval);
                 }
 
             } catch (error) {
@@ -132,16 +134,20 @@ export const SearchExistingDialog = {
             <span class="text-primary fw-semibold"><i class="fa fa-circle-info text-primary"></i>&nbsp;{{ personList.length }} Personen gefunden</span>
             <table class="table table-sm table-striped table-hover mt-2">
                 <thead>
-                    <tr><th>UID</th><th>Name</th><th>Geb.Dat.</th><th>SVNr</th><th>Email</th><th>Status</th><th>Aktion</th></tr>
+                    <tr><th>UID</th><th>Name</th><th>Geb.Dat.</th><th>SVNr</th><th>Email</th><th>Status</th><th>Unruly</th><th>Aktion</th></tr>
                 </thead>
                 <tbody>
                     <tr v-for="person in personList" >
                         <td>{{ person.uid }}</td>
                         <td>{{ person.nachname }}, {{ person.vorname }}</td>
                         <td>{{ formatDate(person.gebdatum) }}</td>
-                        <td>{{ person.svnr }}</td>
+                        <td>{{ person.svnr }}</td>                        
                         <td><span v-if="person.emails.length > 0">{{ person.emails.join(", ") }}</span></td>
                         <td>{{ person.status }}</td>
+                        <td>
+                            <span v-if="person.unruly" class="badge bg-unruly rounded-0">Unruly</span>
+                            <span v-else>-</span>
+                        </td>
                         <td @click.stop>
                             <div class="d-grid gap-2 d-md-flex justify-content-start">
                                 <button type="button" class="btn btn-secondary btn-sm" 
