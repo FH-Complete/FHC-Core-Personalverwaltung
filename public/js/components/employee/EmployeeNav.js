@@ -1,4 +1,5 @@
 export const EmployeeNav = {
+	name: 'EmployeeNav',
     props: {
         //date: Date,
     },

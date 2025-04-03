@@ -4,6 +4,7 @@ import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const DeadlineIssueDialog = {
+	name: 'DeadlineIssueDialog',
     components: {
         Modal,
         ModalDialog,
@@ -14,12 +15,14 @@ export const DeadlineIssueDialog = {
     },  
     setup(props) {
 
-        const { watch, ref, toRefs, onMounted, defineExpose, toRaw, reactive } = Vue; 
+        const { watch, ref, toRefs, onMounted, defineExpose, toRaw, reactive, inject } = Vue; 
         const { t } = usePhrasen();
         const frist = ref()
         const fristStatus = ref([])
         const fristEreignisse = ref([])
         const isFetching = ref(false)
+        const fhcApi = inject('$fhcApi')
+        const fhcAlert = inject('$fhcAlert');
 
         // Modal 
         let modalRef = ref()
@@ -49,9 +52,13 @@ export const DeadlineIssueDialog = {
 
         const fetchFristStatus = async () => {
             try {
-                isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenStatus();
-                fristStatus.value = res.data;			  
+                isFetching.value = true;	
+                fhcApi
+			        .factory.Deadline.getFristenStatus()
+			        .then(result => {
+                        fristStatus.value = result.error !== 1 ? result.retval : [];				        	
+			        })
+			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);
@@ -62,8 +69,12 @@ export const DeadlineIssueDialog = {
         const fetchFristEreignisse = async () => {
             try {
                 isFetching.value = true;
-                const res = await Vue.$fhcapi.Deadline.getFristenEreignisseManuell();
-                fristEreignisse.value = res.data;			  
+                fhcApi
+			        .factory.Deadline.getFristenEreignisseManuell()
+			        .then(result => {
+                        fristEreignisse.value = result.error !== 1 ? result.retval : [];
+			        })
+			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);
@@ -120,12 +131,6 @@ export const DeadlineIssueDialog = {
                 // submit
                 try {
                     _resolve({type: 'OK', payload: frist.value })
-                    /* const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
-                    if (r.data.error == 0) {
-                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
-                        console.log('materialdata successfully saved');
-                        showToast();
-                    }   */
                 } catch (error) {
                     console.log(error)              
                 } finally {

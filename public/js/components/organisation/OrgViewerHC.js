@@ -1,4 +1,5 @@
 const OrgViewer = {
+	name: 'OrgViewerHC',
     components: {
         Modal,
     },

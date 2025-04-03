@@ -1,29 +1,25 @@
 export default {
 
   byPerson: function(person_id) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/issue/byPerson';
-    return axios.get(url, { params: { person_id: person_id} });
+    let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/issue/byPerson';
+    return this.$fhcApi.get(url, { person_id: person_id});
   },
 
   countPersonOpenIssues: function(person_id) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/IssueChecker/countPersonOpenIssues/'
+    let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/IssueChecker/countPersonOpenIssues/'
             + person_id;
-    return axios.get(url);
+    return this.$fhcApi.get(url);
   },
 
   checkPerson: function(person_id) {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/IssueChecker/checkPerson/'
+    let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/IssueChecker/checkPerson/'
             + person_id;
-    return axios.post(url);
+    return this.$fhcApi.post(url);
   },
 
   openIssuesPersons: function() {
-    let url =  FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-            + '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/issue/PersonenMitOffenenIssues';
-    return axios.get(url);
+    let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/issue/PersonenMitOffenenIssues';
+    return this.$fhcApi.get(url);
   },
   
 };

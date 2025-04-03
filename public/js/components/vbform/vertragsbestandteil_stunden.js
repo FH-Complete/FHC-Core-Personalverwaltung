@@ -5,6 +5,7 @@ import errors from './errors.js';
 import infos from './infos.js';
 
 export default {
+  name: 'VertragsbestandteilStunden',
   template: `
   <div class="card card-body my-2">
     <div class="py-0">
@@ -67,6 +68,7 @@ export default {
     this.getTeilzeittypen();
     this.setDataFromConfig();
   },
+  inject: ['$fhcApi'],
   methods: {
     gueltigkeitchanged: function(payload) {
       console.log(JSON.stringify(payload));  
@@ -93,8 +95,8 @@ export default {
       }
     },
     getTeilzeittypen: async function() {
-      const response = await Vue.$fhcapi.Stunden.getTeilzeittypen();
-      const teilzeittypen = response.data.retval;
+      const response = await this.$fhcApi.factory.Stunden.getTeilzeittypen();
+      const teilzeittypen = response.retval;
       teilzeittypen.unshift({
         value: '',
         label: 'Teilzeittyp wählen',

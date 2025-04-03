@@ -1,5 +1,5 @@
-import fhcapifactory from "../../../../js/apps/api/fhcapifactory.js";
 import pv21apifactory from "../api/api.js";
+import FhcApi from '../../../../js/plugin/FhcApi.js';
 import {default as EmployeeHome} from "../components/employee/EmployeeHome.js";
 import {EmployeePerson} from "../components/employee/EmployeePerson.js";
 import {EmployeeContract} from "../components/employee/contract/EmployeeContract.js";
@@ -12,8 +12,6 @@ import Phrasen from '../../../../js/plugin/Phrasen.js';
 import FhcAlert from '../../../../js/plugin/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
-
-Vue.$fhcapi = {...fhcapifactory, ...pv21apifactory};
 
 var personSelectedRef = { callback: () => {}};
 
@@ -33,10 +31,10 @@ const router = VueRouter.createRouter(
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid })  },
 					{ path: 'contract',
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid }) },
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, openhistory: location.href.indexOf("#dvhistory") != -1}) },
 					{ path: 'contract/:dienstverhaeltnis_id',
 					  component: EmployeeContract,
-					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: route.params.dienstverhaeltnis_id })
+					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })
 					 },
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
@@ -44,7 +42,7 @@ const router = VueRouter.createRouter(
 					{ path: 'summary', component: EmployeeSummary, name: 'summary', props: route => ({ date: route.query.d })},
 				]
 		    },
-			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: true}
+			{ path: `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/:dienstverhaeltnis_id`, component: ValorisationCheck, props: route => ({ dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })}
 		],
 	}
 );
@@ -58,6 +56,7 @@ Highcharts.setOptions({
   })
 
 const pvApp = Vue.createApp({
+	name: 'PV21Employee',
 	setup() {
 
 		// init shared data
@@ -268,6 +267,7 @@ const fetchBeendigungsgruende = async () => {
 
 pvApp.use(primevue.config.default);
 pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
+pvApp.use(FhcApi, {factory: pv21apifactory});
 pvApp.use(Phrasen);
 pvApp.use(FhcAlert);
 pvApp.mount('#wrapper');

@@ -1,6 +1,7 @@
 
 
 export const EmployeeLifeCycle = {
+	name: 'EmployeeLifeCycle',
     components: {
  
     },

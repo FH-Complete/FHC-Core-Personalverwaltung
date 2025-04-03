@@ -5,6 +5,7 @@ import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const TimeRecording = {
+	name: 'TimeRecording',
     components: {
         Modal,
         ModalDialog,
@@ -13,12 +14,13 @@ export const TimeRecording = {
         "datepicker": VueDatePicker
     },
     props: {
-        personID: { type: Number, required: true },
-        personUID: { type: String, required: true },
+        personID: { type: [Number, null], required: true },
+        personUID: { type: [String, null], required: true },
     },
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -65,11 +67,11 @@ export const TimeRecording = {
             }
             try {
               isFetching.value = true;
-              const response = await Vue.$fhcapi.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
+              const response = await fhcApi.factory.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
               isFetching.value = false;              
-              console.log('zeiterfassung', response.data.retval);	  
-              if (response.data.retval.length>0) {
-                timeRecordList.value = response.data.retval;
+              console.log('zeiterfassung', response.retval);	  
+              if (response.retval.length>0) {
+                timeRecordList.value = response.retval;
               } else {
                 timeRecordList.value = [];
               }

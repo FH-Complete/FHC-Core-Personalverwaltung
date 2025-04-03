@@ -5,6 +5,7 @@ import errors from './errors.js';
 import infos from './infos.js';
 
 export default {
+  name: 'VertragsbestandteilFreitext',
   template: `
   <div class="my-2" :class="canhavegehaltsbestandteile ? 'card card-body' : 'py-0'">
     <div class="py-0">

@@ -1,4 +1,5 @@
 export const Toast = {
+	name: 'Toast',
     props: {
         title: {
             text: String,

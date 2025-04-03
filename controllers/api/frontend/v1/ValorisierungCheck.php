@@ -13,11 +13,12 @@ class ValorisierungCheck extends FHCAPI_Controller
 				'index' => self::DEFAULT_PERMISSION,
 				'getDvData' => self::DEFAULT_PERMISSION,
 				'getValorisierungCheckData' => self::DEFAULT_PERMISSION,
-				'checkValorisationValidityOfDv' => self::DEFAULT_PERMISSION,
-				'redoValorisation' => self::DEFAULT_PERMISSION.'w'
+				'checkValorisationValidityOfDv' => 'basis/mitarbeiter:r',
+				'redoValorisation' => self::DEFAULT_PERMISSION
 			)
 		);
 
+		$this->load->library('PermissionLib', null, 'PermissionLib');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungLib', null, 'ValorisierungLib');
 		$this->load->library('extensions/FHC-Core-Personalverwaltung/valorisierung/ValorisierungCheckLib', null, 'ValorisierungCheckLib');
 	}
@@ -68,6 +69,11 @@ class ValorisierungCheck extends FHCAPI_Controller
 	 */
 	public function checkValorisationValidityOfDv()
 	{
+		if( !$this->PermissionLib->isBerechtigt('extension/pv21_valorisierung', 'su') )
+		{
+			$this->terminateWithSuccess('checkValorisationValidityOfDv skipped due to missing permission');
+		}
+
 		$dienstverhaeltnis_id = $this->input->get('dienstverhaeltnis_id');
 
 		if (!isset($dienstverhaeltnis_id)) $this->terminateWithError('Dienstverhältnis Id fehlt');
@@ -88,6 +94,11 @@ class ValorisierungCheck extends FHCAPI_Controller
 	 */
 	public function redoValorisation()
 	{
+		if( !$this->PermissionLib->isBerechtigt('extension/pv21_valorisierung', 'su') )
+		{
+			$this->terminateWithError('redoValorisation skipped due to missing permission');
+		}
+
 		$data = json_decode($this->input->raw_input_stream, true);
 
 		$dienstverhaeltnis_id = $data['dienstverhaeltnis_id'];

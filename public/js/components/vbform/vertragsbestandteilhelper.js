@@ -11,6 +11,7 @@ import dvaenderung from './dvaenderung.js';
 import sharedstate from './vbsharedstate.js';
 
 export default {
+  name: 'VertragsbestandteilHelper',
   template: `
       <div>
         <div class="row g-2 py-2 border-bottom mb-3">

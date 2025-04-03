@@ -6,6 +6,7 @@ import infos from './infos.js';
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'VertragsbestandteilFunktion',
   template: `
   <div class="card card-body my-2" :class="canhavegehaltsbestandteile ? '' : 'border-white py-0'">
     <div class="py-0">
@@ -111,6 +112,7 @@ export default {
     <gehaltsbestandteilhelper v-if="canhavegehaltsbestandteile" ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
+  inject: ['$fhcApi','$fhcAlert'],
   components: {
     'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
     'gueltigkeit': gueltigkeit,
@@ -218,8 +220,8 @@ export default {
     },
     getFunktionen: async function() {
       const filter = (this.config.guioptions?.filter) ? this.config.guioptions?.filter : 'all';
-      const response = await Vue.$fhcapi.Funktion.getContractFunctions(filter);
-      const funktionen = response.data.retval;
+      const response = await this.$fhcApi.factory.Funktion.getContractFunctions(filter);
+      const funktionen = response.retval;
       funktionen.unshift({
         value: '',
         label: 'Funktion wählen',
@@ -233,8 +235,8 @@ export default {
       if( this.store.unternehmen === '' ) {
           return;
       }
-      const response = await Vue.$fhcapi.Funktion.getOrgetsForCompany(this.store.unternehmen);
-      const orgets = response.data.retval;
+      const response = await this.$fhcApi.factory.Funktion.getOrgetsForCompany(this.store.unternehmen);
+      const orgets = response.retval;
       orgets.unshift({
         value: '',
         label: 'OrgEinheit wählen',
@@ -248,8 +250,8 @@ export default {
       if(this.store.unternehmen === '' || this.store.mitarbeiter_uid === '' ) {
         return;  
       }
-      const response = await Vue.$fhcapi.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
-      const benutzerfunktionen = (response.error === 1) ? [] : response.data.retval;
+      const response = await this.$fhcApi.factory.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
+      const benutzerfunktionen = (response.error === 1) ? [] : response.retval;
       benutzerfunktionen.unshift({
         value: '',
         label: 'Benutzerfunktion wählen',

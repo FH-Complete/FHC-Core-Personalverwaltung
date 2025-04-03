@@ -41,6 +41,12 @@ class ValorisierungsBetragAbweichendVonBerechnung extends PlausiChecker
 			if (hasData($dvRes)) $dvIdArr = array_column(getData($dvRes), 'dienstverhaeltnis_id');
 		}
 
+		if( $person_id !== null && count($dvIdArr) === 0 )
+		{
+			//specific person but currently no active dvs
+			return success(array());
+		}
+
 		$invalidGehaltsbestandteile = $this->_ci->ValorisierungCheckLib->getInvalidGehaltsbestandteile($dvIdArr);
 
 		foreach ($invalidGehaltsbestandteile as $gehaltsbestandteil_id)

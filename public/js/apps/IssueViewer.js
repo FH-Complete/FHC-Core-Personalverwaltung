@@ -22,6 +22,7 @@ import {CoreFilterCmpt} from '../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 
 const issueViewerApp = Vue.createApp({
+	name: 'PV21IssueViewer',
 	data: function() {
 		return {
 			appSideMenuEntries: {},

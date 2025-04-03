@@ -5,6 +5,7 @@ import infos from './infos.js';
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'VertragsbestandteilKarenz',
   template: `
   <div class="py-0 my-2">
    <div class="py-0">
@@ -100,6 +101,7 @@ export default {
     this.getKarenztypen();
     this.setDataFromConfig();
   },
+  inject: ['$fhcApi'],
   methods: {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
@@ -127,8 +129,8 @@ export default {
       }
     },
     getKarenztypen: async function() {
-      const response = await Vue.$fhcapi.Karenz.getKarenztypen();
-      const karenztypen = response.data.retval;
+      const response = await this.$fhcApi.factory.Karenz.getKarenztypen();
+      const karenztypen = response.retval;
       karenztypen.unshift({
         value: '',
         label: 'Karenztyp wählen',

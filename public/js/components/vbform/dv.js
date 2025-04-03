@@ -6,6 +6,7 @@ import infos from './infos.js';
 import gueltigkeit from './gueltigkeit.js';
 
 export default {
+  name: 'Dv',
   template:`
     <div class="py-0">
       <div class="py-0">

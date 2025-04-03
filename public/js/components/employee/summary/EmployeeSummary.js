@@ -8,6 +8,7 @@ import { DeadlineIssueTable } from './DeadlineIssueTable.js'
 
 
 export const EmployeeSummary = {
+	name: 'EmployeeSummary',
     components: {
         CovidCard,
         DvCard,

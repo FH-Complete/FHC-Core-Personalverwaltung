@@ -4,6 +4,7 @@ import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
 
 export const EmployeeHeader = {
+	name: 'EmployeeHeader',
     components: {
         Toast,
 		Modal,
@@ -22,7 +23,7 @@ export const EmployeeHeader = {
 
         /* const route = VueRouter.useRoute();
         const router = VueRouter.useRouter(); */
-        const { watch, ref, onMounted } = Vue;
+        const { watch, ref, onMounted, inject } = Vue;
         const currentPersonID = Vue.computed(() => { return props.personID });
         const currentPersonUID = Vue.computed(() => { return props.personUID });
 
@@ -34,6 +35,7 @@ export const EmployeeHeader = {
         const isFetching = ref(false);
         const isFetchingName = ref(false);
         const isFetchingIssues = ref(false);
+        const fhcApi = inject('$fhcApi')        
 
        //const currentDate = ref(null);
 
@@ -50,13 +52,13 @@ export const EmployeeHeader = {
             isFetchingName.value = true;
             try {
                 // fetch header data
-                const res = await Vue.$fhcapi.Employee.personHeaderData(personID, uid);
-                employee.value = res.data.retval[0];
+                const res = await fhcApi.factory.Employee.personHeaderData(personID, uid);
+                employee.value = res.retval[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
-                const resAbteilung = await Vue.$fhcapi.Employee.personAbteilung(employee.value.uid);
+                const resAbteilung = await fhcApi.factory.Employee.personAbteilung(employee.value.uid);
                // response = await resAbteilung.json();
-                employee.value = { ...employee.value, ...{ abteilung: resAbteilung.data.retval } };
+                employee.value = { ...employee.value, ...{ abteilung: resAbteilung.retval } };
             } catch (error) {
                 console.log(error);
             } finally {
@@ -68,8 +70,8 @@ export const EmployeeHeader = {
         const fetchOpenIssuesCount = async(personID) => {
             isFetchingIssues.value = true;
             try {
-                const res = await Vue.$fhcapi.Issue.countPersonOpenIssues(personID);
-                openissuescount.value = res.data.data.openissues;
+                const res = await fhcApi.factory.Issue.countPersonOpenIssues(personID);
+                openissuescount.value = res.data.openissues;
             } catch (error) {
                 console.log(error);
             } finally {
@@ -80,8 +82,8 @@ export const EmployeeHeader = {
         const checkPerson = async() => {
             isFetchingIssues.value = true;
             try {
-                const res = await Vue.$fhcapi.Issue.checkPerson(props.personID);
-                openissuescount.value = res.data.data.openissues;
+                const res = await fhcApi.factory.Issue.checkPerson(props.personID);
+                openissuescount.value = res.data.openissues;
             } catch (error) {
                 console.log(error);
             } finally {
@@ -112,10 +114,18 @@ export const EmployeeHeader = {
                 fetchHeaderData(props.personID, props.personUID);
                 fetchOpenIssuesCount(props.personID);
             }
+
+            if (modalRef.value)
+            {
+                modalRef.value.$el.addEventListener("hidden.bs.modal", () => {
+                    resetPreview();
+                });
+            }
         })
 
         // Toast
         const toastRef = ref();
+        const toastRefVal = ref();
         const toastDeleteRef = ref();
 
         const showToast = () => {
@@ -141,7 +151,14 @@ export const EmployeeHeader = {
         const postFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);
+                const res = await fhcApi.factory.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);
+                if (res.error !== 0)
+                {
+                    toastRefVal.value = res.data.retval;
+                }
+                else
+                    toastRefVal.value = 'Foto gespeichert.'
+
                 fetchHeaderData(props.personID, props.personUID);
                 showToast();
             } catch (error) {
@@ -155,7 +172,7 @@ export const EmployeeHeader = {
         const postDeleteFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await Vue.$fhcapi.Employee.deletePersonEmployeeFoto(props.personID);
+                const res = await fhcApi.factory.Employee.deletePersonEmployeeFoto(props.personID);
                 fetchHeaderData(props.personID, props.personUID);
                 showDeleteToast();
             } catch (error) {
@@ -193,6 +210,11 @@ export const EmployeeHeader = {
             hideModal();
         }
 
+        const resetPreview = () => {
+            previewImage.value = null;
+            fileInput.value.value = null;
+        }
+
         const redirect = (person_id, uid) => {
             emit('personSelected', { person_id, uid });
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
@@ -225,13 +247,16 @@ export const EmployeeHeader = {
         return {
             showModal,
             hideModal,
+            resetPreview,
             modalRef,
             showDeleteModal,
             confirmDeleteRef,
             pickFile,
             okHandler,
             statusRef,
-            toastRef,toastDeleteRef,
+            toastRef,
+            toastRefVal,
+            toastDeleteRef,
             redirect,
             FHC_JS_CONFIG,
             getStatusTags,
@@ -254,7 +279,7 @@ export const EmployeeHeader = {
     template: `
         <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
             <Toast ref="toastRef">
-                <template #body><h4>Foto gespeichert.</h4></template>
+                <template #body><h4>{{toastRefVal}}</h4></template>
             </Toast>
 
             <Toast ref="toastDeleteRef">

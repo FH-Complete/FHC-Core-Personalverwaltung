@@ -1,4 +1,5 @@
 export const DropDownButton = {
+	name: 'DropDownButton',
     props: {
         links: { type: Array, required: true }
     },

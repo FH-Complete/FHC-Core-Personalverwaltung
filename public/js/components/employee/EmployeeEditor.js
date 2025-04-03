@@ -3,6 +3,7 @@ import { EmployeeHeader } from './EmployeeHeader.js';
 import { EmployeeNav } from './EmployeeNav.js';
 
 export default {
+	name: 'EmployeeEditor',
     components: {
         EmployeePerson,
         EmployeeHeader,
