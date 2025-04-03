@@ -2,6 +2,7 @@ import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 
 export default {
+  name: 'DvNeuanlage',
   template: `
   <div class="col-2">
     <select v-model="unternehmen" class="form-select form-select-sm" aria-label=".form-select-sm example">

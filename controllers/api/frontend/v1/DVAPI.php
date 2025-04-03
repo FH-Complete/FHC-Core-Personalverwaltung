@@ -283,7 +283,7 @@ class DVAPI extends Auth_Controller
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnis_id));
         $ret = $this->VertragsbestandteilLib->deactivateDienstverhaeltnis($dv, $payload->gueltig_bis, true);
 
-        if ( $ret !== TRUE) {
+        if (!$ret) {
             return $this->outputJsonError($ret);
         }
 

@@ -10,6 +10,7 @@ import { Toast } from '../Toast.js';
 
 
 export const SalaryExport = {
+	name: 'SalaryExport',
     components: {
         "datepicker": VueDatePicker,
         "p-skeleton": primevue.skeleton,
@@ -118,7 +119,7 @@ export const SalaryExport = {
         const exportSalarylist = async () => {
             isFetching.value = true
             try {
-              const response = await Vue.$fhcapi.SalaryExport.getAll(filterPerson.value, getFilterInterval(), true);        
+              const response = await fhcApi.factory.SalaryExport.getAll(filterPerson.value, getFilterInterval(), true);        
               
              /*  // create file link in browser's memory
               const href = URL.createObjectURL(response.data);

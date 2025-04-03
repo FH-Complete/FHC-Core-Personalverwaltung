@@ -8,6 +8,7 @@ import { CoreFilterCmpt } from "../../../../../../js/components/filter/Filter.js
 
 
 export const DeadlineIssueTable = {    
+  name: 'DeadlineIssueTable',
   components: {
     ModalDialog,
     Toast,
@@ -20,7 +21,7 @@ export const DeadlineIssueTable = {
   },
   setup(props, { emit }){
 
-      const { watch, ref, toRefs, onMounted } = Vue; 
+      const { watch, ref, toRefs, onMounted, inject } = Vue; 
       const { t } = usePhrasen();
       const isFetching = ref(false);
       const isFristFetching = ref(false);
@@ -32,6 +33,8 @@ export const DeadlineIssueTable = {
       const dialogRef = ref();
       const confirmDeleteRef = ref();
       const modalContainer = ref();
+      const fhcApi = inject('$fhcApi');
+      const fhcAlert = inject('$fhcAlert');
 
       const redirect = (issue_id) => {
         console.log('issue_id', person_id);
@@ -48,13 +51,15 @@ export const DeadlineIssueTable = {
             fristenTable.value.tabulator.dataLoader.alertLoader();
           }
           isFristFetching.value = true;
-          const res = await Vue.$fhcapi.Deadline.allByPerson(currentUID.value, deadline_filter_all.value);
-          fristen.value = res.data;			  
-          isFristFetching.value = false;                        
+          fhcApi.factory.Deadline.allByPerson(currentUID.value, deadline_filter_all.value)
+            .then(result => {
+              fristen.value = result.error !== 1 ? result.retval : [];	
+            }).catch(fhcAlert.handleSystemError);  
+          			  
         } catch (error) {
-          console.log(error);
-          isFristFetching.value = false;           
+          console.log(error);         
         } finally {
+            isFristFetching.value = false;   
             if( fristenTable.value?.tabulator !== null ) {
                 fristenTable.value.tabulator.dataLoader.clearAlert();
             }
@@ -64,13 +69,17 @@ export const DeadlineIssueTable = {
       const fetchFristStatus = async () => {
         try {
             isFetching.value = true;
-            const res = await Vue.$fhcapi.Deadline.getFristenStatus();
-            fristStatus.value = res.data;		
-            isFetching.value = false;                        
+            fhcApi
+			        .factory.Deadline.getFristenStatus()
+			        .then(result => {
+                fristStatus.value = result.error !== 1 ? result.retval : [];				        	
+			        })
+			        .catch(fhcAlert.handleSystemError);              
         } catch (error) {
-            console.log(error);
-            isFetching.value = false;           
-        }	
+            console.log(error);               
+        }	finally {
+            isFetching.value = false;
+        }
       }
 
       
@@ -87,8 +96,8 @@ export const DeadlineIssueTable = {
       const fetchFristEreignisse = async () => {
         try {
             isFetching.value = true;
-            const res = await Vue.$fhcapi.Deadline.getFristenEreignisse();
-            fristEreignisse.value = res.data;			  
+            const res = await fhcApi.factory.Deadline.getFristenEreignisse();
+            fristEreignisse.value = res.retval;			  
             isFetching.value = false;                        
         } catch (error) {
             console.log(error);
@@ -115,7 +124,7 @@ export const DeadlineIssueTable = {
       const updateDeadlines = async () => {
         try {
           isFetching.value = true;
-          const res = await Vue.$fhcapi.Deadline.updateFristenListe();
+          const res = await fhcApi.factory.Deadline.updateFristenListe();
           isFetching.value = false;              
           fetchList();		  
         } catch (error) {
@@ -131,8 +140,8 @@ export const DeadlineIssueTable = {
         if (ok) {   
 
             try {
-                const res = await Vue.$fhcapi.Deadline.deleteFrist(id);                    
-                if (res.data.error == 0) {
+                const res = await fhcApi.factory.Deadline.deleteFrist(id);                    
+                if (res.error == 0) {
                     fristen.value = fristen.value.filter((frist) => frist.frist_id != id);
                     showDeletedToast();
                 }
@@ -150,12 +159,12 @@ export const DeadlineIssueTable = {
         () => {
           fetchList();
         }
-      )
+      );
   
-      onMounted(() => {
-        fetchFristStatus()
-        fetchFristEreignisse()
-      })
+      (async () => {
+        await fetchFristStatus();
+        await fetchFristEreignisse();
+      })();
 
       const onPersonSelect = (uid, person_id) => {
         let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	
@@ -167,7 +176,7 @@ export const DeadlineIssueTable = {
         const frist = fristen.value.filter((frist) => frist.frist_id == frist_id)[0];
         try  {
           isFetching.value = true
-          const res = await Vue.$fhcapi.Deadline.updateFristStatus(frist_id, frist.status_kurzbz);    
+          const res = await fhcApi.factory.Deadline.updateFristStatus(frist_id, frist.status_kurzbz);    
           showToast();     
         } catch (error) {
             console.log(error);                
@@ -193,7 +202,7 @@ export const DeadlineIssueTable = {
           console.log('addDeadline', fristPayload)
           try  {
             isFetching.value = true
-            const res = await Vue.$fhcapi.Deadline.upsertFrist(fristPayload);    
+            const res = await fhcApi.factory.Deadline.upsertFrist(fristPayload);    
             showCreateToast();     
             fetchList();
           } catch (error) {
@@ -219,7 +228,7 @@ export const DeadlineIssueTable = {
           console.log('editDeadline', fristPayload)
           try  {
             isFetching.value = true
-            const res = await Vue.$fhcapi.Deadline.upsertFrist(fristPayload);    
+            const res = await fhcApi.factory.Deadline.upsertFrist(fristPayload);    
             showCreateToast();     
             fetchList();
           } catch (error) {
@@ -250,7 +259,7 @@ export const DeadlineIssueTable = {
         console.log('onTableCellEdited', cell.getValue(), cell.getRow().getIndex())
         try  {
           isFetching.value = true
-          const res = await Vue.$fhcapi.Deadline.updateFristStatus(cell.getRow().getIndex(), cell.getValue());    
+          const res = await fhcApi.factory.Deadline.updateFristStatus(cell.getRow().getIndex(), cell.getValue());    
           showToast();     
         } catch (error) {
             console.log(error);                
@@ -303,11 +312,11 @@ export const DeadlineIssueTable = {
         console.log('fristen', fristen) 
         try  {
           isFetching.value = true
-          const res = await Vue.$fhcapi.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);    
+          const res = await fhcApi.factory.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);    
           fetchList();
           showToast();     
         } catch (error) {
-            console.log(error);                
+            fhcAlert.handleSystemError(error)
         } finally {
             isFetching.value = false;
         }     
@@ -422,16 +431,16 @@ export const DeadlineIssueTable = {
             event: 'tableBuilt',
             handler: () => {
                 fetchList();
+
+				Vue.watch(fristen, (newVal, oldVal) => {
+				  console.log('fristenList changed');
+				  if( fristenTable.value?.tabulator !== null ) {
+					  fristenTable.value.tabulator.setData(fristen.value);
+				  }
+				}, {deep: true})
             }
         }
       ]);
-
-      Vue.watch(fristen, (newVal, oldVal) => {
-        console.log('fristenList changed');
-        if( fristenTable.value?.tabulator !== null ) {
-            fristenTable.value.tabulator.setData(fristen.value);
-        }
-      }, {deep: true})
 
     /*   Vue.watch(fristStatusList, (newVal, oldVal) => {
         let colDefs = fristenTable.value?.tabulator.getColumnDefinitions()

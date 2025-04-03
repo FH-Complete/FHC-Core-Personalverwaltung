@@ -3,6 +3,7 @@ import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
+  name: 'GehaltsbestandteilHelper',
   inject: [
 	  'hassalarypermission'
   ],

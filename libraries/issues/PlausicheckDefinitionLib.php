@@ -11,6 +11,8 @@ class PlausicheckDefinitionLib
 	// structure: fehler_kurzbz => class (library) name for resolving
 	private $_fehlerLibMappings = array(
 		'echteDienstverhaeltnisseOhneStundenVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneStundenVertragsbestandteil',
+		'echteDienstverhaeltnisseOhneOeVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneOeVertragsbestandteil',
+		'echteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil' => 'EchteDienstverhaeltnisseOhneKostenstelleVertragsbestandteil',
 		'fehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe' => 'FehlendeDienstverhaeltnisOeFuerStandardkostenstelleOe',
 		'funktionFaelltNichtInVertragsbestandteilZeitraum' => 'FunktionFaelltNichtInVertragsbestandteilZeitraum',
 		'funktionUidUngleichDienstverhaeltnisUid' => 'FunktionUidUngleichDienstverhaeltnisUid',

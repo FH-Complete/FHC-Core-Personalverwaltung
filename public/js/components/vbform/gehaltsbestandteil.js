@@ -4,6 +4,7 @@ import errors from './errors.js';
 import infos from './infos.js';
 
 export default {
+  name: 'Gehaltsbestandteil',
   template: `
   <div class="card card-body border-0 bg-primary my-2 px-0" style="--bs-bg-opacity: .1;">
     <infos :infos="(config?.guioptions?.infos !== undefined) ? config?.guioptions?.infos : []"></infos>
