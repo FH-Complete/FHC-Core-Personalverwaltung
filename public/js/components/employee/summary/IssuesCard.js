@@ -156,7 +156,7 @@ export const IssuesCard = {
                                     if (!('gbs' in issue.behebung_data)) {
                                         issue.behebung_data['gbs'] = {};
                                     }                            
-                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb.data;
+                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb;
                                 })
                                 break;
                         
