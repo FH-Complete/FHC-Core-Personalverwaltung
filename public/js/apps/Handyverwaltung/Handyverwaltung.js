@@ -16,20 +16,22 @@
  */
 
 import pv21apifactory from "../../api/api.js";
-import FhcApi from '../../../../../js/plugin/FhcApi.js';
+import OldFhcApi from '../../../../../js/plugin/OldFhcApi.js';
 
 import {CoreFilterCmpt} from '../../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 
 import CoreVerticalsplitCmpt from '../../../../../js/components/verticalsplit/verticalsplit.js';
 import {EmailTelData} from '../../components/employee/contact/EmailTelData.js';
+
+import BetriebsmittelPersonApi from '../../../../../js/api/factory/betriebsmittel/person.js';
 import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebsmittel.js";
 
 import JobFunction from "../../components/employee/JobFunction.js";
 import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
 import { EmployeeContractInfo } from "../../components/employee/contract/EmployeeContractInfo.js";
 
-import Phrasen from '../../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../../js/plugins/Phrasen.js';
 import * as typeDefinition from '../../helpers/typeDefinition/loader.js';
 
 const handyVerwaltungApp = Vue.createApp({
@@ -37,7 +39,8 @@ const handyVerwaltungApp = Vue.createApp({
 	data: function() {
 		return {
                     personid: null,
-                    personuid: 'keine'
+                    personuid: 'keine',
+					betriebsmittelpersonapi: BetriebsmittelPersonApi
 		};
 	},
 	components: {
@@ -207,7 +210,7 @@ const handyVerwaltungApp = Vue.createApp({
                                                 <div class="h5 mb-0"><h5>{{ $p.t('ui', 'betriebsmittel') }}</h5></div>        
                                             </div>
                                             <div class="card-body">
-                                                <Betriebsmittel :endpoint="$fhcApi.factory.betriebsmittel.person" type-id="person_id" :id="personid" :uid="personuid" />
+                                                <Betriebsmittel :endpoint="betriebsmittelpersonapi" type-id="person_id" :id="personid" :uid="personuid" />
                                             </div>
                                          </div>
                                      </div>
@@ -220,7 +223,8 @@ const handyVerwaltungApp = Vue.createApp({
 });
 
 handyVerwaltungApp.use(primevue.config.default);
-handyVerwaltungApp.use(FhcApi, {factory: pv21apifactory});
-handyVerwaltungApp.use(Phrasen).mount('#main');
+handyVerwaltungApp.use(OldFhcApi, {factory: pv21apifactory});
+handyVerwaltungApp.use(Phrasen);
+handyVerwaltungApp.mount('#main');
 handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 
