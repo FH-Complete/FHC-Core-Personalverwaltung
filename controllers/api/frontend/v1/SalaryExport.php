@@ -218,7 +218,7 @@ class SalaryExport extends Auth_Controller
 				vertragsbestandteil_freitext.freitexttyp_kurzbz,vertragsbestandteil_freitext.titel freitext_titel, vertragsbestandteil_freitext.anmerkung as freitext_anmerkung,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
-				ksttypbezeichnung, kstorgbezeichnung
+				ksttypbezeichnung, kstorgbezeichnung, sap_org.oe_kurzbz_sap as kstnummer
 			FROM
 
 				hr.tbl_dienstverhaeltnis dienstverhaeltnis 
@@ -276,6 +276,8 @@ class SalaryExport extends Auth_Controller
 						'.$vbs_where.'
 						-- ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id AND kst.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
+
+				LEFT JOIN sync.tbl_sap_organisationsstruktur sap_org ON(kst.oe_kurzbz=sap_org.oe_kurzbz)
 				
 			WHERE
 				gehaltstyp.lvexport = true
@@ -349,7 +351,7 @@ class SalaryExport extends Auth_Controller
 					array_agg(freitexttyp_kurzbz) freitexttyp_kurzbz,array_agg(freitext_titel) freitext_titel, array_agg(freitext_anmerkung) as freitext_anmerkung,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden,
-					ksttypbezeichnung, kstorgbezeichnung
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer
 				FROM ($qry_history) as hist
 
 			GROUP BY coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
@@ -359,7 +361,7 @@ class SalaryExport extends Auth_Controller
 					nachname,vorname,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden,
-					ksttypbezeichnung, kstorgbezeichnung
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer
 			HAVING ((dv_bis >= ". $this->_ci->db->escape($von_datestring) .")
 							OR dv_bis IS NULL)
 						AND
