@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiStundensatz from '../../api/factory/stundensatz.js';
 
 export const HourlyRateData = {
 	name: 'HourlyRateData',
@@ -19,7 +20,7 @@ export const HourlyRateData = {
 	},
 	setup (props) {
 
-		const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
 		const { t } = usePhrasen();
 
 		const theModel = Vue.computed({ 
@@ -46,7 +47,7 @@ export const HourlyRateData = {
 
 			try
 			{
-				const response = await fhcApi.factory.Stundensatz.getStundensaetze(theModel.value.personUID);
+				const response = await $api.call(ApiStundensatz.getStundensaetze(theModel.value.personUID));
 				hourlyRatedataList.value = response.retval;
 			}
 			catch (error)
@@ -118,7 +119,7 @@ export const HourlyRateData = {
 			if (ok)
 			{
 				try {
-					const res = await fhcApi.factory.Stundensatz.deleteStundensatz(id);
+					const res = await $api.call(ApiStundensatz.deleteStundensatz(id));
 
 					if (res.error === 0)
 					{
@@ -137,7 +138,7 @@ export const HourlyRateData = {
 			if (validate())
 			{
 				try {
-					const r = await fhcApi.factory.Stundensatz.updateStundensatz(currentValue.value);
+					const r = await $api.call(ApiStundensatz.updateStundensatz(currentValue.value));
 					if (r.error === 0)
 					{
 						hourlyRatedataList.value[r.retval[0].stundensatz_id] = r.retval[0];

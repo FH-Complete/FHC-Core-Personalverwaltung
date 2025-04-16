@@ -2,6 +2,7 @@ import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import ApiPerson from '../../../api/factory/person.js';
 
 export const EmailTelData = {
 	name: 'EmailTelData',
@@ -16,7 +17,7 @@ export const EmailTelData = {
     },  
     setup(props) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const { personID } = Vue.toRefs(props);
 
         const { t } = usePhrasen();
@@ -48,7 +49,7 @@ export const EmailTelData = {
             }
             // submit
             try {
-                const response = await fhcApi.factory.Person.personContactData(personID.value);
+                const response = await $api.call(ApiPerson.personContactData(personID.value));
                 contactList.value = response.retval;
             } catch (error) {
                 console.log(error)              
@@ -109,7 +110,7 @@ export const EmailTelData = {
             if (ok) {
 
                 try {
-                    const res = await fhcApi.factory.Person.deletePersonContactData(id);                    
+                    const res = await $api.call(ApiPerson.deletePersonContactData(id));
                     if (res.error == 0) {
                         delete contactList.value[id];
                         showDeleteToast();
@@ -136,7 +137,7 @@ export const EmailTelData = {
 
                 // submit
                 try {
-                    const r = await fhcApi.factory.Person.upsertPersonContactData(currentContact.value);                    
+                    const r = await $api.call(ApiPerson.upsertPersonContactData(currentContact.value)); 
                     if (r.error == 0) {
                         contactList.value[r.retval[0].kontakt_id] = r.retval[0];
                         console.log('contact successfully saved');

@@ -1,6 +1,7 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiPerson from '../../api/factory/person.js';
 
 
 export const EmployeeData= {
@@ -19,7 +20,7 @@ export const EmployeeData= {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const readonly = Vue.ref(true);
         const { t } = usePhrasen();
 
@@ -47,7 +48,8 @@ export const EmployeeData= {
             }
             isFetching.value = true;
             try {
-              const res = await fhcApi.factory.Person.personEmployeeData(theModel.value.personID || personID.value);                    
+              //const res = await fhcApi.factory.Person.personEmployeeData(theModel.value.personID || personID.value);                    
+              const res = await $api.call(ApiPerson.personEmployeeData(theModel.value.personID || personID.value));
               currentValue.value = res.retval[0];
             } catch (error) {
               console.log(error)              
@@ -152,7 +154,7 @@ export const EmployeeData= {
                     isFetching.value = true;
 
                     try {
-                        fhcApi.factory.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
+                        $api.call(ApiPerson.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz)).then((res) => {
                             if (res.error == 1) {
                                 console.error("error checking kurzbz", res.msg)
                             } else {                                
@@ -190,7 +192,8 @@ export const EmployeeData= {
 
                 // submit
                 try {
-                    const response = await fhcApi.factory.Person.updatePersonEmployeeData(currentValue.value);                    
+                    //const response = await fhcApi.factory.Person.updatePersonEmployeeData(currentValue.value);                    
+                    const response = await $api.call(ApiPerson.updatePersonEmployeeData(currentValue.value));
                     showToast();
                     currentValue.value = response.retval[0];
                     preservedValue.value = currentValue.value;

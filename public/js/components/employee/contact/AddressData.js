@@ -2,6 +2,8 @@ import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import ApiPerson from '../../../api/factory/person.js';
+
 
 export const AddressData = {
 	name: 'AddressData',
@@ -17,6 +19,7 @@ export const AddressData = {
     setup(props) {
 
         const { personID } = Vue.toRefs(props);
+        const $api = Vue.inject('$api');
 
         const { t } = usePhrasen();
 
@@ -55,7 +58,7 @@ export const AddressData = {
             isFetching.value = true
             // submit
             try {
-                const response = await fhcApi.factory.Person.personAddressData(personID.value);                    
+                const response = await $api.call(ApiPerson.personAddressData(personID.value)); 
                 addressList.value = response.retval;
             } catch (error) {
                 console.log(error)              
@@ -117,7 +120,7 @@ export const AddressData = {
             if (ok && !currentAddress.value.heimatadresse) {   
 
                 try {
-                    const res = await fhcApi.factory.Person.deletePersonAddressData(id);                    
+                    const res = await $api.call(ApiPerson.deletePersonAddressData(id));   
                     if (res.error == 0) {
                         delete addressList.value[id];
                         showDeletedToast();
@@ -182,7 +185,7 @@ export const AddressData = {
 
                 // submit
                 try {
-                    const r = await fhcApi.factory.Person.upsertPersonAddressData(currentAddress.value);                    
+                    const r = await $api.call(ApiPerson.upsertPersonAddressData(currentAddress.value))
                     if (r.error == 0) {
                         addressList.value[r.retval[0].adresse_id] = r.retval[0];
                         console.log('address successfully saved');

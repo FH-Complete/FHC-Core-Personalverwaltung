@@ -1,6 +1,7 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiPerson from '../../api/factory/person.js';
 
 export const BaseData = {
 	name: 'BaseData',
@@ -19,7 +20,7 @@ export const BaseData = {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api')
         const readonly = Vue.ref(true);
 
         const { personID } = Vue.toRefs(props);
@@ -59,7 +60,7 @@ export const BaseData = {
             }
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.Person.personBaseData(theModel.value.personID || personID.value);
+              const res = await $api.call(ApiPerson.personBaseData(theModel.value.personID || personID.value));
               currentValue.value = res.retval[0];
             } catch (error) {
               console.log(error)              
@@ -194,9 +195,9 @@ export const BaseData = {
 
                 // submit
                 try {
-                    const response = await fhcApi.factory.Person.updatePersonBaseData(currentValue.value);                    
+                    const res = await $api.call(ApiPerson.updatePersonBaseData(currentValue.value));                  
                     showToast();
-                    currentValue.value = response.retval[0];
+                    currentValue.value = res.retval[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  

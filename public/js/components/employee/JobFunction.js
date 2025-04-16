@@ -3,6 +3,8 @@ import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiFunktion from '../../api/factory/funktion.js';
+import ApiPerson from '../../api/factory/person.js';
 
 export const JobFunction = {
 	name: 'JobFunction',
@@ -24,8 +26,8 @@ export const JobFunction = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
-        const fhcApi = Vue.inject('$fhcApi');
-        const fhcAlert = Vue.inject('$fhcAlert');
+        const $api = Vue.inject('$api');
+        //const fhcAlert = Vue.inject('$fhcAlert');
 
 
         const readonly = Vue.ref(false);
@@ -79,7 +81,7 @@ export const JobFunction = {
  
             // fetch data and map them for easier access
             try {
-                const response = await fhcApi.factory.Funktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value);
+                const response = await $api.call(ApiFunktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value));
                 if(response.error === 1) {
                     let rawList = [];
                     tableData.value = [];
@@ -282,7 +284,7 @@ export const JobFunction = {
             // fetch company
             isFetching.value = true;
             try {
-                const res = await fhcApi.factory.Funktion.getCompanyByOrget(currentValue.value.oe_kurzbz);                    
+                const res = await $api.call(ApiFunktion.getCompanyByOrget(currentValue.value.oe_kurzbz));
                 if (res.error == 0) {
                     unternehmen.value = res.retval[0].oe_kurzbz;
                 } else {
@@ -305,7 +307,7 @@ export const JobFunction = {
             if (ok) {   
 
                 try {
-                    const res = await fhcApi.factory.Person.deletePersonJobFunction(id);                    
+                    const res = await $api.call(ApiPerson.deletePersonJobFunction(id));                
                     if (res.error == 0) {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
@@ -337,7 +339,7 @@ export const JobFunction = {
                     delete payload.funktion_oebezeichnung;
                     delete payload.aktiv;
                     delete payload.funktion_beschreibung;
-                    const r = await fhcApi.factory.Person.upsertPersonJobFunction(payload);                    
+                    const r = await $api.call(ApiPerson.upsertPersonJobFunction(payload));
                     if (r.error == 0) {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
@@ -405,7 +407,7 @@ export const JobFunction = {
             if( unternehmen_kurzbz === '' ) {
                 return;
             }
-            const response = await fhcApi.factory.Funktion.getOrgetsForCompany(unternehmen_kurzbz);
+            const response = await $api.call(ApiFunktion.getOrgetsForCompany(unternehmen_kurzbz));
             const orgets = response.retval;
             orgets.unshift({
               value: '',
@@ -418,7 +420,7 @@ export const JobFunction = {
             if(unternehmen_kurzbz === '' || uid === '' ) { 
               return;  
             }
-            const response = await fhcApi.factory.Funktion.getAllFunctions();
+            const response = await $api.call(ApiFunktion.getAllFunctions());
             const benutzerfunktionen = response.retval;
             benutzerfunktionen.unshift({
               value: '',

@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiPerson from '../../api/factory/person.js';
 
 export const MaterialExpensesData = {
 	name: 'MaterialExpensesData',
@@ -18,7 +19,7 @@ export const MaterialExpensesData = {
     },
     setup( props ) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -56,7 +57,7 @@ export const MaterialExpensesData = {
  
             // submit
             try {
-                const response = await fhcApi.factory.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
+                const response = await $api.call(ApiPerson.personMaterialExpenses(theModel.value.personID, theModel.value.personUID));
                 materialdataList.value = response.retval;
             } catch (error) {
                 console.log(error)              
@@ -147,7 +148,7 @@ export const MaterialExpensesData = {
             if (ok) {   
 
                 try {
-                    const res = await fhcApi.factory.Person.deletePersonMaterialExpenses(id);                    
+                    const res = await $api.call(ApiPerson.deletePersonMaterialExpenses(id));
                     if (res.error == 0) {
                         delete materialdataList.value[id];
                         showDeletedToast();
@@ -174,7 +175,7 @@ export const MaterialExpensesData = {
 					if(currentValue.value.betrag !== null) {
 						currentValue.value.betrag = (String(currentValue.value.betrag)).replace(',', '.');
 					}
-                    const r = await fhcApi.factory.Person.upsertPersonMaterialExpenses(currentValue.value);                    
+                    const r = await $api.call(ApiPerson.upsertPersonMaterialExpenses(currentValue.value));
                     if (r.error == 0) {
                         materialdataList.value[r.retval[0].sachaufwand_id] = r.retval[0];
                         console.log('materialdata successfully saved');

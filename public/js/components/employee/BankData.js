@@ -1,7 +1,9 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';5
+import ApiPerson from '../../api/factory/person.js';
+
 
 export const BankData = {
 	name: 'BankData',
@@ -18,7 +20,7 @@ export const BankData = {
     },
     setup( props ) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const readonly = Vue.ref(false);
         const { personID } = Vue.toRefs(props);
         const { t } = usePhrasen();
@@ -38,7 +40,7 @@ export const BankData = {
             }
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.Person.personBankData(theModel.value.personID || personID.value);                    
+              const res = await $api.call(ApiPerson.personBankData(theModel.value.personID || personID.value));                                    
               bankdataList.value = res.retval;
             } catch (error) {
               console.log(error)              
@@ -122,7 +124,7 @@ export const BankData = {
 
                 isFetching.value = true
                 try {
-                  const res = await fhcApi.factory.Person.deletePersonBankData(id);                    
+                  const res = await $api.call(ApiPerson.deletePersonBankData(id));                 
                   if (res.error == 0) {
                     delete bankdataList.value[id];
                     showDeletedToast();
@@ -148,7 +150,7 @@ export const BankData = {
             } else {
 
                 try {
-                    const r = await fhcApi.factory.Person.upsertPersonBankData(currentValue.value);                    
+                    const r = await $api.call(ApiPerson.upsertPersonBankData(currentValue.value));                              
                     if (r.error == 0) {
                         bankdataList.value[r.retval[0].bankverbindung_id] = r.retval[0];
                         console.log('bankdata successfully saved');
