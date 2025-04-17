@@ -242,6 +242,7 @@ export const SalaryExport = {
             } finally {
                 isFetching.value = false
                 if (salaryTableRef.value.tabulator != null) {
+					salaryTableRef.value.tabulator.setData(salaryExportList.value);
                     salaryTableRef.value.tabulator.dataLoader.clearAlert();
                 }
             }
@@ -294,17 +295,7 @@ export const SalaryExport = {
                 }           
             }
         }
-        
 
-        // Workaround to update tabulator
-        Vue.watch(salaryExportList, (newVal, oldVal) => {
-            console.log('salaryExportList changed');
-            //tabulator.value?.setData(salaryExportList.value);
-            if( salaryTableRef.value?.tabulator !== null ) {
-                salaryTableRef.value.tabulator.setData(salaryExportList.value);
-            }
-        }, {deep: true}) 
-        
         Vue.watch(filterPerson, () => {
             if (filterDate.value == null) return;
             //fetchData();
@@ -353,7 +344,7 @@ export const SalaryExport = {
         { title: 'Freitext', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 },
+        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
         { title: 'WS', field: "wochenstunden", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
         { title: 'Teilzeittyp', field: "teilzeittyp", hozAlign: "left", sorter:"string", headerFilter:true, width:100 },
