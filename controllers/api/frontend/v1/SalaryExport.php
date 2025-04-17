@@ -196,6 +196,11 @@ class SalaryExport extends Auth_Controller
 			return;
 		}
 
+		$sapInstalled = $this->_checkIfSAPSyncTableExists();
+
+		$oe_kurzbz_sap = $sapInstalled ? 'sap_org.oe_kurzbz_sap' : 'NULL';
+		$sap_join = $sapInstalled ? 'LEFT JOIN sync.tbl_sap_organisationsstruktur sap_org ON(kst.oe_kurzbz=sap_org.oe_kurzbz)' : '';
+
         $von_datestring = $date_von->format("Y-m-d");
 		$bis_datestring = $date_bis->format("Y-m-d");
 
@@ -212,13 +217,15 @@ class SalaryExport extends Auth_Controller
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
 				dienstverhaeltnis.dienstverhaeltnis_id, dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
 				gehaltstyp.gehaltstyp_kurzbz, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
+				gehaltstyp.sort as gehaltstyp_sort,
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
 				person.nachname,person.vorname,
 				vertragsbestandteil_freitext.freitexttyp_kurzbz,vertragsbestandteil_freitext.titel freitext_titel, vertragsbestandteil_freitext.anmerkung as freitext_anmerkung,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
-				ksttypbezeichnung, kstorgbezeichnung, sap_org.oe_kurzbz_sap as kstnummer
+				ksttypbezeichnung, kstorgbezeichnung, 
+				' . $oe_kurzbz_sap . ' AS kstnummer
 			FROM
 
 				hr.tbl_dienstverhaeltnis dienstverhaeltnis 
@@ -277,7 +284,7 @@ class SalaryExport extends Auth_Controller
 						-- ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id AND kst.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
 
-				LEFT JOIN sync.tbl_sap_organisationsstruktur sap_org ON(kst.oe_kurzbz=sap_org.oe_kurzbz)
+				' . $sap_join . '
 				
 			WHERE
 				gehaltstyp.lvexport = true
@@ -344,7 +351,7 @@ class SalaryExport extends Auth_Controller
 					lvexport_sum,sum(grundbetr_decrypted) as grundbetr_decrypted, sum(betr_valorisiert_decrypted) as betr_valorisiert_decrypted,
 					sum(hbetrag_decrypted) as hbetrag_decrypted,sum(betrag_valorisiert_historie_decrypted) as betrag_valorisiert_historie_decrypted,
 					dv_von, dv_bis, 
-					array_agg(gehaltstyp_bezeichnung) as gehaltstyp_bezeichnung, 
+					array_agg(gehaltstyp_bezeichnung ORDER BY gehaltstyp_sort ASC) as gehaltstyp_bezeichnung, 
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
 					nachname,vorname,
@@ -433,7 +440,30 @@ class SalaryExport extends Auth_Controller
 		return $fp;
 	}
 
-	
+	/**
+	 * Checks if sap sync table exists.
+	 * slightly adapted duplicate of core Vertragsbestandteil_model->_checkIfSAPSyncTableExists
+	 * @return bool
+	 */
+	private function _checkIfSAPSyncTableExists()
+	{
+		$params = array(
+			DB_NAME,
+			'sync',
+			'tbl_sap_organisationsstruktur'
+		);
 
+		$sql = "SELECT
+				1 AS exists
+			FROM
+				information_schema.tables
+			WHERE
+				table_catalog = ? AND
+				table_schema = ? AND
+				table_name = ?";
 
+		$res = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery($sql, $params);
+
+		return hasData($res);
+	}
 }
