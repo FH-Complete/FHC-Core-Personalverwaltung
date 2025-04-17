@@ -199,23 +199,33 @@ export const SalaryExport = {
               // merge live and history value into one field 
               let value = null;
               let source = '';
+              let freitext_titel = ''
+
+              
               // helper to select the right value and add the index field
               // priority:
-              // 1. use data from history table
-              // 2. use data from valorisierung table
-              // 3. use data from gehaltsbestandteil ("live data")
+              // 1. use data from history table              
+              // 2. use data from valorisierung_historie
+              // 3. use data from gehaltsbestandteil
               const selectValue = (r, index) => {
-                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted !== "") {
+                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted != null && r.hbetrag_decrypted != "") {
                     // history data
                     value = r.hbetrag_decrypted
-                    source = 'h'
-                // TODO data from valorisierung table
-                } else if (r.betr_valorisiert_decrypted !== "") {
+                    source = 'h'    
+                } else if (r.betrag_valorisiert_historie_decrypted != null && r.betrag_valorisiert_historie_decrypted != "") {
                     // live data
-                    value = r.betr_valorisiert_decrypted
+                    value = r.betrag_valorisiert_historie_decrypted
+                    source = 'v'             
+                } else if (r.betr_valorisiert_decrypted	 != null && r.betr_valorisiert_decrypted != "") {
+                    // live data
+                    value = r.betr_valorisiert_decrypted	
                     source = 'l'
                 }
-                return {index, ...r, betrag: value, source}
+                
+                //freitext_titel = removeLeadingComma(r.freitext_titel)
+                freitext_titel = r.freitext_titel.filter(item => item !== null);            
+
+                return {index, ...r, freitext_titel, betrag: value, source}
               }
 
               let list = res.retval.map((row, index) => selectValue(row, index) )
@@ -362,6 +372,7 @@ export const SalaryExport = {
         { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },
         { title: 'SVNr.', field: "svnr", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
         { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
+        { title: 'Kst. Nr.', field: "kstnummer", hozAlign: "left", sorter:"number", headerFilter:true, width:100 }, 
         { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 }, 
       ];
 
@@ -374,7 +385,7 @@ export const SalaryExport = {
          // index: 'index', 
           layout: 'fitColumns',
           columns: salaryTableColumnsDef,
-          rowFormatter: rowFormatter,
+        //  rowFormatter: rowFormatter,
           groupBy: "personalnummer",
           groupHeader:function(value, count, data, group) { return data[0].personalnummer + " " + data[0].name_gesamt + " (" + data[0].svnr + ") " },
           initialSort:[
