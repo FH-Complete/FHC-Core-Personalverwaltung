@@ -360,7 +360,7 @@ class SalaryExport extends Auth_Controller
 					nachname,vorname,
 					array_agg(freitexttyp_kurzbz) freitexttyp_kurzbz,array_agg(freitext_titel) freitext_titel, array_agg(freitext_anmerkung) as freitext_anmerkung,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
-					stunden_von, stunden_bis, wochenstunden,
+					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer
 				FROM ($qry_history) as hist
 
@@ -371,7 +371,7 @@ class SalaryExport extends Auth_Controller
 					personalnummer,name_gesamt,svnr,
 					nachname,vorname,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
-					stunden_von, stunden_bis, wochenstunden,
+					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer
 			HAVING ((dv_bis >= ". $this->_ci->db->escape($von_datestring) .")
 							OR dv_bis IS NULL)
