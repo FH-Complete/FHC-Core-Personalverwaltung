@@ -166,6 +166,9 @@ export const SalaryExport = {
             return value != null ? value.toString().replace('.', ',') : '';
         }
 
+		const arr2string = function(value, data, type, params, column){
+            return value.join(', ');
+        }
 
         const fetchAbrechnungExists = async () => {
             try {
@@ -336,18 +339,19 @@ export const SalaryExport = {
 
       const salaryTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
-        { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
-        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+		{ title: 'DVID', field: "dienstverhaeltnis_id", hozAlign: "left", sorter:"number", headerFilter: true, width:150, visible:false, download:true }, 
+        { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:false, download:true, accessorDownload: arr2string }, 
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Index', field: "index", visible:false, download:false, hozAlign: "left", sorter:"string", headerFilter:true, width:100  },        
-        { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
-        { title: 'Freitext', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
+        { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
+        { title: 'Freitext', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
+        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
         { title: 'WS', field: "wochenstunden", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
-        { title: 'Teilzeittyp', field: "teilzeittyp", hozAlign: "left", sorter:"string", headerFilter:true, width:100 },
+        { title: 'Teilzeittyp', field: "teilzeittyp", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 },
         { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Grundbetrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
@@ -360,11 +364,11 @@ export const SalaryExport = {
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true },  */
         { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },
+        { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, visible:true, download:true },
         { title: 'SVNr.', field: "svnr", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
-        { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
+        { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
         { title: 'Kst. Nr.', field: "kstnummer", hozAlign: "left", sorter:"number", headerFilter:true, width:100 }, 
-        { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 }, 
+        { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
       ];
 
       // Options
@@ -373,8 +377,10 @@ export const SalaryExport = {
           height: "700px",
           reactiveData: true,
           data: salaryExportList.value,
-         // index: 'index', 
+		  index: 'gehaltsbestandteil_id',
+		  persistenceID: 'pv21_gehaltsliste_2025042301',
           layout: 'fitColumns',
+		  footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
           columns: salaryTableColumnsDef,
         //  rowFormatter: rowFormatter,
           groupBy: "personalnummer",
@@ -395,7 +401,21 @@ export const SalaryExport = {
                 //fetchData();
 				fetchAbrechnungExists();
             }
-        }
+        },
+		{
+			event: "dataFiltered",
+			handler: function(filters, rows) {
+				var el = document.getElementById("search_count");
+				el.innerHTML = rows.length;
+			}
+		},
+		{
+			event: "dataLoaded",
+			handler: function(data) {
+				var el = document.getElementById("total_count");
+				el.innerHTML = data.length;
+			}
+		}
       ]);
 
       const downloadconfig = {

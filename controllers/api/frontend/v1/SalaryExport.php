@@ -347,7 +347,8 @@ class SalaryExport extends Auth_Controller
 
 		$qry_grouped =  "
 			SELECT
-					
+					dienstverhaeltnis_id,
+					array_agg(gehaltsbestandteil_id ORDER BY gehaltstyp_sort ASC) as gehaltsbestandteil_id, 
 					lvexport_sum,sum(grundbetr_decrypted) as grundbetr_decrypted, sum(betr_valorisiert_decrypted) as betr_valorisiert_decrypted,
 					sum(hbetrag_decrypted) as hbetrag_decrypted,sum(betrag_valorisiert_historie_decrypted) as betrag_valorisiert_historie_decrypted,
 					dv_von, dv_bis, 
@@ -361,7 +362,8 @@ class SalaryExport extends Auth_Controller
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer
 				FROM ($qry_history) as hist
 
-			GROUP BY coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+			GROUP BY dienstverhaeltnis_id,
+					coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
                     dv_von, dv_bis,
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
