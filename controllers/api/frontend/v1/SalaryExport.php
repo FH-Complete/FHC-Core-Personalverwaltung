@@ -223,6 +223,7 @@ class SalaryExport extends Auth_Controller
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
 				person.nachname,person.vorname,
 				vertragsbestandteil_freitext.freitexttyp_kurzbz,vertragsbestandteil_freitext.titel freitext_titel, vertragsbestandteil_freitext.anmerkung as freitext_anmerkung,
+				vertragsbestandteil_freitext.freitexttyp_bezeichnung,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
 				ksttypbezeichnung, kstorgbezeichnung, 
@@ -238,9 +239,11 @@ class SalaryExport extends Auth_Controller
 				JOIN public.tbl_person person on (benutzer.person_id = person.person_id)
 				LEFT JOIN (
 					SELECT
-						dienstverhaeltnis_id,vertragsbestandteil_id,freitexttyp_kurzbz, freitext.titel, freitext.anmerkung
+						dienstverhaeltnis_id,vertragsbestandteil_id,freitexttyp_kurzbz, freitext.titel, freitext.anmerkung, 
+						freitexttyp.bezeichnung as freitexttyp_bezeichnung
 					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
 					JOIN hr.tbl_vertragsbestandteil_freitext freitext using(vertragsbestandteil_id)
+					JOIN hr.tbl_vertragsbestandteil_freitexttyp freitexttyp using(freitexttyp_kurzbz)
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'freitext\'
 						'.$vbs_where.'	
@@ -358,7 +361,10 @@ class SalaryExport extends Auth_Controller
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
 					nachname,vorname,
-					array_agg(freitexttyp_kurzbz) freitexttyp_kurzbz,array_agg(freitext_titel) freitext_titel, array_agg(freitext_anmerkung) as freitext_anmerkung,
+					array_remove(array_agg(freitexttyp_kurzbz), NULL) freitexttyp_kurzbz,
+					array_remove(array_agg(freitext_titel), NULL) freitext_titel, 
+					array_remove(array_agg(freitext_anmerkung), NULL) as freitext_anmerkung,
+					array_remove(array_agg(freitexttyp_bezeichnung), NULL) as freitexttyp_bezeichnung,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer

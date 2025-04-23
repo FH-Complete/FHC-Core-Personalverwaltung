@@ -202,8 +202,6 @@ export const SalaryExport = {
               // merge live and history value into one field 
               let value = null;
               let source = '';
-              let freitext_titel = ''
-
               
               // helper to select the right value and add the index field
               // priority:
@@ -224,11 +222,8 @@ export const SalaryExport = {
                     value = r.betr_valorisiert_decrypted	
                     source = 'l'
                 }
-                
-                //freitext_titel = removeLeadingComma(r.freitext_titel)
-                freitext_titel = r.freitext_titel.filter(item => item !== null);            
 
-                return {index, ...r, freitext_titel, betrag: value, source}
+				return {index, ...r, betrag: value, source}
               }
 
               let list = res.retval.map((row, index) => selectValue(row, index) )
@@ -345,7 +340,8 @@ export const SalaryExport = {
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Index', field: "index", visible:false, download:false, hozAlign: "left", sorter:"string", headerFilter:true, width:100  },        
         { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
-        { title: 'Freitext', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
+        { title: 'Freitexttyp', field: "freitexttyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
+        { title: 'Freitext-Titel', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
@@ -379,7 +375,7 @@ export const SalaryExport = {
           reactiveData: true,
           data: salaryExportList.value,
 		  index: 'gehaltsbestandteil_id',
-		  persistenceID: 'pv21_gehaltsliste_2025042304',
+		  persistenceID: 'pv21_gehaltsliste_2025042305',
           layout: 'fitColumns',
 		  footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 		  movableColumns: false,
