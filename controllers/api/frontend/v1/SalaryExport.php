@@ -213,7 +213,8 @@ class SalaryExport extends Auth_Controller
 		$qry_live = '
 			SELECT
 				lvexport_sum,
-				gehaltsbestandteil.gehaltsbestandteil_id,gehaltsbestandteil.von, gehaltsbestandteil.bis, 
+				gehaltsbestandteil.gehaltsbestandteil_id, gehaltsbestandteil.auszahlungen, 
+				gehaltsbestandteil.von, gehaltsbestandteil.bis, 
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
 				dienstverhaeltnis.dienstverhaeltnis_id, dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
 				gehaltstyp.gehaltstyp_kurzbz, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
@@ -349,6 +350,7 @@ class SalaryExport extends Auth_Controller
 			SELECT
 					dienstverhaeltnis_id,
 					array_agg(gehaltsbestandteil_id ORDER BY gehaltstyp_sort ASC) as gehaltsbestandteil_id, 
+					array_agg(DISTINCT auszahlungen) as gehaltsbestandteil_auszahlungen, 
 					lvexport_sum,sum(grundbetr_decrypted) as grundbetr_decrypted, sum(betr_valorisiert_decrypted) as betr_valorisiert_decrypted,
 					sum(hbetrag_decrypted) as hbetrag_decrypted,sum(betrag_valorisiert_historie_decrypted) as betrag_valorisiert_historie_decrypted,
 					dv_von, dv_bis, 
