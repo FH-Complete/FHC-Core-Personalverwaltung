@@ -1,6 +1,7 @@
 import { Toast } from "../Toast.js";
 import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
+import ApiDeadline from '../../api/factory/deadline.js';
 
 export const DeadlineIssueTable = {
   name: 'DeadlineIssueTable',
@@ -22,7 +23,8 @@ export const DeadlineIssueTable = {
 
       const current_status_kurzbz = Vue.ref("");
 
-      const fhcApi = Vue.inject('$fhcApi') 
+      // const fhcApi = Vue.inject('$fhcApi') 
+      const $api = Vue.inject('$api');
 
       const dateFormatter = (cell) => {
         return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
@@ -42,7 +44,7 @@ export const DeadlineIssueTable = {
             tabulator.value.dataLoader.alertLoader();
           }
           isFetching.value = true;
-          const res = await fhcApi.factory.Deadline.all();
+          const res = await $api.call(ApiDeadline.all()); 
           fristen.value = res;
           isFetching.value = false;
         } catch (error) {const columnsDef = [
@@ -83,7 +85,7 @@ export const DeadlineIssueTable = {
       const fetchFristStatus = async () => {
         try {
             isFetching.value = true;
-            const res = await fhcApi.factory.Deadline.getFristenStatus();
+            const res = await $api.call(ApiDeadline.getFristenStatus()); 
             fristStatus.value = res.retval;
             isFetching.value = false;
         } catch (error) {
@@ -95,7 +97,7 @@ export const DeadlineIssueTable = {
       const updateDeadlines = async () => {
         try {
           isFetching.value = true;
-          const res = await fhcApi.factory.Deadline.updateFristenListe();
+          const res = await $api.call(ApiDeadline.updateFristenListe()); 
           isFetching.value = false;
           fetchList();
           showRefreshToast();
@@ -216,7 +218,7 @@ export const DeadlineIssueTable = {
           console.log('fristen', fristen)
           try  {
             isFetching.value = true
-            const res = await fhcApi.factory.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);
+            const res = await $api.call(ApiDeadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value)); 
             fetchList();
             showToast();
           } catch (error) {

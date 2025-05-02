@@ -5,6 +5,7 @@ import { DeadlineIssueDialog } from './DeadlineIssueDialog.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../../js/components/filter/Filter.js";
+import ApiDeadline from '../../../api/factory/deadline.js';
 
 
 export const DeadlineIssueTable = {    
@@ -33,8 +34,9 @@ export const DeadlineIssueTable = {
       const dialogRef = ref();
       const confirmDeleteRef = ref();
       const modalContainer = ref();
-      const fhcApi = inject('$fhcApi');
+      //const fhcApi = inject('$fhcApi');
       const fhcAlert = inject('$fhcAlert');
+      const $api = Vue.inject('$api');
 
       const redirect = (issue_id) => {
         console.log('issue_id', person_id);
@@ -51,10 +53,13 @@ export const DeadlineIssueTable = {
             fristenTable.value.tabulator.dataLoader.alertLoader();
           }
           isFristFetching.value = true;
-          fhcApi.factory.Deadline.allByPerson(currentUID.value, deadline_filter_all.value)
+/*           fhcApi.factory.Deadline.allByPerson(currentUID.value, deadline_filter_all.value)
             .then(result => {
               fristen.value = result.error !== 1 ? result.retval : [];	
-            }).catch(fhcAlert.handleSystemError);  
+            }).catch(fhcAlert.handleSystemError);   */
+          $api.call(ApiDeadline.allByPerson(currentUID.value, deadline_filter_all.value)).then(result => {
+            fristen.value = result.error !== 1 ? result.retval : [];	
+          }).catch(fhcAlert.handleSystemError);
           			  
         } catch (error) {
           console.log(error);         
@@ -69,12 +74,17 @@ export const DeadlineIssueTable = {
       const fetchFristStatus = async () => {
         try {
             isFetching.value = true;
-            fhcApi
+            /* fhcApi
 			        .factory.Deadline.getFristenStatus()
 			        .then(result => {
                 fristStatus.value = result.error !== 1 ? result.retval : [];				        	
 			        })
-			        .catch(fhcAlert.handleSystemError);              
+			        .catch(fhcAlert.handleSystemError);  */
+            
+            $api.call(ApiDeadline.getFristenStatus()).then(result => {
+              fristStatus.value = result.error !== 1 ? result.retval : [];			
+            }).catch(fhcAlert.handleSystemError);
+              
         } catch (error) {
             console.log(error);               
         }	finally {
@@ -96,7 +106,7 @@ export const DeadlineIssueTable = {
       const fetchFristEreignisse = async () => {
         try {
             isFetching.value = true;
-            const res = await fhcApi.factory.Deadline.getFristenEreignisse();
+            const res = await $api.call(ApiDeadline.getFristenEreignisse()); 
             fristEreignisse.value = res.retval;			  
             isFetching.value = false;                        
         } catch (error) {
@@ -124,7 +134,8 @@ export const DeadlineIssueTable = {
       const updateDeadlines = async () => {
         try {
           isFetching.value = true;
-          const res = await fhcApi.factory.Deadline.updateFristenListe();
+          //const res = await fhcApi.factory.Deadline.updateFristenListe();
+          const res = await $api.call(ApiDeadline.updateFristenListe()); 
           isFetching.value = false;              
           fetchList();		  
         } catch (error) {
@@ -140,7 +151,8 @@ export const DeadlineIssueTable = {
         if (ok) {   
 
             try {
-                const res = await fhcApi.factory.Deadline.deleteFrist(id);                    
+                //const res = await fhcApi.factory.Deadline.deleteFrist(id);   
+                const res = await $api.call(ApiDeadline.deleteFrist(id));                  
                 if (res.error == 0) {
                     fristen.value = fristen.value.filter((frist) => frist.frist_id != id);
                     showDeletedToast();
@@ -176,7 +188,8 @@ export const DeadlineIssueTable = {
         const frist = fristen.value.filter((frist) => frist.frist_id == frist_id)[0];
         try  {
           isFetching.value = true
-          const res = await fhcApi.factory.Deadline.updateFristStatus(frist_id, frist.status_kurzbz);    
+          const res = await $api.call(ApiDeadline.updateFristStatus(frist_id, frist.status_kurzbz));   
+          //const res = await fhcApi.factory.Deadline.updateFristStatus(frist_id, frist.status_kurzbz);    
           showToast();     
         } catch (error) {
             console.log(error);                
@@ -202,7 +215,7 @@ export const DeadlineIssueTable = {
           console.log('addDeadline', fristPayload)
           try  {
             isFetching.value = true
-            const res = await fhcApi.factory.Deadline.upsertFrist(fristPayload);    
+            const res = await $api.call(ApiDeadline.upsertFrist(fristPayload));    
             showCreateToast();     
             fetchList();
           } catch (error) {
@@ -228,7 +241,7 @@ export const DeadlineIssueTable = {
           console.log('editDeadline', fristPayload)
           try  {
             isFetching.value = true
-            const res = await fhcApi.factory.Deadline.upsertFrist(fristPayload);    
+            const res = await $api.call(ApiDeadline.upsertFrist(fristPayload));    
             showCreateToast();     
             fetchList();
           } catch (error) {
@@ -259,7 +272,8 @@ export const DeadlineIssueTable = {
         console.log('onTableCellEdited', cell.getValue(), cell.getRow().getIndex())
         try  {
           isFetching.value = true
-          const res = await fhcApi.factory.Deadline.updateFristStatus(cell.getRow().getIndex(), cell.getValue());    
+          // const res = await fhcApi.factory.Deadline.updateFristStatus(cell.getRow().getIndex(), cell.getValue());    
+          const res = await $api.call(ApiDeadline.updateFristStatus(cell.getRow().getIndex(), cell.getValue()));    
           showToast();     
         } catch (error) {
             console.log(error);                
@@ -312,7 +326,8 @@ export const DeadlineIssueTable = {
         console.log('fristen', fristen) 
         try  {
           isFetching.value = true
-          const res = await fhcApi.factory.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);    
+          // const res = await fhcApi.factory.Deadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value);
+          const res = await $api.call(ApiDeadline.batchUpdateFristStatus(fristen, current_status_kurzbz.value));        
           fetchList();
           showToast();     
         } catch (error) {

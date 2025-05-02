@@ -5,6 +5,7 @@ import { progressbar } from '../Progressbar.js';
 import { BetragDialog } from './BetragDialog.js';
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
 import { Toast } from '../Toast.js';
+import ApiSalaryRange from '../../api/factory/salaryrange.js';
 
 
 export const SalaryRange = {
@@ -41,7 +42,8 @@ export const SalaryRange = {
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const fhcAlert = inject('$fhcAlert');
 
         const startOfYear = () => {
             const cleanDate = new Date(currentDate.value);
@@ -144,7 +146,7 @@ export const SalaryRange = {
             
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.SalaryRange.getAll(filterDate.value);
+              const res = await $api.call(ApiSalaryRange.getAll(filterDate.value));  
               if (res.error !==1) {
                 salaryRangeList.value = res.retval;
               } else {
@@ -163,7 +165,7 @@ export const SalaryRange = {
                 console.log("dialogRes=", dialogRes);
                 
                 try {
-                    const res = await fhcApi.factory.SalaryRange.upsertSalaryRange(dialogRes.payload);  
+                    const res = await $api.call(ApiSalaryRange.upsertSalaryRange(dialogRes.payload)); 
                     if (res.error !==1) {
                         fetchData();
                         createToastRef.value.show();
@@ -189,7 +191,7 @@ export const SalaryRange = {
                 console.log("dialogRes=", dialogRes);
                 
                 try {
-                    const res = await fhcApi.factory.SalaryRange.upsertSalaryRange(dialogRes.payload);       
+                    const res = await $api.call(ApiSalaryRange.upsertSalaryRange(dialogRes.payload));      
                     if (res.error !==1) {
                         fetchData();
                         updateToastRef.value.show();
@@ -361,7 +363,7 @@ export const SalaryRange = {
             if (ok) {   
     
                 try {
-                    const res = await fhcApi.factory.SalaryRange.deleteSalaryRange(id);             
+                    const res = await $api.call(ApiSalaryRange.deleteSalaryRange(id));             
                     if (res.error == 0) {
                         salaryRangeList.value = salaryRangeList.value.filter((item) => item.gehaltsband_betrag_id != id);
                         deleteToastRef.value.show();

@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiSalaryRange from '../../api/factory/salaryrange.js';
 
 export const BetragDialog = {
 	name: 'BetragDialog',
@@ -20,7 +21,8 @@ export const BetragDialog = {
         const salaryRangeList = ref([])        
         const isFetching = ref(false)
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const fhcAlert = inject('$fhcAlert');
 
         // Modal 
         let modalRef = ref()
@@ -67,7 +69,7 @@ export const BetragDialog = {
         const fetchSalaryRangeList = async () => {
             try {
                 isFetching.value = true;
-                const res = await fhcApi.factory.SalaryRange.getSalaryRangeList();  
+                const res = await $api.call(ApiSalaryRange.getSalaryRangeList());  
                 salaryRangeList.value = res.error !== 1 ? res.retval : [] 
                 isFetching.value = false;                        
             } catch (error) {

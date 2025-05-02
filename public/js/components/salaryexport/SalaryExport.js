@@ -7,7 +7,7 @@ import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
 import {formatter} from '../bulk/valorisationformathelper.js';
 import { Toast } from '../Toast.js';
-
+import ApiSalaryExport from '../../api/factory/salaryexport.js';
 
 export const SalaryExport = {
 	name: 'SalaryExport',
@@ -44,7 +44,8 @@ export const SalaryExport = {
 
         const abrechnungExists = ref(true);
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const fhcAlert = inject('$fhcAlert');
 
 
         const startOfYear = () => {
@@ -119,7 +120,7 @@ export const SalaryExport = {
         const exportSalarylist = async () => {
             isFetching.value = true
             try {
-              const response = await fhcApi.factory.SalaryExport.getAll(filterPerson.value, getFilterInterval(), true);        
+              const response = await $api.call(ApiSalaryExport.getAll(filterPerson.value, getFilterInterval(), true));     
               
              /*  // create file link in browser's memory
               const href = URL.createObjectURL(response.data);
@@ -170,7 +171,7 @@ export const SalaryExport = {
         const fetchAbrechnungExists = async () => {
             try {
                 let i = getFilterInterval();
-                const res = await fhcApi.factory.SalaryExport.abrechnungExists(i[0], currentOrgID.value);  
+                const res = await $api.call(ApiSalaryExport.abrechnungExists(i[0], currentOrgID.value));  
                 if (res.error !== 0) {                    
                     abrechnungExists.value = false;
                   } else {
@@ -195,7 +196,7 @@ export const SalaryExport = {
                 salaryTableRef.value.tabulator.dataLoader.alertLoader();
               }
               
-              const res = await fhcApi.factory.SalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false); 
+              const res = await $api.call(ApiSalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false)); 
               // merge live and history value into one field 
               let value = null;
               let source = '';
@@ -244,7 +245,7 @@ export const SalaryExport = {
                     salaryTableRef.value.tabulator.dataLoader.alertLoader();
                 }
                let i = getFilterInterval();
-               const res = await fhcApi.factory.SalaryExport.runAbrechnungJob(i[0]);      
+               const res = await $api.call(ApiSalaryExport.runAbrechnungJob(i[0]));  
 //               if (listType.value != 'history') {
 //                 listType.value = 'history';                          
 //               } else {
@@ -268,7 +269,7 @@ export const SalaryExport = {
                     salaryTableRef.value.tabulator.dataLoader.alertLoader();
                 }
                let i = getFilterInterval();
-               const res = await fhcApi.factory.SalaryExport.deleteAbrechnung(i[0], currentOrgID.value);      
+               const res = await $api.call(ApiSalaryExport.deleteAbrechnung(i[0], currentOrgID.value));   
 //               if (listType.value != 'history') {
 //                 listType.value = 'history';                          
 //               } else {
