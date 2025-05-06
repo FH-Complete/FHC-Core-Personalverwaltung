@@ -40,5 +40,18 @@ export default {
         url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getCovidState',
         params: { person_id: person_id, d: date},
       };
+    },
+    getAllCourseHours(uid) {
+      return {
+        method: 'get',
+        url: `extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllCourseHours?uid=${uid}`,
+      };
+    },
+    getAllSupportHours(uid) {
+      return {
+        method: 'get',
+        url: `extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllSupportHours?uid=${uid}`,
+      };
     }
+
 }    

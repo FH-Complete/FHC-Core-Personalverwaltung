@@ -1,3 +1,5 @@
+import ApiEmployee from '../../../api/factory/employee.js';
+
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -14,7 +16,7 @@ export const SearchExistingDialog = {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         
         const currentValue = Vue.reactive({
             surname: "",
@@ -45,9 +47,8 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true;
-                const res = await fhcApi.factory.Employee.filterPerson(currentValue);                
+                const res = await $api.call(ApiEmployee.filterPerson(currentValue));        
                 isFetching.value = false;              
-			    console.log(res);	  
 			    personList.value = res.retval;
 
             } catch (error) {
@@ -70,7 +71,7 @@ export const SearchExistingDialog = {
 
             try {
                 isFetching.value = true
-                const res = await fhcApi.factory.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await $api.call(ApiEmployee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}})); 
                 isFetching.value = false;    
 
                 if (!res.error) {            

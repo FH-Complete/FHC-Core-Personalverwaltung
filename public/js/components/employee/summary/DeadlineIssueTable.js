@@ -34,7 +34,6 @@ export const DeadlineIssueTable = {
       const dialogRef = ref();
       const confirmDeleteRef = ref();
       const modalContainer = ref();
-      //const fhcApi = inject('$fhcApi');
       const fhcAlert = inject('$fhcAlert');
       const $api = Vue.inject('$api');
 
@@ -53,10 +52,6 @@ export const DeadlineIssueTable = {
             fristenTable.value.tabulator.dataLoader.alertLoader();
           }
           isFristFetching.value = true;
-/*           fhcApi.factory.Deadline.allByPerson(currentUID.value, deadline_filter_all.value)
-            .then(result => {
-              fristen.value = result.error !== 1 ? result.retval : [];	
-            }).catch(fhcAlert.handleSystemError);   */
           $api.call(ApiDeadline.allByPerson(currentUID.value, deadline_filter_all.value)).then(result => {
             fristen.value = result.error !== 1 ? result.retval : [];	
           }).catch(fhcAlert.handleSystemError);

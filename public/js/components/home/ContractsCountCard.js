@@ -1,4 +1,7 @@
-const ContractCountCard = {
+import ApiCommon from '../../api/factory/common.js';
+import ApiDV from '../../api/factory/dv.js';
+
+export const ContractCountCard = {
 	name: 'ContractCountCard',
      components: {
         "p-overlaypanel": primevue.overlaypanel,
@@ -12,7 +15,7 @@ const ContractCountCard = {
         showNew: Boolean
      },
      setup( props ) {
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const contractDataNew = Vue.ref();
         const currentDate = Vue.ref(new Date());
         const currentMonth = Vue.ref(currentDate.value.getMonth()+1);
@@ -38,7 +41,7 @@ const ContractCountCard = {
         ];
 
         const vertragsarten = Vue.ref([]);
-        fhcApi.factory.DV.getVertragsarten().then((resp) => {
+        $api.call(ApiDV.getVertragsarten()).then((resp) => {
             let varts = [];
             let defaultfilter = ['Echter DV', 'Studentische Hilfskraft'];
             for( let vart of resp.retval) {
@@ -87,9 +90,9 @@ const ContractCountCard = {
                 isFetching.value = true;
                 if (!props.showNew) {
                     title.value = "Dienstaustritte";
-                    response = await fhcApi.factory.Common.getContractExpire(year, month);
+                    response = await $api.call(ApiCommon.getContractExpire(year, month));
                 } else {
-                    response = await fhcApi.factory.Common.getContractNew(year, month);
+                    response = await $api.call(ApiCommon.getContractNew(year, month));
                 }
                 contractDataNew.value = response.retval.map((row) => {
                     row.von = (row.von === null) ? null : new Date(row.von);

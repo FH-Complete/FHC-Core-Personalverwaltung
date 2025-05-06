@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiEmployee from '../../../api/factory/employee.js';
 
 export const DvCard = {
 	name: 'DvCard',
@@ -14,7 +14,7 @@ export const DvCard = {
         const isFetching = ref(false);
         const title = ref("Dienstverhältnis");
         const currentUID = toRefs(props).uid;   
-        const fhcApi = inject('$fhcApi')       
+        const $api = Vue.inject('$api');
 
         const formatDate = (ds) => {
             if (ds == null) return '';
@@ -34,7 +34,7 @@ export const DvCard = {
 			try {
               let ts = convert2UnixTS(currentDate.value);  // unix timestamp
               isFetching.value = true;
-              const response = await fhcApi.factory.Employee.getCurrentDV(currentUID.value, ts);
+              const response = await $api.call(ApiEmployee.getCurrentDV(currentUID.value, ts));
               isFetching.value = false;              
 			  console.log(response.retval);	  
               if (response.retval.length>0) {

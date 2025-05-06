@@ -2,6 +2,7 @@
 import FhcApi from '../../../../js/plugin/FhcApi.js';
 import pv21apifactory from "../api/api.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
+import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import {searchbaroptions} from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
@@ -16,13 +17,14 @@ const pvApp = Vue.createApp(	{
         OrgViewer,
 		CoreNavigationCmpt,
 	},
+	inject: ['$api', '$fhcAlert'],
 	data() {
 		return 	{
 			isEditorOpen: false,
 			currentPersonID: null,	
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
-			searchfunction: this.$fhcApi.factory.search.search,
+			searchfunction: (params) => this.$api.call(ApiSearchbar.search(params)),
 			appSideMenuEntries: {},
 			isCollapsed: true
 		}

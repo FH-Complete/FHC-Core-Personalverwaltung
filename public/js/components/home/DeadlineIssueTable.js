@@ -23,7 +23,6 @@ export const DeadlineIssueTable = {
 
       const current_status_kurzbz = Vue.ref("");
 
-      // const fhcApi = Vue.inject('$fhcApi') 
       const $api = Vue.inject('$api');
 
       const dateFormatter = (cell) => {

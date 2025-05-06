@@ -1,3 +1,6 @@
+import ApiVertragsbestandteil from '../../api/factory/vertragsbestandteil.js';
+import ApiEmployee from '../../api/factory/employee.js';
+
 export const EmployeeStatus = {
 	name: 'EmployeeStatus',
     props: {
@@ -21,7 +24,7 @@ export const EmployeeStatus = {
         const vertragsarten = inject('vertragsarten');
         const karenztypen = inject('karenztypen');
         const teilzeittypen = inject('teilzeittypen');
-        const fhcApi = inject('$fhcApi')   
+        const $api = inject('$api')   
         
         const formatVertragsart = (item) => {
           let va = vertragsarten.value.find(kt => kt.value == item);
@@ -64,7 +67,7 @@ export const EmployeeStatus = {
             statusList.value.unshift({text: 'derzeit kein aktives DV', description:'', css: 'bg-dv rounded-0'});
           }
           console.log("dvIDs", dvIDs)
-          Promise.all(dvIDs.map((dvID) => fhcApi.factory.Vertragsbestandteil.getCurrentVBs(dvID))).then(
+          Promise.all(dvIDs.map((dvID) => $api.call(ApiVertragsbestandteil.getCurrentVBs(dvID)))).then(
             (allData) => {
               allData.map((item) => {
                 item.data.map((vbs => {
@@ -104,7 +107,7 @@ export const EmployeeStatus = {
           }
           isFetching.value = true
           try {
-            const res = await fhcApi.factory.Employee.dvByPerson(uid);
+              const res = await $api.call(ApiEmployee.dvByPerson(uid));
               dvList.value = res.retval;          
               isFetching.value = false;
               generateStatusList();           

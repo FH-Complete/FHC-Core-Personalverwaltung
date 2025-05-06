@@ -3,6 +3,7 @@ import { ModalDialog } from '../../ModalDialog.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import ApiPerson from '../../../api/factory/person.js';
+import ApiCommon from '../../../api/factory/common.js';
 
 
 export const AddressData = {
@@ -35,7 +36,6 @@ export const AddressData = {
 
         const confirmDeleteRef = Vue.ref();
 
-        const fhcApi = Vue.inject('$fhcApi');
         const nations = Vue.inject('nations');
         const adressentyp = Vue.inject('adressentyp');
 
@@ -73,7 +73,7 @@ export const AddressData = {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 try  {
                     isFetching.value = true
-                    const response = await fhcApi.factory.Common.getGemeinden(currentAddress.value.plz);     
+                    const response = await $api.call(ApiCommon.getGemeinden(currentAddress.value.plz));     
                     gemeinden.value = response.retval;
                 } catch (error) {
                     console.log(error)                    
@@ -87,7 +87,7 @@ export const AddressData = {
             if (currentAddress?.value?.nation == 'A' && currentAddress.value.plz != '') {
                 try  {
                     isFetching.value = true
-                    const response = await fhcApi.factory.Common.getOrtschaften(currentAddress.value.plz);     
+                    const response = await $api.call(ApiCommon.getOrtschaften(currentAddress.value.plz));     
                     ortschaften.value = response.retval;
                 } catch (error) {
                     console.log(error)                    

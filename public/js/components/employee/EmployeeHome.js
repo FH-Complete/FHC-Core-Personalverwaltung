@@ -3,6 +3,7 @@ import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Naviga
 
 import verticalsplit from "../../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
+import ApiSearchbar from  '../../../../../js/api/factory/searchbar.js';
 import {searchbaroptions} from "../../apps/common.js";
 import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
@@ -37,7 +38,7 @@ export default {
 		const toastEmployeeCreatedRef = ref();
 		const toastEmployeeCreateFailedRef = ref();
 		const currentDate = ref(null);
-		const $fhcApi = inject("$fhcApi");
+		const $api = inject("$api");
 
 		watch(
 			() => route.params,
@@ -192,7 +193,7 @@ export default {
                     }
                 };
 				
-				const searchfunction = $fhcApi.factory.search.search;
+				const searchfunction = (params) => $api.call(ApiSearchbar.search(params));
 
 		return {
 			personSelectedHandler,

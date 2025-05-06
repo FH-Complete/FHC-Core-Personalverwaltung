@@ -1,4 +1,7 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiIssue from '../../../api/factory/issue.js';
+import ApiVertragsbestandteil from '../../../api/factory/vertragsbestandteil.js';
+import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
+import ApiDV from '../../../api/factory/dv.js';
 
 export const IssuesCard = {
 	name: 'IssuesCard',
@@ -20,7 +23,7 @@ export const IssuesCard = {
         const vertragsbestandteiltypen = inject('vertragsbestandteiltypen');
         const gehaltstypen = inject('gehaltstypen');
         const vertragsarten = inject('vertragsarten');
-        const fhcApi = inject('$fhcApi')  
+        const $api = inject('$api');  
         
         const formatVertragsbestandteiltyp = (item) => {
           let va = vertragsbestandteiltypen.value.find(kt => kt.value == item);
@@ -50,7 +53,7 @@ export const IssuesCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await fhcApi.factory.Issue.byPerson(currentPersonID.value);
+              const response = await $api.call(ApiIssue.byPerson(currentPersonID.value));
               isFetching.value = false;              
 			  console.log(response.retval);	  
               if (response.retval.length>0) {
@@ -74,7 +77,7 @@ export const IssuesCard = {
 
         const getVB = async (vbid) =>  {
             try {
-                let res = await fhcApi.factory.Vertragsbestandteil.getVB(vbid)
+                let res = await $api.call(ApiVertragsbestandteil.getVB(vbid))
                 console.log(res);
                 return res;
             } catch(error) {
@@ -85,7 +88,7 @@ export const IssuesCard = {
 
         const getGB = async (gbid) =>  {
             try {
-                let res = await fhcApi.factory.Gehaltsbestandteil.getGB(gbid)
+                let res = await $api.call(ApiGehaltsbestandteil.getGB(gbid))
                 console.log(res);
                 return res;
             } catch(error) {
@@ -95,7 +98,7 @@ export const IssuesCard = {
         }
         const getDV = async (dvid) =>  {
             try {
-                let res = await fhcApi.factory.DV.getDVByID(dvid)
+                let res = await $api.call(ApiDV.getDVByID(dvid))
                 console.log(res);
                 return res;
             } catch(error) {

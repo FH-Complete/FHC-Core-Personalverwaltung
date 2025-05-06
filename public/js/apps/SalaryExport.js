@@ -3,6 +3,7 @@ import FhcApi from '../../../../js/plugin/FhcApi.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
+import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import {searchbaroptions } from "./common.js";
 import {SalaryExport} from '../components/salaryexport/SalaryExport.js';
 
@@ -13,10 +14,11 @@ const pvApp = Vue.createApp(	{
 		CoreNavigationCmpt,
 		SalaryExport,
 	},
+	inject: ['$api', '$fhcAlert'],
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
-			searchfunction: this.$fhcApi.factory.search.search, 
+			searchfunction: (params) => this.$api.call(ApiSearchbar.search(params)),
 			appSideMenuEntries: {},
 		}
 	},

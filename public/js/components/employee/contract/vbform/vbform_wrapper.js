@@ -8,6 +8,9 @@ import tmpstorehelper from '../../../vbform/tmpstorehelper.js';
 import vbgb2gui from '../../../../helpers/vbform/vbgb2gui.js';
 import Phrasen from '../../../../../../../js/mixins/Phrasen.js';
 import savedpayloadchecker from '../../../../helpers/vbform/savedpayloadchecker.js';
+import ApiVertrag from '../../../../api/factory/vertrag.js';
+import ApiVertragsbestandteil from '../../../../api/factory/vertragsbestandteil.js';
+import ApiTmpStore from '../../../../api/factory/tmpstore.js';
 
 export default {
   name: 'VbFormWrapper',
@@ -79,7 +82,7 @@ export default {
       }
     };
   },
-  inject: ['$fhcApi', '$fhcAlert'],
+  inject: ['$api', '$fhcAlert'],
   emits: [
     "dvsaved"
   ],
@@ -221,7 +224,7 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      this.$fhcApi.factory.Vertrag.saveForm(this.store.mitarbeiter_uid, payload)
+      this.$api.call(ApiVertrag.saveForm(this.store.mitarbeiter_uid, payload))
       .then((response) => {
         that.handleSaved(response.data);
       })
@@ -236,7 +239,7 @@ export default {
       const payload = this.$refs['vbformhelperRef'].getPayload();
       
       const that = this;
-      this.$fhcApi.factory.Vertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun')
+      this.$api.call(ApiVertrag.saveForm(this.store.mitarbeiter_uid, payload, 'dryrun'))
       .then((response) => {
         that.handleValidated(response.data);
       })
@@ -248,7 +251,7 @@ export default {
     handlePresetSelected: function(preset) {
       if( this.mode === 'aenderung' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        this.$fhcApi.factory.Vertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id)
+        this.$api.call(ApiVertragsbestandteil.getCurrentAndFutureVBs(this.curdv.dienstverhaeltnis_id))
         .then((response) => {          
           this.iterateChilds(preset.children, response.data, preset);          
           this.presetselected(preset);
@@ -256,7 +259,7 @@ export default {
         });
       } else if( this.mode === 'korrektur' ) {
         var preset = JSON.parse(JSON.stringify(preset));
-        this.$fhcApi.factory.Vertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id)
+        this.$api.call(ApiVertragsbestandteil.getAllVBs(this.curdv.dienstverhaeltnis_id))
         .then((response) => {          
           this.iterateChilds(preset.children, response.data, preset);          
           this.presetselected(preset);
@@ -300,7 +303,7 @@ export default {
         mitarbeiter_uid: this.store.mitarbeiter_uid,  
         formdata: formdata
       };
-      this.$fhcApi.factory.TmpStore.storeToTmpStore(payload)
+      this.$api.call(ApiTmpStore.storeToTmpStore(payload))
       .then((response) => {
         this.store.setTmpStoreId(response.meta.tmpstoreid);
         this.$refs['tmpstorehelper'].fetchTmpStoreList(false);

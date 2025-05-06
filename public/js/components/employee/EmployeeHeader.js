@@ -2,6 +2,8 @@ import { Modal } from '../Modal.js';
 import { Toast } from '../Toast.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
+import ApiEmployee from '../../api/factory/employee.js';
+import ApiIssue from '../../api/factory/issue.js';
 
 export const EmployeeHeader = {
 	name: 'EmployeeHeader',
@@ -35,7 +37,7 @@ export const EmployeeHeader = {
         const isFetching = ref(false);
         const isFetchingName = ref(false);
         const isFetchingIssues = ref(false);
-        const fhcApi = inject('$fhcApi')        
+        const $api = inject('$api')        
 
        //const currentDate = ref(null);
 
@@ -52,11 +54,11 @@ export const EmployeeHeader = {
             isFetchingName.value = true;
             try {
                 // fetch header data
-                const res = await fhcApi.factory.Employee.personHeaderData(personID, uid);
+                const res = await $api.call(ApiEmployee.personHeaderData(personID, uid));
                 employee.value = res.retval[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
-                const resAbteilung = await fhcApi.factory.Employee.personAbteilung(employee.value.uid);
+                const resAbteilung = await $api.call(ApiEmployee.personAbteilung(employee.value.uid));
                // response = await resAbteilung.json();
                 employee.value = { ...employee.value, ...{ abteilung: resAbteilung.retval } };
             } catch (error) {
@@ -70,7 +72,7 @@ export const EmployeeHeader = {
         const fetchOpenIssuesCount = async(personID) => {
             isFetchingIssues.value = true;
             try {
-                const res = await fhcApi.factory.Issue.countPersonOpenIssues(personID);
+                const res = await $api.call(ApiIssue.countPersonOpenIssues(personID));
                 openissuescount.value = res.data.openissues;
             } catch (error) {
                 console.log(error);
@@ -82,7 +84,7 @@ export const EmployeeHeader = {
         const checkPerson = async() => {
             isFetchingIssues.value = true;
             try {
-                const res = await fhcApi.factory.Issue.checkPerson(props.personID);
+                const res = await $api.call(ApiIssue.checkPerson(props.personID));
                 openissuescount.value = res.data.openissues;
             } catch (error) {
                 console.log(error);
@@ -151,7 +153,7 @@ export const EmployeeHeader = {
         const postFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await fhcApi.factory.Employee.uploadPersonEmployeeFoto(props.personID,previewImage.value);
+                const res = await $api.call(ApiEmployee.uploadPersonEmployeeFoto(props.personID,previewImage.value));
                 if (res.error !== 0)
                 {
                     toastRefVal.value = res.data.retval;
@@ -172,7 +174,7 @@ export const EmployeeHeader = {
         const postDeleteFile = async () => {
             try  {
                 isFetching.value = true
-                const res = await fhcApi.factory.Employee.deletePersonEmployeeFoto(props.personID);
+                const res = await $api.call(ApiEmployee.deletePersonEmployeeFoto(props.personID));
                 fetchHeaderData(props.personID, props.personUID);
                 showDeleteToast();
             } catch (error) {
