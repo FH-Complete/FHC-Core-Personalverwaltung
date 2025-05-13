@@ -4,6 +4,7 @@ import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
 import store from './vbsharedstate.js';
+import ApiFunktion from  '../../../js/api/factory/funktion.js';
 
 export default {
   name: 'VertragsbestandteilFunktion',
@@ -112,7 +113,7 @@ export default {
     <gehaltsbestandteilhelper v-if="canhavegehaltsbestandteile" ref="gbh" v-bind:preset="getgehaltsbestandteile"></gehaltsbestandteilhelper>
   </div>
   `,
-  inject: ['$fhcApi','$fhcAlert'],
+  inject: ['$api','$fhcAlert'],
   components: {
     'gehaltsbestandteilhelper': gehaltsbestandteilhelper,
     'gueltigkeit': gueltigkeit,
@@ -220,7 +221,7 @@ export default {
     },
     getFunktionen: async function() {
       const filter = (this.config.guioptions?.filter) ? this.config.guioptions?.filter : 'all';
-      const response = await this.$fhcApi.factory.Funktion.getContractFunctions(filter);
+      const response = await this.$api.call(ApiFunktion.getContractFunctions(filter));
       const funktionen = response.retval;
       funktionen.unshift({
         value: '',
@@ -235,7 +236,7 @@ export default {
       if( this.store.unternehmen === '' ) {
           return;
       }
-      const response = await this.$fhcApi.factory.Funktion.getOrgetsForCompany(this.store.unternehmen);
+      const response = await this.$api.call(ApiFunktion.getOrgetsForCompany(this.store.unternehmen));
       const orgets = response.retval;
       orgets.unshift({
         value: '',
@@ -250,7 +251,7 @@ export default {
       if(this.store.unternehmen === '' || this.store.mitarbeiter_uid === '' ) {
         return;  
       }
-      const response = await this.$fhcApi.factory.Funktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen);
+      const response = await this.$api.call(ApiFunktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen));
       const benutzerfunktionen = (response.error === 1) ? [] : response.retval;
       benutzerfunktionen.unshift({
         value: '',

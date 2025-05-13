@@ -3,6 +3,7 @@ import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
+import ApiStunden from  '../../../js/api/factory/stunden.js';
 
 export default {
   name: 'VertragsbestandteilStunden',
@@ -68,7 +69,7 @@ export default {
     this.getTeilzeittypen();
     this.setDataFromConfig();
   },
-  inject: ['$fhcApi'],
+  inject: ['$api'],
   methods: {
     gueltigkeitchanged: function(payload) {
       console.log(JSON.stringify(payload));  
@@ -95,7 +96,7 @@ export default {
       }
     },
     getTeilzeittypen: async function() {
-      const response = await this.$fhcApi.factory.Stunden.getTeilzeittypen();
+      const response = await this.$api.call(ApiStunden.getTeilzeittypen());
       const teilzeittypen = response.retval;
       teilzeittypen.unshift({
         value: '',

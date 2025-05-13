@@ -1,4 +1,5 @@
 import store from './vbsharedstate.js';
+import ApiTmpstore from  '../../../js/api/factory/tmpstore.js';
 
 export default {
   name: 'TmpStoreHelper',
@@ -53,13 +54,13 @@ export default {
         this.fetchTmpStoreList();
     }
   },
-  inject: ['$fhcApi'],
+  inject: ['$api'],
   methods: {
     fetchTmpStoreList: function(resetselected) {
       if( typeof resetselected === 'undefined' ) {
           var resetselected = true;
       }  
-      this.$fhcApi.factory.TmpStore.listTmpStoreForMA(this.store.mitarbeiter_uid)
+      this.$api.call(ApiTmpstore.listTmpStoreForMA(this.store.mitarbeiter_uid))
       .then((response) => {
         this.tmpstores = response.data;
         if(resetselected === true) {
@@ -73,7 +74,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            return this.$fhcApi.factory.TmpStore.deleteFromTmpStore(tmpstoreid);
+            return this.$api.call(ApiTmpstore.deleteFromTmpStore(tmpstoreid));
         }
         return Promise.resolve('noTmpStoreUsed');
     },
@@ -81,7 +82,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            this.$fhcApi.factory.TmpStore.deleteFromTmpStore(tmpstoreid)
+            this.$api.call(ApiTmpstore.deleteFromTmpStore(tmpstoreid))
             .then((response) => {
               this.fetchTmpStoreList();
               console.log('deleteFromTmpStore executed.');
@@ -95,7 +96,7 @@ export default {
         if( typeof this.tmpstores[this.store.mode][this.selectedtmpstoreidx] !== 'undefined' ) {
             const tmpstoreid = this.tmpstores[this.store.mode][this.selectedtmpstoreidx]['tmp_store_id'];
             
-            this.$fhcApi.factory.TmpStore.getTmpStoreById(tmpstoreid)
+            this.$api.call(ApiTmpstore.getTmpStoreById(tmpstoreid))
             .then((response) => {
               console.log('loadFromTmpStore executed.');
               this.store.setTmpStoreId(response.data.tmp_store_id);

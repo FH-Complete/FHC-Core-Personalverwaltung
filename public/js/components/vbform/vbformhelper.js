@@ -8,6 +8,8 @@ import errors from './errors.js';
 import infos from './infos.js';
 import tabsspacer from './tabsspacer.js';
 import vblistgroupspacer from './vblistgroupspacer.js';
+import ApiFreitext from  '../../../js/api/factory/freitext.js';
+import ApiGehaltsbestandteil from  '../../../js/api/factory/gehaltsbestandteil.js';
 
 export default {
   name: 'VbFormHelper',
@@ -33,7 +35,7 @@ export default {
   mixins: [
     presetable
   ],
-  inject: ['$fhcApi','$fhcAlert'],
+  inject: ['$api','$fhcAlert'],
   data: function() {
     return {
       store: store,
@@ -77,7 +79,7 @@ export default {
       this.$emit('vbhjsonready', JSON.stringify(payload, null, 2));
     },
     getFreitexttypen: async function() {
-      const response = await this.$fhcApi.factory.Freitext.getFreitexttypen();
+      const response = await this.$api.call(ApiFreitext.getFreitexttypen());
       const freitexttypen = response.retval;
       freitexttypen.unshift({
         value: '',
@@ -87,7 +89,7 @@ export default {
       this.lists.freitexttypen = freitexttypen;
     },
     getGehaltstypen: async function() {
-      const response = await this.$fhcApi.factory.Gehaltsbestandteil.getGehaltstypen();
+      const response = await this.$api.call(ApiGehaltsbestandteil.getGehaltstypen());
       const gehaltstypen = response.retval;
       gehaltstypen.unshift({
         value: '',
