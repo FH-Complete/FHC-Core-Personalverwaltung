@@ -70,7 +70,7 @@ export const BetragDialog = {
             try {
                 isFetching.value = true;
                 const res = await $api.call(ApiSalaryRange.getSalaryRangeList());  
-                salaryRangeList.value = res.error !== 1 ? res.retval : [] 
+                salaryRangeList.value = res.meta.status == 'success' ? res.data : [] 
                 isFetching.value = false;                        
             } catch (error) {
                 console.log(error);

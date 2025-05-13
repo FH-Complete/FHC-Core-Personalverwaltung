@@ -147,13 +147,13 @@ export const SalaryRange = {
             isFetching.value = true
             try {
               const res = await $api.call(ApiSalaryRange.getAll(filterDate.value));  
-              if (res.error !==1) {
-                salaryRangeList.value = res.retval;
+              if (res?.meta?.status == 'success') {
+                salaryRangeList.value = res.data;
               } else {
                 salaryRangeList.value = [];
               }              
             } catch (error) {
-              console.log(error)              
+              fhcAlert.handleSystemError(error)
             } finally {
                 isFetching.value = false
             }
@@ -166,7 +166,7 @@ export const SalaryRange = {
                 
                 try {
                     const res = await $api.call(ApiSalaryRange.upsertSalaryRange(dialogRes.payload)); 
-                    if (res.error !==1) {
+                    if (res?.meta?.status == 'success') {
                         fetchData();
                         createToastRef.value.show();
                       // salaryRangeList.value = res.data.retval;
@@ -192,7 +192,7 @@ export const SalaryRange = {
                 
                 try {
                     const res = await $api.call(ApiSalaryRange.upsertSalaryRange(dialogRes.payload));      
-                    if (res.error !==1) {
+                    if (res?.meta?.status == 'success') {
                         fetchData();
                         updateToastRef.value.show();
                     } else {
@@ -364,7 +364,7 @@ export const SalaryRange = {
     
                 try {
                     const res = await $api.call(ApiSalaryRange.deleteSalaryRange(id));             
-                    if (res.error == 0) {
+                    if (res?.meta?.status == 'success') {
                         salaryRangeList.value = salaryRangeList.value.filter((item) => item.gehaltsband_betrag_id != id);
                         deleteToastRef.value.show();
                     }
