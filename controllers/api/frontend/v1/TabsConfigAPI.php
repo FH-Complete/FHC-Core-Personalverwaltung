@@ -68,10 +68,15 @@ class TabsConfigAPI extends FHCAPI_Controller
 				'config' => null
 			),
 			'jobfunction' => array(
-				'title' => $this->p->t('person', 'funktionen'),
+				'title' => $this->p->t('person', 'funktionen') . " PV_21",
 				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/JobFunction.js',
 				'config' => null
-			)
+			),
+			'corefunction' => array(
+				'title' => $this->p->t('person', 'funktionen'),
+				'component' => APP_ROOT . 'public/extensions/FHC-Core-Personalverwaltung/js/components/employee/EmployeeFunction.js',
+				'config' => null
+			),
 		);
 
 		Events::trigger('pv21_conf_stammdaten', function & () use (&$result) {
