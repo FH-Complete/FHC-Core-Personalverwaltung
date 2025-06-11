@@ -2,7 +2,7 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions} from "./common.js";
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
 	name: 'PV21Report',

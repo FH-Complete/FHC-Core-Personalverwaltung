@@ -1,5 +1,5 @@
-import Phrasen from '../../../../js/plugin/Phrasen.js';
-import FhcAlert from '../../../../js/plugin/FhcAlert.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
+import FhcAlert from '../../../../js/plugins/FhcAlert.js';
 //import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationSelection} from "../components/bulk/ValorisationSelection.js";
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";

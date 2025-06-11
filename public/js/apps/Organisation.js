@@ -5,7 +5,7 @@ import {searchbaroptions} from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import {OrgViewer} from '../components/organisation/OrgViewer.js';
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
 	name: 'PV21Organisation',

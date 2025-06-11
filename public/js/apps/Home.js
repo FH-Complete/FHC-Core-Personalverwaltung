@@ -2,7 +2,7 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import {searchbaroptions} from "./common.js";
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 import { DeadlineIssueTable } from '../components/home/DeadlineIssueTable.js';
 import { BirthdayCountCard } from '../components/home/BirthdayCountCard.js';
 import { ContractCountCard } from '../components/home/ContractsCountCard.js';

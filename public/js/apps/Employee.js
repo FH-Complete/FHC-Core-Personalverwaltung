@@ -5,9 +5,8 @@ import {EmployeeSummary } from "../components/employee/summary/EmployeeSummary.j
 import {EmployeeTime} from "../components/employee/time/EmployeeTime.js";
 import { EmployeeLifeCycle } from "../components/employee/lifecycle/EmployeeLifeCycle.js";
 import { EmployeeDocument } from "../components/employee/document/EmployeeDocument.js";
-import {CoreRESTClient} from '../../../../js/RESTClient.js';
 import Phrasen from '../../../../js/plugins/Phrasen.js';
-import FhcAlert from '../../../../js/plugin/FhcAlert.js';
+import FhcAlert from '../../../../js/plugins/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 import ApiCommon from '../api/factory/common.js';

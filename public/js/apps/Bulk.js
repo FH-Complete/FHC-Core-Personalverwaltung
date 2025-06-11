@@ -1,5 +1,4 @@
-import pv21apifactory from "../api/api.js";
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
