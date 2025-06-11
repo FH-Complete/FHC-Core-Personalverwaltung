@@ -16,9 +16,9 @@ export const EmployeePerson = {
 		BankData,
 		ContactData,
 		MaterialExpensesData,
-		HourlyRateData: HourlyRateData,
-        JobFunction,
-        FhcTabs,
+		HourlyRateData,
+    JobFunction,
+    FhcTabs,
 	},
     props: {
         id: Number,

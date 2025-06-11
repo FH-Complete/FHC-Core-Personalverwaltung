@@ -34,7 +34,7 @@ export const BirthdayCountCard = {
                 let ts = Math.round(currentDate.value.getTime() / 1000);  // unix timestamp
                 isFetching.value = true;
                 const response = await $api.call(ApiCommon.getBirthdays(ts));
-                birthdayData.value = response.retval;
+                birthdayData.value = response.data || [];
             } catch (error) {
                 console.log(error);
             } finally {

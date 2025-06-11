@@ -48,9 +48,8 @@ export const EmployeeData= {
             }
             isFetching.value = true;
             try {
-              //const res = await fhcApi.factory.Person.personEmployeeData(theModel.value.personID || personID.value);                    
               const res = await $api.call(ApiPerson.personEmployeeData(theModel.value.personID || personID.value));
-              currentValue.value = res.retval[0];
+              currentValue.value = res.data[0];
             } catch (error) {
               console.log(error)              
             } finally {
@@ -158,7 +157,7 @@ export const EmployeeData= {
                             if (res.error == 1) {
                                 console.error("error checking kurzbz", res.msg)
                             } else {                                
-                                validKurzbz.value = !res.retval
+                                validKurzbz.value = !res.data
                             }
                         })
                         
@@ -192,10 +191,9 @@ export const EmployeeData= {
 
                 // submit
                 try {
-                    //const response = await fhcApi.factory.Person.updatePersonEmployeeData(currentValue.value);                    
                     const response = await $api.call(ApiPerson.updatePersonEmployeeData(currentValue.value));
                     showToast();
-                    currentValue.value = response.retval[0];
+                    currentValue.value = response.data[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  

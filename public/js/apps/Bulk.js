@@ -1,4 +1,3 @@
-import FhcApi from '../../../../js/plugin/FhcApi.js';
 import pv21apifactory from "../api/api.js";
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
@@ -30,7 +29,6 @@ const pvApp = Vue.createApp(	{
 });
 
 pvApp.use(primevue.config.default);
-pvApp.use(FhcApi, {factory: pv21apifactory});
 pvApp.use(Phrasen);
 pvApp.mount('#wrapper');
 

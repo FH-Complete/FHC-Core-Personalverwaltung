@@ -83,8 +83,8 @@ export const OrgViewer = {
             console.log(d);
             currentValue.value = d;
             modalRef.value.show();
-            const result = fetchPersons(d.oe_kurzbz).then((data) => {
-                currentPersons.value = data.retval;
+            const result = fetchPersons(d.oe_kurzbz).then((res) => {
+                currentPersons.value = res.data;
             })
         }
 
@@ -100,8 +100,8 @@ export const OrgViewer = {
  
 
         Vue.watch(oe, (currentVal, oldVal) => {            
-            fetchOrg(currentVal).then((data) => {
-                nodes.value = [data];
+            fetchOrg(currentVal).then((res) => {
+                nodes.value = [res.data];
                 expandedKeys.value[nodes.value[0].key] = true;
                 
               }

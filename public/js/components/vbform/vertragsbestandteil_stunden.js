@@ -97,7 +97,7 @@ export default {
     },
     getTeilzeittypen: async function() {
       const response = await this.$api.call(ApiStunden.getTeilzeittypen());
-      const teilzeittypen = response.retval;
+      const teilzeittypen = response.data;
       teilzeittypen.unshift({
         value: '',
         label: 'Teilzeittyp wählen',

@@ -219,9 +219,9 @@ export const SalaryExport = {
                 return {index, ...r, betrag: value, source}
               }
 
-              let list = res.retval.map((row, index) => selectValue(row, index) )
+              let list = res.data.map((row, index) => selectValue(row, index) )
 
-              if (res.error !==1) {
+              if (res.meta.status == "success") {
                 salaryExportList.value = list // res.retval.map((item, index) => ({index, ...item}));
                 //salaryExportList.value = res.retval;
                 //fetchAbrechnungExists();

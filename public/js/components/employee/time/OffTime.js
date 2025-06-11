@@ -76,9 +76,9 @@ export const OffTime = {
               isFetching.value = true;
               const response = await $api.call(ApiZeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value));
               isFetching.value = false;              
-              console.log('abwesenheiten', response.retval);	  
-              if (response.retval.length>0) {
-                offTimeList.value = response.retval;
+              console.log('abwesenheiten', response.data);	  
+              if (response.data.length>0) {
+                offTimeList.value = response.data;
               } else {
                 offTimeList.value = [];
               }

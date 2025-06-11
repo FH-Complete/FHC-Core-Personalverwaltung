@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class IssueChecker extends Auth_Controller
+class IssueChecker extends FHCAPI_Controller
 {
 	const DEBUG = false;
     	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -131,7 +131,7 @@ class IssueChecker extends Auth_Controller
 			$meta['debug'] = $this->debug;
 		}
 
-		$this->outputJson(
+		$this->terminateWithSuccess(
 			array(
 				'data' => $data,
 				'meta' => $meta
@@ -169,7 +169,7 @@ class IssueChecker extends Auth_Controller
 			$meta['debug'] = $this->debug;
 		}
 
-		$this->outputJson(
+		$this->terminateWithSuccess(
 			array(
 				'data' => $data,
 				'meta' => $meta

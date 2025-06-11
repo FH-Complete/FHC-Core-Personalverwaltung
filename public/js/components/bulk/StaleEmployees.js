@@ -54,7 +54,7 @@ export const StaleEmployees = {
             isFetching.value = true
             try {
               const res = await $api.call(ApiEmployee.getEmployeesWithoutContract());                 
-              employeeList.value = res.retval;
+              employeeList.value = res.data;
             } catch (error) {
               console.log(error)              
             } finally {

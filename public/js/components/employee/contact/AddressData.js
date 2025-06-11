@@ -59,7 +59,7 @@ export const AddressData = {
             // submit
             try {
                 const response = await $api.call(ApiPerson.personAddressData(personID.value)); 
-                addressList.value = response.retval;
+                addressList.value = response.data;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -74,7 +74,7 @@ export const AddressData = {
                 try  {
                     isFetching.value = true
                     const response = await $api.call(ApiCommon.getGemeinden(currentAddress.value.plz));     
-                    gemeinden.value = response.retval;
+                    gemeinden.value = response.data;
                 } catch (error) {
                     console.log(error)                    
                 } finally {
@@ -88,7 +88,7 @@ export const AddressData = {
                 try  {
                     isFetching.value = true
                     const response = await $api.call(ApiCommon.getOrtschaften(currentAddress.value.plz));     
-                    ortschaften.value = response.retval;
+                    ortschaften.value = response.data;
                 } catch (error) {
                     console.log(error)                    
                 } finally {
@@ -121,7 +121,7 @@ export const AddressData = {
 
                 try {
                     const res = await $api.call(ApiPerson.deletePersonAddressData(id));   
-                    if (res.error == 0) {
+                    if (res?.meta?.status == 'success') {
                         delete addressList.value[id];
                         showDeletedToast();
                     }
@@ -186,8 +186,8 @@ export const AddressData = {
                 // submit
                 try {
                     const r = await $api.call(ApiPerson.upsertPersonAddressData(currentAddress.value))
-                    if (r.error == 0) {
-                        addressList.value[r.retval[0].adresse_id] = r.retval[0];
+                    if (r?.meta?.status == 'success') {
+                        addressList.value[r.data[0].adresse_id] = r.data[0];
                         console.log('address successfully saved');
                         showToast();
                     }

@@ -41,7 +41,7 @@ export const BankData = {
             isFetching.value = true
             try {
               const res = await $api.call(ApiPerson.personBankData(theModel.value.personID || personID.value));                                    
-              bankdataList.value = res.retval;
+              bankdataList.value = res.data;
             } catch (error) {
               console.log(error)              
             } finally {
@@ -125,7 +125,7 @@ export const BankData = {
                 isFetching.value = true
                 try {
                   const res = await $api.call(ApiPerson.deletePersonBankData(id));                 
-                  if (res.error == 0) {
+                  if (res.meta.status == "success") {
                     delete bankdataList.value[id];
                     showDeletedToast();
                   }
@@ -151,12 +151,12 @@ export const BankData = {
 
                 try {
                     const r = await $api.call(ApiPerson.upsertPersonBankData(currentValue.value));                              
-                    if (r.error == 0) {
-                        bankdataList.value[r.retval[0].bankverbindung_id] = r.retval[0];
+                    if (r.meta.status == "success") {
+                        bankdataList.value[r.data[0].bankverbindung_id] = r.data[0];
                         console.log('bankdata successfully saved');
                         preservedValue.value = currentValue.value;
                         showToast();
-                    }     
+                    }   // TODO show error toast
                 } catch (error) {
                     console.log(error)              
                 } finally {

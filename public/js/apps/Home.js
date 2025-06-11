@@ -2,8 +2,6 @@ import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigatio
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import {searchbaroptions} from "./common.js";
-import pv21apifactory from "../api/api.js";
-import FhcApi from '../../../../js/plugin/FhcApi.js';
 import Phrasen from '../../../../js/plugin/Phrasen.js';
 import { DeadlineIssueTable } from '../components/home/DeadlineIssueTable.js';
 import { BirthdayCountCard } from '../components/home/BirthdayCountCard.js';
@@ -42,6 +40,5 @@ const pvApp = Vue.createApp(	{
 });
 
 pvApp.use(primevue.config.default);
-pvApp.use(FhcApi, {factory: pv21apifactory})
 pvApp.use(Phrasen);
 pvApp.mount('#wrapper');

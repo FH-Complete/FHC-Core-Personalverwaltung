@@ -82,13 +82,13 @@ export const JobFunction = {
             // fetch data and map them for easier access
             try {
                 const response = await $api.call(ApiFunktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value));
-                if(response.error === 1) {
+                if(response.meta.status != "success") {
                     let rawList = [];
                     tableData.value = [];
                     jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
                 } else {
-                    let rawList = response.retval;
-                    tableData.value = response.retval;
+                    let rawList = response.data;
+                    tableData.value = response.data;
                     jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
                 }
             } catch (error) {
@@ -285,8 +285,8 @@ export const JobFunction = {
             isFetching.value = true;
             try {
                 const res = await $api.call(ApiFunktion.getCompanyByOrget(currentValue.value.oe_kurzbz));
-                if (res.error == 0) {
-                    unternehmen.value = res.retval[0].oe_kurzbz;
+                if (res.meta.status == "success") {
+                    unternehmen.value = res.data[0].oe_kurzbz;
                 } else {
                     console.log('company not found for orget!');
                 }
@@ -308,7 +308,7 @@ export const JobFunction = {
 
                 try {
                     const res = await $api.call(ApiPerson.deletePersonJobFunction(id));                
-                    if (res.error == 0) {
+                    if (res.meta.status == "success") {
                         delete jobfunctionList.value[id];
                         showDeletedToast();
                         theModel.value.updateHeader();
@@ -340,7 +340,7 @@ export const JobFunction = {
                     delete payload.aktiv;
                     delete payload.funktion_beschreibung;
                     const r = await $api.call(ApiPerson.upsertPersonJobFunction(payload));
-                    if (r.error == 0) {
+                    if (r.meta.status == "success") {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
@@ -408,7 +408,7 @@ export const JobFunction = {
                 return;
             }
             const response = await $api.call(ApiFunktion.getOrgetsForCompany(unternehmen_kurzbz));
-            const orgets = response.retval;
+            const orgets = response.data;
             orgets.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),
@@ -421,7 +421,7 @@ export const JobFunction = {
               return;  
             }
             const response = await $api.call(ApiFunktion.getAllFunctions());
-            const benutzerfunktionen = response.retval;
+            const benutzerfunktionen = response.data;
             benutzerfunktionen.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),

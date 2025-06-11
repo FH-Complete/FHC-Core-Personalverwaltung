@@ -58,7 +58,7 @@ export const MaterialExpensesData = {
             // submit
             try {
                 const response = await $api.call(ApiPerson.personMaterialExpenses(theModel.value.personID, theModel.value.personUID));
-                materialdataList.value = response.retval;
+                materialdataList.value = response.data;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -149,7 +149,7 @@ export const MaterialExpensesData = {
 
                 try {
                     const res = await $api.call(ApiPerson.deletePersonMaterialExpenses(id));
-                    if (res.error == 0) {
+                    if (res.meta.status == "success") {
                         delete materialdataList.value[id];
                         showDeletedToast();
                     }
@@ -176,8 +176,8 @@ export const MaterialExpensesData = {
 						currentValue.value.betrag = (String(currentValue.value.betrag)).replace(',', '.');
 					}
                     const r = await $api.call(ApiPerson.upsertPersonMaterialExpenses(currentValue.value));
-                    if (r.error == 0) {
-                        materialdataList.value[r.retval[0].sachaufwand_id] = r.retval[0];
+                    if (r.meta.status == "success") {
+                        materialdataList.value[r.data[0].sachaufwand_id] = r.data[0];
                         console.log('materialdata successfully saved');
                         showToast();
                     }  

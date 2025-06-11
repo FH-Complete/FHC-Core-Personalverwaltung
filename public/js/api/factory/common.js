@@ -52,6 +52,103 @@ export default {
         method: 'get',
         url: `extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllSupportHours?uid=${uid}`,
       };
-    }
+    },
+    // migrated from loader.js
+    getNations() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getNations',
+      }
+    },
+    getSachaufwandTyp() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getSachaufwandtyp',
+      }
+    },
+    getKontakttyp() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getKontakttyp',
+      }
+    },
+    getAdressentyp() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAdressentyp',
+      }
+    },
+    getSprache() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getSprache',
+      }
+    },
+    getAusbildung() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAusbildung',
+      }
+    },
+    getStandorteIntern() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getStandorteIntern',
+      }
+    },
+    getOrte() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getOrte',
+      }
+    },
+    getKarenztypen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getKarenztypen',
+      }
+    },
+    getGehaltstypen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltstypen',
+      }
+    },
+    getVertragsarten() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsarten',
+      }
+    },
 
+    getVertragsbestandteiltypen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsbestandteiltypen',
+      }
+    },
+    getTeilzeittypen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getTeilzeittypen',
+      }
+    },
+    getFreitexttypen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getFreitexttypen',
+      }
+    },
+    getStundensatztypen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getStundensatztypen',
+      }
+    },
+/*     getUnternehmen() {
+      return {
+        method: 'get',
+        url: 'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getUnternehmen',
+      }
+    }, */
 }    

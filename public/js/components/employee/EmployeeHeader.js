@@ -55,12 +55,12 @@ export const EmployeeHeader = {
             try {
                 // fetch header data
                 const res = await $api.call(ApiEmployee.personHeaderData(personID, uid));
-                employee.value = res.retval[0];
+                employee.value = res.data[0];
                 isFetchingName.value = false;
                 // fetch abteilung (needs uid from previous fetch!)
                 const resAbteilung = await $api.call(ApiEmployee.personAbteilung(employee.value.uid));
                // response = await resAbteilung.json();
-                employee.value = { ...employee.value, ...{ abteilung: resAbteilung.retval } };
+                employee.value = { ...employee.value, ...{ abteilung: resAbteilung.data } };
             } catch (error) {
                 console.log(error);
             } finally {
@@ -154,13 +154,14 @@ export const EmployeeHeader = {
             try  {
                 isFetching.value = true
                 const res = await $api.call(ApiEmployee.uploadPersonEmployeeFoto(props.personID,previewImage.value));
-                if (res.error !== 0)
+                if (res?.meta?.status != 'success') 
                 {
-                    toastRefVal.value = res.data.retval;
+                    toastRefVal.value = res.data;
                 }
                 else
+                {                    
                     toastRefVal.value = 'Foto gespeichert.'
-
+                }
                 fetchHeaderData(props.personID, props.personUID);
                 showToast();
             } catch (error) {
@@ -207,7 +208,7 @@ export const EmployeeHeader = {
           }
 
         const okHandler = () => {
-            console.log("previewImage: ", previewImage.value);
+            // console.log("previewImage: ", previewImage.value);
             postFile();
             hideModal();
         }

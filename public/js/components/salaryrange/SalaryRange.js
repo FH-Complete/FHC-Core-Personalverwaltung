@@ -367,6 +367,8 @@ export const SalaryRange = {
                     if (res?.meta?.status == 'success') {
                         salaryRangeList.value = salaryRangeList.value.filter((item) => item.gehaltsband_betrag_id != id);
                         deleteToastRef.value.show();
+                    } else {
+                        salaryRangeList.value = []
                     }
                 } catch (error) {
                     console.log(error)              

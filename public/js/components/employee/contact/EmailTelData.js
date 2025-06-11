@@ -50,7 +50,7 @@ export const EmailTelData = {
             // submit
             try {
                 const response = await $api.call(ApiPerson.personContactData(personID.value));
-                contactList.value = response.retval;
+                contactList.value = response.data;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -111,7 +111,7 @@ export const EmailTelData = {
 
                 try {
                     const res = await $api.call(ApiPerson.deletePersonContactData(id));
-                    if (res.error == 0) {
+                    if (res?.meta?.status == 'success') {
                         delete contactList.value[id];
                         showDeleteToast();
                     }
@@ -138,9 +138,8 @@ export const EmailTelData = {
                 // submit
                 try {
                     const r = await $api.call(ApiPerson.upsertPersonContactData(currentContact.value)); 
-                    if (r.error == 0) {
-                        contactList.value[r.retval[0].kontakt_id] = r.retval[0];
-                        console.log('contact successfully saved');
+                    if (r?.meta?.status == 'success') {
+                        contactList.value[r.data[0].kontakt_id] = r.data[0];
                         showToast();
                     }  
                 } catch (error) {

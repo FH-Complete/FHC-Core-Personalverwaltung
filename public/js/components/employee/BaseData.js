@@ -53,6 +53,18 @@ export const BaseData = {
             return '';
         }
 
+        const printLanguage =  (code) => {
+            const userLanguageMap = ['German','English','Espanol','Magyar']
+            
+            if (!code) return ''
+            let languageIndex = userLanguageMap.findIndex((item) => item == FHC_JS_DATA_STORAGE_OBJECT.user_language)
+            let result = sprache.value?.filter((item) => item.sprache == code)
+            if (result?.length > 0) {
+                return result[0].bezeichnung[languageIndex]
+            }
+            return '?'
+        }
+
         
         const fetchData = async () => {
             if (theModel.value.personID==null && props.personID==null) {                
@@ -61,7 +73,7 @@ export const BaseData = {
             isFetching.value = true
             try {
               const res = await $api.call(ApiPerson.personBaseData(theModel.value.personID || personID.value));
-              currentValue.value = res.retval[0];
+              currentValue.value = res.data[0];
             } catch (error) {
               console.log(error)              
             } finally {
@@ -197,7 +209,7 @@ export const BaseData = {
                 try {
                     const res = await $api.call(ApiPerson.updatePersonBaseData(currentValue.value));                  
                     showToast();
-                    currentValue.value = res.retval[0];
+                    currentValue.value = res.data[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  
@@ -247,6 +259,7 @@ export const BaseData = {
             validGeburtsdatum,  
             validSVNR,    
             printNation,
+            printLanguage,
         }
         
     },
@@ -331,10 +344,10 @@ export const BaseData = {
                     <select v-if="!readonly" id="sprache" :readonly="readonly"  v-model="currentValue.sprache" class="form-select form-select-sm" aria-label=".form-select-sm " >
                         <option value="">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
                         <option v-for="(item, index) in sprache" :value="item.sprache">
-                            {{ item.sprache }}
+                            {{ item.bezeichnung[0] }}
                         </option>         
                     </select>
-                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" v-model="currentValue.sprache">
+                    <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="sprache" :value="printLanguage(currentValue.sprache)">
     
                 </div>
                 <div class="col-lg-6 col-md-3"></div>

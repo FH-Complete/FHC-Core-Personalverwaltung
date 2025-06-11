@@ -58,7 +58,7 @@ export const DeadlineIssueDialog = {
                 $api.call(
 			        ApiDeadline.getFristenStatus())
 			        .then(result => {
-                        fristStatus.value = result.error !== 1 ? result.retval : [];				        	
+                        fristStatus.value = result.meta.status == "success" ? result.data : [];			        	
 			        })
 			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        
@@ -74,7 +74,7 @@ export const DeadlineIssueDialog = {
                 $api.call(
 			        ApiDeadline.getFristenEreignisseManuell())
 			        .then(result => {
-                        fristEreignisse.value = result.error !== 1 ? result.retval : [];
+                        fristEreignisse.value = result.meta.status == "success" ? result.data : [];
 			        })
 			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        

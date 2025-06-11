@@ -44,7 +44,7 @@ export const ContractCountCard = {
         $api.call(ApiDV.getVertragsarten()).then((resp) => {
             let varts = [];
             let defaultfilter = ['Echter DV', 'Studentische Hilfskraft'];
-            for( let vart of resp.retval) {
+            for( let vart of resp.data) {
                 varts.push(vart.label);
                 if( defaultfilter.includes(vart.label) ) {
                     filters.value.vertragsart.value.push(vart.label);
@@ -94,11 +94,15 @@ export const ContractCountCard = {
                 } else {
                     response = await $api.call(ApiCommon.getContractNew(year, month));
                 }
-                contractDataNew.value = response.retval.map((row) => {
-                    row.von = (row.von === null) ? null : new Date(row.von);
-                    row.bis = (row.bis === null) ? null : new Date(row.bis);
-                    return row;
-                });
+                if (response?.meta?.status == 'success' && response.data != null) {
+                    contractDataNew.value = response?.data?.map((row) => {
+                        row.von = (row.von === null) ? null : new Date(row.von);
+                        row.bis = (row.bis === null) ? null : new Date(row.bis);
+                        return row;
+                    });
+                } else {
+                    contractDataNew.value = []
+                }
             } catch (error) {
                 console.log(error);
             } finally {

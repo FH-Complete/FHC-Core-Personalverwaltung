@@ -44,7 +44,7 @@ export const DeadlineIssueTable = {
           }
           isFetching.value = true;
           const res = await $api.call(ApiDeadline.all()); 
-          fristen.value = res;
+          fristen.value = res.data;
           isFetching.value = false;
         } catch (error) {const columnsDef = [
           { title: 'Ereignis', field: "ereignis_bezeichnung", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
@@ -85,7 +85,7 @@ export const DeadlineIssueTable = {
         try {
             isFetching.value = true;
             const res = await $api.call(ApiDeadline.getFristenStatus()); 
-            fristStatus.value = res.retval;
+            fristStatus.value = res.data;
             isFetching.value = false;
         } catch (error) {
             console.log(error);

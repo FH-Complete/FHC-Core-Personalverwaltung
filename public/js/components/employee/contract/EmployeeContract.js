@@ -187,7 +187,7 @@ export const EmployeeContract = {
             isFetching.value = true
             try {
                 const res = await $api.call(ApiEmployee.dvByPerson(uid));  
-                dvList.value = res.retval;
+                dvList.value = res.data;
                 isFetching.value = false;
                 if (dvList.value.length > 0) {
                     if (props.dienstverhaeltnis_id != undefined) {
@@ -214,7 +214,7 @@ export const EmployeeContract = {
             isFetching.value = true
             try {
                 const res = await $api.call(ApiVertrag.vertragByDV(dv_id, convert2UnixTS(date))); 
-                vertragList.value = res;
+                vertragList.value = res.data;
                 getCurrentVertragsbestandteil();
                 //}
             } catch (error) {
@@ -230,7 +230,7 @@ export const EmployeeContract = {
             isFetching.value = true
             try {
                 const res = await $api.call(ApiGehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date)));
-                gbtList.value = res;
+                gbtList.value = res.data;
             } catch (error) {
                 console.log(error)
             } finally {
@@ -246,16 +246,16 @@ export const EmployeeContract = {
             try {
                 if (dv_id != null) {
                     const res = await $api.call(ApiGehaltsbestandteil.gbtChartDataByDV(dv_id));
-                    gbtChartData.value = res;
+                    gbtChartData.value = res.data;
                     
                     // chartOptions.series[0].data.length = 0;
-					Object.keys(res.valorisiert).forEach(element => {
-						tempData1.push([new Date(element).getTime(), parseFloat(res.valorisiert[element])]);
+					Object.keys(res.data.valorisiert).forEach(element => {
+						tempData1.push([new Date(element).getTime(), parseFloat(res.data.valorisiert[element])]);
 					});
-                    Object.keys(res.gesamt).forEach(element => {
-                       tempData2.push([new Date(element).getTime(), parseFloat(res.gesamt[element])]);
+                    Object.keys(res.data.gesamt).forEach(element => {
+                       tempData2.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
                     });
-                    res.abgerechnet.forEach(element => {
+                    res.data.abgerechnet.forEach(element => {
                         tempData3.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                     });
                 }
