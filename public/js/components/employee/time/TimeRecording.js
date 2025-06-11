@@ -70,9 +70,8 @@ export const TimeRecording = {
               isFetching.value = true;
               const response = await $api.call(ApiZeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value));
               isFetching.value = false;              
-              console.log('zeiterfassung', response.retval);	  
-              if (response.retval.length>0) {
-                timeRecordList.value = response.retval;
+              if (response.data.length>0) {
+                timeRecordList.value = response.data;
               } else {
                 timeRecordList.value = [];
               }
