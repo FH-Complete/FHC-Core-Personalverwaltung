@@ -21,6 +21,7 @@ export const HourlyRateData = {
 	setup (props) {
 
         const $api = Vue.inject('$api');
+		const $fhcAlert = Vue.inject('$fhcAlert');
 		const { t } = usePhrasen();
 
 		const theModel = Vue.computed({ 
@@ -114,23 +115,27 @@ export const HourlyRateData = {
 
 		const showDeleteModal = async (id) => {
 			currentValue.value = { ...hourlyRatedataList.value[id] };
-			const ok = await confirmDeleteRef.value.show();
 
-			if (ok)
-			{
-				try {
-					const res = await $api.call(ApiStundensatz.deleteStundensatz(id));
+			if (await $fhcAlert.confirm({
+                    message: t('person','stundensatzWirklichLoeschen') + ' ' + currentValue.value?.stundensatztyp + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
 
-					if (res.meta.status === "success")
-					{
-						delete hourlyRatedataList.value[id];
-						showDeletedToast();
-					}
-				} catch (error) {
-					console.log(error)
-				} finally {
-					isFetching.value = false
+			try {
+				const res = await $api.call(ApiStundensatz.deleteStundensatz(id));
+
+				if (res.meta.status === "success")
+				{
+					delete hourlyRatedataList.value[id];
+					showDeletedToast();
 				}
+			} catch (error) {
+				console.log(error)
+			} finally {
+				isFetching.value = false
 			}
 		}
 
@@ -238,12 +243,12 @@ export const HourlyRateData = {
 		const deleteToastRef = Vue.ref();
 
 		const showToast = () => {
-			toastRef.value.show();
-		}
+            $fhcAlert.alertSuccess(t('person','stundensatzGespeichert'));
+        }
 
-		const showDeletedToast = () => {
-			deleteToastRef.value.show();
-		}
+        const showDeletedToast = () => {
+            $fhcAlert.alertSuccess(t('person','stundensatzGeloescht'));
+        }
 
 		return {
 			hourlyRatedataList,
@@ -267,18 +272,6 @@ export const HourlyRateData = {
 	},
 	template: `
 	<div class="row">
-
-		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-		  <Toast ref="toastRef">
-			<template #body><h4>{{ t('person','stundensatzGespeichert') }}</h4></template>
-		  </Toast>
-		</div>
-
-		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-			<Toast ref="deleteToastRef">
-				<template #body><h4>{ t('person','stundensatzGeloescht') }}</h4></template>
-			</Toast>
-		</div>
 	</div>
 	<div class="row pt-md-4">
 		 <div class="col">
@@ -412,11 +405,6 @@ export const HourlyRateData = {
 	  </template>
 	</ModalDialog>
 
-	<ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-		<template #body>
-		{{ t('person','stundensatzWirklichLoeschen') }} '{{ currentValue?.stundensatztyp }}' ({{ currentValue?.gueltig_von }}<span v-if="currentValue?.gueltig_bis"> - {{ currentValue?.gueltig_bis }}</span>) {{ t('person','wirklichLoeschen') }}
-		</template>
-	</ModalDialog>
 	`
 }
 
