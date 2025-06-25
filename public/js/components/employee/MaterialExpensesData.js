@@ -20,6 +20,7 @@ export const MaterialExpensesData = {
     setup( props ) {
 
         const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -143,23 +144,26 @@ export const MaterialExpensesData = {
 			if(currentValue.value.betrag !== null) {
 				currentValue.value.betrag = (String(currentValue.value.betrag)).replace('.', ',');
 			}
-            const ok = await confirmDeleteRef.value.show();
+            if (await $fhcAlert.confirm({
+                    //message: t('person','sachaufwand') + ' ' + getType(currentValue.value?.sachaufwandtyp_kurzbz) + ' ' + currentValue.value?.beginn - currentValue.value?.ende + ' ' + t('person','wirklichLoeschen'),
+                    message: t('person','sachaufwand') + ' ' + getType(currentValue.value?.sachaufwandtyp_kurzbz) + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
             
-            if (ok) {   
-
-                try {
-                    const res = await $api.call(ApiPerson.deletePersonMaterialExpenses(id));
-                    if (res.meta.status == "success") {
-                        delete materialdataList.value[id];
-                        showDeletedToast();
-                    }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                      isFetching.value = false
-                }   
-                
-            }
+            try {
+                const res = await $api.call(ApiPerson.deletePersonMaterialExpenses(id));
+                if (res.meta.status == "success") {
+                    delete materialdataList.value[id];
+                    showDeletedToast();
+                }
+            } catch (error) {
+                console.log(error)              
+            } finally {
+                    isFetching.value = false
+            }   
         }
 
 
@@ -256,16 +260,12 @@ export const MaterialExpensesData = {
             return t.length > 0 ? t[0].bezeichnung : ''
         }
         
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
-        
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','sachaufwandGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','sachaufwandGeloescht'));
         }
 
         return { 
@@ -274,7 +274,6 @@ export const MaterialExpensesData = {
             readonly,
             frmState,
             dialogRef,
-            toastRef, deleteToastRef,
             materialDataFrm,
             modalRef,
             types, 

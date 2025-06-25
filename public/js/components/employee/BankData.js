@@ -21,6 +21,7 @@ export const BankData = {
     setup( props ) {
 
         const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
         const readonly = Vue.ref(false);
         const { personID } = Vue.toRefs(props);
         const { t } = usePhrasen();
@@ -67,7 +68,7 @@ export const BankData = {
         const currentValue = Vue.ref(createShape(theModel.value.personID || personID.value));
         const preservedValue = Vue.ref(createShape(theModel.value.personID || personID.value));
 
-        const toggleMode = async () => {
+        /* const toggleMode = async () => {
             if (!readonly.value) {
                 // cancel changes?
                 if (hasChanged.value) {
@@ -84,7 +85,7 @@ export const BankData = {
                 preservedValue.value = {...currentValue.value};
               }
               readonly.value = !readonly.value;
-        }
+        } */
 
         Vue.onMounted(() => {
             currentValue.value = createShape(theModel.value.personID || personID.value);
@@ -118,24 +119,28 @@ export const BankData = {
 
         const showDeleteModal = async (id) => {
             currentValue.value = { ...bankdataList.value[id] };
-            const ok = await confirmDeleteRef.value.show();
-            
-            if (ok) {   
 
-                isFetching.value = true
-                try {
-                  const res = await $api.call(ApiPerson.deletePersonBankData(id));                 
-                  if (res.meta.status == "success") {
-                    delete bankdataList.value[id];
-                    showDeletedToast();
-                  }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                    isFetching.value = false
+            if (await $fhcAlert.confirm({
+                    message: t('person','bankdaten') + ' ' + currentValue.value?.iban + ' ' + currentValue.value?.bic + ' ' + currentValue.value?.name + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
+            
+            isFetching.value = true
+            try {
+                const res = await $api.call(ApiPerson.deletePersonBankData(id));                 
+                if (res.meta.status == "success") {
+                delete bankdataList.value[id];
+                showDeletedToast();
                 }
-                
+            } catch (error) {
+                console.log(error)              
+            } finally {
+                isFetching.value = false
             }
+            
         }
 
 
@@ -210,17 +215,13 @@ export const BankData = {
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
         });
-
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','bankdatenGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','bankdatenGeloescht'));
         }
 
         return { 
@@ -229,11 +230,10 @@ export const BankData = {
             readonly,
             frmState,
             dialogRef,
-            toastRef, deleteToastRef,
             bankDataFrm,
             modalRef, 
             
-            toggleMode,  
+          /*   toggleMode,   */
             validIban, 
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler, t,
@@ -242,18 +242,6 @@ export const BankData = {
     },
     template: `
     <div class="row">
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-          <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','bankdatenGespeichert') }}</h4></template>
-          </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person','bankdatenGeloescht') }}</h4></template>
-            </Toast>
-        </div>
     </div>
 
    <div class="row pt-md-4">      
