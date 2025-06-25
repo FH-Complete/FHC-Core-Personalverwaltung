@@ -21,6 +21,7 @@ export const AddressData = {
 
         const { personID } = Vue.toRefs(props);
         const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
 
         const { t } = usePhrasen();
 
@@ -33,8 +34,6 @@ export const AddressData = {
         const isEditActive = Vue.ref(false);
 
         const currentAddress = Vue.ref();
-
-        const confirmDeleteRef = Vue.ref();
 
         const nations = Vue.inject('nations');
         const adressentyp = Vue.inject('adressentyp');
@@ -115,9 +114,16 @@ export const AddressData = {
 
         const showDeleteModal = async (id) => {
             currentAddress.value = { ...addressList.value[id] };
-            const ok = await confirmDeleteRef.value.show();
+
+            if (await $fhcAlert.confirm({
+                    message:`${currentAddress.value?.plz} ${currentAddress.value?.ort}, ${currentAddress.value?.strasse} wirklich löschen?`,
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }     
             
-            if (ok && !currentAddress.value.heimatadresse) {   
+            if (!currentAddress.value.heimatadresse) {   
 
                 try {
                     const res = await $api.call(ApiPerson.deletePersonAddressData(id));   
@@ -131,6 +137,8 @@ export const AddressData = {
                       isFetching.value = false
                 }                  
                 
+            } else {
+                $fhcAlert.alertInfo(t('person','heimatadresse') + ' ' + t('person','kannNichtGeloeschtWerden'));
             }
         }
 
@@ -230,23 +238,19 @@ export const AddressData = {
             }
             return false;
         }
-
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','adresseGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','adresseGeloescht'));
         }
 
         return {
             addressList, addressListArray, isEditActive, showAddModal, 
-            showDeleteModal, showEditModal, confirmDeleteRef, currentAddress, 
-            modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
+            showDeleteModal, showEditModal, currentAddress, 
+            modalRef,hideModal, okHandler, nations,
             gemeinden, ortschaften, adressentyp, t,
             // form handling
             validOrt, validPLZ, validTyp, frmState, addressDataFrm, readonly
@@ -255,18 +259,6 @@ export const AddressData = {
     },
     template: ` 
         <div class="row">
-
-            <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                <Toast ref="toastRef">
-                    <template #body><h4>{{ t('person','adresseGespeichert') }}</h4></template>
-                </Toast>
-            </div>
-
-            <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                <Toast ref="deleteToastRef">
-                    <template #body><h4>{{ t('person','adresseGeloescht') }}</h4></template>
-                </Toast>
-            </div>
 
             <div class="d-flex bd-highlight">
                 <div class="py-2 bd-highlight">                   
@@ -403,17 +395,6 @@ export const AddressData = {
                 </button>
             </template>
         </Modal>
-
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                <span v-if="!currentAddress?.heimatadresse">
-                   {{ t('person','adresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','wirklichLoeschen') }}?
-                </span>
-                <span v-else>
-                    {{ t('person','heimatadresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','kannNichtGeloeschtWerden') }}!
-                </span>
-            </template>
-        </ModalDialog>
 
         
         `

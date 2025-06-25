@@ -18,6 +18,7 @@ export const EmailTelData = {
     setup(props) {
 
         const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
         const { personID } = Vue.toRefs(props);
 
         const { t } = usePhrasen();
@@ -105,23 +106,27 @@ export const EmailTelData = {
 
         const showDeleteModal = async (id) => {
             currentContact.value = { ...contactList.value[id] };
-            const ok = await confirmDeleteRef.value.show();
-            
-            if (ok) {
 
-                try {
-                    const res = await $api.call(ApiPerson.deletePersonContactData(id));
-                    if (res?.meta?.status == 'success') {
-                        delete contactList.value[id];
-                        showDeleteToast();
-                    }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                      isFetching.value = false
-                }   
+            if (await $fhcAlert.confirm({
+                    message:t('person','kontaktinformation') + ' ' + currentContact.value?.kontakt + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
 
-            }
+            try {
+                const res = await $api.call(ApiPerson.deletePersonContactData(id));
+                if (res?.meta?.status == 'success') {
+                    delete contactList.value[id];
+                    showDeleteToast();
+                }
+            } catch (error) {
+                console.log(error)              
+            } finally {
+                    isFetching.value = false
+            }   
+
         }
 
         const hideModal = () => {
@@ -176,41 +181,25 @@ export const EmailTelData = {
             }
             return false;
         }
-
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','kontaktdatenGespeichert'));
         }
 
         const showDeleteToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','kontaktdatenGeloescht'));
         }
 
         return {
             contactList, contactListArray, 
             currentContact, showEditModal, showAddModal, showDeleteModal, hideModal, modalRef,
-            kontakttyp, confirmDeleteRef, okHandler, toastRef, deleteToastRef, t, getKontakttyp,
+            kontakttyp, confirmDeleteRef, okHandler, t, getKontakttyp,
             // form handling
             validKontakt, frmState, contactDataFrm, readonly
         }
     },
     template: `
             <div class="row">
-
-                <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                    <Toast ref="toastRef">
-                        <template #body><h4>{{ t('person','kontaktdatenGespeichert') }}</h4></template>
-                    </Toast>
-                </div>
-
-                <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                    <Toast ref="deleteToastRef">
-                        <template #body><h4>{{ t('person','kontaktdatenGeloescht') }}</h4></template>
-                    </Toast>
-                </div>
 
                 <!--div class="d-flex bd-highlight">
                     <div class="flex-grow-1 bd-highlight"></div>        
@@ -300,10 +289,5 @@ export const EmailTelData = {
             </template>
         </Modal>
 
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                {{ t('person','kontaktinformation') }} '{{ currentContact?.kontakt }}' {{ t('person','wirklichLoeschen') }}?
-            </template>
-        </ModalDialog>
     `
 }
