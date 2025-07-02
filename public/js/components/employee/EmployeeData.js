@@ -21,6 +21,7 @@ export const EmployeeData= {
     setup(props, { emit }) {
 
         const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');        
         const readonly = Vue.ref(true);
         const { t } = usePhrasen();
 
@@ -93,13 +94,15 @@ export const EmployeeData= {
             if (!readonly.value) {
                 // cancel changes?
                 if (hasChanged.value) {
-                  const ok = await dialogRef.value.show();
-                  if (ok) {
-                    console.log("ok=", ok);
-                    currentValue.value = preservedValue.value;
-                  } else {
-                    return
-                  }
+
+                  if (await $fhcAlert.confirm({
+                        message:`t('person','mitarbeiterdatenGeandert')`,
+                        acceptLabel: 'OK',
+				        acceptClass: 'p-button-danger'
+                    }) === false) {
+                    return;
+                  }     
+                  currentValue.value = preservedValue.value;                  
                 }
               } else {
                 // switch to edit mode and preserve data
@@ -211,12 +214,9 @@ export const EmployeeData= {
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
         });
-
-        // Toast 
-        const toastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+             $fhcAlert.alertSuccess(t('person','mitarbeiterdatenGespeichert'))
         }
 
         return {
@@ -225,9 +225,7 @@ export const EmployeeData= {
             readonly,
             frmState,
             dialogRef,
-            toastRef,
             employeeDataFrm,
-            showToast, 
             ausbildung,
             standorte,
             orte,
@@ -246,14 +244,6 @@ export const EmployeeData= {
 
     },
     template: `
-    <div class="row">
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="toastRef">
-                <template #body><h4>{{ t('person','mitarbeiterdatenGespeichert') }}</h4></template>
-            </Toast>
-        </div>
-    </div>
-
    <div class="row pt-md-4">      
              <div class="col">
                  <div class="card">
@@ -373,13 +363,6 @@ export const EmployeeData= {
                 </div>
             </div>
         </div>
-
-
-    <ModalDialog :title="t('global', 'warnung')" ref="dialogRef">
-      <template #body>
-        {{ t('t','mitarbeiterdatenGeandert') }}
-      </template>
-    </ModalDialog>
     `
 }
 
