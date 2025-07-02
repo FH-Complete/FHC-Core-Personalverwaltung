@@ -34,7 +34,7 @@ export const DeadlineIssueTable = {
       const dialogRef = ref();
       const confirmDeleteRef = ref();
       const modalContainer = ref();
-      const fhcAlert = inject('$fhcAlert');
+      const $fhcAlert = inject('$fhcAlert');
       const $api = Vue.inject('$api');
 
       const redirect = (issue_id) => {
@@ -54,7 +54,7 @@ export const DeadlineIssueTable = {
           isFristFetching.value = true;
           $api.call(ApiDeadline.allByPerson(currentUID.value, deadline_filter_all.value)).then(result => {
             fristen.value = result.meta.status == "success" ? result.data : [];	
-          }).catch(fhcAlert.handleSystemError);
+          }).catch($fhcAlert.handleSystemError);
           			  
         } catch (error) {
           console.log(error);         
@@ -71,7 +71,7 @@ export const DeadlineIssueTable = {
             isFetching.value = true;           
             $api.call(ApiDeadline.getFristenStatus()).then(result => {
               fristStatus.value = result.meta.status == "success" ? result.data : [];			
-            }).catch(fhcAlert.handleSystemError);
+            }).catch($fhcAlert.handleSystemError);
               
         } catch (error) {
             console.log(error);               
@@ -133,24 +133,27 @@ export const DeadlineIssueTable = {
 
       const showDeleteModal = async (id) => {
         currentFrist.value = fristen.value.find((frist) => frist.frist_id == id);
-        const ok = await confirmDeleteRef.value.show();
+        if (await $fhcAlert.confirm({
+                    message: t('fristenmanagement','frist') + ' ' + getFristEreignisBezeichnung(currentFrist?.ereignis_kurzbz) + ' ' + formatDate(currentFrist?.datum) + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+          return;
+        }    
         
-        if (ok) {   
-
-            try {
-                //const res = await fhcApi.factory.Deadline.deleteFrist(id);   
-                const res = await $api.call(ApiDeadline.deleteFrist(id));                  
-                if (res.meta.status == "success") {
-                    fristen.value = fristen.value.filter((frist) => frist.frist_id != id);
-                    showDeletedToast();
-                }
-            } catch (error) {
-                console.log(error)              
-            } finally {
-                  isFetching.value = false
-            }                  
-            
-        }
+        try {
+            //const res = await fhcApi.factory.Deadline.deleteFrist(id);   
+            const res = await $api.call(ApiDeadline.deleteFrist(id));                  
+            if (res.meta.status == "success") {
+                fristen.value = fristen.value.filter((frist) => frist.frist_id != id);
+                showDeletedToast();
+            }
+        } catch (error) {
+            console.log(error)              
+        } finally {
+              isFetching.value = false
+        }                  
+        
     }
 
       watch(
@@ -298,14 +301,14 @@ export const DeadlineIssueTable = {
         //smodalContainer.value.show();
         addDeadline();
       }
-      const manipulateData = (id) => {
+/*       const manipulateData = (id) => {
         Vue.$fhcAlert.alertInfo('ID' + id + ' do some Action');
-      }
-      const deleteData = async (id) => {
+      } */
+/*       const deleteData = async (id) => {
         if (await Vue.$fhcAlert.confirmDelete() === false)
           return;
         Vue.$fhcAlert.alertSuccess('ID' + id + ' deleted');
-      }      
+      }  */     
 
       const updateStatus = async () => {
         let selectedData = fristenTable.value.tabulator.getSelectedData();
@@ -318,7 +321,7 @@ export const DeadlineIssueTable = {
           fetchList();
           showToast();     
         } catch (error) {
-            fhcAlert.handleSystemError(error)
+            $fhcAlert.handleSystemError(error)
         } finally {
             isFetching.value = false;
         }     
@@ -454,48 +457,26 @@ export const DeadlineIssueTable = {
 
 
       // Toast 
-      const toastRef = Vue.ref();
-      const createToastRef = Vue.ref();
-      const deleteToastRef = Vue.ref();
       
       const showToast = () => {
-          toastRef.value.show();
+          $fhcAlert.alertSuccess(t('fristenmanagement','fristStatusGespeichert'));
       }
 
       const showCreateToast = () => {
-        createToastRef.value.show();
+        $fhcAlert.alertSuccess(t('fristenmanagement','fristGespeichert'));
       }
 
       const showDeletedToast = () => {
-          deleteToastRef.value.show();
+        $fhcAlert.alertSuccess(t('fristenmanagement','fristGeloescht'));
       }
 
-      return { t, confirmDeleteRef, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, onTableCellEdited,
+      return { t, currentFrist, getFristEreignisBezeichnung, showDeleteModal, onPersonSelect, onTableCellEdited,
                fristen, formatDate, updateDeadlines, currentUID, fristStatus, fristEreignisse, statusChanged, addDeadline,
-               toastRef, createToastRef, deleteToastRef, dialogRef, isFetching, isFristFetching, updateStatus,
-               fristenTable, tabulatorOptions, tabulatorEvents, addData, editDeadline,  deleteData, manipulateData, modalContainer, modalTitel,
+               dialogRef, isFetching, isFristFetching, updateStatus,
+               fristenTable, tabulatorOptions, tabulatorEvents, addData, editDeadline,  modalContainer, modalTitel,
                current_status_kurzbz, deadline_filter_all, handleDeadlineFilterAllChanged }
     },
   template: `
-
-    <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-      <Toast ref="toastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristStatusGespeichert') }}</h4></template>
-      </Toast>
-    </div>
-
-    <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-      <Toast ref="createToastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristGespeichert') }}</h4></template>
-      </Toast>
-    </div>
-
-    <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-      <Toast ref="deleteToastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristGeloescht') }}</h4></template>
-      </Toast>
-    </div>
-
     <div id="master" class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-5 pb-2 mb-3">
                         
       <div class="flex-fill align-self-center">
@@ -503,11 +484,6 @@ export const DeadlineIssueTable = {
       </div>
     </div>
     
-    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-        <template #body>
-            {{ t('fristenmanagement','frist') }} '{{ getFristEreignisBezeichnung(currentFrist?.ereignis_kurzbz) }} {{ formatDate(currentFrist?.datum) }}' {{ t('person','wirklichLoeschen') }}?
-        </template>
-    </ModalDialog>
 
     <DeadlineIssueDialog ref="dialogRef"></DeadlineIssueDialog>
 

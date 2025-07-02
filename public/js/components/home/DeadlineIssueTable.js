@@ -24,6 +24,7 @@ export const DeadlineIssueTable = {
       const current_status_kurzbz = Vue.ref("");
 
       const $api = Vue.inject('$api');
+      const $fhcAlert = Vue.inject('$fhcAlert');
 
       const dateFormatter = (cell) => {
         return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
@@ -241,34 +242,19 @@ export const DeadlineIssueTable = {
       }
 
       // Toast
-      const updateStatusToastRef = Vue.ref()
-      const refreshDeadlinesToastRef = Vue.ref()
 
       const showToast = () => {
-        updateStatusToastRef.value.show()
+        $fhcAlert.alertSuccess(t('fristenmanagement','fristStatusGespeichert'));
       }
 
       const showRefreshToast = () => {
-        refreshDeadlinesToastRef.value.show()
+        $fhcAlert.alertSuccess(t('fristenmanagement','fristenAktualisiert'));
       }
 
       return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef, isFetching, fristStatus, current_status_kurzbz,
-        updateStatus, updateStatusToastRef, refreshDeadlinesToastRef, t, selectedData }
+        updateStatus, t, selectedData }
     },
   template: `
-
-    <div class="toast-container position-absolute z-3 top-0 end-0 pt-4 pe-2">
-      <Toast ref="updateStatusToastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristStatusGespeichert') }}</h4></template>
-      </Toast>
-    </div>
-
-    <div class="toast-container position-fixed top-0 end-0 pt-5 pe-2">
-      <Toast ref="refreshDeadlinesToastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristenAktualisiert') }}</h4></template>
-      </Toast>
-    </div>
-
     <div id="master" class="d-flex flex-column  pt-4 pb-1 mb-1">
 
       <div class="me-auto">
