@@ -55,7 +55,7 @@ export const IssuesCard = {
               isFetching.value = true;
               const response = await $api.call(ApiIssue.byPerson(currentPersonID.value));
               isFetching.value = false;              
-              if (response?.meta?.status == 'success' && response?.data.length>0) {
+              if (response?.meta?.status == 'success' && response?.data?.length>0) {
                 issues.value = response.data;
                 getBehebungData(issues.value);
               } else {

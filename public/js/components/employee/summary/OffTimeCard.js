@@ -34,7 +34,7 @@ export const OffTimeCard = {
               isFetching.value = true;
               const response = await $api.call(ApiZeit.personAbwesenheiten(currentUID.value));
               isFetching.value = false;              
-              if (response?.meta?.status == 'success' && response.data.length>0) {
+              if (response?.meta?.status == 'success' && response?.data?.length>0) {
                 offTimeList.value = response.data;
               } else {
                 offTimeList.value = null;
