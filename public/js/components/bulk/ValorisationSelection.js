@@ -212,6 +212,7 @@ export const ValorisationSelection = {
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
 						{title: 'Wochenstunden', field: 'wochenstunden', headerFilter: true, frozen: true, formatter: formatWochenstunden, sorter: 'number'},
+						{title: 'Teilzeittyp', field: 'teilzeittyp', headerFilter: true, frozen: true},
 						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman},
 						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman}
 					]

@@ -24,6 +24,7 @@ SELECT
 	dv.von AS dvvon,
 	dv.bis AS dvbis,
 	vbstunden.wochenstunden,
+	vbstunden.teilzeittyp,
 	ma.personalnummer AS personalnummer
 FROM
 	hr.tbl_dienstverhaeltnis dv
@@ -82,13 +83,16 @@ LEFT JOIN
 	public.vw_oe_path oep ON oep.oe_kurzbz = oezuordnung.oe_kurzbz
 LEFT JOIN (
 	SELECT
-		vb.dienstverhaeltnis_id, MAX(vbs.wochenstunden) AS wochenstunden
+		vb.dienstverhaeltnis_id, MAX(vbs.wochenstunden) AS wochenstunden, 
+		STRING_AGG(tzt.bezeichnung, ', ') AS teilzeittyp
 	FROM
 		hr.tbl_vertragsbestandteil vb
 	JOIN
 		hr.tbl_dienstverhaeltnis dv USING(dienstverhaeltnis_id)
 	JOIN
 		hr.tbl_vertragsbestandteil_stunden vbs USING (vertragsbestandteil_id)
+	LEFT JOIN
+		hr.tbl_teilzeittyp tzt USING(teilzeittyp_kurzbz)
 	WHERE
 		dv.vertragsart_kurzbz = 'echterdv' AND
 		{$this->db->escape($valorisierungsDatum)} BETWEEN COALESCE(vb.von, '1970-01-01') AND COALESCE(vb.bis, '2170-12-31')
