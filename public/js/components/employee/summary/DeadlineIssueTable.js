@@ -2,7 +2,6 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { DeadlineIssueDialog } from './DeadlineIssueDialog.js';
-import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../../js/components/filter/Filter.js";
 import ApiDeadline from '../../../api/factory/deadline.js';
@@ -12,7 +11,6 @@ export const DeadlineIssueTable = {
   name: 'DeadlineIssueTable',
   components: {
     ModalDialog,
-    Toast,
     "p-skeleton": primevue.skeleton,
     DeadlineIssueDialog,
     CoreFilterCmpt,
@@ -446,14 +444,6 @@ export const DeadlineIssueTable = {
             }
         }
       ]);
-
-    /*   Vue.watch(fristStatusList, (newVal, oldVal) => {
-        let colDefs = fristenTable.value?.tabulator.getColumnDefinitions()
-        let statusCol = colDefs.find(col => col.field === 'status_kurzbz')
-        if (statusCol !== undefined) {
-          statusCol.headerFilterParams.values = newVal;
-        }
-      }) */
 
 
       // Toast 

@@ -1,5 +1,4 @@
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import ApiPerson from '../../api/factory/person.js';
 
@@ -7,7 +6,6 @@ export const BaseData = {
 	name: 'BaseData',
     components: {
         ModalDialog,
-        Toast,
         "datepicker": VueDatePicker
     },
     props: {
@@ -77,7 +75,7 @@ export const BaseData = {
               const res = await $api.call(ApiPerson.personBaseData(theModel.value.personID || personID.value));
               currentValue.value = res.data[0];
             } catch (error) {
-              console.log(error)              
+              $fhcAlert.handleSystemError(error)                   
             } finally {
                 isFetching.value = false
             }          
@@ -217,7 +215,7 @@ export const BaseData = {
                     theModel.value.updateHeader();
                     toggleMode();  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)             
                 } finally {
                     isFetching.value = false
                 }

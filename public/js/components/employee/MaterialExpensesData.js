@@ -1,6 +1,5 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import ApiPerson from '../../api/factory/person.js';
 
@@ -9,7 +8,6 @@ export const MaterialExpensesData = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
         "datepicker": VueDatePicker
     },
     props: {
@@ -61,7 +59,7 @@ export const MaterialExpensesData = {
                 const response = await $api.call(ApiPerson.personMaterialExpenses(theModel.value.personID, theModel.value.personUID));
                 materialdataList.value = response.data;
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)            
             } finally {
                 isFetching.value = false
             }
@@ -160,7 +158,7 @@ export const MaterialExpensesData = {
                     showDeletedToast();
                 }
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)             
             } finally {
                     isFetching.value = false
             }   
@@ -186,7 +184,7 @@ export const MaterialExpensesData = {
                         showToast();
                     }  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)         
                 } finally {
                     isFetching.value = false
                 }
@@ -286,19 +284,7 @@ export const MaterialExpensesData = {
          }
     },
     template: `
-    <div class="row">
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-          <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','sachaufwandGespeichert') }}</h4></template>
-          </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person', 'sachaufwandGeloescht') }}</h4></template>
-            </Toast>
-        </div>
+    <div class="row">        
     </div>
     <div class="row pt-md-4">      
          <div class="col">

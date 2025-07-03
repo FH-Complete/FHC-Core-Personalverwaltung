@@ -1,6 +1,5 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import ApiPerson from '../../../api/factory/person.js';
 import ApiCommon from '../../../api/factory/common.js';
@@ -11,7 +10,6 @@ export const AddressData = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
     },
     props: {
         personID: { type: Number, required: true },

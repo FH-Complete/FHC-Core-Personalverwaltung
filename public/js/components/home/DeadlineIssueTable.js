@@ -1,4 +1,3 @@
-import { Toast } from "../Toast.js";
 import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import ApiDeadline from '../../api/factory/deadline.js';
@@ -6,7 +5,6 @@ import ApiDeadline from '../../api/factory/deadline.js';
 export const DeadlineIssueTable = {
   name: 'DeadlineIssueTable',
   components: {
-    Toast,
   },
   props: {
   },

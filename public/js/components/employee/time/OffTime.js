@@ -1,6 +1,5 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
 import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import ApiZeit from '../../../api/factory/zeit.js';
@@ -10,7 +9,6 @@ export const OffTime = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
         OrgChooser,
         "datepicker": VueDatePicker
     },

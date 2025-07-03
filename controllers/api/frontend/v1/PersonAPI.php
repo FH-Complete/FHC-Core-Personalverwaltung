@@ -988,12 +988,9 @@ class PersonAPI extends FHCAPI_Controller
      * Update/Insert banking data of a person
      */
     function upsertPersonBankData()
+    
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 

@@ -53,8 +53,7 @@ export const HourlyRateData = {
 			}
 			catch (error)
 			{
-				console.log(error)
-				isFetching.value = false;
+				$fhcAlert.handleSystemError(error)
 			}
 			finally
 			{
@@ -133,7 +132,7 @@ export const HourlyRateData = {
 					showDeletedToast();
 				}
 			} catch (error) {
-				console.log(error)
+				$fhcAlert.handleSystemError(error)
 			} finally {
 				isFetching.value = false
 			}
@@ -153,7 +152,7 @@ export const HourlyRateData = {
 				}
 				catch (error)
 				{
-					console.log(error)
+					$fhcAlert.handleSystemError(error)
 				}
 				finally
 				{

@@ -1,6 +1,5 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';5
 import ApiPerson from '../../api/factory/person.js';
 
@@ -10,7 +9,6 @@ export const BankData = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
     },
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
@@ -44,9 +42,9 @@ export const BankData = {
               const res = await $api.call(ApiPerson.personBankData(theModel.value.personID || personID.value));                                    
               bankdataList.value = res.data;
             } catch (error) {
-              console.log(error)              
+              $fhcAlert.handleSystemError(error)                      
             } finally {
-                isFetching.value = false
+              isFetching.value = false
             }
         }
 
@@ -136,7 +134,7 @@ export const BankData = {
                 showDeletedToast();
                 }
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)                    
             } finally {
                 isFetching.value = false
             }
@@ -158,12 +156,11 @@ export const BankData = {
                     const r = await $api.call(ApiPerson.upsertPersonBankData(currentValue.value));                              
                     if (r.meta.status == "success") {
                         bankdataList.value[r.data[0].bankverbindung_id] = r.data[0];
-                        console.log('bankdata successfully saved');
                         preservedValue.value = currentValue.value;
                         showToast();
-                    }   // TODO show error toast
+                    }   
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)            
                 } finally {
                     isFetching.value = false
                 }

@@ -1,6 +1,5 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import ApiFunktion from '../../api/factory/funktion.js';
@@ -11,7 +10,6 @@ export const JobFunction = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
         OrgChooser,
         "datepicker": VueDatePicker
     },
@@ -294,7 +292,7 @@ export const JobFunction = {
                 }
 
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)           
             } finally {
                   isFetching.value = false
             }   
@@ -321,7 +319,7 @@ export const JobFunction = {
                     theModel.value.updateHeader();
                 }
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)             
             } finally {
                     isFetching.value = false
             }   
@@ -354,7 +352,7 @@ export const JobFunction = {
                         showToast();
                     }  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)            
                 } finally {
                     isFetching.value = false
                 }

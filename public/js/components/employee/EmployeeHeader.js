@@ -1,14 +1,13 @@
 import { Modal } from '../Modal.js';
-import { Toast } from '../Toast.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
 import ApiEmployee from '../../api/factory/employee.js';
 import ApiIssue from '../../api/factory/issue.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeHeader = {
 	name: 'EmployeeHeader',
     components: {
-        Toast,
 		Modal,
         ModalDialog,
         "p-skeleton": primevue.skeleton,
@@ -33,11 +32,13 @@ export const EmployeeHeader = {
         const fileInput = ref();
         const previewImage = ref();
         const statusRef = ref();
+        const { t } = usePhrasen();
 
         const isFetching = ref(false);
         const isFetchingName = ref(false);
         const isFetchingIssues = ref(false);
-        const $api = inject('$api')        
+        const $api = inject('$api')     
+        const $fhcAlert = Vue.inject('$fhcAlert')   
 
        //const currentDate = ref(null);
 
@@ -125,19 +126,6 @@ export const EmployeeHeader = {
             }
         })
 
-        // Toast
-        const toastRef = ref();
-        const toastRefVal = ref();
-        const toastDeleteRef = ref();
-
-        const showToast = () => {
-            toastRef.value.show();
-        }
-
-        const showDeleteToast = () => {
-            toastDeleteRef.value.show();
-        }
-
         const pickFile = () => {
             let input = fileInput.value
             let file = input.files
@@ -156,16 +144,15 @@ export const EmployeeHeader = {
                 const res = await $api.call(ApiEmployee.uploadPersonEmployeeFoto(props.personID,previewImage.value));
                 if (res?.meta?.status != 'success') 
                 {
-                    toastRefVal.value = res.data;
+                    $fhcAlert.alertError(t('person', res.data))
                 }
                 else
                 {                    
-                    toastRefVal.value = 'Foto gespeichert.'
+                    $fhcAlert.alertSuccess(t('person', 'Foto gespeichert.'))
                 }
                 fetchHeaderData(props.personID, props.personUID);
-                showToast();
             } catch (error) {
-                console.log(error);
+                $fhcAlert.handleSystemError(error)  
             } finally {
                 isFetching.value = false;
             }
@@ -177,9 +164,9 @@ export const EmployeeHeader = {
                 isFetching.value = true
                 const res = await $api.call(ApiEmployee.deletePersonEmployeeFoto(props.personID));
                 fetchHeaderData(props.personID, props.personUID);
-                showDeleteToast();
+                $fhcAlert.alertSuccess(t('person','Foto gelöscht'))
             } catch (error) {
-                console.log(error);
+                $fhcAlert.handleSystemError(error)  
             } finally {
                 isFetching.value = false;
             }
@@ -196,15 +183,17 @@ export const EmployeeHeader = {
             modalRef.value.hide();
         }
 
-        // confirm
-        let confirmDeleteRef = ref();
-
         const showDeleteModal = async () => {
-            const ok = await confirmDeleteRef.value.show();
 
-            if (ok) {
-              postDeleteFile();
-            }
+            if (await $fhcAlert.confirm({
+                    message:`Foto wirklich löschen?`,
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }     
+
+            postDeleteFile();
           }
 
         const okHandler = () => {
@@ -223,15 +212,7 @@ export const EmployeeHeader = {
             // window.location.href = `${protocol_host}/index.ci.php/extensions/FHC-Core-Personalverwaltung/Employees/summary?person_id=${person_id}`;
           }
 
-        /* const setDateHandler = (e) => {
-            console.log('setDateHandler', e.target.value);
-            let url = route.path + '?d=' + e.target.value;
-            currentDate.value = e.target.value;
-            router.push(url);
-        } */
-
         const refresh = () => {
-            console.log('refresh called')
             fetchHeaderData(props.personID, props.personUID);
             checkPerson(props.personID);
             statusRef.value.refresh();
@@ -253,13 +234,9 @@ export const EmployeeHeader = {
             resetPreview,
             modalRef,
             showDeleteModal,
-            confirmDeleteRef,
             pickFile,
             okHandler,
             statusRef,
-            toastRef,
-            toastRefVal,
-            toastDeleteRef,
             redirect,
             FHC_JS_CONFIG,
             getStatusTags,
@@ -280,15 +257,6 @@ export const EmployeeHeader = {
         }
     },
     template: `
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="toastRef">
-                <template #body><h4>{{toastRefVal}}</h4></template>
-            </Toast>
-
-            <Toast ref="toastDeleteRef">
-                <template #body><h4>Foto gelöscht.</h4></template>
-            </Toast>
-        </div>
 
         <div class="d-flex justify-content-between ms-sm-auto col-lg-12 p-md-2" >
             <div class="d-flex align-items-top flex-fill" >
@@ -392,13 +360,6 @@ export const EmployeeHeader = {
                 <button class="btn btn-primary"  @click="okHandler()">OK</button>
             </template>
         </Modal>
-
-        <!-- Confirm Delete -->
-        <ModalDialog title="Warnung" ref="confirmDeleteRef">
-            <template #body>
-                Foto wirklich löschen?
-            </template>
-        </ModalDialog>
 
         `
 }

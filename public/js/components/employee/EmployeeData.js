@@ -1,5 +1,4 @@
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import ApiPerson from '../../api/factory/person.js';
 
@@ -8,7 +7,6 @@ export const EmployeeData= {
 	name: 'EmployeeData',
     components: {
         ModalDialog,
-        Toast,
     },
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
@@ -52,7 +50,7 @@ export const EmployeeData= {
               const res = await $api.call(ApiPerson.personEmployeeData(theModel.value.personID || personID.value));
               currentValue.value = res.data[0];
             } catch (error) {
-              console.log(error)              
+              $fhcAlert.handleSystemError(error)         
             } finally {
                 isFetching.value = false
             }   
@@ -165,7 +163,7 @@ export const EmployeeData= {
                         })
                         
                     } catch (error) {
-                        console.log(error)              
+                        $fhcAlert.handleSystemError(error)             
                     } finally {
                         isFetching.value = false
                     }   
@@ -201,7 +199,7 @@ export const EmployeeData= {
                     theModel.value.updateHeader();
                     toggleMode();  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)              
                 } finally {
                     isFetching.value = false
                 }
