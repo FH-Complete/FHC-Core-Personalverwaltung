@@ -179,6 +179,12 @@ export const ValorisationSelection = {
 					}
 				};
 
+				const formatWochenstunden = function(cell) {
+					let value = cell.getValue();
+					let retval = (typeof value === 'string') ? value.replace(/\./, ',') : value;
+					return retval;
+				};
+
 				return {
 					height: '75vh',
 					// Unique ID
@@ -205,6 +211,7 @@ export const ValorisationSelection = {
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
+						{title: 'Wochenstunden', field: 'wochenstunden', headerFilter: true, frozen: true, formatter: formatWochenstunden, sorter: 'number'},
 						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman},
 						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman}
 					]
