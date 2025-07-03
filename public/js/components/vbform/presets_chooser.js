@@ -1,6 +1,7 @@
 import store from './vbsharedstate.js';
 
 export default {
+  name: 'PresetsChooser',
   template: `
   <div class="row g-2 py-2">
     <div class="col-12">

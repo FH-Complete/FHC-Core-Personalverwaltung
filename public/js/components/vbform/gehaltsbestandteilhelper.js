@@ -3,6 +3,7 @@ import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
 
 export default {
+  name: 'GehaltsbestandteilHelper',
   template: `
   <div class="row pt-3 pb-1">
     <div class="col-12">

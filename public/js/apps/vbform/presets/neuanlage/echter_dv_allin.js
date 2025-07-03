@@ -298,7 +298,7 @@ export default {
             removeable: true
           },
           data: {
-            gehaltstyp: 'zulage',
+            gehaltstyp: 'zulage_allin',
             valorisierung: true
           }
         }

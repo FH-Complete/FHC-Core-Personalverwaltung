@@ -5,6 +5,7 @@ import errors from '../../../vbform/errors.js';
 import infos from '../../../vbform/infos.js';
 
 export default {
+  name: 'EndDvModal',
   template: `
     <Modal :title="'Dienstverhältnis beenden'" :noscroll="true" ref="modalRef" 
            :class="'vbformModal'" id="endDvModal">
@@ -15,7 +16,7 @@ export default {
                 <dienstverhaeltnis ref="dienstverhaeltnisRef" :config="curdv" :showdvcheckoverlap="false"></dienstverhaeltnis>
             </div>
 
-            <input type="checkbox" v-model="unrulyInternal" id="unruly" :disabled="saving" ref="unrulyCheckbox">
+            <input type="checkbox" v-model="unrulyInternal" id="unruly" :disabled="spinners.saving" ref="unrulyCheckbox">
 			<label for="unruly" style="margin-left: 12px;" >{{ $p.t('studierendenantrag', 'mark_person_as_unruly') }}</label>
 
             
@@ -52,6 +53,7 @@ export default {
   emits: [
     "dvended", "updateunruly"
   ],
+  inject: ['$fhcApi', '$fhcAlert'],
   components: {
     'Modal': Modal,
     'dienstverhaeltnis': dienstverhaeltnis,
@@ -64,14 +66,14 @@ export default {
       this.store.showmsgs = false;
       const payload = this.$refs['dienstverhaeltnisRef'].getPayload();
       
-      Vue.$fhcapi.DV.endDV(payload)
+      this.$fhcApi.factory.DV.endDV(payload)
       .then((response) => {
-        this.handleDVEnded(response.data);
+        this.handleDVEnded(response);
       }).then(() => {
         if(!this.unrulyInternal) return
 
         // TODO maybe add updateUnruly into pv21 api for concurrency reasons
-        Vue.$fhcapi.Person.updatePersonUnruly({
+        this.$fhcapi.factory.Person.updatePersonUnruly({
           person_id: this.curdv.person_id,
           unruly: this.unrulyInternal
         }).then((response) => {
@@ -105,7 +107,7 @@ export default {
         this.spinners.saving = true;
         this.store.showmsgs = false;
 
-        Vue.$fhcapi.Person.updatePersonUnruly({
+        this.$fhcapi.factory.Person.updatePersonUnruly({
           person_id: this.curdv.person_id,
           unruly: this.unrulyInternal
         }).then((response) => {

@@ -1,4 +1,5 @@
 export default {     
+	name: 'Steps',
      expose: ['selectedTitle', 'selectStep', 'reset'],
      setup( props, { slots } ) {  
         const stepTitles = Vue.ref(slots.default().map((step) => step.props.title))

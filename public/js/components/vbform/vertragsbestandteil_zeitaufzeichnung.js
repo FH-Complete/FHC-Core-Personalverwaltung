@@ -4,6 +4,7 @@ import errors from './errors.js';
 import infos from './infos.js';
 
 export default {
+  name: 'VertragsbestandteilZeitaufzeichnung',
   template: `
   <div class="py-0 my-2">
    <div class="py-0">

@@ -1,6 +1,7 @@
 import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 export const TimelineCard = {
+	name: 'TimelineCard',
      components: {
         "p-timeline": primevue.timeline,
      },

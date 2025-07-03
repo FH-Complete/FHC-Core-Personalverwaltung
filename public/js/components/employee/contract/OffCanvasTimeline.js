@@ -2,6 +2,7 @@ import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
 
 
 export const OffCanvasTimeline = {
+	name: 'OffCanvasTimeline',
      components: {
         "p-timeline": primevue.timeline,
         "p-multiselect": primevue.multiselect,
@@ -16,6 +17,7 @@ export const OffCanvasTimeline = {
      setup( props, { expose, emit } ) {
 
         const colorPalette = ["#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"];
+        const fhcApi = Vue.inject('$fhcApi');
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Timeline");
@@ -81,14 +83,13 @@ export const OffCanvasTimeline = {
 
 
         async function show() {
-            //let response = await Vue.$fhcapi.Vertragsbestandteil.getAllVBs(props.curdv.dienstverhaeltnis_id)
-            //console.log('curdv: ',response.data)
+
             vbsData.value = []
                         
             for (const dv of props.alldv){
-                let response = await Vue.$fhcapi.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
-                console.log('alldv: ',response.data)
-                vbsData.value.push(response.data.data)
+                let response = await fhcApi.factory.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
+                console.log('alldv: ',response)
+                vbsData.value.push(response.data)
             }            
 
             events.value = generateTimeline(vbsData.value)

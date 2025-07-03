@@ -4,6 +4,7 @@ import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const MaterialExpensesData = {
+	name: 'MaterialExpensesData',
     components: {
         Modal,
         ModalDialog,
@@ -17,9 +18,13 @@ export const MaterialExpensesData = {
     },
     setup( props ) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
+        const numberFormat = new Intl.NumberFormat('de-AT',{
+            minimumFractionDigits: 2
+          });
 
         const theModel = Vue.computed({
             get: () => props.modelValue,
@@ -51,8 +56,8 @@ export const MaterialExpensesData = {
  
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
-                materialdataList.value = response.data.retval;
+                const response = await fhcApi.factory.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
+                materialdataList.value = response.retval;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -69,6 +74,7 @@ export const MaterialExpensesData = {
                 beginn: "",
                 ende: "",  
                 anmerkung: "",     
+                betrag: "",
             } 
         }
 
@@ -113,6 +119,7 @@ export const MaterialExpensesData = {
             currentValue.value = createShape();
             // reset form state
             frmState.beginnBlurred=false;
+            frmState.betragBlurred=false;
             // call bootstrap show function
             modalRef.value.show();
         }
@@ -124,18 +131,24 @@ export const MaterialExpensesData = {
         const showEditModal = (id) => {
             currentValue.value = { ...materialdataList.value[id] };
             delete currentValue.value.bezeichnung;
+			if(currentValue.value.betrag !== null) {
+				currentValue.value.betrag = (String(currentValue.value.betrag)).replace('.', ',');
+			}
             modalRef.value.show();
         }
 
         const showDeleteModal = async (id) => {
             currentValue.value = { ...materialdataList.value[id] };
+			if(currentValue.value.betrag !== null) {
+				currentValue.value.betrag = (String(currentValue.value.betrag)).replace('.', ',');
+			}
             const ok = await confirmDeleteRef.value.show();
             
             if (ok) {   
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonMaterialExpenses(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.Person.deletePersonMaterialExpenses(id);                    
+                    if (res.error == 0) {
                         delete materialdataList.value[id];
                         showDeletedToast();
                     }
@@ -158,9 +171,12 @@ export const MaterialExpensesData = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonMaterialExpenses(currentValue.value);                    
-                    if (r.data.error == 0) {
-                        materialdataList.value[r.data.retval[0].sachaufwand_id] = r.data.retval[0];
+					if(currentValue.value.betrag !== null) {
+						currentValue.value.betrag = (String(currentValue.value.betrag)).replace(',', '.');
+					}
+                    const r = await fhcApi.factory.Person.upsertPersonMaterialExpenses(currentValue.value);                    
+                    if (r.error == 0) {
+                        materialdataList.value[r.retval[0].sachaufwand_id] = r.retval[0];
                         console.log('materialdata successfully saved');
                         showToast();
                     }  
@@ -186,14 +202,33 @@ export const MaterialExpensesData = {
             return !!n && n.trim() != "";
         }
 
-        const validate = () => {
-            frmState.beginnBlurred = true;
-            if (validBeginn(currentValue.value.beginn)) {
-                return true;
-            }
+		const validBetrag = (betrag) => {
+			if( betrag === null || betrag === '' ) {
+				return true;
+			}
+
+			if( betrag.match(/^[0-9]{1,7}(,[0-9]{0,2})?$/) ) {
+				return true;
+			}
+
             return false;
         }
-        
+
+        const validate = () => {
+			let retval = true;
+
+            frmState.beginnBlurred = true;
+            if (!validBeginn(currentValue.value.beginn)) {
+                retval = false;
+            }
+
+            frmState.betragBlurred = true;
+            if (!validBetrag(currentValue.value.betrag)) {
+                retval = false;
+            }
+
+            return retval;
+        }
 
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
@@ -205,6 +240,14 @@ export const MaterialExpensesData = {
             } else {
                 return ''
             }
+        }
+
+        const formatNumber = (num) => {
+            let n = parseFloat(num);
+            if (isNaN(n)) {
+                return '';
+            }
+            return numberFormat.format(parseFloat(num),);
         }
 
         const getType = (kurzbz) => {
@@ -235,11 +278,11 @@ export const MaterialExpensesData = {
             modalRef,
             types, 
             
-            toggleMode,  validBeginn, formatDate,
+            toggleMode,  validBeginn, validBetrag, formatDate,
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler,
             showDeleteModal, showEditModal, confirmDeleteRef, t,
-            getType
+            getType, formatNumber
          }
     },
     template: `
@@ -277,6 +320,7 @@ export const MaterialExpensesData = {
                                 <th scope="col">{{ t('global','typ') }}</th>
                                 <th scope="col">{{ t('ui','from') }}</th>
                                 <th scope="col">{{ t('global','bis') }}</th>
+                                <th scope="col">{{ t('ui','betrag') }}</th>
                                 <th scope="col">{{ t('global','anmerkung') }}</th>
                             </tr>
                             </thead>
@@ -285,6 +329,7 @@ export const MaterialExpensesData = {
                                 <td class="align-middle">{{ getType(materialdata.sachaufwandtyp_kurzbz) }}</td>
                                 <td class="align-middle">{{ formatDate(materialdata.beginn) }}</td>
                                 <td class="align-middle">{{ formatDate(materialdata.ende) }}</td>
+                                <td class="align-middle">{{ formatNumber(materialdata.betrag) }}</td>
                                 <td class="align-middle">{{ materialdata.anmerkung }}</td>
                                 <td class="align-middle" width="5%">
                                     <div class="d-grid gap-2 d-md-flex align-middle">
@@ -351,7 +396,11 @@ export const MaterialExpensesData = {
                 <div class="col-md-2">
                 </div>
                 <!-- -->
-                <div class="col-md-10">
+                <div class="col-md-3">
+                    <label for="betrag" class="form-label">{{ t('ui','betrag') }}</label>
+					<input type="text" :readonly="readonly" @blur="frmState.betragBlurred = true" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'dp-invalid-input': (!validBetrag(currentValue.betrag) && frmState.betragBlurred)}" id="betrag" v-model="currentValue.betrag">
+                </div>
+                <div class="col-md-7">
                     <label for="uid" class="form-label">{{ t('global','anmerkung') }}</label>
                     <input type="text"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly}" id="bank" v-model="currentValue.anmerkung">
                 </div>

@@ -3,6 +3,7 @@ import { OffTime } from './OffTime.js';
 import { TimeRecording } from './TimeRecording.js';
 
 export const EmployeeTime = {
+	name: 'EmployeeTime',
     components: {
         OffTime,
         TimeRecording,

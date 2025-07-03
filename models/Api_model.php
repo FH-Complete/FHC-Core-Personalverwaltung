@@ -427,6 +427,7 @@ class Api_model extends DB_Model
             p.nachname,
             p.vorname,
             p.vornamen,
+            p.geschlecht,
             p.sprache,
             p.gebdatum,
             p.svnr,

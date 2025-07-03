@@ -196,6 +196,11 @@ class SalaryExport extends Auth_Controller
 			return;
 		}
 
+		$sapInstalled = $this->_checkIfSAPSyncTableExists();
+
+		$oe_kurzbz_sap = $sapInstalled ? 'sap_org.oe_kurzbz_sap' : 'NULL';
+		$sap_join = $sapInstalled ? 'LEFT JOIN sync.tbl_sap_organisationsstruktur sap_org ON(kst.oe_kurzbz=sap_org.oe_kurzbz)' : '';
+
         $von_datestring = $date_von->format("Y-m-d");
 		$bis_datestring = $date_bis->format("Y-m-d");
 
@@ -207,17 +212,22 @@ class SalaryExport extends Auth_Controller
 
 		$qry_live = '
 			SELECT
-				gehaltsbestandteil.gehaltsbestandteil_id,gehaltsbestandteil.von, gehaltsbestandteil.bis, 
+				lvexport_sum,
+				gehaltsbestandteil.gehaltsbestandteil_id, gehaltsbestandteil.auszahlungen, 
+				gehaltsbestandteil.von, gehaltsbestandteil.bis, 
 				grundbetrag as grundbetr_decrypted, betrag_valorisiert as betr_valorisiert_decrypted,
-				dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
+				dienstverhaeltnis.dienstverhaeltnis_id, dienstverhaeltnis.von as dv_von, dienstverhaeltnis.bis as dv_bis, 
 				gehaltstyp.gehaltstyp_kurzbz, gehaltstyp.bezeichnung as gehaltstyp_bezeichnung, 
+				gehaltstyp.sort as gehaltstyp_sort,
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
 				person.nachname,person.vorname,
 				vertragsbestandteil_freitext.freitexttyp_kurzbz,vertragsbestandteil_freitext.titel freitext_titel, vertragsbestandteil_freitext.anmerkung as freitext_anmerkung,
+				vertragsbestandteil_freitext.freitexttyp_bezeichnung,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
-				ksttypbezeichnung, kstorgbezeichnung
+				ksttypbezeichnung, kstorgbezeichnung, 
+				' . $oe_kurzbz_sap . ' AS kstnummer
 			FROM
 
 				hr.tbl_dienstverhaeltnis dienstverhaeltnis 
@@ -229,9 +239,11 @@ class SalaryExport extends Auth_Controller
 				JOIN public.tbl_person person on (benutzer.person_id = person.person_id)
 				LEFT JOIN (
 					SELECT
-						dienstverhaeltnis_id,vertragsbestandteil_id,freitexttyp_kurzbz, freitext.titel, freitext.anmerkung
+						dienstverhaeltnis_id,vertragsbestandteil_id,freitexttyp_kurzbz, freitext.titel, freitext.anmerkung, 
+						freitexttyp.bezeichnung as freitexttyp_bezeichnung
 					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
 					JOIN hr.tbl_vertragsbestandteil_freitext freitext using(vertragsbestandteil_id)
+					JOIN hr.tbl_vertragsbestandteil_freitexttyp freitexttyp using(freitexttyp_kurzbz)
 					WHERE 
 						vertragsbestandteiltyp_kurzbz=\'freitext\'
 						'.$vbs_where.'	
@@ -259,8 +271,7 @@ class SalaryExport extends Auth_Controller
 						vertragsbestandteiltyp_kurzbz=\'stunden\'
 						'.$vbs_where.'
 						
-					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id
-					 AND gehaltsbestandteil.vertragsbestandteil_id=vertragsbestandteil_stunden.vertragsbestandteil_id)
+					) as vertragsbestandteil_stunden ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_stunden.dienstverhaeltnis_id)
 				 
 				LEFT JOIN (
 					SELECT 
@@ -276,9 +287,11 @@ class SalaryExport extends Auth_Controller
 						'.$vbs_where.'
 						-- ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id AND kst.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
+
+				' . $sap_join . '
 				
 			WHERE
-				gehaltstyp.gehaltstyp_kurzbz <> \'lohnausgleichatz\'
+				gehaltstyp.lvexport = true
 				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
 					OR gehaltsbestandteil.bis IS NULL)
 				AND
@@ -300,25 +313,94 @@ class SalaryExport extends Auth_Controller
 
 		$qry_live = $qry_live.$where;
 
-		$qry_history = '
+		/* $qry_history = '
 			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted
 			FROM (select * from ('.$qry_live.') t) live 
 			LEFT JOIN hr.tbl_gehaltshistorie historie using(gehaltsbestandteil_id) 
 			WHERE
 				((historie.datum >= '. $this->_ci->db->escape($von_datestring) .')
-					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')
+					AND historie.datum <= '. $this->_ci->db->escape($bis_datestring) .')			
+			'; */
+
+		$qry_history = '
+			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted, 
+				vh.betrag_valorisiert as betrag_valorisiert_historie_decrypted
+			FROM (select * FROM ('.$qry_live.') t) live 
+			LEFT JOIN (
+				SELECT * FROM hr.tbl_gehaltshistorie
+				WHERE
+				((datum >= '. $this->_ci->db->escape($von_datestring) .')
+					AND datum <= '. $this->_ci->db->escape($bis_datestring) .')
+				) historie using(gehaltsbestandteil_id)
+			LEFT JOIN 
+				hr.tbl_valorisierung_historie vh ON vh.gehaltsbestandteil_id = live.gehaltsbestandteil_id AND vh.valorisierungsdatum = (
+					SELECT 
+						vi.valorisierungsdatum 
+					FROM 
+						hr.tbl_valorisierung_instanz vi
+					JOIN
+						hr.tbl_dienstverhaeltnis d ON d.dienstverhaeltnis_id = live.dienstverhaeltnis_id 
+						AND d.oe_kurzbz = vi.oe_kurzbz
+					WHERE 
+						'. $this->_ci->db->escape($bis_datestring) .' >= valorisierungsdatum 
+					ORDER BY 
+						valorisierungsdatum DESC 
+					LIMIT 1
+					) 
 			';
 
-		switch ($listType) {
+		$qry_grouped =  "
+			SELECT
+					dienstverhaeltnis_id,
+					array_agg(gehaltsbestandteil_id ORDER BY gehaltstyp_sort ASC) as gehaltsbestandteil_id, 
+					array_agg(DISTINCT auszahlungen) as gehaltsbestandteil_auszahlungen, 
+					lvexport_sum,sum(grundbetr_decrypted) as grundbetr_decrypted, sum(betr_valorisiert_decrypted) as betr_valorisiert_decrypted,
+					sum(hbetrag_decrypted) as hbetrag_decrypted,sum(betrag_valorisiert_historie_decrypted) as betrag_valorisiert_historie_decrypted,
+					dv_von, dv_bis, 
+					array_agg(gehaltstyp_bezeichnung ORDER BY gehaltstyp_sort ASC) as gehaltstyp_bezeichnung, 
+					vertragsart_bezeichnung,mitarbeiter_uid, 
+					personalnummer,name_gesamt,svnr,
+					nachname,vorname,
+					array_remove(array_agg(freitexttyp_kurzbz), NULL) freitexttyp_kurzbz,
+					array_remove(array_agg(freitext_titel), NULL) freitext_titel, 
+					array_remove(array_agg(freitext_anmerkung), NULL) as freitext_anmerkung,
+					array_remove(array_agg(freitexttyp_bezeichnung), NULL) as freitexttyp_bezeichnung,
+					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
+					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer
+				FROM ($qry_history) as hist
+
+			GROUP BY dienstverhaeltnis_id,
+					coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+                    dv_von, dv_bis,
+					vertragsart_bezeichnung,mitarbeiter_uid, 
+					personalnummer,name_gesamt,svnr,
+					nachname,vorname,
+					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
+					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer
+			HAVING ((dv_bis >= ". $this->_ci->db->escape($von_datestring) .")
+							OR dv_bis IS NULL)
+						AND
+						((dv_von <= ". $this->_ci->db->escape($bis_datestring) .")
+							OR dv_von IS NULL)
+		";
+		/* switch ($listType) {
 			case 'live':
-				$qry = $qry_live;
-				$encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
+				//$qry = $qry_live;
+				$qry = $qry_grouped;
+				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+				// $encryptedCols = $this->_ci->GehaltsbestandteilModel->getEncryptedColumns();
 				break;
 			case 'history': 
-				$qry = $qry_history;
+				$qry = $qry_grouped;
 				$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
 				break;
-		};
+		}; */
+
+		$qry = $qry_grouped;
+		$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+
 
 
 		$result = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
@@ -368,7 +450,30 @@ class SalaryExport extends Auth_Controller
 		return $fp;
 	}
 
-	
+	/**
+	 * Checks if sap sync table exists.
+	 * slightly adapted duplicate of core Vertragsbestandteil_model->_checkIfSAPSyncTableExists
+	 * @return bool
+	 */
+	private function _checkIfSAPSyncTableExists()
+	{
+		$params = array(
+			DB_NAME,
+			'sync',
+			'tbl_sap_organisationsstruktur'
+		);
 
+		$sql = "SELECT
+				1 AS exists
+			FROM
+				information_schema.tables
+			WHERE
+				table_catalog = ? AND
+				table_schema = ? AND
+				table_name = ?";
 
+		$res = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery($sql, $params);
+
+		return hasData($res);
+	}
 }

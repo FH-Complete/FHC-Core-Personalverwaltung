@@ -67,6 +67,7 @@ class PersonAPI extends Auth_Controller
         $this->load->model('person/Adresse_model','AdresseModel');
         $this->load->model('person/Kontakt_model','KontaktModel');
         $this->load->model('person/Person_model','PersonModel');
+		$this->load->model('person/Fotostatusperson_model', 'FotostatusPersonModel');
         $this->load->model('ressource/Mitarbeiter_model', 'EmployeeModel');
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
         $this->load->model('person/Bankverbindung_model','BankverbindungModel');
@@ -74,6 +75,7 @@ class PersonAPI extends Auth_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
         $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
         $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
+		$this->load->model("crm/Akte_model", "AkteModel");
 
          // get CI for transaction management
          $this->CI = &get_instance();
@@ -374,115 +376,129 @@ class PersonAPI extends Auth_Controller
         return $this->output->set_content_type('jpeg')->set_output(base64_decode($data->retval[0]->foto));
     }
 
-    function uploadPersonEmployeeFoto()
-    {
-        if($this->input->method() === 'post'){
+	function uploadPersonEmployeeFoto()
+	{
+		if($this->input->method() === 'post')
+		{
 
-            $payload = json_decode($this->input->raw_input_stream, TRUE);
-            $image = $payload['imagedata'];
-            $person_id = $payload['person_id'];
+			$payload = json_decode($this->input->raw_input_stream, TRUE);
+			$image = $payload['imagedata'];
+			$person_id = $payload['person_id'];
 
-            if (!is_numeric($person_id))
-			    show_error("person_id is not numeric!'");
+			if (!is_numeric($person_id))
+				show_error("person_id is not numeric!'");
 
-            // scale image to maxsize (and convert to jpg)
+			$resizedImage1 = $this->_resize($image, 827, 1063);
 
-            $meta = getimagesize($image);
-            $src_width = $meta[0];
-            $src_height = $meta[1];
+			if (is_null($resizedImage1))
+				return $this->outputJsonError("Fehler beim Speichern des Fotos");
 
-            switch ($meta['mime']) {
-                case 'image/jpeg':
-                case 'image/jpg':
-                  $imagecreated = imagecreatefromjpeg($image);
-                  break;
-                case 'image/png':
-                  $imagecreated = imagecreatefrompng($image);
-                  break;
-                case 'image/gif':
-                  $imagecreated = imagecreatefromgif($image);
-                  break;
-                default:
-                  return null;
-              }
+			$akte = $this->AkteModel->loadWhere(array('person_id' =>  $person_id, 'dokument_kurzbz' => 'Lichtbil'));
 
-              // max image size
-              $maxwidth = 101;
-              $maxheight = 130;
-              $quality = 90;
-              // ratio
-              $src_aspect_ratio = $src_width / $src_height;
-              $thu_aspect_ratio = $maxwidth / $maxheight;
+			$akteUpdateData = array(
+				'dokument_kurzbz' => 'Lichtbil',
+				'person_id' => $person_id,
+				'inhalt' => $resizedImage1,
+				'mimetype' => 'image/jpg',
+				'erstelltam' => date('Y-m-d H:i:s'),
+				'gedruckt' => false,
+				'titel' => 'Lichtbild_'.$person_id.'.jpg',
+				'bezeichnung' => 'Lichtbild gross',
+				'insertamum' => date('Y-m-d H:i:s'),
+				'insertvon' => getAuthUID(),
+			);
 
-              // calc image dimensions
-              if ($src_width <= $maxwidth && $src_height <= $maxheight)
-              {
-                  $thu_width  = $src_width;
-                  $thu_height = $src_height;
-              } elseif ($thu_aspect_ratio > $src_aspect_ratio) {
-                  $thu_width  = (int) ($maxheight * $src_aspect_ratio);
-                  $thu_height = $maxheight;
-              } else {
-                  $thu_width = $maxwidth;
-                  $thu_height = (int) ($maxwidth / $src_aspect_ratio);
-              }
+			if (hasData($akte))
+			{
+				$akte_id = getData($akte)[0]->akte_id;
 
-              $imageScaled        =   ImageCreateTrueColor($thu_width,$thu_height);
-              imagecopyresampled($imageScaled,$imagecreated,0,0,0,0,$thu_width,$thu_height,$src_width,$src_height);
+				$akteUpdateData['updateamum'] =  date('Y-m-d H:i:s');
+				$akteUpdateData['updatevon'] =  getAuthUID();
+				$akteResult = $this->AkteModel->update(array('akte_id' => $akte_id), $akteUpdateData);
+			}
+			else
+			{
+				$akteResult = $this->AkteModel->insert($akteUpdateData);
+			}
 
+			if (isError($akteResult))
+			{
+				return $this->outputJsonError("Fehler beim Speichern des Fotos");
+			}
 
-              //if (!empty($imagecreated) && $imageScaled = imagescale($imagecreated, $thu_width, $thu_height))
-              if (!empty($imageScaled))
-              {
-                ob_start();
+			$resizedImage2 = $this->_resize($image, 101, 130);
 
-                imagejpeg($imageScaled, NULL, $quality);
+			if (is_null($resizedImage2))
+				return $this->outputJsonError("Fehler beim Speichern des Fotos");
 
-                $image = ob_get_contents();
-                ob_end_clean();
-                imagedestroy($imagecreated);
-                imagedestroy($imageScaled);
+			$result = $this->ApiModel->updateFoto($person_id, $resizedImage2);
 
-                if (!empty($image))
-                {
-                    $scaledBase64 = base64_encode($image);
-                    $this->ApiModel->updateFoto($person_id, $scaledBase64);
+			if (!isError($result))
+			{
+				$this->FotostatusPersonModel->insert(array(
+					'person_id' => $person_id,
+					'fotostatus_kurzbz' => 'hochgeladen',
+					'datum' => date('Y-m-d'),
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => getAuthUID(),
+					'insertamum' => date('Y-m-d H:i:s'),
+					'insertvon' => getAuthUID(),
+				));
 
-                    $this->outputJsonSuccess(true);
-                } else {
-                    $this->outputJsonError(false);
-                }
+				return $this->outputJsonSuccess(true);
+			}
 
-              }
+			return $this->outputJsonError("Fehler beim Speichern des Fotos");
 
-        }  else {
-            $this->output->set_status_header('405');
-        }
-    }
+		}
+		else
+		{
+			$this->output->set_status_header('405');
+		}
+	}
 
-    function deletePersonEmployeeFoto()
-    {
-        if($this->input->method() === 'post'){
+	function deletePersonEmployeeFoto()
+	{
+		if($this->input->method() === 'post')
+		{
 
-            $payload = json_decode($this->input->raw_input_stream, TRUE);
-            $person_id = $payload['person_id'];
+			$payload = json_decode($this->input->raw_input_stream, TRUE);
+			$person_id = $payload['person_id'];
 
-            if (!is_numeric($person_id))
-                $this->outputJsonError("person_id is not numeric!'");
+			if (!is_numeric($person_id))
+				$this->outputJsonError("person_id is not numeric!'");
 
-            $result = $this->ApiModel->deleteFoto($person_id);
+			$result = $this->ApiModel->deleteFoto($person_id);
 
-            if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
-		    else
-			    $this->outputJsonError('Error when deleting foto');
+			if (isSuccess($result))
+			{
+				$this->FotostatusPersonModel->delete(array('person_id' => $person_id, 'fotostatus_kurzbz' => 'akzeptiert'));
+				$akteResult = $this->AkteModel->delete(array('person_id' => $person_id, 'dokument_kurzbz' => 'Lichtbil'));
 
-        }  else {
-            $this->output->set_status_header('405');
-        }
-    }
+				if (isSuccess($akteResult))
+				{
+					$this->FotostatusPersonModel->insert(array(
+						'person_id' => $person_id,
+						'fotostatus_kurzbz' => 'abgewiesen',
+						'datum' => date('Y-m-d'),
+						'updateamum' => date('Y-m-d H:i:s'),
+						'updatevon' => getAuthUID(),
+						'insertamum' => date('Y-m-d H:i:s'),
+						'insertvon' => getAuthUID(),
+					));
+				}
+				$this->outputJsonSuccess($result->retval);
+			}
+			else
+				$this->outputJsonError('Error when deleting foto');
+		}
+		else
+		{
+			$this->output->set_status_header('405');
+		}
+	}
 
-
+   
 
     // ---------------------------------------
     // base data (Stammdaten)
@@ -822,13 +838,31 @@ class PersonAPI extends Auth_Controller
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
             if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
-                show_error('sachaufwand_id is not numeric!');
+			{
+                $this->outputJsonError('sachaufwand_id is not numeric!');
+				exit();
+			}
 
             if (!isset($payload['sachaufwandtyp_kurzbz']) || (isset($payload['sachaufwandtyp_kurzbz']) && $payload['sachaufwandtyp_kurzbz'] == ''))
-                show_error('sachaufwandtyp_kurzbz is empty!');
+			{
+                $this->outputJsonError('sachaufwandtyp_kurzbz is empty!');
+				exit();
+			}
 
             if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
-                show_error('mitarbeiter_uid is empty!');
+			{
+                $this->outputJsonError('mitarbeiter_uid is empty!');
+				exit();
+			}
+
+            if (isEmptyString($payload['betrag']))
+				$payload['betrag']=null; 
+
+			if( $payload['betrag'] !== null && !is_numeric($payload['betrag']) )
+			{
+				$this->outputJsonError('betrag is not numeric!');
+				exit();
+			}
 
             if ($payload['sachaufwand_id'] == 0)
             {
@@ -1223,5 +1257,99 @@ class PersonAPI extends Auth_Controller
         $data = $this->ApiModel->filter($searchString);
         return $this->outputJson($data);
     }
+	private function _resize($imageData, $maxwidth, $maxheight, $quality = 90)
+	{
+		$meta = getimagesize($imageData);
+		if (!$meta)
+		{
+			return null;
+		}
 
+		$src_width = $meta[0];
+		$src_height = $meta[1];
+		$mime = $meta['mime'];
+
+		switch ($mime) {
+			case 'image/jpeg':
+			case 'image/jpg':
+				$imagecreated = imagecreatefromjpeg($imageData);
+				break;
+			case 'image/png':
+				$imagecreated = imagecreatefrompng($imageData);
+				break;
+			case 'image/gif':
+				$imagecreated = imagecreatefromgif($imageData);
+				break;
+			default:
+				return null;
+		}
+
+
+		if (!$imagecreated)
+		{
+			return null;
+		}
+
+		$src_aspect_ratio = $src_width / $src_height;
+		$thu_aspect_ratio = $maxwidth / $maxheight;
+
+		if ($src_width <= $maxwidth && $src_height <= $maxheight)
+		{
+			$thu_width = $src_width;
+			$thu_height = $src_height;
+		}
+		elseif ($thu_aspect_ratio > $src_aspect_ratio)
+		{
+			$thu_width = (int) ($maxheight * $src_aspect_ratio);
+			$thu_height = $maxheight;
+		}
+		else
+		{
+			$thu_width = $maxwidth;
+			$thu_height = (int) ($maxwidth / $src_aspect_ratio);
+		}
+
+		$imageScaled = imagecreatetruecolor($thu_width, $thu_height);
+
+		if ($mime === 'image/png')
+		{
+			$background = imagecolorallocate($imageScaled , 0, 0, 0);
+			imagecolortransparent($imageScaled, $background);
+			imagealphablending($imageScaled, false);
+			imagesavealpha($imageScaled, true);
+		}
+
+		imagecopyresampled($imageScaled, $imagecreated, 0, 0, 0, 0, $thu_width, $thu_height, $src_width, $src_height);
+
+		if ($mime === "image/gif")
+		{
+			$background = imagecolorallocate($imageScaled, 0, 0, 0);
+			imagecolortransparent($imageScaled, $background);
+		}
+
+		if (!empty($imageScaled))
+		{
+			ob_start();
+
+			if ($mime == 'image/png')
+				imagepng($imageScaled, NULL);
+			else if ($mime === 'image/gif')
+				imagegif($imageScaled, NULL);
+			else
+				imagejpeg($imageScaled, NULL, $quality);
+
+			$resizedImageData = ob_get_contents();
+			ob_end_clean();
+			@imagedestroy($imagecreated);
+			@imagedestroy($imageScaled);
+
+
+			if (!empty($resizedImageData))
+			{
+				return base64_encode($resizedImageData);
+			}
+			return null;
+		}
+		return null;
+	}
 }

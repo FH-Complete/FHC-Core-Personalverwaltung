@@ -4,6 +4,7 @@ import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmailTelData = {
+	name: 'EmailTelData',
     components: {
         Modal,
         ModalDialog,
@@ -15,6 +16,7 @@ export const EmailTelData = {
     },  
     setup(props) {
 
+        const fhcApi = Vue.inject('$fhcApi');
         const { personID } = Vue.toRefs(props);
 
         const { t } = usePhrasen();
@@ -46,8 +48,8 @@ export const EmailTelData = {
             }
             // submit
             try {
-                const response = await Vue.$fhcapi.Person.personContactData(personID.value);
-                contactList.value = response.data.retval;
+                const response = await fhcApi.factory.Person.personContactData(personID.value);
+                contactList.value = response.retval;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -107,8 +109,8 @@ export const EmailTelData = {
             if (ok) {
 
                 try {
-                    const res = await Vue.$fhcapi.Person.deletePersonContactData(id);                    
-                    if (res.data.error == 0) {
+                    const res = await fhcApi.factory.Person.deletePersonContactData(id);                    
+                    if (res.error == 0) {
                         delete contactList.value[id];
                         showDeleteToast();
                     }
@@ -134,9 +136,9 @@ export const EmailTelData = {
 
                 // submit
                 try {
-                    const r = await Vue.$fhcapi.Person.upsertPersonContactData(currentContact.value);                    
-                    if (r.data.error == 0) {
-                        contactList.value[r.data.retval[0].kontakt_id] = r.data.retval[0];
+                    const r = await fhcApi.factory.Person.upsertPersonContactData(currentContact.value);                    
+                    if (r.error == 0) {
+                        contactList.value[r.retval[0].kontakt_id] = r.retval[0];
                         console.log('contact successfully saved');
                         showToast();
                     }  

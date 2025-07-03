@@ -1,6 +1,7 @@
 import { usePhrasen } from '../../../../../public/js/mixins/Phrasen.js';
 
 export const ModalDialog = {
+	name: 'ModalDialog',
     props: {
         type: String,
         title: String,

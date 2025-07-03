@@ -1,4 +1,5 @@
 const PivotReport = {
+	name: 'PivotReport',
     components : {
       "p-datatable": primevue.datatable,
       "p-column": primevue.column,
