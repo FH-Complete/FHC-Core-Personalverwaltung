@@ -102,6 +102,8 @@ LEFT JOIN (
 WHERE
 	dv.vertragsart_kurzbz = 'echterdv'
 	AND
+	ma.personalnummer > 0
+	AND
 		{$this->db->escape($valorisierungsDatum)} BETWEEN COALESCE(dv.von, '1970-01-01') AND COALESCE(dv.bis, '2170-12-31')
 EOSQL;
 
