@@ -187,7 +187,6 @@ export const DeadlineIssueTable = {
 
           // Workaround to update tabulator
           Vue.watch(fristen, (newVal, oldVal) => {
-              console.log('fristenList changed');
               tabulator.value?.setData(fristen.value);
           }, {deep: true})
 

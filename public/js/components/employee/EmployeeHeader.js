@@ -104,13 +104,6 @@ export const EmployeeHeader = {
             }
         });
 
-        /* watch(
-            currentDate,
-            (newVal) => {
-                console.log('header date changed: ', newVal);
-            }
-        ) */
-
         onMounted(() => {
             //currentDate.value = route.query.d || new Date();
             if (props.personID, props.personUID) {

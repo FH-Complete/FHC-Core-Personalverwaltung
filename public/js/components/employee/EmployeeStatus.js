@@ -108,7 +108,7 @@ export const EmployeeStatus = {
           isFetching.value = true
           try {
               const res = await $api.call(ApiEmployee.dvByPerson(uid));
-              dvList.value = res.data;          
+              dvList.value = res.data || [];          
               isFetching.value = false;
               generateStatusList();           
           } catch (error) {

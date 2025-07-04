@@ -436,7 +436,6 @@ export const DeadlineIssueTable = {
                 fetchList();
 
 				Vue.watch(fristen, (newVal, oldVal) => {
-				  console.log('fristenList changed');
 				  if( fristenTable.value?.tabulator !== null ) {
 					  fristenTable.value.tabulator.setData(fristen.value);
 				  }

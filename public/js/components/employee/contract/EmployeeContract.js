@@ -187,8 +187,8 @@ export const EmployeeContract = {
             isFetching.value = true
             try {
                 const res = await $api.call(ApiEmployee.dvByPerson(uid));  
-                dvList.value = res.data;
-                isFetching.value = false;
+                dvList.value = res.data || [];
+                
                 if (dvList.value.length > 0) {
                     if (props.dienstverhaeltnis_id != undefined) {
                         currentDVID.value = props.dienstverhaeltnis_id;
@@ -204,7 +204,8 @@ export const EmployeeContract = {
                 }
             } catch (error) {
                 console.log(error)
-                isFetching.value = false
+            } finally {
+                isFetching.value = false;
             }
 
 
@@ -283,7 +284,7 @@ export const EmployeeContract = {
         }
 
         const activeDV = computed(() => {
-            return dvList.value.filter((dv) => {
+            return dvList.value?.filter((dv) => {
                 let von = new Date(dv.von);
                 let bis = dv.bis != null ? new Date(dv.bis) : null;
                 return von <= currentDate.value && (bis == null || bis >= currentDate.value);
