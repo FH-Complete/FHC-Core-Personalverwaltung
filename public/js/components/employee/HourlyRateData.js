@@ -237,10 +237,6 @@ export const HourlyRateData = {
 			}
 		}
 
-		// Toast
-		const toastRef = Vue.ref();
-		const deleteToastRef = Vue.ref();
-
 		const showToast = () => {
             $fhcAlert.alertSuccess(t('person','stundensatzGespeichert'));
         }
@@ -256,8 +252,6 @@ export const HourlyRateData = {
 			readonly,
 			frmState,
 			dialogRef,
-			toastRef,
-			deleteToastRef,
 			houryrateDataFrm,
 			modalRef,
 			types,

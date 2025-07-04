@@ -6,7 +6,6 @@ import { progressbar } from '../Progressbar.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
 import {formatter} from '../bulk/valorisationformathelper.js';
-import { Toast } from '../Toast.js';
 import ApiSalaryExport from '../../api/factory/salaryexport.js';
 
 export const SalaryExport = {
@@ -18,7 +17,6 @@ export const SalaryExport = {
         Modal,
         ModalDialog,
         CoreFilterCmpt,
-        Toast,
         OrgChooser,
     },
     props: {
@@ -45,7 +43,7 @@ export const SalaryExport = {
         const abrechnungExists = ref(true);
 
         const $api = Vue.inject('$api');
-        const fhcAlert = inject('$fhcAlert');
+        const $fhcAlert = inject('$fhcAlert');
 
 
         const startOfYear = () => {
@@ -101,9 +99,6 @@ export const SalaryExport = {
         }
         // Modal 
         const confirmDeleteRef = Vue.ref();
-        // Toast
-        const deleteToastRef = Vue.ref();
-
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
         const filterPerson = ref('');
@@ -410,39 +405,35 @@ export const SalaryExport = {
         }
 
         const orgSelectedHandler = (orgID) => {
-            console.log('org selected:', orgID);
 			currentOrgID.value = orgID;
             if (!!filterMonth.value.year) {
-				//fetchData();
 				fetchAbrechnungExists();
 			}
         }
 
         const showDeleteModal = async () => {
             
-            const ok = await confirmDeleteRef.value.show();
+            if (await $fhcAlert.confirm({
+                    message: 'Gehaltshistorie von ' + filterMonth.month + '/' + filterMonth.year + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
             
-            if (ok) {   
-                await deleteAbrechnung()
-                deleteToastRef.value.show();
-            }
+            await deleteAbrechnung()
+            $fhcAlert.alertSuccess(t('person','gehaltshistoriegeloescht'));
         }
                 
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
-            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler, deleteToastRef,
-            salaryTabulatorEvents, salaryTabulatorOptions, listType, confirmDeleteRef, showDeleteModal,
+            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler, 
+            salaryTabulatorEvents, salaryTabulatorOptions, listType, showDeleteModal,
             currentBetrag, filterPerson, jobRunning,
             formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
 
     },
-    template: `    
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person','gehaltshistoriegeloescht') }}</h4></template>
-            </Toast>
-        </div>
+    template: `            
 
         <core-filter-cmpt 
 			ref="salaryTableRef"
@@ -482,18 +473,11 @@ export const SalaryExport = {
                         <button  v-if="false" type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>	
                         <button  v-if="false" type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="showDeleteModal">Gehaltshistorie löschen</button>
 
-                        
-
                     </div>
 
 				</div>
 			</template>
 		</core-filter-cmpt>
 
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                Gehaltshistorie von {{ filterMonth.month }}/{{ filterMonth.year }} {{ t('person','wirklichLoeschen') }}?
-            </template>
-        </ModalDialog>
     `
 }
