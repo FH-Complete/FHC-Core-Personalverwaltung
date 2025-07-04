@@ -36,7 +36,7 @@ export const DvCard = {
               isFetching.value = true;
               const response = await $api.call(ApiEmployee.getCurrentDV(currentUID.value, ts));
               isFetching.value = false;              
-              if (response?.meta?.status == 'success' && response.data.length>0) {
+              if (response?.meta?.status == 'success' && response?.data?.length>0) {
                 dvData.value = response.data;
               } else {
                 dvData.value = null;
