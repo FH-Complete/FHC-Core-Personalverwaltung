@@ -70,7 +70,7 @@ export default {
   },
   dvInfoByPerson(uid) {
     return {
-      method: 'post',
+      method: 'get',
       url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/DVAPI/dvInfoByPerson',
       params: {uid}
     }

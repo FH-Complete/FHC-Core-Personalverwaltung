@@ -46,7 +46,7 @@ export const EmployeeContractInfo = {
             isFetching.value = true
             try {
                 const res = await $api.call(ApiEmployee.dvInfoByPerson(uid));
-                dvList.value = res.retval.dvList;
+                dvList.value = res.data.dvList;
                 isFetching.value = false;                   
             } catch (error) {
                 console.log(error)
