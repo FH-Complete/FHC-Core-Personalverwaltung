@@ -47,7 +47,22 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		{
 			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'stunden' )
 			{
-				$this->wochenstunden = $vb->getWochenstunden();
+				if( $vb->getTeilzeittyp_kurzbz() === 'altersteilzeit' )
+				{
+					$lvbbatz = $this->ci->VertragsbestandteilLib->fetchLastVertragsbestandteilStundenBeforeAltersteilzeit($vb->getDienstverhaeltnis_id());
+					if($lvbbatz)
+					{
+						$this->wochenstunden = $lvbbatz->getWochenstunden();
+					}
+					else
+					{
+						throw new Exception(__CLASS__ . ' can not determine ATZ Wochenstunden.');
+					}
+				}
+				else
+				{
+					$this->wochenstunden = $vb->getWochenstunden();
+				}
 			}
 		}
 	}
