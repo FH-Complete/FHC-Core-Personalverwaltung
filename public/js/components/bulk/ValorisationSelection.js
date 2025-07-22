@@ -74,7 +74,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$api.call(bValorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz))
+				const res = this.$api.call(ApiValorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz))
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();

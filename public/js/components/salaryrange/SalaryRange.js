@@ -359,10 +359,10 @@ export const SalaryRange = {
 				    acceptClass: 'p-button-danger'
                 }) === false) {
                 return;
-            }    
-            
-            if (ok) {   
-    
+            }
+
+          //  if (ok) {
+
                 try {
                     const res = await $api.call(ApiSalaryRange.deleteSalaryRange(id));             
                     if (res?.meta?.status == 'success') {
@@ -375,9 +375,9 @@ export const SalaryRange = {
                     $fhcAlert.handleSystemError(error)           
                 } finally {
                       isFetching.value = false
-                }                  
-                
-            }
+                }
+
+          //  }
         }
 
         return { t, isFetching, tableRef, tabulator, currentDate, presetDates, filterDate, 

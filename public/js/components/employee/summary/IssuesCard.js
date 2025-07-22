@@ -121,29 +121,31 @@ export const IssuesCard = {
                             case 'dienstverhaeltnis_id':
                             case 'erste_dienstverhaeltnis_id':
                             case 'zweite_dienstverhaeltnis_id':
-                                    getDV( behebungParam[key] ).then((vb) => {
+                                    getDV( behebungParam[key] ).then((dv) => {
+										if (dv.data === null) return;
                                         let dienstverhaeltnis_id = behebungParam[key] + '';
                                         if (!('behebung_data' in issue)) {
                                             issue.behebung_data = { dvs: {} };                                
                                         }
                                         if (!('dvs' in issue.behebung_data)) {
                                             issue.behebung_data['dvs'] = {};
-                                        }                            
-                                        issue.behebung_data.dvs[dienstverhaeltnis_id] = vb;
+                                        }
+                                        issue.behebung_data.dvs[dienstverhaeltnis_id] = dv.data;
                                     })
                                     break;
                             case 'vertragsbestandteil_id':
                             case 'erste_vertragsbestandteil_id':
-                            case 'zweite_vertragsbestandteil_id':                            
+                            case 'zweite_vertragsbestandteil_id':
                                 getVB( behebungParam[key] ).then((vb) => {
+									if (vb.data === null) return;
                                     let vertragsbestandteil_id = behebungParam[key] + '';
                                     if (!('behebung_data' in issue)) {
                                         issue.behebung_data = { vbs: {} };                                
                                     }
                                     if (!('vbs' in issue.behebung_data)) {
                                         issue.behebung_data['vbs'] = {};
-                                    }                            
-                                    issue.behebung_data.vbs[vertragsbestandteil_id] = vb;
+                                    }
+                                    issue.behebung_data.vbs[vertragsbestandteil_id] = vb.data;
                                 })
                                 
                                 break;
@@ -151,14 +153,15 @@ export const IssuesCard = {
 
                             case 'gehaltsbestandteil_id':
                                 getGB( behebungParam[key] ).then((gb) => {
+									if (gb.data === null) return;
                                     let gehaltsbestandteil_id = behebungParam[key] + '';
                                     if (!('behebung_data' in issue)) {
                                         issue.behebung_data = { gbs: {} };                                
                                     }
                                     if (!('gbs' in issue.behebung_data)) {
                                         issue.behebung_data['gbs'] = {};
-                                    }                            
-                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb;
+                                    }
+                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb.data;
                                 })
                                 break;
                         
