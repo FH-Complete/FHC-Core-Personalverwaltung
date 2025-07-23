@@ -11,6 +11,7 @@ import ApiEmployee from '../../../api/factory/employee.js';
 import ApiVertrag from '../../../api/factory/vertrag.js';
 import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
 import ApiValorisierungscheck from '../../../api/factory/valorisierungcheck.js';
+import ApiPermission from '../../../../../../../public/js/api/factory/permission.js';
 
 export const EmployeeContract = {
 	name: 'EmployeeContract',
@@ -697,13 +698,13 @@ export const EmployeeContract = {
             var isBerechtigt = false;
             if (currentDVID != null && currentDVID.value > 0) {
                 try {
-                    const res = await fhcApi.factory.permission.isBerechtigt(
+                    const res = await $api.call(ApiPermission.isBerechtigt(
                         'basis/gehaelter', 
                         's',
                         currentDV.value.oe_kurzbz, 
                         null
-                    );
-                    isBerechtigt = res.data.data.isBerechtigt;
+                    ));
+                    isBerechtigt = res.data.isBerechtigt;
                 } catch (error) {
                     isBerechtigt = false;
                     console.log(error)
@@ -718,13 +719,13 @@ export const EmployeeContract = {
 			var isBerechtigt = false;
 			if (currentDVID != null && currentDVID.value > 0) {
 				try {
-					const res = await fhcApi.factory.permission.isBerechtigt(
+					const res = await $api.call(ApiPermission.isBerechtigt(
 						'extension/pv21_dv', 
 						's',
 						currentDV.value.oe_kurzbz, 
 						null
-					);
-					isBerechtigt = res.data.data.isBerechtigt;
+					));
+					isBerechtigt = res.data.isBerechtigt;
 				} catch (error) {
 					isBerechtigt = false;
 					console.log(error)
@@ -739,13 +740,13 @@ export const EmployeeContract = {
 			var isBerechtigt = false;
 			if (currentDVID != null && currentDVID.value > 0) {
 				try {
-					const res = await fhcApi.factory.permission.isBerechtigt(
+					const res = await $api.call(ApiPermission.isBerechtigt(
 						'extension/pv21_dv_korr', 
 						's',
 						currentDV.value.oe_kurzbz, 
 						null
-					);
-					isBerechtigt = res.data.data.isBerechtigt;
+					));
+					isBerechtigt = res.data.isBerechtigt;
 				} catch (error) {
 					isBerechtigt = false;
 					console.log(error)
