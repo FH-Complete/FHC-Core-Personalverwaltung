@@ -2,6 +2,7 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { Toast } from '../Toast.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import ApiStundensatz from '../../api/factory/stundensatz.js';
 
 export const HourlyRateData = {
 	name: 'HourlyRateData',
@@ -19,7 +20,8 @@ export const HourlyRateData = {
 	},
 	setup (props) {
 
-		const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
+		const $fhcAlert = Vue.inject('$fhcAlert');
 		const { t } = usePhrasen();
 
 		const theModel = Vue.computed({ 
@@ -46,13 +48,12 @@ export const HourlyRateData = {
 
 			try
 			{
-				const response = await fhcApi.factory.Stundensatz.getStundensaetze(theModel.value.personUID);
-				hourlyRatedataList.value = response.retval;
+				const response = await $api.call(ApiStundensatz.getStundensaetze(theModel.value.personUID));
+				hourlyRatedataList.value = response.data;
 			}
 			catch (error)
 			{
-				console.log(error)
-				isFetching.value = false;
+				$fhcAlert.handleSystemError(error)
 			}
 			finally
 			{
@@ -113,23 +114,27 @@ export const HourlyRateData = {
 
 		const showDeleteModal = async (id) => {
 			currentValue.value = { ...hourlyRatedataList.value[id] };
-			const ok = await confirmDeleteRef.value.show();
 
-			if (ok)
-			{
-				try {
-					const res = await fhcApi.factory.Stundensatz.deleteStundensatz(id);
+			if (await $fhcAlert.confirm({
+                    message: t('person','stundensatzWirklichLoeschen') + ' ' + currentValue.value?.stundensatztyp + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
 
-					if (res.error === 0)
-					{
-						delete hourlyRatedataList.value[id];
-						showDeletedToast();
-					}
-				} catch (error) {
-					console.log(error)
-				} finally {
-					isFetching.value = false
+			try {
+				const res = await $api.call(ApiStundensatz.deleteStundensatz(id));
+
+				if (res.meta.status === "success")
+				{
+					delete hourlyRatedataList.value[id];
+					showDeletedToast();
 				}
+			} catch (error) {
+				$fhcAlert.handleSystemError(error)
+			} finally {
+				isFetching.value = false
 			}
 		}
 
@@ -137,17 +142,17 @@ export const HourlyRateData = {
 			if (validate())
 			{
 				try {
-					const r = await fhcApi.factory.Stundensatz.updateStundensatz(currentValue.value);
-					if (r.error === 0)
+					const r = await $api.call(ApiStundensatz.updateStundensatz(currentValue.value));
+					if (r.meta.status === "success")
 					{
-						hourlyRatedataList.value[r.retval[0].stundensatz_id] = r.retval[0];
+						hourlyRatedataList.value[r.data[0].stundensatz_id] = r.data[0];
 						preservedValue.value = currentValue.value;
 						showToast();
 					}
 				}
 				catch (error)
 				{
-					console.log(error)
+					$fhcAlert.handleSystemError(error)
 				}
 				finally
 				{
@@ -232,17 +237,13 @@ export const HourlyRateData = {
 			}
 		}
 
-		// Toast
-		const toastRef = Vue.ref();
-		const deleteToastRef = Vue.ref();
-
 		const showToast = () => {
-			toastRef.value.show();
-		}
+            $fhcAlert.alertSuccess(t('person','stundensatzGespeichert'));
+        }
 
-		const showDeletedToast = () => {
-			deleteToastRef.value.show();
-		}
+        const showDeletedToast = () => {
+            $fhcAlert.alertSuccess(t('person','stundensatzGeloescht'));
+        }
 
 		return {
 			hourlyRatedataList,
@@ -251,8 +252,6 @@ export const HourlyRateData = {
 			readonly,
 			frmState,
 			dialogRef,
-			toastRef,
-			deleteToastRef,
 			houryrateDataFrm,
 			modalRef,
 			types,
@@ -266,18 +265,6 @@ export const HourlyRateData = {
 	},
 	template: `
 	<div class="row">
-
-		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-		  <Toast ref="toastRef">
-			<template #body><h4>{{ t('person','stundensatzGespeichert') }}</h4></template>
-		  </Toast>
-		</div>
-
-		<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-			<Toast ref="deleteToastRef">
-				<template #body><h4>{ t('person','stundensatzGeloescht') }}</h4></template>
-			</Toast>
-		</div>
 	</div>
 	<div class="row pt-md-4">
 		 <div class="col">
@@ -411,11 +398,6 @@ export const HourlyRateData = {
 	  </template>
 	</ModalDialog>
 
-	<ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-		<template #body>
-		{{ t('person','stundensatzWirklichLoeschen') }} '{{ currentValue?.stundensatztyp }}' ({{ currentValue?.gueltig_von }}<span v-if="currentValue?.gueltig_bis"> - {{ currentValue?.gueltig_bis }}</span>) {{ t('person','wirklichLoeschen') }}
-		</template>
-	</ModalDialog>
 	`
 }
 

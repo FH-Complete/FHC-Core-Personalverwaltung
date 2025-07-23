@@ -3,6 +3,8 @@ import dienstverhaeltnis from '../../../vbform/dienstverhaeltnis.js';
 import store from '../../../vbform/vbsharedstate.js';
 import errors from '../../../vbform/errors.js';
 import infos from '../../../vbform/infos.js';
+import ApiPerson from '../../../../api/factory/person.js';
+import ApiDV from '../../../../api/factory/dv.js';
 
 export default {
   name: 'EndDvModal',
@@ -53,7 +55,7 @@ export default {
   emits: [
     "dvended", "updateunruly"
   ],
-  inject: ['$fhcApi', '$fhcAlert'],
+  inject: ['$api', '$fhcAlert'],
   components: {
     'Modal': Modal,
     'dienstverhaeltnis': dienstverhaeltnis,
@@ -66,17 +68,17 @@ export default {
       this.store.showmsgs = false;
       const payload = this.$refs['dienstverhaeltnisRef'].getPayload();
       
-      this.$fhcApi.factory.DV.endDV(payload)
+      this.$api.call(ApiDV.endDV(payload))
       .then((response) => {
         this.handleDVEnded(response);
       }).then(() => {
         if(!this.unrulyInternal) return
 
         // TODO maybe add updateUnruly into pv21 api for concurrency reasons
-        this.$fhcapi.factory.Person.updatePersonUnruly({
+        this.$api.call(ApiPerson.updatePersonUnruly({
           person_id: this.curdv.person_id,
           unruly: this.unrulyInternal
-        }).then((response) => {
+        })).then((response) => {
           this.$emit('updateunruly', this.unrulyInternal);
         })
 
@@ -107,10 +109,10 @@ export default {
         this.spinners.saving = true;
         this.store.showmsgs = false;
 
-        this.$fhcapi.factory.Person.updatePersonUnruly({
+        this.$api.call(ApiPerson.updatePersonUnruly({
           person_id: this.curdv.person_id,
           unruly: this.unrulyInternal
-        }).then((response) => {
+        })).then((response) => {
           this.$emit('updateunruly', this.unrulyInternal);
         }).finally(() => {
           this.spinners.saving = false;

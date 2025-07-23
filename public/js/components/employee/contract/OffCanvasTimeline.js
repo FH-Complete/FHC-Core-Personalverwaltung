@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiVertragsbestandteil from '../../../api/factory/vertragsbestandteil.js';
 
 
 export const OffCanvasTimeline = {
@@ -17,7 +17,7 @@ export const OffCanvasTimeline = {
      setup( props, { expose, emit } ) {
 
         const colorPalette = ["#fd7f6f", "#7eb0d5", "#b2e061", "#bd7ebe", "#ffb55a", "#ffee65", "#beb9db", "#fdcce5", "#8bd3c7"];
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Timeline");
@@ -87,8 +87,7 @@ export const OffCanvasTimeline = {
             vbsData.value = []
                         
             for (const dv of props.alldv){
-                let response = await fhcApi.factory.Vertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id)
-                console.log('alldv: ',response)
+                const response = await $api.call(ApiVertragsbestandteil.getAllVBs(dv.dienstverhaeltnis_id))
                 vbsData.value.push(response.data)
             }            
 

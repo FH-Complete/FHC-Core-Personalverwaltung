@@ -1,6 +1,8 @@
 import { Modal } from '../Modal.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
+import ApiEmployee from '../../api/factory/employee.js';
+import ApiDV from '../../api/factory/dv.js';
 
 export const StaleEmployees = {
 	name: 'StaleEmployees',
@@ -27,7 +29,7 @@ export const StaleEmployees = {
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const fhcAlert = inject('$fhcAlert');
         
         const formatDateISO = (ds) => {
@@ -51,8 +53,8 @@ export const StaleEmployees = {
             
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.Employee.getEmployeesWithoutContract();                    
-              employeeList.value = res.retval;
+              const res = await $api.call(ApiEmployee.getEmployeesWithoutContract());                 
+              employeeList.value = res.data;
             } catch (error) {
               console.log(error)              
             } finally {
@@ -69,6 +71,7 @@ export const StaleEmployees = {
             modalRef.value.show();
             //await sleep(500);
             cancelAction.value = false;
+            let promises = [];
             for (let index = 1; index <= selectedData.value.length; index++) {
                 progressValue.value = Math.round(index/selectedData.value.length*100);
                 const payload = { 
@@ -78,15 +81,10 @@ export const StaleEmployees = {
                 
                 // API call
                 try {
-                    fhcApi.
-                        factory.DV.deactivateDV(payload)                    
-                        .then(result => {
-                            if (result.error === 1) {
-                                console.log(result)
-                                fhcAlert.handleSystemError(result)
-                            }
-                        })
-                        .catch(fhcAlert.handleSystemError);  	  
+                    promises.push(
+                        $api.call(ApiDV.deactivateDV(payload))                            
+                    );	 
+                    //await sleep(20); 
                     
                     
                     if (cancelAction.value) {
@@ -98,6 +96,13 @@ export const StaleEmployees = {
                 } 
                 
             }
+            Promise.all(promises).then(result => {
+                if (result.error === 1) {
+                    console.log(result)
+                    fhcAlert.handleSystemError(result)
+                }
+            })
+            .catch(fhcAlert.handleSystemError)
 
             await fetchData()
             modalRef.value.hide();

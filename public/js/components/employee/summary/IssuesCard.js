@@ -1,4 +1,7 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiIssue from '../../../api/factory/issue.js';
+import ApiVertragsbestandteil from '../../../api/factory/vertragsbestandteil.js';
+import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
+import ApiDV from '../../../api/factory/dv.js';
 
 export const IssuesCard = {
 	name: 'IssuesCard',
@@ -20,7 +23,7 @@ export const IssuesCard = {
         const vertragsbestandteiltypen = inject('vertragsbestandteiltypen');
         const gehaltstypen = inject('gehaltstypen');
         const vertragsarten = inject('vertragsarten');
-        const fhcApi = inject('$fhcApi')  
+        const $api = inject('$api');  
         
         const formatVertragsbestandteiltyp = (item) => {
           let va = vertragsbestandteiltypen.value.find(kt => kt.value == item);
@@ -50,11 +53,10 @@ export const IssuesCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await fhcApi.factory.Issue.byPerson(currentPersonID.value);
+              const response = await $api.call(ApiIssue.byPerson(currentPersonID.value));
               isFetching.value = false;              
-			  console.log(response.retval);	  
-              if (response.retval.length>0) {
-                issues.value = response.retval;
+              if (response?.meta?.status == 'success' && response?.data?.length>0) {
+                issues.value = response.data;
                 getBehebungData(issues.value);
               } else {
                 issues.value = null;
@@ -74,7 +76,7 @@ export const IssuesCard = {
 
         const getVB = async (vbid) =>  {
             try {
-                let res = await fhcApi.factory.Vertragsbestandteil.getVB(vbid)
+                let res = await $api.call(ApiVertragsbestandteil.getVB(vbid))
                 console.log(res);
                 return res;
             } catch(error) {
@@ -85,7 +87,7 @@ export const IssuesCard = {
 
         const getGB = async (gbid) =>  {
             try {
-                let res = await fhcApi.factory.Gehaltsbestandteil.getGB(gbid)
+                let res = await $api.call(ApiGehaltsbestandteil.getGB(gbid))
                 console.log(res);
                 return res;
             } catch(error) {
@@ -95,7 +97,7 @@ export const IssuesCard = {
         }
         const getDV = async (dvid) =>  {
             try {
-                let res = await fhcApi.factory.DV.getDVByID(dvid)
+                let res = await $api.call(ApiDV.getDVByID(dvid))
                 console.log(res);
                 return res;
             } catch(error) {
@@ -119,29 +121,31 @@ export const IssuesCard = {
                             case 'dienstverhaeltnis_id':
                             case 'erste_dienstverhaeltnis_id':
                             case 'zweite_dienstverhaeltnis_id':
-                                    getDV( behebungParam[key] ).then((vb) => {
+                                    getDV( behebungParam[key] ).then((dv) => {
+										if (dv.data === null) return;
                                         let dienstverhaeltnis_id = behebungParam[key] + '';
                                         if (!('behebung_data' in issue)) {
                                             issue.behebung_data = { dvs: {} };                                
                                         }
                                         if (!('dvs' in issue.behebung_data)) {
                                             issue.behebung_data['dvs'] = {};
-                                        }                            
-                                        issue.behebung_data.dvs[dienstverhaeltnis_id] = vb;
+                                        }
+                                        issue.behebung_data.dvs[dienstverhaeltnis_id] = dv.data;
                                     })
                                     break;
                             case 'vertragsbestandteil_id':
                             case 'erste_vertragsbestandteil_id':
-                            case 'zweite_vertragsbestandteil_id':                            
+                            case 'zweite_vertragsbestandteil_id':
                                 getVB( behebungParam[key] ).then((vb) => {
+									if (vb.data === null) return;
                                     let vertragsbestandteil_id = behebungParam[key] + '';
                                     if (!('behebung_data' in issue)) {
                                         issue.behebung_data = { vbs: {} };                                
                                     }
                                     if (!('vbs' in issue.behebung_data)) {
                                         issue.behebung_data['vbs'] = {};
-                                    }                            
-                                    issue.behebung_data.vbs[vertragsbestandteil_id] = vb;
+                                    }
+                                    issue.behebung_data.vbs[vertragsbestandteil_id] = vb.data;
                                 })
                                 
                                 break;
@@ -149,14 +153,15 @@ export const IssuesCard = {
 
                             case 'gehaltsbestandteil_id':
                                 getGB( behebungParam[key] ).then((gb) => {
+									if (gb.data === null) return;
                                     let gehaltsbestandteil_id = behebungParam[key] + '';
                                     if (!('behebung_data' in issue)) {
                                         issue.behebung_data = { gbs: {} };                                
                                     }
                                     if (!('gbs' in issue.behebung_data)) {
                                         issue.behebung_data['gbs'] = {};
-                                    }                            
-                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb;
+                                    }
+                                    issue.behebung_data.gbs[gehaltsbestandteil_id] = gb.data;
                                 })
                                 break;
                         

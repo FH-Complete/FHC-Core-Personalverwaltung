@@ -1,15 +1,14 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
 import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
 import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import ApiZeit from '../../../api/factory/zeit.js';
 
 export const OffTime = {
 	name: 'OffTime',
     components: {
         Modal,
         ModalDialog,
-        Toast,
         OrgChooser,
         "datepicker": VueDatePicker
     },
@@ -23,7 +22,7 @@ export const OffTime = {
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
 
         const { personID: currentPersonID , personUID: currentPersonUID  } = Vue.toRefs(props);
 
@@ -73,11 +72,11 @@ export const OffTime = {
             }
             try {
               isFetching.value = true;
-              const response = await fhcApi.factory.Zeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value);
+              const response = await $api.call(ApiZeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value));
               isFetching.value = false;              
-              console.log('abwesenheiten', response.retval);	  
-              if (response.retval.length>0) {
-                offTimeList.value = response.retval;
+              console.log('abwesenheiten', response.data);	  
+              if (response?.data?.length>0) {
+                offTimeList.value = response.data;
               } else {
                 offTimeList.value = [];
               }

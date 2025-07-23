@@ -8,7 +8,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/libraries/gui/GUIHandler.php';
 require_once DOC_ROOT . '/include/' . EXT_FKT_PATH . '/generateuid.inc.php';
 
-class DVAPI extends Auth_Controller
+class DVAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
@@ -102,13 +102,13 @@ class DVAPI extends Auth_Controller
                 {
                     $dv->gehaltsbestandteile = $gbt_data->retval;
                 } else {
-                    $this->outputJsonError("Error when getting salary");
+                    $this->terminateWithError("Error when getting salary");
                 }
             }
 
-            $this->outputJson($data);
+            $this->terminateWithSuccess(getData($data));
         } else {
-            $this->outputJsonError("Error when getting current DV");
+            $this->terminateWithError("Error when getting current DV");
         }
     }
 
@@ -121,13 +121,13 @@ class DVAPI extends Auth_Controller
 
         if (!$person_uid)
         {
-            $this->outputJsonError('invalid parameter person_uid');
+            $this->terminateWithError('invalid parameter person_uid');
             exit;
         }
 
         $data = $this->DVModel->getDVByPersonUID($person_uid);
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
     function dvByID($dvid)
@@ -135,16 +135,16 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($dvid))
         {
-            $this->outputJsonError('invalid parameter dvid');
+            $this->terminateWithError('invalid parameter dvid');
             exit;
         }
 
         $result = $this->DVModel->getDVByID($dvid);
 
         if (isSuccess($result))
-			$this->outputJson($result->retval[0]);
+			$this->terminateWithSuccess($result->retval[0]);
 		else
-			$this->outputJsonError('Error fetching DV');
+			$this->terminateWithError('Error fetching DV');
 
     }
 
@@ -155,7 +155,7 @@ class DVAPI extends Auth_Controller
 
         if (!$person_uid)
         {
-            $this->outputJsonError('invalid parameter person_uid');
+            $this->terminateWithError('invalid parameter person_uid');
             exit;
         }
 
@@ -167,7 +167,7 @@ class DVAPI extends Auth_Controller
         $dvData = $this->DVModel->getDVByPersonUID($person_uid, null, $datestring);
 
         if (isError($dvData)) {
-            $this->outputJsonError('error fetching dv: '.$dvData->retval);
+            $this->terminateWithError('error fetching dv: '.$dvData->retval);
             return;
         }
         
@@ -176,7 +176,7 @@ class DVAPI extends Auth_Controller
         if (is_array($dvData->retval) && count($dvData->retval) > 0) {
             $dvList = $dvData->retval;
         } else {
-            $this->outputJsonError('no DV found');
+            $this->terminateWithError('no DV found');
             return;
         }
 
@@ -194,7 +194,7 @@ class DVAPI extends Auth_Controller
             $retval[] = array('dv' => $value, 'vb' => $dbDataFiltered);            
         }          
 
-        return $this->outputJsonSuccess(array("dvList" => $retval ));
+        return $this->terminateWithSuccess(array("dvList" => $retval ));
     }
 
     /**
@@ -207,7 +207,7 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($dv_id))
         {
-            $this->outputJsonError('invalid parameter dv_id');
+            $this->terminateWithError('invalid parameter dv_id');
             exit;
         }
 
@@ -215,10 +215,10 @@ class DVAPI extends Auth_Controller
         $ret = $this->VertragsbestandteilLib->deleteDienstverhaeltnis($dv);
 
         if ( $ret !== TRUE) {
-            return $this->outputJsonError($ret);
+            return $this->terminateWithError($ret);
         }
 
-        return $this->outputJsonSuccess(TRUE);
+        return $this->terminateWithSuccess(TRUE);
     }
 
     function endDV()
@@ -227,25 +227,25 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($payload->dienstverhaeltnisid))
         {
-            $this->outputJsonError('invalid parameter dienstverhaeltnisid');
+            $this->terminateWithError('invalid parameter dienstverhaeltnisid');
             return;
         }
 
         if (empty($payload->dvendegrund_kurzbz))
         {
-            $this->outputJsonError('Bitte einen Beendigungsgrund auswählen.');
+            $this->terminateWithError('Bitte einen Beendigungsgrund auswählen.');
             return;
         }
 
         if ($payload->dvendegrund_kurzbz === 'sonstige' && empty($payload->dvendegrund_anmerkung))
         {
-            $this->outputJsonError('Bitte beim Beendigungsgrund "Sonstige" eine Anmerkung eingeben.');
+            $this->terminateWithError('Bitte beim Beendigungsgrund "Sonstige" eine Anmerkung eingeben.');
             return;
         }
 
 	if( !$payload->gueltigkeit->data->gueltig_bis )
 	{
-	    $this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+	    $this->terminateWithError('Bitte ein gültiges Endedatum angeben.');
             return;
 	}
 
@@ -254,10 +254,10 @@ class DVAPI extends Auth_Controller
 	    $payload->dvendegrund_kurzbz, $payload->dvendegrund_anmerkung);
 
         if ( $ret !== TRUE) {
-            return $this->outputJsonError($ret);
+            return $this->terminateWithError($ret);
         }
 
-        return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
+        return $this->terminateWithSuccess('Dienstverhaeltnis beendet');
 
     }
 
@@ -270,13 +270,13 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($payload->dienstverhaeltnis_id))
         {
-            $this->outputJsonError('invalid parameter dienstverhaeltnis_id');
+            $this->terminateWithError('invalid parameter dienstverhaeltnis_id');
             return;
         }
 
 		if( !$payload->gueltig_bis )
 		{
-			$this->outputJsonError('Bitte ein gültiges Endedatum angeben.');
+			$this->terminateWithError('Bitte ein gültiges Endedatum angeben.');
             return;
 		}
 
@@ -284,10 +284,10 @@ class DVAPI extends Auth_Controller
         $ret = $this->VertragsbestandteilLib->deactivateDienstverhaeltnis($dv, $payload->gueltig_bis, true);
 
         if (!$ret) {
-            return $this->outputJsonError($ret);
+            return $this->terminateWithError($ret);
         }
 
-        return $this->outputJsonSuccess('Dienstverhaeltnis beendet');
+        return $this->terminateWithSuccess('Dienstverhaeltnis beendet');
     }
 
     function vertragByDV()
@@ -296,7 +296,7 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($dv_id))
         {
-            $this->outputJsonError('invalid parameter dv_id');
+            $this->terminateWithError('invalid parameter dv_id');
             exit;
         }
 
@@ -315,7 +315,7 @@ class DVAPI extends Auth_Controller
 			intval($dv_id), $datestring);
 
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess($data);
     }
 
     /**
@@ -368,7 +368,7 @@ class DVAPI extends Auth_Controller
 
                 $data = $this->DVModel->getDVByPersonUID($person_uid);
 
-            return $this->outputJson($data);
+            return $this->terminateWithSuccess($data);
 
         } else {
             $this->output->set_status_header('405');
@@ -388,16 +388,10 @@ class DVAPI extends Auth_Controller
 			->setEditorUID($editor);
 		$ret = $guihandler->handle($payload, $onlyvalidate);
 
-		$this->outputJson(
-			array(
-				'data' => json_decode($ret),
-				'meta' => array(
-					'mitarbeiter_uid' => $mitarbeiter_uid,
-					'payload' => json_decode($payload)
-				)
-			)
-		);
-		return;
+        $this->addMeta('mitarbeiter_uid', $mitarbeiter_uid);
+        $this->addMeta('payload', json_decode($payload));
+		$this->terminateWithSuccess(json_decode($ret));
+			
 	}
 
     public function getCurrentVBs($dvid)
@@ -408,13 +402,7 @@ class DVAPI extends Auth_Controller
 			$today->format('Y-m-d'),
 			$this->VertragsbestandteilLib::DO_NOT_INCLUDE_FUTURE);
 
-		$this->outputJson(
-			array(
-				'data' => $vbs,
-				'meta' => array()
-			)
-		);
-		return;
+		$this->terminateWithSuccess($vbs);
 	}
 
 	public function getCurrentAndFutureVBs($dvid, $typ=null)
@@ -427,26 +415,14 @@ class DVAPI extends Auth_Controller
 			$this->VertragsbestandteilLib::NOT_WITH_VALORISATION_HISTORY
 		);
 
-		$this->outputJson(
-			array(
-				'data' => $vbs,
-				'meta' => array()
-			)
-		);
-		return;
+		$this->terminateWithSuccess($vbs);
 	}
 
 	public function getAllVBs($dvid)
 	{
 		$vbs = $this->VertragsbestandteilLib->fetchVertragsbestandteile($dvid);
 
-		$this->outputJson(
-			array(
-				'data' => $vbs,
-				'meta' => array()
-			)
-		);
-		return;
+		$this->terminateWithSuccess($vbs);
 	}
 
 	public function storeToTmpStore($tmpstoreid=null)
@@ -482,16 +458,10 @@ class DVAPI extends Auth_Controller
 			$payload->tmpStoreId = $tmpstoreid;
 		}
 
-		$this->outputJson(
-			array(
-				'data' => $payload,
-				'meta' => array(
-					'tmpstoreid' => $tmpstoreid,
-					'ret' => $ret
-				)
-			)
-		);
-		return;
+        $this->addMeta('tmpstoreid', $tmpstoreid);
+        $this->addMeta('ret', $ret);
+        $this->terminateWithSuccess($payload);
+			
 	}
 
 	public function listTmpStoreForMA($mitarbeiteruid)
@@ -511,13 +481,7 @@ class DVAPI extends Auth_Controller
 			}
 		}
 
-		$this->outputJson(
-			array(
-				'data' => $data,
-				'meta' => array()
-			)
-		);
-		return;
+		$this->terminateWithSuccess($data);
 	}
 
 	public function getTmpStoreById($tmpstoreid)
@@ -531,26 +495,14 @@ class DVAPI extends Auth_Controller
 			$data->formdata = json_decode($data->formdata);
 		}
 
-		$this->outputJson(
-			array(
-				'data' => $data,
-				'meta' => array()
-			)
-		);
-		return;
+		$this->terminateWithSuccess($data);
 	}
 
 	public function deleteFromTmpStore($tmpstoreid)
 	{
 		$result = $this->TmpStoreModel->delete($tmpstoreid);
 
-		$this->outputJson(
-			array(
-				'data' => $result,
-				'meta' => array()
-			)
-		);
-		return;
+		$this->terminateWithSuccess($result);
 	}
 
     function getVB($vertragsbestandteil_id)
@@ -558,7 +510,7 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($vertragsbestandteil_id))
         {
-            $this->outputJsonError('invalid parameter vbid');
+            $this->terminateWithError('invalid parameter vbid');
             exit;
         }
 
@@ -566,7 +518,7 @@ class DVAPI extends Auth_Controller
 			intval($vertragsbestandteil_id));
 
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess($data);
     }
 
     function getGB($gehaltsbestandteil_id)
@@ -574,7 +526,7 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($gehaltsbestandteil_id))
         {
-            $this->outputJsonError('invalid parameter vbid');
+            $this->terminateWithError('invalid parameter vbid');
             exit;
         }
 
@@ -582,7 +534,7 @@ class DVAPI extends Auth_Controller
 			intval($gehaltsbestandteil_id));
 
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess($data);
     }
 
 
@@ -594,7 +546,7 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($dv_id))
         {
-            $this->outputJsonError("dv_id is not numeric!'");
+            $this->terminateWithError("dv_id is not numeric!'");
             return;
         }
 
@@ -611,9 +563,9 @@ class DVAPI extends Auth_Controller
 
         if (isSuccess($gbt_data))
         {
-            $this->outputJson($gbt_data->retval);
+            $this->terminateWithSuccess($gbt_data->retval);
         } else {
-            $this->outputJsonError("Error when getting salary");
+            $this->terminateWithError("Error when getting salary");
         }
 
     }
@@ -625,7 +577,7 @@ class DVAPI extends Auth_Controller
 
         if (!is_numeric($dv_id))
         {
-            $this->outputJsonError("dv_id is not numeric!'");
+            $this->terminateWithError("dv_id is not numeric!'");
             return;
         }
 
@@ -658,11 +610,11 @@ class DVAPI extends Auth_Controller
 
         if(isError($abgerechnet_data))
 	{
-	    $this->outputJsonError("error getting chart data");
+	    $this->terminateWithError("error getting chart data");
             return;
 	}
 
-        $this->outputJson(array('valorisiert' => $dataValorisiert, 'gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
+        $this->terminateWithSuccess(array('valorisiert' => $dataValorisiert, 'gesamt' => $data, 'abgerechnet' => $abgerechnet_data->retval));
 
     }
 
@@ -818,7 +770,7 @@ class DVAPI extends Auth_Controller
     public function getEmployeesWithoutContract()
     {
         $data = $this->ApiModel->getEmployeesWithoutContract();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getDvEndeGruende()
@@ -829,12 +781,12 @@ class DVAPI extends Auth_Controller
         $dvendegruende = $this->DvEndeGrundModel->load();
         if( hasData($dvendegruende) )
         {
-            $this->outputJson($dvendegruende);
+            $this->terminateWithSuccess(getData($dvendegruende));
             return;
         }
         else
         {
-            $this->outputJsonError('no contract types found');
+            $this->terminateWithError('no contract types found');
             return;
         }
     }

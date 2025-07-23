@@ -1,14 +1,14 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';5
+import ApiPerson from '../../api/factory/person.js';
+
 
 export const BankData = {
 	name: 'BankData',
     components: {
         Modal,
         ModalDialog,
-        Toast,
     },
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
@@ -18,7 +18,8 @@ export const BankData = {
     },
     setup( props ) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
         const readonly = Vue.ref(false);
         const { personID } = Vue.toRefs(props);
         const { t } = usePhrasen();
@@ -38,12 +39,12 @@ export const BankData = {
             }
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.Person.personBankData(theModel.value.personID || personID.value);                    
-              bankdataList.value = res.retval;
+              const res = await $api.call(ApiPerson.personBankData(theModel.value.personID || personID.value));                                    
+              bankdataList.value = res.data;
             } catch (error) {
-              console.log(error)              
+              $fhcAlert.handleSystemError(error)                      
             } finally {
-                isFetching.value = false
+              isFetching.value = false
             }
         }
 
@@ -65,7 +66,7 @@ export const BankData = {
         const currentValue = Vue.ref(createShape(theModel.value.personID || personID.value));
         const preservedValue = Vue.ref(createShape(theModel.value.personID || personID.value));
 
-        const toggleMode = async () => {
+        /* const toggleMode = async () => {
             if (!readonly.value) {
                 // cancel changes?
                 if (hasChanged.value) {
@@ -82,7 +83,7 @@ export const BankData = {
                 preservedValue.value = {...currentValue.value};
               }
               readonly.value = !readonly.value;
-        }
+        } */
 
         Vue.onMounted(() => {
             currentValue.value = createShape(theModel.value.personID || personID.value);
@@ -116,24 +117,28 @@ export const BankData = {
 
         const showDeleteModal = async (id) => {
             currentValue.value = { ...bankdataList.value[id] };
-            const ok = await confirmDeleteRef.value.show();
-            
-            if (ok) {   
 
-                isFetching.value = true
-                try {
-                  const res = await fhcApi.factory.Person.deletePersonBankData(id);                    
-                  if (res.error == 0) {
-                    delete bankdataList.value[id];
-                    showDeletedToast();
-                  }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                    isFetching.value = false
+            if (await $fhcAlert.confirm({
+                    message: t('person','bankdaten') + ' ' + currentValue.value?.iban + ' ' + currentValue.value?.bic + ' ' + currentValue.value?.name + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
+            
+            isFetching.value = true
+            try {
+                const res = await $api.call(ApiPerson.deletePersonBankData(id));                 
+                if (res.meta.status == "success") {
+                delete bankdataList.value[id];
+                showDeletedToast();
                 }
-                
+            } catch (error) {
+                $fhcAlert.handleSystemError(error)                    
+            } finally {
+                isFetching.value = false
             }
+            
         }
 
 
@@ -148,15 +153,14 @@ export const BankData = {
             } else {
 
                 try {
-                    const r = await fhcApi.factory.Person.upsertPersonBankData(currentValue.value);                    
-                    if (r.error == 0) {
-                        bankdataList.value[r.retval[0].bankverbindung_id] = r.retval[0];
-                        console.log('bankdata successfully saved');
+                    const r = await $api.call(ApiPerson.upsertPersonBankData(currentValue.value));                              
+                    if (r.meta.status == "success") {
+                        bankdataList.value[r.data[0].bankverbindung_id] = r.data[0];
                         preservedValue.value = currentValue.value;
                         showToast();
-                    }     
+                    }   
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)            
                 } finally {
                     isFetching.value = false
                 }
@@ -208,17 +212,13 @@ export const BankData = {
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
         });
-
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','bankdatenGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','bankdatenGeloescht'));
         }
 
         return { 
@@ -227,11 +227,10 @@ export const BankData = {
             readonly,
             frmState,
             dialogRef,
-            toastRef, deleteToastRef,
             bankDataFrm,
             modalRef, 
             
-            toggleMode,  
+          /*   toggleMode,   */
             validIban, 
             showToast, showDeletedToast,
             showAddModal, hideModal, okHandler, t,
@@ -240,18 +239,6 @@ export const BankData = {
     },
     template: `
     <div class="row">
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-          <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','bankdatenGespeichert') }}</h4></template>
-          </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person','bankdatenGeloescht') }}</h4></template>
-            </Toast>
-        </div>
     </div>
 
    <div class="row pt-md-4">      
