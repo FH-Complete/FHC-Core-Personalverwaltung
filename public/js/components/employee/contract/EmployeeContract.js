@@ -692,7 +692,7 @@ export const EmployeeContract = {
             var isBerechtigt = false;
             if (currentDVID != null && currentDVID.value > 0) {
                 try {
-                    const res = await Vue.$fhcapi.permission.isBerechtigt(
+                    const res = await fhcApi.factory.permission.isBerechtigt(
                         'basis/gehaelter', 
                         's',
                         currentDV.value.oe_kurzbz, 
@@ -713,7 +713,7 @@ export const EmployeeContract = {
 			var isBerechtigt = false;
 			if (currentDVID != null && currentDVID.value > 0) {
 				try {
-					const res = await Vue.$fhcapi.permission.isBerechtigt(
+					const res = await fhcApi.factory.permission.isBerechtigt(
 						'extension/pv21_dv', 
 						's',
 						currentDV.value.oe_kurzbz, 
@@ -734,7 +734,7 @@ export const EmployeeContract = {
 			var isBerechtigt = false;
 			if (currentDVID != null && currentDVID.value > 0) {
 				try {
-					const res = await Vue.$fhcapi.permission.isBerechtigt(
+					const res = await fhcApi.factory.permission.isBerechtigt(
 						'extension/pv21_dv_korr', 
 						's',
 						currentDV.value.oe_kurzbz, 
