@@ -1,4 +1,5 @@
-const ContractExpiring = {
+
+export const ContractExpiring = {
 	name: 'ContractExpiring',
      props: {
         columns:  { type: Array, required: true },

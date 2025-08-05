@@ -1,7 +1,4 @@
-import pv21apifactory from "../api/api.js";
-import FhcApi from '../../../../js/plugin/FhcApi.js';
-import {CoreRESTClient} from '../../../../js/RESTClient.js';
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 import FhcAlert from '../../../../js/plugins/FhcAlert.js';
 //import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationSelection} from "../components/bulk/ValorisationSelection.js";
@@ -25,7 +22,6 @@ const valApp = Vue.createApp({
 }).use(router);
 
 valApp.use(primevue.config.default);
-valApp.use(FhcApi, {factory: pv21apifactory});
 valApp.use(Phrasen);
 valApp.use(FhcAlert);
 valApp.mount('#wrapper');

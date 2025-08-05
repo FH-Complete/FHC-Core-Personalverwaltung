@@ -6,7 +6,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 
 require_once DOC_ROOT . '/include/' . EXT_FKT_PATH . '/generateuid.inc.php';
 
-class PersonAPI extends Auth_Controller
+class PersonAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
@@ -89,10 +89,10 @@ class PersonAPI extends Auth_Controller
         $person_id = $this->input->get('person_id', TRUE);
 
         if (!is_numeric($person_id))
-            $this->outputJsonError('person id is not numeric!');
+            $this->terminateWithError('person id is not numeric!');
 
         $data = $this->ApiModel->getPersonHeaderData($person_id);
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
     /**
@@ -117,7 +117,7 @@ class PersonAPI extends Auth_Controller
 
         }
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
      /**
@@ -132,7 +132,7 @@ class PersonAPI extends Auth_Controller
 
         $data = $this->ApiModel->getUID($person_id);
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess($data);
     }
 
     function filterPerson()
@@ -169,9 +169,9 @@ class PersonAPI extends Auth_Controller
             $result = $this->ApiModel->filterPerson($nachnameString, $vornameString, $birthdateString, $filterUnruly);
 
             if (isSuccess($result))
-			    $this->outputJson($result);
+			    $this->terminateWithSuccess($result);
 		    else
-			    $this->outputJsonError('Error when searching for person');
+			    $this->terminateWithError('Error when searching for person');
 
         } else {
             $this->output->set_status_header('405');
@@ -209,7 +209,7 @@ class PersonAPI extends Auth_Controller
                     if (!$this->validateEmployeeQuickPayload($payload))
                     {
                         $this->CI->db->trans_rollback();
-                        $this->outputJsonError('validation error');
+                        $this->terminateWithError('validation error');
                         return;
                     }
 
@@ -222,7 +222,7 @@ class PersonAPI extends Auth_Controller
                     if (isError($result))
                     {
                         $this->CI->db->trans_rollback();
-                        $this->outputJsonError('error creating person base data');
+                        $this->terminateWithError('error creating person base data');
                         return;
                     }
                     $person_id = $result->retval;
@@ -238,7 +238,7 @@ class PersonAPI extends Auth_Controller
                     if (isError($result))
                     {
                         $this->CI->db->trans_rollback();
-                        $this->outputJsonError('error creating email for person');
+                        $this->terminateWithError('error creating email for person');
                         return;
                     }
 
@@ -249,7 +249,7 @@ class PersonAPI extends Auth_Controller
                     if (!$this->validateEmployeeTakePayload($payload))
                     {
                         $this->CI->db->trans_rollback();
-                        $this->outputJsonError('validation error');
+                        $this->terminateWithError('validation error');
                         return;
                     }
 
@@ -267,7 +267,7 @@ class PersonAPI extends Auth_Controller
                 if ($uid === false)
                 {
                     $this->CI->db->trans_rollback();
-                    $this->outputJsonError('error generating UID for person');
+                    $this->terminateWithError('error generating UID for person');
                     return;
                 }
 
@@ -276,7 +276,7 @@ class PersonAPI extends Auth_Controller
                 if (isError($result))
                 {
                     $this->CI->db->trans_rollback();
-                    $this->outputJsonError('error creating user for person');
+                    $this->terminateWithError('error creating user for person');
                     return;
                 }
                 $uid = $result->retval;
@@ -296,7 +296,7 @@ class PersonAPI extends Auth_Controller
 							if (isError($aliasupdres))
 							{
 								$this->CI->db->trans_rollback();
-								$this->outputJsonError('error setting alias for benutzer');
+								$this->terminateWithError('error setting alias for benutzer');
 								return;
 							}
 						}
@@ -322,7 +322,7 @@ class PersonAPI extends Auth_Controller
                     }
                 } else {
                     $this->CI->db->trans_rollback();
-                    $this->outputJsonError('error creating employee: duplicate kurzbz');
+                    $this->terminateWithError('error creating employee: duplicate kurzbz');
                     return;
                 }
 
@@ -331,7 +331,7 @@ class PersonAPI extends Auth_Controller
                 if (isError($result))
                 {
                     $this->CI->db->trans_rollback();
-                    $this->outputJsonError('error creating employee');
+                    $this->terminateWithError('error creating employee');
                     return;
                 }
 
@@ -343,13 +343,13 @@ class PersonAPI extends Auth_Controller
             {
                 log_message('debug', "Transaction rolled back. " . $ex->getMessage());
                 $this->CI->db->trans_rollback();
-                $this->outputJsonError('Creating Employee failed.');
+                $this->terminateWithError('Creating Employee failed.');
                 return;
             }
 
 
             // return person_id and uid
-            $this->outputJsonSuccess(['person_id' => $person_id, 'uid' => $uid]);
+            $this->terminateWithSuccess(['person_id' => $person_id, 'uid' => $uid]);
 
         } else {
             $this->output->set_status_header('405');
@@ -391,7 +391,7 @@ class PersonAPI extends Auth_Controller
 			$resizedImage1 = $this->_resize($image, 827, 1063);
 
 			if (is_null($resizedImage1))
-				return $this->outputJsonError("Fehler beim Speichern des Fotos");
+				return $this->terminateWithError("Fehler beim Speichern des Fotos");
 
 			$akte = $this->AkteModel->loadWhere(array('person_id' =>  $person_id, 'dokument_kurzbz' => 'Lichtbil'));
 
@@ -423,13 +423,13 @@ class PersonAPI extends Auth_Controller
 
 			if (isError($akteResult))
 			{
-				return $this->outputJsonError("Fehler beim Speichern des Fotos");
+				return $this->terminateWithError("Fehler beim Speichern des Fotos");
 			}
 
 			$resizedImage2 = $this->_resize($image, 101, 130);
 
 			if (is_null($resizedImage2))
-				return $this->outputJsonError("Fehler beim Speichern des Fotos");
+				return $this->terminateWithError("Fehler beim Speichern des Fotos");
 
 			$result = $this->ApiModel->updateFoto($person_id, $resizedImage2);
 
@@ -445,10 +445,10 @@ class PersonAPI extends Auth_Controller
 					'insertvon' => getAuthUID(),
 				));
 
-				return $this->outputJsonSuccess(true);
+				return $this->terminateWithSuccess(true);
 			}
 
-			return $this->outputJsonError("Fehler beim Speichern des Fotos");
+			return $this->terminateWithError("Fehler beim Speichern des Fotos");
 
 		}
 		else
@@ -466,7 +466,7 @@ class PersonAPI extends Auth_Controller
 			$person_id = $payload['person_id'];
 
 			if (!is_numeric($person_id))
-				$this->outputJsonError("person_id is not numeric!'");
+				$this->terminateWithError("person_id is not numeric!'");
 
 			$result = $this->ApiModel->deleteFoto($person_id);
 
@@ -487,10 +487,10 @@ class PersonAPI extends Auth_Controller
 						'insertvon' => getAuthUID(),
 					));
 				}
-				$this->outputJsonSuccess($result->retval);
+				$this->terminateWithSuccess($result->retval);
 			}
 			else
-				$this->outputJsonError('Error when deleting foto');
+				$this->terminateWithError('Error when deleting foto');
 		}
 		else
 		{
@@ -515,7 +515,7 @@ class PersonAPI extends Auth_Controller
                 show_error('person id is not numeric!');
 
             $data = $this->ApiModel->getPersonBaseData($person_id);
-            $this->outputJson($data);
+            $this->terminateWithSuccess(getData($data));
         } else {
             $this->output->set_status_header('405');
         }
@@ -542,9 +542,9 @@ class PersonAPI extends Auth_Controller
 
             $result = $this->ApiModel->updatePersonBaseData($payload);
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating person base data');
+			    $this->terminateWithError('Error when updating person base data');
         } else {
             $this->output->set_status_header('405');
         }
@@ -565,13 +565,13 @@ class PersonAPI extends Auth_Controller
 
             if (isError($kurzbzexists))
             {
-                $this->outputJsonError($kurzbzexists->msg, EXIT_ERROR);
+                $this->terminateWithError($kurzbzexists->msg, EXIT_ERROR);
             }
 
             if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
-                $this->outputJsonSuccess(true);
+                $this->terminateWithSuccess(true);
             else
-                $this->outputJsonSuccess(false);
+                $this->terminateWithSuccess(false);
         } else {
             $this->output->set_status_header('405');
         }
@@ -587,7 +587,7 @@ class PersonAPI extends Auth_Controller
                 show_error('person id is not numeric!');
 
             $data = $this->ApiModel->getPersonEmployeeData($person_id);
-            $this->outputJson($data);
+            $this->terminateWithSuccess(getData($data));
         } else {
             $this->output->set_status_header('405');
         }
@@ -601,7 +601,7 @@ class PersonAPI extends Auth_Controller
 
             if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
             {
-                $this->outputJsonError('person id is not numeric!');
+                $this->terminateWithError('person id is not numeric!');
                 exit();
             }
 
@@ -655,9 +655,9 @@ class PersonAPI extends Auth_Controller
 
             if (isSuccess($result))
             {
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
             } else
-			    $this->outputJsonError('Error when updating employee data');
+			    $this->terminateWithError('Error when updating employee data');
         } else {
             $this->output->set_status_header('405');
         }
@@ -677,7 +677,7 @@ class PersonAPI extends Auth_Controller
 
             $data = $this->ApiModel->getPersonAddressData($person_id);
             $this->_remapData('adresse_id',$data);
-            $this->outputJson($data);
+            $this->terminateWithSuccess($data->retval);
         } else if ($this->input->post()) {
 
         } else {
@@ -705,9 +705,9 @@ class PersonAPI extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating address data');
+			    $this->terminateWithError('Error when updating address data');
         } else {
             $this->output->set_status_header('405');
         }
@@ -726,9 +726,9 @@ class PersonAPI extends Auth_Controller
             $result = $this->ApiModel->deletePersonAddressData($payload['adresse_id']);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when deleting address data');
+			    $this->terminateWithError('Error when deleting address data');
 
         } else {
             $this->output->set_status_header('405');
@@ -755,9 +755,9 @@ class PersonAPI extends Auth_Controller
             if (isSuccess($data))
             {
                 $this->_remapData('kontakt_id',$data);
-			    $this->outputJsonSuccess($data->retval);
+			    $this->terminateWithSuccess($data->retval);
             } else
-			    $this->outputJsonError('Error when fetching contact data');
+			    $this->terminateWithError('Error when fetching contact data');
 
         } else {
             $this->output->set_status_header('405');
@@ -784,9 +784,9 @@ class PersonAPI extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating contact data');
+			    $this->terminateWithError('Error when updating contact data');
         } else {
             $this->output->set_status_header('405');
         }
@@ -805,9 +805,9 @@ class PersonAPI extends Auth_Controller
             $result = $this->ApiModel->deletePersonContactData($payload['kontakt_id']);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when deleting contact data');
+			    $this->terminateWithError('Error when deleting contact data');
 
         } else {
             $this->output->set_status_header('405');
@@ -828,7 +828,7 @@ class PersonAPI extends Auth_Controller
 
         $data = $this->SachaufwandModel->getByPersonID($person_id);
         $this->_remapData('sachaufwand_id',$data);
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
     function upsertPersonMaterialExpenses()
@@ -839,19 +839,19 @@ class PersonAPI extends Auth_Controller
 
             if (isset($payload['sachaufwand_id']) && !is_numeric($payload['sachaufwand_id']))
 			{
-                $this->outputJsonError('sachaufwand_id is not numeric!');
+                $this->terminateWithError('sachaufwand_id is not numeric!');
 				exit();
 			}
 
             if (!isset($payload['sachaufwandtyp_kurzbz']) || (isset($payload['sachaufwandtyp_kurzbz']) && $payload['sachaufwandtyp_kurzbz'] == ''))
 			{
-                $this->outputJsonError('sachaufwandtyp_kurzbz is empty!');
+                $this->terminateWithError('sachaufwandtyp_kurzbz is empty!');
 				exit();
 			}
 
             if (!isset($payload['mitarbeiter_uid']) || (isset($payload['mitarbeiter_uid']) && $payload['mitarbeiter_uid'] == ''))
 			{
-                $this->outputJsonError('mitarbeiter_uid is empty!');
+                $this->terminateWithError('mitarbeiter_uid is empty!');
 				exit();
 			}
 
@@ -860,7 +860,7 @@ class PersonAPI extends Auth_Controller
 
 			if( $payload['betrag'] !== null && !is_numeric($payload['betrag']) )
 			{
-				$this->outputJsonError('betrag is not numeric!');
+				$this->terminateWithError('betrag is not numeric!');
 				exit();
 			}
 
@@ -872,9 +872,9 @@ class PersonAPI extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating material expenses');
+			    $this->terminateWithError('Error when updating material expenses');
         } else {
             $this->output->set_status_header('405');
         }
@@ -892,9 +892,9 @@ class PersonAPI extends Auth_Controller
             $result = $this->SachaufwandModel->deletePersonSachaufwand($payload['sachaufwand_id']);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when deleting bank data');
+			    $this->terminateWithError('Error when deleting bank data');
 
         } else {
             $this->output->set_status_header('405');
@@ -933,9 +933,9 @@ class PersonAPI extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating job function');
+			    $this->terminateWithError('Error when updating job function');
         } else {
             $this->output->set_status_header('405');
         }
@@ -953,9 +953,9 @@ class PersonAPI extends Auth_Controller
             $result = $this->BenutzerfunktionModel->deleteBenutzerfunktion($payload['benutzerfunktion_id']);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when deleting bank data');
+			    $this->terminateWithError('Error when deleting bank data');
 
         } else {
             $this->output->set_status_header('405');
@@ -981,19 +981,16 @@ class PersonAPI extends Auth_Controller
         $data = $this->BankverbindungModel->loadWhere(array('person_id' => $person_id));
         $this->_remapData('bankverbindung_id',$data);
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
     /**
      * Update/Insert banking data of a person
      */
     function upsertPersonBankData()
+    
     {
         if($this->input->method() === 'post'){
-
-            // TODO Permissions
-            //if ($this->permissionlib->isBerechtigt(self::VERWALTEN_MITARBEITER, 'suid', null, $kostenstelle_id))
-		    //{
 
             $payload = json_decode($this->input->raw_input_stream, TRUE);
 
@@ -1011,9 +1008,9 @@ class PersonAPI extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating bank data');
+			    $this->terminateWithError('Error when updating bank data');
         } else {
             $this->output->set_status_header('405');
         }
@@ -1031,9 +1028,9 @@ class PersonAPI extends Auth_Controller
             $result = $this->ApiModel->deletePersonBankData($payload['bankverbindung_id']);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when deleting bank data');
+			    $this->terminateWithError('Error when deleting bank data');
 
         } else {
             $this->output->set_status_header('405');
@@ -1055,7 +1052,7 @@ class PersonAPI extends Auth_Controller
 
 		$data = $this->StundensatzModel->execReadOnlyQuery($qry, array($uid));
 		$this->_remapData('stundensatz_id',$data);
-		return $this->outputJson($data);
+		return $this->terminateWithSuccess(getData($data));
 	}
 
     public function updateStundensatz()
@@ -1094,12 +1091,12 @@ class PersonAPI extends Auth_Controller
 		}
 
 		if (isError($result))
-			return $this->outputJsonError('Fehler beim Speichern des Stundensatzes');
+			return $this->terminateWithError('Fehler beim Speichern des Stundensatzes');
 
 		$stundensatz = $this->StundensatzModel->load($result->retval);
 
 		if (hasData($stundensatz))
-			$this->outputJsonSuccess($stundensatz->retval);
+			$this->terminateWithSuccess($stundensatz->retval);
 	}
 
 	public function deleteStundensatz()
@@ -1112,9 +1109,9 @@ class PersonAPI extends Auth_Controller
 			$result = $this->StundensatzModel->delete($data['stundensatz_id']);
 
 			if (isError($result))
-				return $this->outputJsonError('Fehler beim Löschen des Stundensatzes');
+				return $this->terminateWithError('Fehler beim Löschen des Stundensatzes');
 
-			return $this->outputJsonSuccess($result);
+			return $this->terminateWithSuccess($result);
 		}
 	}
 
@@ -1131,7 +1128,7 @@ class PersonAPI extends Auth_Controller
 
         if (!$person_uid)
         {
-            $this->outputJsonError('invalid parameter person_uid');
+            $this->terminateWithError('invalid parameter person_uid');
             exit;
         }
 
@@ -1147,7 +1144,7 @@ class PersonAPI extends Auth_Controller
             $data = $this->ApiModel->getOffTimeList($person_uid, $year);
         }
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
     function timeRecordingByPerson()
@@ -1158,19 +1155,19 @@ class PersonAPI extends Auth_Controller
 
         if (!$person_uid)
         {
-            $this->outputJsonError('invalid parameter person_uid');
+            $this->terminateWithError('invalid parameter person_uid');
             exit;
         }
 
         if (!is_numeric($year))
         {
-            $this->outputJsonError('invalid parameter year');
+            $this->terminateWithError('invalid parameter year');
             exit;
         }
 
         if (!is_numeric($week))
         {
-            $this->outputJsonError('invalid parameter week');
+            $this->terminateWithError('invalid parameter week');
             exit;
         }
 
@@ -1180,7 +1177,7 @@ class PersonAPI extends Auth_Controller
         $toDate = $week_start->add(new DateInterval( "P6D" ))->format('Y-m-d');
         $data = $this->ZeitaufzeichnungModel->getFullInterval($person_uid, $fromDate, $toDate);
 
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
 
@@ -1220,7 +1217,7 @@ class PersonAPI extends Auth_Controller
         foreach ($attributeList as $key) {
             if (!$this->validateJSONDataString($payload[$key], $payload, $key))
                 {
-                    $this->outputJsonError($key.' is empty!');
+                    $this->terminateWithError($key.' is empty!');
                     return false;
                 }
         }
@@ -1235,13 +1232,13 @@ class PersonAPI extends Auth_Controller
     {
         if (!isset($payload['person_id']) || (isset($payload['person_id']) && !is_int($payload['person_id'])))
             {
-                $this->outputJsonError('missing person_id');
+                $this->terminateWithError('missing person_id');
                 return false;
             }
 
         if (!$this->validateJSONDataString($payload['uid'], $payload, 'uid'))
             {
-                $this->outputJsonError('uid is empty!');
+                $this->terminateWithError('uid is empty!');
                 return false;
             }
         return true;
@@ -1255,7 +1252,7 @@ class PersonAPI extends Auth_Controller
     {
         $searchString = $this->input->get('search', TRUE);
         $data = $this->ApiModel->filter($searchString);
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess($data);
     }
 	private function _resize($imageData, $maxwidth, $maxheight, $quality = 90)
 	{

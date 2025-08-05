@@ -3,7 +3,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 
-class SalaryExport extends Auth_Controller
+class SalaryExport extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/gehaelter:r';
@@ -46,14 +46,14 @@ class SalaryExport extends Auth_Controller
 		$date = $this->input->get('date', null);
 
 		if ($date === null) {
-			$this->outputJsonError('missing date parameter');
+			$this->terminateWithError('missing date parameter');
 			return;
 		}
 
 		$orgID = $this->input->get('orgID', null);
 
 		if ($orgID === null) {
-			$this->outputJsonError('no organisation selected');
+			$this->terminateWithError('no organisation selected');
 			return;
 		}
 
@@ -62,11 +62,11 @@ class SalaryExport extends Auth_Controller
 		if (isError($result))
 		{
 			$this->logError(getError($result));
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			return;
 		}
 
-		return $this->outputJson($result);
+		return $this->terminateWithSuccess($result);
 
 	}
 
@@ -76,14 +76,14 @@ class SalaryExport extends Auth_Controller
 		$date = $this->input->get('date', null);	
 
 		if ($date === null) {
-			$this->outputJsonError('missing date parameter');
+			$this->terminateWithError('missing date parameter');
 			return;
 		}
 
 		$orgID = $this->input->get('orgID', null);
 
 		if ($orgID === null) {
-			$this->outputJsonError('no organisation selected');
+			$this->terminateWithError('no organisation selected');
 			return;
 		}
 
@@ -92,11 +92,11 @@ class SalaryExport extends Auth_Controller
 		
 		if (isError($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			return;
 		} elseif (hasData($result))
 		{
-			$this->outputJsonError('Gehaltshistorie existiert bereits!');
+			$this->terminateWithError('Gehaltshistorie existiert bereits!');
 			return;
 		}
 
@@ -105,7 +105,7 @@ class SalaryExport extends Auth_Controller
 		
 		if (isError($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			return;
 		}
 
@@ -127,7 +127,7 @@ class SalaryExport extends Auth_Controller
 					
 					if (isError($result))
 					{
-						$this->outputJsonError(getError($result));
+						$this->terminateWithError(getError($result));
 						return;
 					}
 					else
@@ -137,7 +137,7 @@ class SalaryExport extends Auth_Controller
 		}
 	
 
-		return $this->outputJson(array("count" => $count));
+		return $this->terminateWithSuccess(array("count" => $count));
 	}
 
 	public function deleteGehaltshistorie()
@@ -161,11 +161,11 @@ class SalaryExport extends Auth_Controller
 			if (isError($result))
 			{
 				$this->logError(getError($result));
-				$this->outputJsonError(getError($result));
+				$this->terminateWithError(getError($result));
 				return;
 			}
 
-			return $this->outputJson($result);
+			return $this->terminateWithSuccess($result);
 
 		} else {
             $this->output->set_status_header('405');
@@ -187,12 +187,12 @@ class SalaryExport extends Auth_Controller
 		$date_bis = DateTime::createFromFormat( 'Y-m-d', $bis );
 
 		if ($date_von === false || $date_bis === false) {
-			$this->outputJsonError('no date range selected');
+			$this->terminateWithError('no date range selected');
 			return;
 		}
 
 		if ($orgID === null) {
-			$this->outputJsonError('no organisation selected');
+			$this->terminateWithError('no organisation selected');
 			return;
 		}
 
@@ -410,15 +410,15 @@ class SalaryExport extends Auth_Controller
 		);
 		
 		if (isError($result)) {
-			$this->outputJsonError('query failed');
+			$this->terminateWithError('query failed');
 			return;
 		}
 
 		if (!$export) {
-			return $this->outputJson($result);
+			return $this->terminateWithSuccess(getData($result));
 		}
 
-		return $this->export2csv($result->retval);
+		return $this->export2csv(getData($result)->retval);
 	}
 
 	private function export2csv($data)

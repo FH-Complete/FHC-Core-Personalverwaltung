@@ -2,7 +2,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class FunctionsAPI extends Auth_Controller
+class FunctionsAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
@@ -43,13 +43,11 @@ EOSQL;
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
 		if( hasData($fkts) )
 		{
-			$this->outputJson($fkts);
-			return;
+			$this->terminateWithSuccess($fkts->retval);
 		}
 		else
 		{
-			$this->outputJsonError('no contract relevant funktionen found');
-			return;
+			$this->terminateWithError('no contract relevant funktionen found');
 		}
 	}
 
@@ -88,13 +86,11 @@ EOSQL;
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
 		if( hasData($fkts) )
 		{
-			$this->outputJson($fkts);
-			return;
+			$this->terminateWithSuccess($fkts->retval);
 		}
 		else
 		{
-			$this->outputJsonError('no contract relevant funktionen found');
-			return;
+			$this->terminateWithError('no contract relevant funktionen found');
 		}
 	}
 
@@ -106,12 +102,12 @@ EOSQL;
 	{
 		if( empty($uid) )
 		{
-			$this->outputJsonError('Missing Parameter <uid>');
+			$this->terminateWithError('Missing Parameter <uid>');
 		}
 
 		if( empty($companyOrgetkurzbz) )
 		{
-			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
+			$this->terminateWithError('Missing Parameter <companyOrgetkurzbz>');
 		}
 
 		$sql = <<<EOSQL
@@ -154,12 +150,12 @@ EOSQL;
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz, $uid));
 		if( hasData($benutzerfunktionen) )
 		{
-			$this->outputJson($benutzerfunktionen);
+			$this->terminateWithSuccess($benutzerfunktionen->retval);
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
+			$this->terminateWithError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
 		}
 	}
@@ -172,7 +168,7 @@ EOSQL;
 	{
 		if( empty($uid) )
 		{
-			$this->outputJsonError('Missing Parameter <uid>');
+			$this->terminateWithError('Missing Parameter <uid>');
 		}
 
 		$sql = <<<EOSQL
@@ -219,13 +215,11 @@ EOSQL;
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($uid));
 		if( hasData($benutzerfunktionen) )
 		{
-			$this->outputJson($benutzerfunktionen);
-			return;
+			$this->terminateWithSuccess(getData($benutzerfunktionen));
 		}
 		else
 		{
-			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid);
-			return;
+			$this->terminateWithError('no benutzerfunktionen found for uid ' . $uid);
 		}
 	}
 

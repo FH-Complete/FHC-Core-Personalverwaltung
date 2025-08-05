@@ -1,12 +1,11 @@
 
-import FhcApi from '../../../../js/plugin/FhcApi.js';
-import pv21apifactory from "../api/api.js";
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
+import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import {searchbaroptions} from "./common.js";
 import {OrgChooser} from "../components/organisation/OrgChooser.js";
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
 import {OrgViewer} from '../components/organisation/OrgViewer.js';
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
 	name: 'PV21Organisation',
@@ -16,13 +15,14 @@ const pvApp = Vue.createApp(	{
         OrgViewer,
 		CoreNavigationCmpt,
 	},
+	inject: ['$api', '$fhcAlert'],
 	data() {
 		return 	{
 			isEditorOpen: false,
 			currentPersonID: null,	
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
-			searchfunction: this.$fhcApi.factory.search.search,
+			searchfunction: (params) => this.$api.call(ApiSearchbar.search(params)),
 			appSideMenuEntries: {},
 			isCollapsed: true
 		}
@@ -56,7 +56,6 @@ const pvApp = Vue.createApp(	{
 
 //pvApp.use(highchartsPlugin, {tagName: 'highcharts'});
 pvApp.use(primevue.config.default);
-pvApp.use(FhcApi, {factory: pv21apifactory})
 pvApp.use(Phrasen);
 //pvApp.use(primevue.toastservice);
 

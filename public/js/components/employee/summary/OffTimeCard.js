@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiZeit from '../../../api/factory/zeit.js';
 
 export const OffTimeCard = {
 	name: 'OffTimeCard',
@@ -12,7 +12,7 @@ export const OffTimeCard = {
 
         const { watch, ref, toRefs, onMounted, inject } = Vue;                 
         const route = VueRouter.useRoute();
-        const fhcApi = inject('$fhcApi');  
+        const $api = inject('$api');  
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Abwesenheiten");
         const currentPersonID = ref(null);
@@ -32,11 +32,10 @@ export const OffTimeCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await fhcApi.factory.Zeit.personAbwesenheiten(currentUID.value);
+              const response = await $api.call(ApiZeit.personAbwesenheiten(currentUID.value));
               isFetching.value = false;              
-			  console.log('abwesenheiten', response.retval);	  
-              if (response.retval.length>0) {
-                offTimeList.value = response.retval;
+              if (response?.meta?.status == 'success' && response?.data?.length>0) {
+                offTimeList.value = response.data;
               } else {
                 offTimeList.value = null;
               }

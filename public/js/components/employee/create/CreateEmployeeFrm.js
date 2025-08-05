@@ -1,5 +1,7 @@
 
 import { validSVNR } from "../../../helpers/validation/svnr.js";
+import ApiCheckPerson from '../../../../../../js/api/factory/checkperson.js';
+import ApiEmployee from '../../../api/factory/employee.js';
 
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -17,7 +19,8 @@ export const CreateEmployeeFrm = {
 
         const router = VueRouter.useRouter();
     	const route = VueRouter.useRoute();     
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
         
         const defaultvalRef = Vue.toRef(props, 'defaultval')
 
@@ -81,10 +84,10 @@ export const CreateEmployeeFrm = {
 
             try {
                 isFetching.value = true;
-                const res = await fhcApi.factory.CheckPerson.filterPerson(
+                const res = await $api.call(ApiCheckPerson.filterPerson(
                     { ...currentValue.value, unruly: true},
                     FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-                );
+                ));
                 isFetching.value = false;
 
                 if(!res.data.retval) return;
@@ -153,7 +156,6 @@ export const CreateEmployeeFrm = {
         }
 
         const save = async () => {
-            console.log('frmState: ', frmState);
             if (!frmState.geburtsdatumBlured) {
                 frmState.geburtsdatumBlured = true;
             }
@@ -168,10 +170,10 @@ export const CreateEmployeeFrm = {
                 // submit
                 isFetching.value = true
                 try {
-                    const response = await fhcApi.factory.Employee.createEmployee({ action: "quick", payload: {...currentValue.value}});
-                    redirect2Employee(response.retval.person_id, response.retval.uid);
+                    const response = await $api.call(ApiEmployee.createEmployee({ action: "quick", payload: {...currentValue.value}}));
+                    redirect2Employee(response.data.person_id, response.data.uid);
                 } catch (error) {
-                    console.log(error);                    
+                    $fhcAlert.handleSystemError(error)                    
                 } finally {
                     isFetching.value = false;           
                 }
@@ -185,12 +187,12 @@ export const CreateEmployeeFrm = {
                                 
             try {
                 isFetching.value = true
-                const res = await fhcApi.factory.Employee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}});             
+                const res = await $api.call(ApiEmployee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}}));          
                 isFetching.value = false;                
-                personSelectedHandler(person_id, res.retval.uid);
+                personSelectedHandler(person_id, res.data.uid);
 
             } catch (error) {
-                console.log(error);
+                $fhcAlert.handleSystemError(error)  
                 isFetching.value = false;           
             }	
             
