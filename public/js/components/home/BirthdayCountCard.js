@@ -1,4 +1,6 @@
-const BirthdayCountCard = {
+import ApiCommon from '../../api/factory/common.js';
+
+export const BirthdayCountCard = {
 	name: 'BirthdayCountCard',
     components: {
         "p-overlaypanel": primevue.overlaypanel,
@@ -8,7 +10,7 @@ const BirthdayCountCard = {
      props: {
      },
      setup( ) {
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const birthdayData = Vue.ref();
         const currentDate = Vue.ref(new Date());
         const currentMonth = Vue.ref(currentDate.value.getMonth()+1);
@@ -31,8 +33,8 @@ const BirthdayCountCard = {
             try {
                 let ts = Math.round(currentDate.value.getTime() / 1000);  // unix timestamp
                 isFetching.value = true;
-                const response = await fhcApi.factory.Common.getBirthdays(ts);
-                birthdayData.value = response.retval;
+                const response = await $api.call(ApiCommon.getBirthdays(ts));
+                birthdayData.value = response.data || [];
             } catch (error) {
                 console.log(error);
             } finally {

@@ -3,6 +3,7 @@ import vertragsbestandteil_karenz from '../../../vbform/vertragsbestandteil_kare
 import store from '../../../vbform/vbsharedstate.js';
 import errors from '../../../vbform/errors.js';
 import infos from '../../../vbform/infos.js';
+import ApiKarenz from '../../../../api/factory/karenz.js';
 
 export default {
   name: 'KarenzModal',
@@ -45,12 +46,12 @@ export default {
     'infos': infos,
     'errors': errors
   },
-  inject: ['$fhcApi', '$fhcAlert'],
+  inject: ['$api', '$fhcAlert'],
   methods: {
     enddv: function() {
       const payload = this.$refs['vertragsbestandteil_karenzRef'].getPayload();
       
-      this.$fhcApi.factory.Karenz.saveKarenz(payload)
+      this.$api.call(ApiKarenz.saveKarenz(payload))
       .then((response) => {
         this.handleKarenzSaved(response);
       });

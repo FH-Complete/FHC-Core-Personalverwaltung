@@ -4,8 +4,7 @@ import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import { BetragDialog } from './BetragDialog.js';
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
-import { Toast } from '../Toast.js';
-
+import ApiSalaryRange from '../../api/factory/salaryrange.js';
 
 export const SalaryRange = {
 	name: 'SalaryRange',
@@ -16,7 +15,6 @@ export const SalaryRange = {
         Modal,
         ModalDialog,
         BetragDialog,
-        Toast,
     },
     props: {
        
@@ -25,9 +23,6 @@ export const SalaryRange = {
 
         const { toRefs, ref, inject } = Vue
         const betragDialogRef = ref();
-        const deleteToastRef = ref();
-        const createToastRef = ref();
-        const updateToastRef = ref();
         const salaryRangeList = ref([])
         const currentBetrag = ref();
         const isFetching = ref(false);
@@ -41,7 +36,8 @@ export const SalaryRange = {
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const $fhcAlert = inject('$fhcAlert');
 
         const startOfYear = () => {
             const cleanDate = new Date(currentDate.value);
@@ -144,14 +140,14 @@ export const SalaryRange = {
             
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.SalaryRange.getAll(filterDate.value);
-              if (res.error !==1) {
-                salaryRangeList.value = res.retval;
+              const res = await $api.call(ApiSalaryRange.getAll(filterDate.value));  
+              if (res?.meta?.status == 'success') {
+                salaryRangeList.value = res.data;
               } else {
                 salaryRangeList.value = [];
               }              
             } catch (error) {
-              console.log(error)              
+              $fhcAlert.handleSystemError(error)
             } finally {
                 isFetching.value = false
             }
@@ -163,16 +159,16 @@ export const SalaryRange = {
                 console.log("dialogRes=", dialogRes);
                 
                 try {
-                    const res = await fhcApi.factory.SalaryRange.upsertSalaryRange(dialogRes.payload);  
-                    if (res.error !==1) {
+                    const res = await $api.call(ApiSalaryRange.upsertSalaryRange(dialogRes.payload)); 
+                    if (res?.meta?.status == 'success') {
                         fetchData();
-                        createToastRef.value.show();
+                        $fhcAlert.alertSuccess(t('gehaltsband','gehaltsband_erstellt'));
                       // salaryRangeList.value = res.data.retval;
                     } else {
                      // salaryRangeList.value = [];
                     }              
                   } catch (error) {
-                    console.log(error)              
+                     $fhcAlert.handleSystemError(error)           
                   } finally {
                       isFetching.value = false
                   }
@@ -189,15 +185,15 @@ export const SalaryRange = {
                 console.log("dialogRes=", dialogRes);
                 
                 try {
-                    const res = await fhcApi.factory.SalaryRange.upsertSalaryRange(dialogRes.payload);       
-                    if (res.error !==1) {
+                    const res = await $api.call(ApiSalaryRange.upsertSalaryRange(dialogRes.payload));      
+                    if (res?.meta?.status == 'success') {
                         fetchData();
-                        updateToastRef.value.show();
+                        $fhcAlert.alertSuccess(t('gehaltsband','gehaltsband_gespeichert'));
                     } else {
                      // salaryRangeList.value = [];
                     }              
                   } catch (error) {
-                    console.log(error)              
+                     $fhcAlert.handleSystemError(error)   
                   } finally {
                       isFetching.value = false
                   }
@@ -356,51 +352,41 @@ export const SalaryRange = {
         
         const showDeleteModal = async (id) => {
             currentBetrag.value = salaryRangeList.value.find((item) => item.gehaltsband_betrag_id == id);
-            const ok = await confirmDeleteRef.value.show();
-            
-            if (ok) {   
-    
+
+            if (await $fhcAlert.confirm({
+                    message: t('gehaltsband','gehaltsband') + ' ' + currentBetrag?.value?.bezeichnung + ' (' + formatDateGerman(currentBetrag?.value?.von) + '-' + formatDateGerman(currentBetrag?.value?.von) + ') ' + t('person','wirklichLoeschen') + '?',
+                    acceptLabel: t('global','Warnung'),
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }
+
+          //  if (ok) {
+
                 try {
-                    const res = await fhcApi.factory.SalaryRange.deleteSalaryRange(id);             
-                    if (res.error == 0) {
-                        salaryRangeList.value = salaryRangeList.value.filter((item) => item.gehaltsband_betrag_id != id);
-                        deleteToastRef.value.show();
+                    const res = await $api.call(ApiSalaryRange.deleteSalaryRange(id));             
+                    if (res?.meta?.status == 'success') {
+                        salaryRangeList.value = salaryRangeList.value.filter((item) => item.gehaltsband_betrag_id != id);                        
+                        $fhcAlert.alertSuccess(t('gehaltsband','gehaltsband_geloescht'));   
+                    } else {
+                        salaryRangeList.value = []
                     }
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)           
                 } finally {
                       isFetching.value = false
-                }                  
-                
-            }
+                }
+
+          //  }
         }
 
         return { t, isFetching, tableRef, tabulator, currentDate, presetDates, filterDate, 
-            formatDateISO, filterDateHandler, modalRef, confirmDeleteRef, deleteToastRef, 
-            createToastRef, updateToastRef, currentBetrag, addSalaryRange, betragDialogRef, decFilter, incFilter,
+            formatDateISO, filterDateHandler, modalRef, confirmDeleteRef, currentBetrag, 
+            addSalaryRange, betragDialogRef, decFilter, incFilter,
             cancelHandler, formatDateGerman, progressValue, startOfMonth, startOfYear, endOfMonth, endOfYear }
 
     },
     template: `    
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="updateToastRef">
-                <template #body><h4>{{ t('gehaltsband','gehaltsband_gespeichert') }}</h4></template>
-            </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="createToastRef">
-                <template #body><h4>{{ t('gehaltsband','gehaltsband_erstellt') }}</h4></template>
-            </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('gehaltsband','gehaltsband_geloescht') }}</h4></template>
-            </Toast>
-        </div>
-
 
         <div v-if="isFetching" class="d-flex justify-content-center container-fluid px-0 " >
             <div  class="spinner-border"  role="status">
@@ -446,12 +432,6 @@ export const SalaryRange = {
         </div>
 
         <betrag-dialog  ref="betragDialogRef"></betrag-dialog>
-
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                {{ t('gehaltsband','gehaltsband') }} '{{ currentBetrag?.bezeichnung }} ({{ formatDateGerman(currentBetrag?.von) }}-{{ formatDateGerman(currentBetrag?.von) }})' {{ t('person','wirklichLoeschen') }}?
-            </template>
-        </ModalDialog>
 
         <Modal title="DV beenden" ref="modalRef">
             <template #body>

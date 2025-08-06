@@ -2,7 +2,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class CommonsAPI extends Auth_Controller
+class CommonsAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
@@ -73,15 +73,15 @@ class CommonsAPI extends Auth_Controller
     function getSprache()
     {
         //$this->SpracheModel->addOrder("sprache");
-	$spracheRes = $this->SpracheModel->load();
+        $spracheRes = $this->SpracheModel->load();
 
-	if (isError($spracheRes))
-	{
-		$this->outputJsonError(getError($spracheRes));
-		exit;
-	}
+        if (isError($spracheRes))
+        {
+            $this->terminateWithError(getError($spracheRes));
+            exit;
+        }
 
-        $this->outputJson($spracheRes);
+        $this->terminateWithSuccess(getData($spracheRes));
     }
 
 
@@ -93,11 +93,11 @@ class CommonsAPI extends Auth_Controller
 
 	if (isError($sachaufwandTypRes))
 	{
-		$this->outputJsonError(getError($sachaufwandTypRes));
+		$this->terminateWithError(getError($sachaufwandTypRes));
 		exit;
 	}
 
-        $this->outputJson($sachaufwandTypRes);
+        $this->terminateWithSuccess(getData($sachaufwandTypRes));
     }
 
     function getNations()
@@ -112,11 +112,11 @@ class CommonsAPI extends Auth_Controller
 
 	if (isError($nationRes))
 	{
-	    $this->outputJsonError(getError($nationRes));
+	    $this->terminateWithError(getError($nationRes));
 	    exit;
 	}
 
-        $this->outputJson($nationRes);
+        $this->terminateWithSuccess(getData($nationRes));
     }
 
     function getAusbildung()
@@ -126,24 +126,24 @@ class CommonsAPI extends Auth_Controller
 
 	if (isError($result))
 	{
-	    $this->outputJsonError(getError($result));
+	    $this->terminateWithError(getError($result));
 	    exit;
 	}
 
-        $this->outputJson($result);
+        $this->terminateWithSuccess(getData($result));
     }
 
     function getStandorteIntern()
     {
         $data = $this->ApiModel->getStandorteIntern();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getOrte()
     {
         $this->OrtModel->addOrder("ort_kurzbz");
         $data = $this->OrtModel->load();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getGemeinden()
@@ -152,10 +152,10 @@ class CommonsAPI extends Auth_Controller
 
         if (!is_numeric($plz))
         {
-            $this->outputJsonError("plz '$plz' is not numeric!'");
+            $this->terminateWithError("plz '$plz' is not numeric!'");
         } else {
             $data = $this->ApiModel->getGemeinden($plz);
-            $this->outputJson($data);
+            $this->terminateWithSuccess(getData($data));
         }
     }
 
@@ -164,10 +164,10 @@ class CommonsAPI extends Auth_Controller
         $plz = $this->input->get('plz', TRUE);
 
         if (!is_numeric($plz))
-            $this->outputJsonError("plz '$plz' is not numeric!'");
+            $this->terminateWithError("plz '$plz' is not numeric!'");
 
         $data = $this->ApiModel->getOrtschaften($plz);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     
@@ -179,7 +179,7 @@ class CommonsAPI extends Auth_Controller
     {
         $this->VertragsartModel->addOrder("sort");
         $data = $this->VertragsartModel->load();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
 
@@ -194,11 +194,11 @@ class CommonsAPI extends Auth_Controller
 
 		if (isError($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			exit;
 		}
 
-        $this->outputJson($result);
+        $this->terminateWithSuccess(getData($result));
     }
 
     //  ------------------------------------------
@@ -212,11 +212,11 @@ class CommonsAPI extends Auth_Controller
 
 		if (isError($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			exit;
 		}
 
-        $this->outputJson($result);
+        $this->terminateWithSuccess(getData($result));
     }
 
     // -----------------------------------------
@@ -235,7 +235,7 @@ class CommonsAPI extends Auth_Controller
 			show_error('month is not numeric!');
 
         $data = $this->ApiModel->getContractExpire($year, $month);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getContractNew()
@@ -251,14 +251,14 @@ class CommonsAPI extends Auth_Controller
 			show_error('month is not numeric!');
 
         $data = $this->ApiModel->getContractNew($year, $month);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getBirthdays()
     {
         $date = $this->input->get('date', TRUE);
         $data = $this->ApiModel->getBirthdays($date);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getCovidState()
@@ -267,7 +267,7 @@ class CommonsAPI extends Auth_Controller
 
         if (!is_numeric($person_id))
         {
-            $this->outputJsonError("person_id is not numeric!'");
+            $this->terminateWithError("person_id is not numeric!'");
             return;
         }
 
@@ -280,7 +280,7 @@ class CommonsAPI extends Auth_Controller
 
 
         $data = $this->ApiModel->getCovidDate($person_id, $date);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getCourseHours()
@@ -290,18 +290,18 @@ class CommonsAPI extends Auth_Controller
 
         if ($uid == '')
         {
-            $this->outputJsonError("uid is missing!'");
+            $this->terminateWithError("uid is missing!'");
             return;
         }
 
         if ($semester == '')
         {
-            $this->outputJsonError("semester is missing!'");
+            $this->terminateWithError("semester is missing!'");
             return;
         }
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getAllCourseHours()
@@ -310,12 +310,12 @@ class CommonsAPI extends Auth_Controller
 
         if ($uid == '')
         {
-            $this->outputJsonError("uid is missing!'");
+            $this->terminateWithError("uid is missing!'");
             return;
         }
 
         $data = $this->LVAModel->getAllCourseHours($uid);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getAllSupportHours()
@@ -324,12 +324,12 @@ class CommonsAPI extends Auth_Controller
 
         if ($uid == '')
         {
-            $this->outputJsonError("uid is missing!'");
+            $this->terminateWithError("uid is missing!'");
             return;
         }
 
         $data = $this->LVAModel->getAllSupportHours($uid);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
 
@@ -342,12 +342,12 @@ class CommonsAPI extends Auth_Controller
 		$gehaltstypen = $this->GehaltstypModel->load();
 		if( hasData($gehaltstypen) )
 		{
-			$this->outputJson($gehaltstypen);
+			$this->terminateWithSuccess(getData($gehaltstypen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no contract types found');
+			$this->terminateWithError('no contract types found');
 			return;
 		}
 	}
@@ -360,12 +360,12 @@ class CommonsAPI extends Auth_Controller
 		$unternehmen = $this->VertragsartModel->loadWhere('dienstverhaeltnis = true');
 		if( hasData($unternehmen) )
 		{
-			$this->outputJson($unternehmen);
+			$this->terminateWithSuccess(getData($unternehmen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no contract types found');
+			$this->terminateWithError('no contract types found');
 			return;
 		}
 	}
@@ -377,12 +377,12 @@ class CommonsAPI extends Auth_Controller
         $vbtypen = $this->VertragsbestandteiltypModel->load();
 		if( hasData($vbtypen) )
 		{
-			$this->outputJson($vbtypen);
+			$this->terminateWithSuccess(getData($vbtypen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no contract types found');
+			$this->terminateWithError('no contract types found');
 			return;
 		}
 	}
@@ -397,12 +397,12 @@ class CommonsAPI extends Auth_Controller
 		$rows = $this->KarenztypModel->load();
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no karenz types found');
+			$this->terminateWithError('no karenz types found');
 			return;
 		}
 	}
@@ -415,12 +415,12 @@ class CommonsAPI extends Auth_Controller
 		$rows = $this->TeilzeittypModel->load();
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no teilzeit types found');
+			$this->terminateWithError('no teilzeit types found');
 			return;
 		}
 	}
@@ -433,12 +433,12 @@ class CommonsAPI extends Auth_Controller
 		$rows = $this->FreitexttypModel->load();
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no freitext types found');
+			$this->terminateWithError('no freitext types found');
 			return;
 		}
 	}
@@ -451,12 +451,12 @@ class CommonsAPI extends Auth_Controller
 
 		if (isError($result))
 		{
-			return $this->outputJsonError('Keine Stundensatztypen gefunden');
+			return $this->terminateWithError('Keine Stundensatztypen gefunden');
 		}
 
 		if (hasData($result))
 		{
-			return $this->outputJson($result);
+			return $this->terminateWithSuccess(getData($result));
 		}
 	}
 
@@ -480,7 +480,7 @@ class CommonsAPI extends Auth_Controller
             // TODO validate param
 
             $result = $this->StatistikModel->load($payload['report']);
-            $this->outputJson($this->ApiModel->runReport($result->retval[0]->sql, $payload['filter']));
+            $this->terminateWithSuccess(getData($this->ApiModel->runReport($result->retval[0]->sql, $payload['filter'])));
         }  else {
             $this->output->set_status_header('405');
         }

@@ -4,6 +4,7 @@ let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OB
 
 export const searchbaroptions = {
     cssclass: "position-relative",
+    origin: 'pv21',
     types: [
         "person",
         "raum",

@@ -3,7 +3,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 
-class SalaryRange extends Auth_Controller
+class SalaryRange extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -35,32 +35,13 @@ class SalaryRange extends Auth_Controller
         $this->CI = &get_instance();
     }
 
-    function index()
-    {}
-
-	/**
-	 * query all salary range data for easy gui handling
-	 */
-    /*function getAll()
+    public function index()
     {
-        $this->SalaryRangeModel->resetQuery();
-		$this->SalaryRangeModel->addSelect('gehaltsband_betrag_id,gehaltsband_kurzbz,bezeichnung,aktiv,sort,von,bis,betrag_von,betrag_bis');
-		$this->SalaryRangeModel->addJoin('hr.tbl_gehaltsband_betrag', 'gehaltsband_kurzbz');
-		$this->SalaryRangeModel->addOrder('sort', 'ASC');
-		$rows = $this->SalaryRangeModel->loadWhere(array('aktiv' => true));
-		if( hasData($rows) )
-		{
-			$this->outputJson($rows);
-			return;
-		}
-		else
-		{
-			$this->outputJsonError('no salary ranges found');
-			return;
-		}
-    }  */
+		$this->terminateWithSuccess('not implemented');
+	}
 
-	function getAll()
+
+	public function getAll()
 	{
 		$von = $this->input->get('von', null);
 		$bis = $this->input->get('bis', null);
@@ -69,17 +50,17 @@ class SalaryRange extends Auth_Controller
 		} else {
 			$rows = $this->SalaryRangeModel->getAllByDateRange($von, $bis);
 		}
-		if( hasData($rows) )
+		if( !isError($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows) ?? []);
 		}
 		else
 		{
-			$this->outputJsonError('no salary ranges found');
+			$this->terminateWithError('no salary ranges found');
 		}
 	}
 
-	function getSalaryRangeList()
+	public function getSalaryRangeList()
 	{
 		$this->SalaryRangeModel->resetQuery();
 		$this->SalaryRangeModel->addSelect('gehaltsband_kurzbz,bezeichnung');
@@ -87,17 +68,15 @@ class SalaryRange extends Auth_Controller
 		$rows = $this->SalaryRangeModel->loadWhere(array('aktiv' => true));
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
-			return;
+			$this->terminateWithSuccess(getData($rows) ?? []);
 		}
 		else
 		{
-			$this->outputJsonError('no salary ranges found');
-			return;
+			$this->terminateWithError('no salary ranges found');
 		}
 	}
 
-	function deleteBetrag($betrag_id)
+	public function deleteBetrag($betrag_id)
 	{
 		if($this->input->method() === 'post')
         {
@@ -108,16 +87,16 @@ class SalaryRange extends Auth_Controller
             $result = $this->SalaryRangeBetragModel->deleteSalaryRangeBetrag($betrag_id);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess(getData($result));
 		    else
-			    $this->outputJsonError('Error when deleting salary range data');
+			    $this->terminateWithError('Error when deleting salary range data');
 
         } else {
-            $this->output->set_status_header('405');
+            $this->terminateWithError('method not allowed',REST_Controller::HTTP_METHOD_NOT_ALLOWED);
         }
 	}
 
-	function upsertBetrag()
+	public function upsertBetrag()
 	{
 		if($this->input->method() === 'post'){
 
@@ -142,11 +121,11 @@ class SalaryRange extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess(getData($result));
 		    else
-			    $this->outputJsonError('Error when updating salary range');
+			    $this->terminateWithError('Error when updating salary range');
         } else {
-            $this->output->set_status_header('405');
+            $this->terminateWithError('method not allowed',REST_Controller::HTTP_METHOD_NOT_ALLOWED);
         }
 	}
 
