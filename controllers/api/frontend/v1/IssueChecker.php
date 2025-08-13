@@ -6,6 +6,7 @@ class IssueChecker extends FHCAPI_Controller
 	const DEBUG = false;
 	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 	const RESTRICTED_PERMISSION = 'extension/pv21_handyverwaltung:r';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:r';
 
 	protected $personid;
 	protected $_app;
@@ -21,7 +22,7 @@ class IssueChecker extends FHCAPI_Controller
 		parent::__construct(
 			array(
 				'checkPerson' => self::DEFAULT_PERMISSION,
-				'countPersonOpenIssues' => [self::DEFAULT_PERMISSION, self::RESTRICTED_PERMISSION]
+				'countPersonOpenIssues' => [self::DEFAULT_PERMISSION, self::RESTRICTED_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION]
 			)
 		);
 
