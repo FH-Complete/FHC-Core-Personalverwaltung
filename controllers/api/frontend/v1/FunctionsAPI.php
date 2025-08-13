@@ -43,14 +43,12 @@ class FunctionsAPI extends FHCAPI_Controller
 EOSQL;
 
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) )
+		if (isError($fkts))
 		{
-			$this->terminateWithSuccess($fkts->retval);
+			$this->terminateWithError('failed to fetch all functions');
 		}
-		else
-		{
-			$this->terminateWithError('no contract relevant funktionen found');
-		}
+		$data = getData($fkts);
+		$this->terminateWithSuccess($data ?? array());
 	}
 
 	/*
@@ -86,14 +84,12 @@ EOSQL;
 EOSQL;
 
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) )
+		if (isError($fkts))
 		{
-			$this->terminateWithSuccess($fkts->retval);
+			$this->terminateWithError('failed to fetch contract relevant functions');
 		}
-		else
-		{
-			$this->terminateWithError('no contract relevant funktionen found');
-		}
+		$data = getData($fkts);
+		$this->terminateWithSuccess($data ?? array());
 	}
 
 	/*
@@ -150,16 +146,12 @@ EOSQL;
 EOSQL;
 
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz, $uid));
-		if( hasData($benutzerfunktionen) )
+		if (isError($benutzerfunktionen))
 		{
-			$this->terminateWithSuccess($benutzerfunktionen->retval);
-			return;
+			$this->terminateWithError('failed to fetch benutzerfunktionen for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz);
 		}
-		else
-		{
-			$this->terminateWithError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
-			return;
-		}
+		$data = getData($benutzerfunktionen);
+		$this->terminateWithSuccess($data ?? array());
 	}
 
 	/*
@@ -215,19 +207,11 @@ EOSQL;
 EOSQL;
 
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($uid));
-		if( hasData($benutzerfunktionen) )
+		if (isError($benutzerfunktionen))
 		{
-			$this->terminateWithSuccess(getData($benutzerfunktionen));
+			$this->terminateWithError('failed to fetch benutzerfunktionen for uid ' . $uid);
 		}
-		else
-		{
-			$this->terminateWithError('no benutzerfunktionen found for uid ' . $uid);
-		}
+		$data = getData($benutzerfunktionen);
+		$this->terminateWithSuccess($data ?? array());
 	}
-
-
-	
-
-
-
 }
