@@ -7,15 +7,17 @@ class OrgAPI extends FHCAPI_Controller
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 
-    public function __construct() {
+	public function __construct() {
         parent::__construct(array(
             'getOrgHeads' => OrgAPI::DEFAULT_PERMISSION,
             'getOrgStructure' => OrgAPI::DEFAULT_PERMISSION,
             'getOrgPersonen' => OrgAPI::DEFAULT_PERMISSION,
-            'getCompanyByOrget'  => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'getCompanyByOrget'  => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		    'getOrgetsForCompany' => OrgAPI::DEFAULT_PERMISSION,
-            'getUnternehmen' => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'getUnternehmen' => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
