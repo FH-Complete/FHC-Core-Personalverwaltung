@@ -283,7 +283,8 @@ class DVAPI extends FHCAPI_Controller
         $dv = $this->VertragsbestandteilLib->fetchDienstverhaeltnis(intval($payload->dienstverhaeltnis_id));
         $ret = $this->VertragsbestandteilLib->deactivateDienstverhaeltnis($dv, $payload->gueltig_bis, true);
 
-        if (!$ret) {
+        if ( !hasData($ret) ) 
+        {
             return $this->terminateWithError($ret);
         }
 
