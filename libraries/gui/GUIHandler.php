@@ -1,4 +1,7 @@
 <?php
+
+use vertragsbestandteil\NoPermissionException;
+
 require_once __DIR__ . '/GUIHandlerFactory.php';
 //require_once __DIR__ . '/../../../models/vertragsbestandteil/Dienstverhaeltnis_model.php';
 //require_once __DIR__ . '/../../libraries/vertragsbestandteil/VertragsbestandteilLib.php';
@@ -138,8 +141,9 @@ class GUIHandler
 					}
 				}
 				if( $vbmapper->hasToBeDeleted() )
-				{
+				{                    
 					$this->VertragsbestandteilLib->deleteVertragsbestandteil($vb);
+                    
 				}
 				else 
 				{
@@ -158,8 +162,11 @@ class GUIHandler
 			
             $this->DataMapper->addGUIInfo('Dienstverhältnis gespeichert');
 
+        } catch(NoPermissionException $ex) {
+            log_message('error','Transaction failed');
+            $this->CI->db->trans_rollback();
+            $vbmapper->addGUIError('Vertragsbestandteil kann nicht gelöscht werden. Keine Berechtigung für zugehörigen Gehaltsbestandteil.');
         } catch(Exception $ex) {
-            // TODO write error message to guioptions errors array
             log_message('error','Transaction failed');
             $this->CI->db->trans_rollback();
             $this->DataMapper->addGUIError('Dienstverhältnis konnte nicht gespeichert werden');
