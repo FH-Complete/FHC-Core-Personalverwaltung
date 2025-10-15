@@ -23,6 +23,7 @@
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeHeader.css',
 				'public/extensions/FHC-Core-Personalverwaltung/css/components/toast.css',
 				'public/css/components/verticalsplit.css',
+				'public/css/components/Detailheader.css',
 				'public/css/components/searchbar/searchbar.css',
                 'public/extensions/FHC-Core-Personalverwaltung/css/vbform/vbform.css'
 			],
