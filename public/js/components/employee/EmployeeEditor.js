@@ -3,7 +3,7 @@ import { EmployeeNav } from './EmployeeNav.js';
 import { EmployeeStatus } from './EmployeeStatus.js'
 import CoreDetailsHeader from '../../../../../../public/js/components/DetailHeader/DetailHeader.js';
 import ApiIssue from "../../api/factory/issue.js";
-import ApiEmployee from "../../api/factory/employee";
+import ApiEmployee from "../../api/factory/employee.js";
 
 export default {
 	name: 'EmployeeEditor',
@@ -93,7 +93,6 @@ export default {
 		}
 
 		const refresh = () => {
-			console.log("in refresh 104");
 			statusRef.value.refresh();
 		}
 
