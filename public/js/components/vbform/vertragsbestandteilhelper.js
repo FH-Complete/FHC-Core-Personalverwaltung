@@ -8,7 +8,7 @@ import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
 import dvneuanlage from './dvneuanlage.js';
 import dvaenderung from './dvaenderung.js';
-import sharedstate from './vbsharedstate.js';
+import store from './vbsharedstate.js';
 
 export default {
   name: 'VertragsbestandteilHelper',
@@ -46,7 +46,7 @@ export default {
   ],
   data: function() {
     return {
-      sharedstate: sharedstate,
+      sharedstate: store,
       vertragsbestandteiltyp: '',
       payload: {
         type: 'formdata',

@@ -1,5 +1,5 @@
 import configurable from '../../mixins/vbform/configurable.js';
-import sharedstate from './vbsharedstate.js';
+import store from './vbsharedstate.js';
 
 export default {
   name: 'Gueltigkeit',
@@ -57,7 +57,7 @@ export default {
   },
   data: function() {
     return {
-      sharedstate: sharedstate,
+      sharedstate: store,
       sharedstatemode: '',
       gueltig_ab: '',
       gueltig_bis: ''
