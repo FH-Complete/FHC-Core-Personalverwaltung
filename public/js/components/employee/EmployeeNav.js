@@ -49,7 +49,12 @@ export const EmployeeNav = {
             class="flex-sm-fill text-sm-center nav-link"
             :class="[{'router-link-active active': route.path.indexOf('contract') > -1 }]" >
             Dienstverhältnis
-        </router-link>        
+        </router-link>
+        <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/training' + maybeAddDate()" 
+        class="flex-sm-fill text-sm-center nav-link"
+        :class="[{'router-link-active active': route?.name === 'training'}]"
+        >Weiterbildung</router-link
+        >        
         <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/time' + maybeAddDate()" 
         class="flex-sm-fill text-sm-center nav-link"
         :class="[{'router-link-active active': route?.name === 'time'}]"
@@ -64,7 +69,7 @@ export const EmployeeNav = {
         class="flex-sm-fill text-sm-center nav-link"
         :class="[{'router-link-active active': route?.name === 'document'}]"
         >Dokumente</router-link
-        >
+        >        
     </nav>
     
     `

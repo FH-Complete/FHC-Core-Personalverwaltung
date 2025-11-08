@@ -7,6 +7,7 @@ $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)'] = 'extensions/
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/contract'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/contract/(:any)'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
+$route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/training'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/time'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/lifecycle'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';
 $route['extensions/FHC-Core-Personalverwaltung/Employees/(:any)/(:any)/summary'] = 'extensions/FHC-Core-Personalverwaltung/Employees/index';

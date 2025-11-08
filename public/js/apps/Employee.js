@@ -5,6 +5,7 @@ import {EmployeeSummary } from "../components/employee/summary/EmployeeSummary.j
 import {EmployeeTime} from "../components/employee/time/EmployeeTime.js";
 import { EmployeeLifeCycle } from "../components/employee/lifecycle/EmployeeLifeCycle.js";
 import { EmployeeDocument } from "../components/employee/document/EmployeeDocument.js";
+import { EmployeeTraining } from "../components/employee/training/EmployeeTraining.js";
 import Phrasen from '../../../../js/plugins/Phrasen.js';
 import FhcAlert from '../../../../js/plugins/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
@@ -35,6 +36,7 @@ const router = VueRouter.createRouter(
 					  component: EmployeeContract,
 					  props: route => ({ id: parseInt(route.params.id), uid: route.params.uid, dienstverhaeltnis_id: parseInt(route.params.dienstverhaeltnis_id) })
 					 },
+					{ path: 'training', component: EmployeeTraining, name: 'training' }, 
 					{ path: 'time', component: EmployeeTime, name: 'time' },
 					{ path: 'lifecycle', component: EmployeeLifeCycle, name: 'lifecycle' },
 					{ path: 'document', component: EmployeeDocument, name: 'document' },
