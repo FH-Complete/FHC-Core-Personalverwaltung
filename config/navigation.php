@@ -103,3 +103,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	)
 );
+
+$config['navigation_menu']['apps'] = [
+	'cdv' => [
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Kontaktdatenverwaltung'),
+		'description' => 'Kontaktdatenverwaltung',
+		#'icon' => 'address-card',
+		'requiredPermissions' => 'extension/pv21_kontaktdatenver:rw'
+	]
+];
