@@ -5,6 +5,7 @@ import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 import { dateFilter } from '../../../../../../js/tabulator/filters/Dates.js';
 import ApiFunktion from '../../../api/factory/funktion.js';
 import ApiPerson from '../../../api/factory/person.js';
+import ApiWeiterbildung from  '../../../api/factory/weiterbildung.js';
 import { EditDialog } from './EditDialog.js';
 
 export const EmployeeTraining = {
@@ -36,13 +37,16 @@ export const EmployeeTraining = {
 
         const route = VueRouter.useRoute();
         const { watch, ref, onMounted } = Vue; 
+        const kategorien = ref([]);
+        const kategorieTypen = ref([]);
         const currentPersonID = ref(null);
         const currentUID = ref(null);
         const currentValue = ref();
         const editDialogRef = ref();   
         const isFetching = ref(false);
-        const interneChecked = Vue.ref(true);
-        const trainingList = Vue.ref({
+        const interneChecked = ref(true);
+        const trainingList = ref([]);
+        /* Vue.ref({
             1: { "training_id" : 1, 
                 "kategorie":"Kategorie 1/Sub-Kategorie 1", 
                 "stunden":"8", 
@@ -54,19 +58,68 @@ export const EmployeeTraining = {
                 "intern_extern":true,
                 "hrfreigabe":true
             }
-        });
+        }); */
         
         const table = Vue.ref(null); // reference to your table element
         const tabulator = Vue.ref(null); // variable to hold your table
         const tableData = Vue.reactive([]); // data for table to display
 
+        const createShape = () => {
+            return { 
+                "weiterbildung_id" : null, 
+                "mitarbeiter_uid": currentUID.value,
+                "bezeichnung": "",
+                "intern": true,
+                "kategorien":[], 
+                "stunden":0, 
+                "intern": true,
+                "von":null, 
+                "bis":null, 
+                "hr_freigegeben":null, 
+                "beantragt":null,
+                "ablaufdatum":null,
+            } 
+        }
+
         onMounted(() => {
             currentPersonID.value = parseInt(route.params.id);
             currentUID.value = route.params.uid;
 
+            const kategorieFormatter = (cell) => {    
+                
+                const kategorien = cell.getRow().getData().kategorien;
+                const kategorienExpanded = [];
+
+                kategorien.forEach(kategorie => {
+                    const k = kategorienList.value.find(kat => kat.weiterbildungskategorie_kurzbz == kategorie.weiterbildungskategorie_kurzbz);
+                    const typ = kategorieTypen.value.find(kat => kat.weiterbildungskategorietyp_kurzbz == kategorie.weiterbildungskategorietyp_kurzbz);
+                    kategorienExpanded.push(k.bezeichnung + ' /' + typ.bezeichnung);
+                });
+                
+                return kategorienExpanded.join(', ');
+            }
+
             const dateFormatter = (cell) => {
                 return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
             }
+
+            const fetchKategorien = async () => {
+                const res = await $api.call(ApiWeiterbildung.getKategorien());                 
+                kategorien.value = res.data                       
+            }
+            const fetchKategorieTypen = async () => {
+                const res = await $api.call(ApiWeiterbildung.getKategorieTypen());                 
+                kategorieTypen.value = res.data                
+            }
+
+
+            Promise.all([
+                fetchKategorien(), fetchKategorieTypen()
+            ]).then(() => {
+                $api.call(ApiWeiterbildung.getAllByUID(currentUID.value)).then((r) => {
+                        trainingList.value = r.data
+                });                               
+            })
 
             // helper
             const createDomButton = (classValue, clickHandler) => {
@@ -90,9 +143,9 @@ export const EmployeeTraining = {
                 classAttrDiv.value = "d-grid gap-2 d-md-flex justify-content-end align-middle";
                 nodeDiv.setAttributeNode(classAttrDiv);
                 // delete button
-                const nodeBtnDel = createDomButton("fa fa-xmark",() => { showDeleteModal(cell.getValue()) })
+                const nodeBtnDel = createDomButton("fa fa-xmark",() => { showDeleteModal(cell.getRow().getData()) })
                 // edit button
-                const nodeBtnEdit = createDomButton("fa fa-pen",() => { showEditModal(cell.getValue()) })
+                const nodeBtnEdit = createDomButton("fa fa-pen",() => { showEditModal(cell.getRow().getData()) })
 
                // if( cell.getRow().getData().dienstverhaeltnis_unternehmen === null ) {
                     nodeDiv.appendChild(nodeBtnEdit);
@@ -103,17 +156,21 @@ export const EmployeeTraining = {
             }
 
             const columnsDef = [
-                { title: t('ui','kategorie'), field: "kategorie", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: 'Kategorie', field: "kategorie", headerFilter:"list", formatter: kategorieFormatter, width: 180, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: 'Stunden', field: "stunden", hozAlign: "right", 
                     width: 140, headerFilter:true },
-                { title: 'Von', field: "datum_von", hozAlign: "center", 
+                { title: 'Von', field: "von", hozAlign: "center", 
                     formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },                
-                { title: 'Bis', field: "datum_bis", hozAlign: "center", 
+                { title: 'Bis', field: "bis", hozAlign: "center", 
                     formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },
-                { title: 'Ablaufdatum', field: "expires", hozAlign: "center", 
-                    formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },  
-                { title: 'Beantragt', field: "beantragt", hozAlign: "center",
+                { title: 'Ablaufdatum', field: "ablaufdatum", hozAlign: "center", 
+                    formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },
+                { title: 'Beantragt', field: "beantragt", hozAlign: "center", 
+                    formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' }, 
+                { title: 'HR-Freigabe', field: "hr_freigegeben", hozAlign: "center", 
+                    formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },             
+                { title: 'Intern', field: "intern", hozAlign: "center", width: 100,
                     formatter:"tickCross", formatterParams: {
 						tickElement: '<i class="fas fa-check text-success"></i>',
 						crossElement: '<i class="fas fa-times text-danger"></i>'
@@ -121,25 +178,7 @@ export const EmployeeTraining = {
                     headerFilter:"tickCross", headerFilterParams: {
 						"tristate":true,elementAttributes:{"value":"true"}
 					}, headerFilterEmptyCheck:function(value){return value === null}
-                 },             
-                { title: 'Intern', field: "intern_extern", hozAlign: "center",
-                    formatter:"tickCross", formatterParams: {
-						tickElement: '<i class="fas fa-check text-success"></i>',
-						crossElement: '<i class="fas fa-times text-danger"></i>'
-					},
-                    headerFilter:"tickCross", headerFilterParams: {
-						"tristate":true,elementAttributes:{"value":"true"}
-					}, headerFilterEmptyCheck:function(value){return value === null}
-                 },
-                { title: 'HR-Freigabe', field: "hrfreigabe", hozAlign: "center", 
-                    formatter:"tickCross", formatterParams: {
-						tickElement: '<i class="fas fa-check text-success"></i>',
-						crossElement: '<i class="fas fa-times text-danger"></i>'
-					},
-                    headerFilter:"tickCross", headerFilterParams: {
-						"tristate":true,elementAttributes:{"value":"true"}
-					}, headerFilterEmptyCheck:function(value){return value === null}
-                },
+                 },               
               ];
 
             if( props.readonlyMode === false) {
@@ -151,6 +190,7 @@ export const EmployeeTraining = {
 				layout: "fitColumns",
 				movableColumns: true,
 				reactiveData: true,
+                placeholder: "No data available",
                 columns: columnsDef,
                 //data: tableData.value,
                 data: trainingListArray.value,
@@ -163,6 +203,12 @@ export const EmployeeTraining = {
 
             
         })
+
+        const refreshList = () => {
+            $api.call(ApiWeiterbildung.getAllByUID(currentUID.value)).then((r) => {
+                trainingList.value = r.data
+            });   
+        }
 
         watch(
 			() => route.params.id,
@@ -184,48 +230,37 @@ export const EmployeeTraining = {
             return filtered;
         });
 
+        const showDeletedToast = () => {
+            $fhcAlert.alertSuccess('Weiterbildung gelöscht');
+        }
+
         Vue.watch(trainingListArray, (newVal, oldVal) => {
                 tabulator.value?.setData(trainingListArray.value);
         }, {deep: true})
 
+
+
         // Modal 
         const modalRef = Vue.ref();
 
-        const showAddModal = () => {
-            currentValue.value = createShape();
+        const showAddModal = () => {            
+            editDialogRef.value.showModal(createShape());
             // reset form state
-            frmState.orgetBlurred=false;
+           /*  frmState.orgetBlurred=false;
             frmState.funktionBlurred=false;            
-            frmState.beginnBlurred=false;
-            // call bootstrap show function
-            modalRef.value.show();
+            frmState.beginnBlurred=false; */
         }
 
-        const showEditModal = async (id) => {
-            currentValue.value = { ...trainingList.value[id] };
-            // fetch company
-            isFetching.value = true;
-            try {
-                /* const res = await $api.call(ApiFunktion.getCompanyByOrget(currentValue.value.oe_kurzbz));
-                if (res.meta.status == "success") {
-                    unternehmen.value = res.data[0].oe_kurzbz;
-                } else {
-                    console.log('company not found for orget!');
-                } */
-
-            } catch (error) {
-                $fhcAlert.handleSystemError(error)           
-            } finally {
-                    isFetching.value = false
-            editDialogRef.value.showModal();
-            }
+        const showEditModal = async (currentRow) => {
+            currentValue.value = { ...currentRow };            
+            editDialogRef.value.showModal(currentValue);
         }
         
-        const showDeleteModal = async (id) => {
-            currentValue.value = { ...jobfunctionList.value[id] };
+        const showDeleteModal = async (currentRow) => {
+            currentValue.value = { ...currentRow };
             
             if (await $fhcAlert.confirm({
-                    message: t('person','funktion') + ' ' + getJobFunction(currentValue.value?.funktion_kurzbz) + '  (' + formatDate(currentValue.value?.datum_von) + '-' + (currentValue.value.datum_bis != null ? formatDate(currentValue.value.datum_bis) : '?') + ') ' + t('person', 'wirklichLoeschen'),
+                    message:  currentValue.value.bezeichnung + t('person', 'wirklichLoeschen'),
                     acceptLabel: 'Löschen',
                     acceptClass: 'p-button-danger'
                 }) === false) {
@@ -233,22 +268,22 @@ export const EmployeeTraining = {
             }    
 
             try {
-                const res = await $api.call(ApiPerson.deletePersonJobFunction(id));                
+                const id = currentValue.value.weiterbildung_id;
+                const res = await $api.call(ApiWeiterbildung.deleteTraining(id));                
                 if (res.meta.status == "success") {
-                    delete jobfunctionList.value[id];
+                    trainingList.value = trainingList.value.filter(val => val.weiterbildung_id != id);
                     showDeletedToast();
-                    theModel.value.updateHeader();
                 }
             } catch (error) {
                 $fhcAlert.handleSystemError(error)             
             } finally {
-                    isFetching.value = false
+                isFetching.value = false
             }   
                 
         }
 
-        return {currentPersonID, currentUID, isFetching, t, table, editDialogRef,
-            readonly, showAddModal, showEditModal, showDeleteModal, interneChecked}
+        return {currentPersonID, currentUID, isFetching, t, table, editDialogRef, refreshList,
+            readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorien, kategorieTypen}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -287,7 +322,7 @@ export const EmployeeTraining = {
         </div>
     </div>
 
-    <edit-dialog  ref="editDialogRef"></edit-dialog>
+    <edit-dialog  ref="editDialogRef"  :kategorien="kategorien"  @changed="refreshList()"></edit-dialog>
 
     `
 }

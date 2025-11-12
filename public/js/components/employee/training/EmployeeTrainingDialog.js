@@ -15,6 +15,12 @@ export const EmployeeTrainingDialog = {
         "datepicker": VueDatePicker
     },
     props: {
+        hauptkategorien: {
+          type: Array,
+        },
+        statistik: {
+          type: Array,
+        }
     },  
     setup(props) {
 
@@ -104,8 +110,8 @@ export const EmployeeTrainingDialog = {
     
 
         onMounted(async () => {
-            fetchMainCatList()
-            fetchSubCatList()
+            /* fetchMainCatList()
+            fetchSubCatList() */
             //fetchFristEreignisse()            
         })
 
@@ -232,11 +238,11 @@ export const EmployeeTrainingDialog = {
             <form class="row g-3" v-if="currentValue != null"  ref="trainingDialogFrm" id="trainingDialogFrm">
                         
                 <div class="col-md-6">
-                    <label for="mainCategory_kurzbz" class="form-label required">Hauptkategorie</label>
-                    <select  id="mainCategory_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " 
-                        @blur="frmState.mainCategoryBlurred = true"   v-model="currentValue.mainCategory_kurzbz" 
-                        :class="{'is-invalid': !validBezeichnung(currentValue.mainCategory_kurzbz) && frmState.mainCategoryBlurred}">
-                        <option v-for="(item, index) in mainCatList" :value="item.mainCategory_kurzbz" >
+                    <label for="weiterbildung_hauptkategorie_id" class="form-label required">Hauptkategorie</label>
+                    <select  id="weiterbildung_hauptkategorie_id" class="form-select form-select-sm" aria-label=".form-select-sm " 
+                        @blur="frmState.mainCategoryBlurred = true"   v-model="currentValue.weiterbildung_hauptkategorie_id" 
+                        :class="{'is-invalid': !validBezeichnung(currentValue.weiterbildung_hauptkategorie_id) && frmState.mainCategoryBlurred}">
+                        <option v-for="(item, index) in hauptkategorie" :value="item.weiterbildung_hauptkategorie_id" >
                             {{ item.bezeichnung }}
                         </option>
                     </select>
@@ -244,11 +250,11 @@ export const EmployeeTrainingDialog = {
                 </div>    
 
                 <div class="col-md-6">
-                    <label for="subcategory_kurzbz" class="form-label required">Subkategorie</label>
-                    <select  id="subcategory_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " 
-                        @blur="frmState.subCategoryBlurred = true"   v-model="currentValue.subcategory_kurzbz" 
-                        :class="{'is-invalid': !validBezeichnung(currentValue.subcategory_kurzbz) && frmState.subCategoryBlurred}">
-                        <option v-for="(item, index) in subCatList" :value="item.subcategory_kurzbz" >
+                    <label for="weiterbildung_statistik_id" class="form-label required">Statistikkategorie</label>
+                    <select  id="weiterbildung_statistik_id" class="form-select form-select-sm" aria-label=".form-select-sm " 
+                        @blur="frmState.subCategoryBlurred = true"   v-model="currentValue.weiterbildung_statistik_id" 
+                        :class="{'is-invalid': !validBezeichnung(currentValue.weiterbildung_statistik_id) && frmState.subCategoryBlurred}">
+                        <option v-for="(item, index) in statistik" :value="item.weiterbildung_statistik_id" >
                             {{ item.bezeichnung }}
                         </option>
                     </select>

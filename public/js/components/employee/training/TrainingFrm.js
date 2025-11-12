@@ -6,75 +6,57 @@ export const TrainingFrm = {
         "datepicker": VueDatePicker
     },
     props: {
-        defaultval: { type: Object, required: false },
+        modelValue: { type: Object },
+        kategorien: { type: Array, required: true },        
     },
-    expose: [ 'save', 'reset'],
-    setup( props ) {
+    expose: [ 'submit', 'reset'],
+    emits: ['update:modelValue','submit'],
+    setup( props, { emit } ) {
 
-        const { watch, ref, computed, onMounted } = Vue;
+        const { watch, ref, computed, onMounted, reactive } = Vue;
 
-        const createShape = () => {
-            return { "training_id" : 1, 
-                "main_category_id":"", 
-                "sub_category_id":"", 
-                "hours":0, 
-                "datum_von":"", 
-                "datum_bis":"", 
-                "expires":"", 
-                "designation":"",
-                "request":false,
-                "approved":false,
-                "internal_external":false,
-  
+        /* const createShape = () => {
+            return { 
+                "weiterbildung_id" : null, 
+                "mitarbeiter_uid": props.uid,
+                "intern": true,
+                "hauptkategorie_id":null, 
+                "statistikkategorie_id":null, 
+                "stunden":0, 
+                "intern": true,
+                "von":null, 
+                "bis":null, 
+                "hr_freigegeben":null, 
+                "beantragt":null,
+                "ablaufdatum":null,
             } 
-        }
+        } */
 
-        const currentValue = ref(createShape());
-        const preservedValue = ref(createShape());   
+        /* const currentValue = ref(createShape());
+        const preservedValue = ref(createShape());    */
 
-         const mainCatList = ref([])     
-        const subCatList = ref([])     
+
         const { t } = usePhrasen();
         const isFetching = ref(false);
 
-        const fetchMainCatList = async () => {
-            try {
-                isFetching.value = true;
-                // const res = await $api.call(ApiSalaryRange.getSalaryRangeList());  
-                // salaryRangeList.value = res.meta.status == 'success' ? res.data : [] 
-                mainCatList.value = [{kurzbz:'KAT01',bezeichnung:'Kategorie 1'}];
-                isFetching.value = false;                        
-            } catch (error) {
-                console.log(error);
-                isFetching.value = false;           
-            }	
-        }
-
-        const fetchSubCatList = async () => {
-            try {
-                isFetching.value = true;
-                // const res = await $api.call(ApiSalaryRange.getSalaryRangeList());  
-                // salaryRangeList.value = res.meta.status == 'success' ? res.data : [] 
-                subCatList.value = [{kurzbz:'SUBKAT01',bezeichnung:'Sub-Kategorie 1'}];
-                isFetching.value = false;                        
-            } catch (error) {
-                console.log(error);
-                isFetching.value = false;           
-            }	
-        }
+        
 
         onMounted(async () => {
-            fetchMainCatList()
-            fetchSubCatList()
-            //fetchFristEreignisse()            
+               
         })
 
         // -------------
         // form handling
         // -------------
 
-        const trainingDialogFrm = Vue.ref();
+        const trainingDialogFrm = ref();
 
+        const update = (field, value) => {
+            // create new object, props are read-only
+            emit('update:modelValue', { ...props.modelValue, [field]: value })
+        }
+
+        // deprecated
         const frmState = Vue.reactive({ mainCategoryBlurred: false, subCategoryBlurred: false, vonBlurred: false, bisBlurred: false, 
             betragVonBlurred: false, betragBisBlurred: false, wasValidated: false });
 
@@ -139,30 +121,20 @@ export const TrainingFrm = {
 			}
         }
 
+        const errors = reactive({ von: '', bis: '', stunden: '', bezeichnung: '', 
+            ablaufdatum: '', beantragt: '', kategorie: '', hr_freigegeben: '' })
+
         const validate = () => {
-            frmState.vonBlurred = true;
-            frmState.bisBlurred = true;
-            frmState.stundenBlurred = true;
-            frmState.expiresBlurred = true;
-            frmState.applicationBlurred = true;
-            frmState.approvedBlurred = true;
-            frmState.mainCategoryBlurred = true;
-            if (validBezeichnung(currentValue.value?.main_cat) && 
-                validDatum(currentValue.value?.von) &&
-                validInput(currentValue.value?.betrag_von) &&
-                validInput(currentValue.value?.betrag_bis) &&
-                checkSalaries(currentValue.value.betrag_von, currentValue.value.betrag_bis) &&
-                checkDates(currentValue.value.von, currentValue.value.bis)) {
-                return true;
-            }
-            return false;
+            errors.bezeichnung = props.modelValue.bezeichnung ? '' : 'Bezeichnung ist erforderlich';
+            errors.kategorie = props.modelValue.kategorien ? '' : 'Kategorie ist erforderlich';
+            return !errors.bezeichnung && !errors.kategorie;
         }        
 
-        const hasChanged = Vue.computed(() => {
+       /*  const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
-        });
+        }); */
 
-        const okHandler = async () => {
+        /* const okHandler = async () => {
             if (!validate()) {
 
                 console.log("form invalid");
@@ -181,48 +153,53 @@ export const TrainingFrm = {
                 
                 
             }
+        } */
+
+        const submit = () => {
+            if (validate()) {
+                emit('submit', props.modelValue)
+            }
         }
 
-        return { mainCatList, subCatList, trainingDialogFrm, currentValue, t, 
-            validInput, validDatum, validBezeichnung, frmState, okHandler, hasChanged }
+        const reset = () => {
+
+        }
+
+        return { trainingDialogFrm,  t, update,
+            validInput, validDatum, validBezeichnung, frmState, errors, submit }
 
 
 
     },
     template: `
-        <form class="row g-3" v-if="currentValue != null"  ref="trainingDialogFrm" id="trainingDialogFrm">
+        <form class="row g-3" ref="trainingDialogFrm" id="trainingDialogFrm" @submit.prevent="submit">
                         
                 <div class="col-md-6">
-                    <label for="mainCategory_kurzbz" class="form-label required">Hauptkategorie</label>
-                    <select  id="mainCategory_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " 
-                        @blur="frmState.mainCategoryBlurred = true"   v-model="currentValue.mainCategory_kurzbz" 
-                        :class="{'is-invalid': !validBezeichnung(currentValue.mainCategory_kurzbz) && frmState.mainCategoryBlurred}">
-                        <option v-for="(item, index) in mainCatList" :value="item.mainCategory_kurzbz" >
+                    <label for="kategorien" class="form-label required">Kategorie</label>
+                    <select  id="kategorien" class="form-select form-select-sm" aria-label=".form-select-sm " 
+                        :value="modelValue.kategorien" 
+                        @input="update('hauptkategorie_id', $event.target.value)"
+                        :class="{'is-invalid': errors.kategorien}">
+                        <option v-for="(item, index) in kategorien" :value="item.weiterbildungskategorie_kurzbz" >
                             {{ item.bezeichnung }}
                         </option>
                     </select>
 
                 </div>    
 
-                <div class="col-md-6">
-                    <label for="subcategory_kurzbz" class="form-label required">Subkategorie</label>
-                    <select  id="subcategory_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " 
-                        @blur="frmState.subCategoryBlurred = true"   v-model="currentValue.subcategory_kurzbz" 
-                        :class="{'is-invalid': !validBezeichnung(currentValue.subcategory_kurzbz) && frmState.subCategoryBlurred}">
-                        <option v-for="(item, index) in subCatList" :value="item.subcategory_kurzbz" >
-                            {{ item.bezeichnung }}
-                        </option>
-                    </select>
-
+                
+                <div class="col-md-12">
+                    <label for="bezeichnung" class="form-label required">Bezeichnung</label>
+                    <input type="text" class="form-control form-control-sm"  id="bezeichnung" :value="modelValue.bezeichnung" @input="update('bezeichnung', $event.target.value)">
                 </div>
 
                 <div class="col-md-3">
                     <label for="von" class="form-label">Von</label>
                     <datepicker id="von" 
                         :teleport="true" 
-                        @blur="frmState.vonBlurred = true" 
-                        :input-class-name="(!validDatum(currentValue.von) && frmState.vonBlurred) ? 'dp-invalid-input' : ''"  
-                        v-model="currentValue.von"
+                        :input-class-name="errors.von ? 'dp-invalid-input' : ''"  
+                        :model-value="modelValue.von"
+                        @update:modelValue="update('von', $event)"
                         v-bind:enable-time-picker="false"
                         text-input 
                         locale="de"
@@ -235,8 +212,8 @@ export const TrainingFrm = {
                     <label for="bis" class="form-label">Bis</label>
                     <datepicker id="bis" 
                         :teleport="true" 
-                        @blur="frmState.bisBlurred = true"                         
-                        v-model="currentValue.bis"
+                        :model-value="modelValue.bis"
+                        @update:modelValue="update('bis', $event)"
                         v-bind:enable-time-picker="false"
                         text-input 
                         locale="de"
@@ -246,11 +223,11 @@ export const TrainingFrm = {
                 </div>
 
                 <div class="col-md-3">
-                    <label for="expires" class="form-label">Ablaufdatum</label>
-                    <datepicker id="expires" 
+                    <label for="ablaufdatum" class="form-label">Ablaufdatum</label>
+                    <datepicker id="ablaufdatum" 
                         :teleport="true" 
-                        @blur="frmState.bisBlurred = true"                         
-                        v-model="currentValue.bis"
+                       :model-value="modelValue.ablaufdatum"
+                        @update:modelValue="update('ablaufdatum', $event)"
                         v-bind:enable-time-picker="false"
                         text-input 
                         locale="de"
@@ -264,28 +241,29 @@ export const TrainingFrm = {
                 </div>
 
                 <div class="col-md-3">
-                    <label for="betrag_von" class="form-label">Stunden</label>
+                    <label for="stunden" class="form-label">Stunden</label>
                     <input type="number" 
-                        class="form-control form-control-sm" :class="{ 'is-invalid': !validInput(currentValue.betrag_von) && frmState.betragVonBlurred}"  
-                        id="betrag_von" maxlength="256" min="0" step="0.01"
-                        @blur="frmState.betragVonBlurred = true" 
-                        v-model="currentValue.betrag_von">
+                        class="form-control form-control-sm" :class="{ 'is-invalid': errors.stunden }"  
+                        id="stunden"  min="0" step="0.1"
+                        :value="modelValue.stunden" 
+                        @input="update('stunden', $event.target.valueAsNumber)"
+                        />
                 </div>
 
                 <div class="col-md-3">
                     <label for="intern" class="form-label">Intern</label>
                     <div>
-                        <input class="form-check-input" type="checkbox" id="intern" v-model="currentValue.intern">
+                        <input class="form-check-input" type="checkbox" id="intern" :value="modelValue.intern">
                     </div>    
-                </div>
+                </div> 
 
                 <div class="col-md-3">
-                    <label for="betrag_bis" class="form-label">Beantragt</label>
-                    <datepicker id="von" 
+                    <label for="beantragt" class="form-label">Beantragt</label>
+                    <datepicker id="beantragt" 
                         :teleport="true" 
-                        @blur="frmState.vonBlurred = true" 
-                        :input-class-name="(!validDatum(currentValue.von) && frmState.vonBlurred) ? 'dp-invalid-input' : ''"  
-                        v-model="currentValue.von"
+                        :input-class-name="errors.beantragt ? 'dp-invalid-input' : ''"  
+                        :model-value="modelValue.beantragt"
+                        @update:modelValue="update('beantragt', $event)"
                         v-bind:enable-time-picker="false"
                         text-input 
                         locale="de"
@@ -295,12 +273,12 @@ export const TrainingFrm = {
                 </div>
 
                 <div class="col-md-3">
-                    <label for="betrag_von" class="form-label">HR-Freigabe</label>
-                    <datepicker id="von" 
+                    <label for="hr_freigegeben" class="form-label">HR-Freigabe</label>
+                    <datepicker id="hr_freigegeben" 
                         :teleport="true" 
-                        @blur="frmState.vonBlurred = true" 
-                        :input-class-name="(!validDatum(currentValue.von) && frmState.vonBlurred) ? 'dp-invalid-input' : ''"  
-                        v-model="currentValue.von"
+                        :input-class-name="errors.hr_freigegeben ? 'dp-invalid-input' : ''"  
+                        :model-value="modelValue.hr_freigegeben"
+                        @update:modelValue="update('hr_freigegeben', $event)"
                         v-bind:enable-time-picker="false"
                         text-input 
                         locale="de"
@@ -309,8 +287,8 @@ export const TrainingFrm = {
                         model-type="yyyy-MM-dd"></datepicker>
                 </div>
                                                 
-                <div class="col-8" v-if="currentValue.frist_id != 0">
-                    <div class="modificationdate">{{ currentValue.insertamum }}/{{ currentValue.insertvon }}, {{ currentValue.updateamum }}/{{ currentValue.updatevon }}</div>
+                <div class="col-8" v-if="modelValue.frist_id != 0">
+                    <div class="modificationdate">{{ modelValue.insertamum }}/{{ modelValue.insertvon }}, {{ modelValue.updateamum }}/{{ modelValue.updatevon }}</div>
                 </div>
         </form> 
     

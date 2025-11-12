@@ -1,5 +1,6 @@
 import { Modal } from '../../Modal.js';
 import { TrainingFrm } from './TrainingFrm.js';
+import ApiWeiterbildung from  '../../../api/factory/weiterbildung.js';
 
 export const EditDialog = {
 	name: 'EditDialog',
@@ -10,25 +11,33 @@ export const EditDialog = {
         TrainingFrm,
     },
     props: {
-        
+        kategorien: { type: Array },        
     },
     expose: ['showModal'],
-    setup( props ) {
+    emits: ['changed'],
+    setup( props, { emit } ) {
 
         // Modal 
-        const { watch, ref, computed } = Vue;
+        const { watch, ref, computed, inject } = Vue;
         const modalRef = ref();
-        const stepsRef = ref();
+        const frmRef = ref(null);
         const searchExistingRef = ref();
         const schnellanlageRef = ref();
-        const currentValue = ref();
+        const currentValue = ref({});
         const activeIndex = ref(0);
+        const $api = inject('$api');
+        const $fhcAlert = inject('$fhcAlert');
+        const isFetching = ref(false);
+
         let _resolve;
         let _reject;
         let mode = 'CREATE';
         
 
-        const showModal = () => {
+        
+
+        const showModal = (f) => {
+            currentValue.value = f
             // call bootstrap show function
             modalRef.value.show();
             return new Promise((resolve, reject) => {
@@ -45,11 +54,8 @@ export const EditDialog = {
         const okHandler = () => {
             
             schnellanlageRef.value.save().then(() => {
-                console.log("employee successfully created")
-                stepsRef.value.reset()
+                console.log("training successfully created")
                 currentValue.value = { surname: '', birthdate: null} 
-                searchExistingRef.value.reset()  
-                schnellanlageRef.value.reset()             
                 hideModal()                            
                 _resolve({type: 'CREATED', payload: { uid: 'dummy' }})
             })
@@ -61,7 +67,8 @@ export const EditDialog = {
             
             
         }
-        
+                        
+
         const cancelHandler = () =>  {
             hideModal();
             _resolve({type: 'CANCELED', payload: { uid: 'dummy' }});
@@ -72,8 +79,10 @@ export const EditDialog = {
             _resolve({type: 'CREATED', payload: { uid: 'dummy' }});
         }
 
-        const showCreateHandler = () => {
-            stepsRef.value.selectStep('Schnellanlage')
+        const formSubmit = () => {
+            console.log(currentValue);
+            // call submit of subcomponent
+            frmRef?.value.submit();
         }
 
         const searchCriteriaHandler = (e) => {
@@ -85,11 +94,28 @@ export const EditDialog = {
             return 'Neue Weiterbildung anlegen'
         })
 
+        const handleSubmit = async (v) => {
+            console.log('handleSubmit',v);
+            try {
+                const res = await $api.call(ApiWeiterbildung.upsertTraining(currentValue.value)); 
+            if (res?.meta?.status == 'success') {
+                $fhcAlert.alertSuccess('Weiterbildung gespeichert.');
+                currentValue.value = res.data[0];
+                emit('changed');
+            } else {
+                
+            }              
+            } catch (error) {
+                $fhcAlert.handleSystemError(error)           
+            } finally {
+                isFetching.value = false
+            }
+        }
         
 
-        return { modalRef, stepsRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
-            okHandler,cancelHandler, currentValue, showCreateHandler, activeIndex,
-            searchCriteriaHandler, takeHandler, mode, modalTitle };
+        return { modalRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
+            okHandler,cancelHandler, currentValue, formSubmit, activeIndex, frmRef,
+            searchCriteriaHandler, takeHandler, mode, modalTitle, handleSubmit };
     },
     template: `
         <Modal :title="modalTitle" ref="modalRef" id="createWizardModal">
@@ -99,7 +125,7 @@ export const EditDialog = {
                 <TabView v-model:activeIndex="activeIndex">
                     <TabPanel header="Weiterbildung">
                         <p class="m-0">
-                            <TrainingFrm />
+                            <TrainingFrm  ref="frmRef" id="trainingFrm" @submit="handleSubmit" :kategorien="kategorien" v-model="currentValue" />
                         </p>
                     </TabPanel>
                     <TabPanel header="Dokumente" :disabled="true">
@@ -114,7 +140,7 @@ export const EditDialog = {
             </template>
             <template #footer>
                 <div class="float-start">
-                    <button type="button" class="btn btn-outline-secondary" @click="stepsRef.selectStep('Formular')" v-if="activeIndex != 0" >
+                    <button type="button" class="btn btn-outline-secondary" @click="activeIndex = 0" v-if="activeIndex != 0" >
                         <i class="fa fa-chevron-left"></i> Zurück
                     </button>
                 </div>
@@ -122,8 +148,8 @@ export const EditDialog = {
                     <button type="button" class="btn btn-primary me-1" @click="hideModal()" v-if="activeIndex == 0 && mode == 'CREATE'" >
                         Abbrechen
                     </button>
-                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue.surname == '' || currentValue.birthdate==null || currentValue.birthdate==''"  @click="showCreateHandler()" >
-                        Weiterbildung anlegen <i class="fa fa-chevron-right"></i>
+                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue?.bezeichnung == '' || currentValue.hauptkategorie_id == null || currentValue.statistikkategorie_id == null "  @click="formSubmit()" >
+                        Weiterbildung {{ currentValue?.weiterbildung_id > 0 ? 'speichern' : 'anlegen' }} <i class="fa fa-chevron-right"></i>
                     </button>
                 </div>
             </template>
