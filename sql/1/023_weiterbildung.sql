@@ -12,7 +12,7 @@ CREATE TABLE hr.tbl_weiterbildungskategorie
     updatevon varchar(32),
     CONSTRAINT tbl_weiterbildungskategorie_pk PRIMARY KEY (weiterbildungskategorie_kurzbz)
 );
-
+/
 CREATE TABLE hr.tbl_weiterbildungskategorietyp
 (
     weiterbildungskategorietyp_kurzbz  character varying(32) NOT NULL,
@@ -72,7 +72,7 @@ ON DELETE SET NULL ON UPDATE CASCADE;
 -- tbl_weiterbildung->tbl_weiterbildungskategorie  (m:n)
 ALTER TABLE hr.tbl_weiterbildung_kategorie_rel ADD CONSTRAINT tbl_weiterbildung_kategorie_rel_weiterbildung_id_fk FOREIGN KEY (weiterbildung_id)
 REFERENCES hr.tbl_weiterbildung (weiterbildung_id) MATCH FULL
-ON DELETE SET NULL ON UPDATE CASCADE;
+ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE hr.tbl_weiterbildung_kategorie_rel ADD CONSTRAINT tbl_weiterbildung_kategorie_rel_kurzbz_fk FOREIGN KEY (weiterbildungskategorie_kurzbz)
 REFERENCES hr.tbl_weiterbildungskategorie (weiterbildungskategorie_kurzbz) MATCH FULL
 ON DELETE SET NULL ON UPDATE CASCADE;

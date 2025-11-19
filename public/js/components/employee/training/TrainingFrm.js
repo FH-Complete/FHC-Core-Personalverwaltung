@@ -3,7 +3,8 @@ import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
 export const TrainingFrm = {
 	name: 'TrainingFrm',
     components: {
-        "datepicker": VueDatePicker
+        "datepicker": VueDatePicker,
+        "p-multiselect": primevue.multiselect,
     },
     props: {
         modelValue: { type: Object },
@@ -38,7 +39,7 @@ export const TrainingFrm = {
 
         const { t } = usePhrasen();
         const isFetching = ref(false);
-
+        const kattest = ref(['KAT01'])
         
 
         onMounted(async () => {
@@ -74,52 +75,26 @@ export const TrainingFrm = {
             return !!n && n.trim() != "";
         }
 
-        const checkDates = (beginn, ende) => {
+        const checkDates = () => {
 
-			if (beginn !== '' && ende !== '' && ende !== null && beginn !== null)
+			if (props.modelValue.von !== '' && props.modelValue.bis !== '' && props.modelValue.bis !== null && props.modelValue.von !== null)
 			{
-				beginn = new Date(beginn);
-				ende = new Date(ende);
+				let vonDatum = new Date(props.modelValue.von);
+				let bisDatum = new Date(props.modelValue.bis);
 
-				if (ende >= beginn)
-				{
-					frmState.bisBlurred = false;
-					return true;
-				}
-				else
-				{
-					frmState.bisBlurred = true;
-					return false;
-				}
+				if (bisDatum < vonDatum)
+				{    
+                    errors.von = 'Datum ungültig';
+                    errors.bis = 'Datum ungültig';     
+                    return;         
+				}				
 			}
-			else
-			{
-				frmState.bisBlurred = false;
-				return true;
-			}
+			errors.von = '';
+            errors.bis = '';    
 
 		}
 
-        const checkSalaries = (von, bis) => {
-            if (von !== '' && bis !== '' && bis !== null && von !== null)
-			{
-				if (bis >= von)
-				{
-					frmState.bisBlurred = false;
-					return true;
-				}
-				else
-				{
-					frmState.bisBlurred = true;
-					return false;
-				}
-			}
-			else
-			{
-				frmState.bisBlurred = false;
-				return true;
-			}
-        }
+        
 
         const errors = reactive({ von: '', bis: '', stunden: '', bezeichnung: '', 
             ablaufdatum: '', beantragt: '', kategorie: '', hr_freigegeben: '' })
@@ -127,7 +102,8 @@ export const TrainingFrm = {
         const validate = () => {
             errors.bezeichnung = props.modelValue.bezeichnung ? '' : 'Bezeichnung ist erforderlich';
             errors.kategorie = props.modelValue.kategorien ? '' : 'Kategorie ist erforderlich';
-            return !errors.bezeichnung && !errors.kategorie;
+            checkDates();
+            return !errors.bezeichnung && !errors.kategorie && !errors.von && !errors.bis;
         }        
 
        /*  const hasChanged = Vue.computed(() => {
@@ -165,7 +141,7 @@ export const TrainingFrm = {
 
         }
 
-        return { trainingDialogFrm,  t, update,
+        return { trainingDialogFrm,  t, update, kattest,
             validInput, validDatum, validBezeichnung, frmState, errors, submit }
 
 
@@ -175,15 +151,20 @@ export const TrainingFrm = {
         <form class="row g-3" ref="trainingDialogFrm" id="trainingDialogFrm" @submit.prevent="submit">
                         
                 <div class="col-md-6">
-                    <label for="kategorien" class="form-label required">Kategorie</label>
-                    <select  id="kategorien" class="form-select form-select-sm" aria-label=".form-select-sm " 
-                        :value="modelValue.kategorien" 
-                        @input="update('hauptkategorie_id', $event.target.value)"
-                        :class="{'is-invalid': errors.kategorien}">
-                        <option v-for="(item, index) in kategorien" :value="item.weiterbildungskategorie_kurzbz" >
-                            {{ item.bezeichnung }}
-                        </option>
-                    </select>
+                    <label for="kategorien" class="form-label required">Kategorie</label>                    
+                    <p-multiselect 
+                        id="kategorien"
+                        :modelValue="modelValue.kategorien"
+                        @update:modelValue="update('kategorien', $event)"                         
+                        display="chip" 
+                        :options="kategorien" 
+                        appendTo="self" 
+                        optionLabel="bezeichnung" 
+                        optionValue="weiterbildungskategorie_kurzbz"
+                        placeholder="Kategorie auswählen"
+                        :teleport="true" 
+                        class="form-select form-select-sm" >
+                    </p-multiselect>
 
                 </div>    
 
@@ -197,7 +178,7 @@ export const TrainingFrm = {
                     <label for="von" class="form-label">Von</label>
                     <datepicker id="von" 
                         :teleport="true" 
-                        :input-class-name="errors.von ? 'dp-invalid-input' : ''"  
+                        :input-class-name="errors.von != '' ? 'dp-invalid-input' : ''"  
                         :model-value="modelValue.von"
                         @update:modelValue="update('von', $event)"
                         v-bind:enable-time-picker="false"
@@ -212,6 +193,7 @@ export const TrainingFrm = {
                     <label for="bis" class="form-label">Bis</label>
                     <datepicker id="bis" 
                         :teleport="true" 
+                        :input-class-name="errors.bis != '' ? 'dp-invalid-input' : ''"  
                         :model-value="modelValue.bis"
                         @update:modelValue="update('bis', $event)"
                         v-bind:enable-time-picker="false"
@@ -253,7 +235,8 @@ export const TrainingFrm = {
                 <div class="col-md-3">
                     <label for="intern" class="form-label">Intern</label>
                     <div>
-                        <input class="form-check-input" type="checkbox" id="intern" :value="modelValue.intern">
+                        <input class="form-check-input" type="checkbox" id="intern" :checked="modelValue.intern"
+                            @change:modelValue="update('intern', $event.target.checked)">
                     </div>    
                 </div> 
 

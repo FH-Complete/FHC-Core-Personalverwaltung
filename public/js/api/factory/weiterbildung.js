@@ -1,6 +1,6 @@
 export default {
 
-    getKategorien() {
+    getWeiterbildungkategorien() {
         return {
             method: 'get',
             url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/getWeiterbildungskategorienList',   

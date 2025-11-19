@@ -87,11 +87,19 @@ class Weiterbildung_model extends DB_Model
 
         // Insert new ones
         foreach ($weiterbildungskategorie_kurzbzs as $weiterbildungskategorie_kurzbz) {
-            $this->db->insert('hr.tbl_weiterbildung_kategorie_rel', [
+            $success = $this->db->insert('hr.tbl_weiterbildung_kategorie_rel', [
                 'weiterbildung_id' => $weiterbildung_id,
                 'weiterbildungskategorie_kurzbz'  => $weiterbildungskategorie_kurzbz
             ]);
+
+            if (!$success)
+            {
+                return error($this->db->error(), EXIT_ERROR);
+            }
         }
+
+        $k = $this->getKategorien($weiterbildung_id);
+        return success($k);
     }
 
     function getKategorien($weiterbildung_id) {

@@ -1,6 +1,8 @@
 import { Modal } from '../../Modal.js';
 import { TrainingFrm } from './TrainingFrm.js';
+import { FileManager } from './FileManager.js';
 import ApiWeiterbildung from  '../../../api/factory/weiterbildung.js';
+
 
 export const EditDialog = {
 	name: 'EditDialog',
@@ -9,6 +11,7 @@ export const EditDialog = {
         "TabPanel": primevue.tabpanel,
         "TabView": primevue.tabview,
         TrainingFrm,
+        FileManager,
     },
     props: {
         kategorien: { type: Array },        
@@ -89,6 +92,10 @@ export const EditDialog = {
             currentValue.value = e;
         }
 
+        Vue.watch(currentValue, (newVal, oldVal) => {
+            console.log('EditDialog watch currentValue=', newVal)                    
+        });
+
         const modalTitle = computed(() => {
             if (mode != 'CREATE') return 'Weiterbildung bearbeiten'
             return 'Neue Weiterbildung anlegen'
@@ -128,10 +135,9 @@ export const EditDialog = {
                             <TrainingFrm  ref="frmRef" id="trainingFrm" @submit="handleSubmit" :kategorien="kategorien" v-model="currentValue" />
                         </p>
                     </TabPanel>
-                    <TabPanel header="Dokumente" :disabled="true">
+                    <TabPanel header="Dokumente" :disabled="currentValue.weiterbildung_id == 0">
                         <p class="m-0">
-                            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
-                            ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Consectetur, adipisci velit, sed quia non numquam eius modi.
+                            <FileManager />
                         </p>
                     </TabPanel>                    
                 </TabView>
@@ -146,9 +152,9 @@ export const EditDialog = {
                 </div>
                 <div class="float-start">
                     <button type="button" class="btn btn-primary me-1" @click="hideModal()" v-if="activeIndex == 0 && mode == 'CREATE'" >
-                        Abbrechen
+                        Schließen
                     </button>
-                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue?.bezeichnung == '' || currentValue.hauptkategorie_id == null || currentValue.statistikkategorie_id == null "  @click="formSubmit()" >
+                    <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue?.bezeichnung == '' || currentValue?.kategorien?.length == 0"  @click="formSubmit()" >
                         Weiterbildung {{ currentValue?.weiterbildung_id > 0 ? 'speichern' : 'anlegen' }} <i class="fa fa-chevron-right"></i>
                     </button>
                 </div>

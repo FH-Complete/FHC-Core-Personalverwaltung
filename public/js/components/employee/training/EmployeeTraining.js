@@ -37,8 +37,8 @@ export const EmployeeTraining = {
 
         const route = VueRouter.useRoute();
         const { watch, ref, onMounted } = Vue; 
-        const kategorien = ref([]);
         const kategorieTypen = ref([]);
+        const kategorienList = ref([]);
         const currentPersonID = ref(null);
         const currentUID = ref(null);
         const currentValue = ref();
@@ -46,19 +46,6 @@ export const EmployeeTraining = {
         const isFetching = ref(false);
         const interneChecked = ref(true);
         const trainingList = ref([]);
-        /* Vue.ref({
-            1: { "training_id" : 1, 
-                "kategorie":"Kategorie 1/Sub-Kategorie 1", 
-                "stunden":"8", 
-                "datum_von":"2025-11-05", 
-                "datum_bis":"2025-11-06", 
-                "expires":"2028-11-30", 
-                "bezeichnung":"KI-Schulung",
-                "beantragt":true,
-                "intern_extern":true,
-                "hrfreigabe":true
-            }
-        }); */
         
         const table = Vue.ref(null); // reference to your table element
         const tabulator = Vue.ref(null); // variable to hold your table
@@ -66,11 +53,11 @@ export const EmployeeTraining = {
 
         const createShape = () => {
             return { 
-                "weiterbildung_id" : null, 
+                "weiterbildung_id" : 0, 
                 "mitarbeiter_uid": currentUID.value,
                 "bezeichnung": "",
                 "intern": true,
-                "kategorien":[], 
+                "kategorien":Vue.reactive([]), 
                 "stunden":0, 
                 "intern": true,
                 "von":null, 
@@ -90,10 +77,10 @@ export const EmployeeTraining = {
                 const kategorien = cell.getRow().getData().kategorien;
                 const kategorienExpanded = [];
 
-                kategorien.forEach(kategorie => {
-                    const k = kategorienList.value.find(kat => kat.weiterbildungskategorie_kurzbz == kategorie.weiterbildungskategorie_kurzbz);
-                    const typ = kategorieTypen.value.find(kat => kat.weiterbildungskategorietyp_kurzbz == kategorie.weiterbildungskategorietyp_kurzbz);
-                    kategorienExpanded.push(k.bezeichnung + ' /' + typ.bezeichnung);
+                kategorien?.forEach(weiterbildungskategorie_kurzbz => {
+                    const k = kategorienList.value.find(kat => kat.weiterbildungskategorie_kurzbz == weiterbildungskategorie_kurzbz);
+                    // const typ = kategorieTypen.value.find(kat => kat.weiterbildungskategorietyp_kurzbz == kategorie.weiterbildungskategorietyp_kurzbz);
+                    kategorienExpanded.push(k.bezeichnung);
                 });
                 
                 return kategorienExpanded.join(', ');
@@ -104,8 +91,8 @@ export const EmployeeTraining = {
             }
 
             const fetchKategorien = async () => {
-                const res = await $api.call(ApiWeiterbildung.getKategorien());                 
-                kategorien.value = res.data                       
+                const res = await $api.call(ApiWeiterbildung.getWeiterbildungkategorien());                 
+                kategorienList.value = res.data                       
             }
             const fetchKategorieTypen = async () => {
                 const res = await $api.call(ApiWeiterbildung.getKategorieTypen());                 
@@ -157,9 +144,8 @@ export const EmployeeTraining = {
 
             const columnsDef = [
                 { title: 'Kategorie', field: "kategorie", headerFilter:"list", formatter: kategorieFormatter, width: 180, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: 'Stunden', field: "stunden", hozAlign: "right", 
-                    width: 140, headerFilter:true },
+                { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", width: 140, headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: 'Stunden', field: "stunden", hozAlign: "right", headerFilter:true },
                 { title: 'Von', field: "von", hozAlign: "center", 
                     formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },                
                 { title: 'Bis', field: "bis", hozAlign: "center", 
@@ -169,7 +155,7 @@ export const EmployeeTraining = {
                 { title: 'Beantragt', field: "beantragt", hozAlign: "center", 
                     formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' }, 
                 { title: 'HR-Freigabe', field: "hr_freigegeben", hozAlign: "center", 
-                    formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },             
+                    formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },                             
                 { title: 'Intern', field: "intern", hozAlign: "center", width: 100,
                     formatter:"tickCross", formatterParams: {
 						tickElement: '<i class="fas fa-check text-success"></i>',
@@ -178,7 +164,9 @@ export const EmployeeTraining = {
                     headerFilter:"tickCross", headerFilterParams: {
 						"tristate":true,elementAttributes:{"value":"true"}
 					}, headerFilterEmptyCheck:function(value){return value === null}
-                 },               
+                 },        
+                 { title: 'Dokumente', field: "", hozAlign: "center", 
+                    width: 140, headerFilter:false },       
               ];
 
             if( props.readonlyMode === false) {
@@ -253,7 +241,7 @@ export const EmployeeTraining = {
 
         const showEditModal = async (currentRow) => {
             currentValue.value = { ...currentRow };            
-            editDialogRef.value.showModal(currentValue);
+            editDialogRef.value.showModal(currentValue.value);
         }
         
         const showDeleteModal = async (currentRow) => {
@@ -283,7 +271,7 @@ export const EmployeeTraining = {
         }
 
         return {currentPersonID, currentUID, isFetching, t, table, editDialogRef, refreshList,
-            readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorien, kategorieTypen}
+            readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorienList, kategorieTypen}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
@@ -303,10 +291,10 @@ export const EmployeeTraining = {
                                     <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
                                         <i class="fa fa-plus"></i> {{ t('person','weiterbildung') }}
                                     </button>
-                                    <div class="form-check">
+                                    <!--div class="form-check">
                                         <input class="form-check-input" type="checkbox" role="switch" id="interneChecked" v-model="interneChecked">
                                         <label class="form-check-label" for="interneChecked">Nur interne anzeigen</label>
-                                    </div>
+                                    </div-->
                                 </div>
 
                                 <!-- TABULATOR -->
@@ -322,7 +310,7 @@ export const EmployeeTraining = {
         </div>
     </div>
 
-    <edit-dialog  ref="editDialogRef"  :kategorien="kategorien"  @changed="refreshList()"></edit-dialog>
+    <edit-dialog  ref="editDialogRef"  :kategorien="kategorienList"  @changed="refreshList()"></edit-dialog>
 
     `
 }
