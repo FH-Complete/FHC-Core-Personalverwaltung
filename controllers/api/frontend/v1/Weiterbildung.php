@@ -142,9 +142,12 @@ class Weiterbildung extends FHCAPI_Controller
 					$result = $this->WeiterbildungModel->syncKategorien($payload['weiterbildung_id'], $kategorien);
 			}
 
-			if (isSuccess($result))
+			if (isSuccess($result)) {
+				// get m:n relation data
+				$katList = $this->getKategorien($resultW->retval[0]->weiterbildung_id);
+				$resultW->retval[0]->kategorien = array_map(function($val) { return $val->weiterbildungskategorie_kurzbz; }, $katList);
 				$this->terminateWithSuccess(getData($resultW));
-			else
+			} else
 				$this->terminateWithError('Error when updating employee training');
 		} else {
 			$this->terminateWithError('method not allowed', REST_Controller::HTTP_METHOD_NOT_ALLOWED);
