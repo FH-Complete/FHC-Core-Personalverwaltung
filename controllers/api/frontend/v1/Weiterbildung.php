@@ -128,11 +128,14 @@ class Weiterbildung extends FHCAPI_Controller
 			if (isset($payload['kategorien']) && !is_array($payload['kategorien']))
 				show_error('kategorien is not an array!');
 
+			// Start DB transaction
+			$this->db->trans_start();
 
 			$kategorien = $payload['kategorien'];
 			unset($payload['kategorien']);
 			$result = null;
-			if (!isset($payload['weiterbildung_id']) || $payload['weiterbildung_id'] == 0) {
+			if (!isset($payload['weiterbildung_id']) || $payload['weiterbildung_id'] == 0) 
+			{
 				$resultW = $this->WeiterbildungModel->insertWeiterbildung($payload);
 				if (isSuccess($resultW))
 					$result = $this->WeiterbildungModel->syncKategorien($resultW->retval[0]->weiterbildung_id, $kategorien);
@@ -142,13 +145,18 @@ class Weiterbildung extends FHCAPI_Controller
 					$result = $this->WeiterbildungModel->syncKategorien($payload['weiterbildung_id'], $kategorien);
 			}
 
-			if (isSuccess($result)) {
-				// get m:n relation data
+			if (isError($result))
+			{
+				$this->db->trans_rollback();
+				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			} else {
+				// commit changes
+				$this->db->trans_commit();
+				// get m:n relation data and return
 				$katList = $this->getKategorien($resultW->retval[0]->weiterbildung_id);
 				$resultW->retval[0]->kategorien = array_map(function($val) { return $val->weiterbildungskategorie_kurzbz; }, $katList);
 				$this->terminateWithSuccess(getData($resultW));
-			} else
-				$this->terminateWithError('Error when updating employee training');
+			}
 		} else {
 			$this->terminateWithError('method not allowed', REST_Controller::HTTP_METHOD_NOT_ALLOWED);
 		}
@@ -162,4 +170,28 @@ class Weiterbildung extends FHCAPI_Controller
 
         return $this->db->get()->result();
     }
+
+	public function loadDokumente()
+	{
+		$weiterbildung_id = $this->input->post('weiterbildung_id');
+
+		$this->WeiterbildungModel->addSelect('campus.tbl_dms_version.*');
+
+		$this->WeiterbildungModel->addJoin('hr.tbl_weiterbildung_dokument', 'ON (hr.tbl_weiterbildung_dokument.weiterbildung_id = hr.tbl_weiterbildung.weiterbildung_id)');
+		$this->WeiterbildungModel->addJoin('campus.tbl_dms_version', 'ON (hr.tbl_weiterbildung_dokument.dms_id = campus.tbl_dms_version.dms_id)');
+
+		$result = $this->WeiterbildungModel->loadWhere(
+			array('hr.tbl_weiterbildung.weiterbildung_id' => $weiterbildung_id)
+		);
+		if (isError($result)) {
+			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+		}
+
+		if(!hasData($result))
+		{
+			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'weiterbildung_id']), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result));
+	}
+
 }
