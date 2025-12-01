@@ -65,6 +65,7 @@ export const EmployeeTraining = {
                 "hr_freigegeben":null, 
                 "beantragt":null,
                 "ablaufdatum":null,
+                "dokumente": []
             } 
         }
 
@@ -97,6 +98,9 @@ export const EmployeeTraining = {
             const fetchKategorieTypen = async () => {
                 const res = await $api.call(ApiWeiterbildung.getKategorieTypen());                 
                 kategorieTypen.value = res.data                
+            }
+            const fetchDokumente = async (id) => {
+                const res = await $api.call(ApiWeiterbildung.loadDokumente(id))
             }
 
 

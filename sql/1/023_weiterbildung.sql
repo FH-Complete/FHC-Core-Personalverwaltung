@@ -94,3 +94,8 @@ GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildung_dokument TO vilesci
 COMMENT ON TABLE hr.tbl_weiterbildung IS E'Interne und externe Weiterbildung von Mitarbeitern';
 
 GRANT USAGE ON hr.tbl_weiterbildung_weiterbildung_id_seq TO vilesci;
+
+-- Anm: es existiert bereits eine Kategorie Weiterbildung => TODO check ob neue Kategorie notwendig ist
+-- INSERT INTO campus.tbl_dms_kategorie(kategorie_kurzbz, bezeichnung, beschreibung) VALUES('weiterbildung','Weiterbildung','Weiterbildung');
+
+  

@@ -21,6 +21,8 @@ class Weiterbildung extends FHCAPI_Controller
 				'getWeiterbildungskategorietypList' => Self::DEFAULT_PERMISSION,
 				'upsertWeiterbildung' => Self::DEFAULT_PERMISSION,
 				'deleteWeiterbildung' => Self::DEFAULT_PERMISSION,
+				'updateDokumente' => Self::DEFAULT_PERMISSION,
+				'loadDokumente' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -35,6 +37,11 @@ class Weiterbildung extends FHCAPI_Controller
 
 		// get CI for transaction management
 		$this->CI = &get_instance();
+
+		// Load language phrases
+		$this->loadPhrases([
+			'ui'
+		]);
 	}
 
 	public function index()
@@ -57,12 +64,20 @@ class Weiterbildung extends FHCAPI_Controller
 		$this->WeiterbildungModel->addOrder('von', 'ASC');
 		$result = $this->WeiterbildungModel->loadWhere(array('mitarbeiter_uid' => $mitarbeiter_uid));
 
-		if (!isError($result)) {
+		if (!isError($result)) 
+		{
 			$rows = getData($result) ?? [];
 			// load m:n data
-			foreach ($rows as $row) {
+			foreach ($rows as $row) 
+			{
 				$katList = $this->getKategorien($row->weiterbildung_id);
 				$row->kategorien = array_map(function($val) { return $val->weiterbildungskategorie_kurzbz; }, $katList);
+				$dokList = $this->WeiterbildungModel->getDokumente($row->weiterbildung_id);
+				if (isError($dokList)) 
+				{
+					$this->terminateWithError('failed to get documents');
+				}
+				$row->dokumente = getData($dokList) ?? [];
 			}
 			$this->terminateWithSuccess($rows);
 		} else {
@@ -125,6 +140,9 @@ class Weiterbildung extends FHCAPI_Controller
 			unset($payload['aktiv']);
 			unset($payload['sort']);            
  */
+
+			unset($payload['dokumente']);
+
 			if (isset($payload['kategorien']) && !is_array($payload['kategorien']))
 				show_error('kategorien is not an array!');
 
@@ -155,6 +173,12 @@ class Weiterbildung extends FHCAPI_Controller
 				// get m:n relation data and return
 				$katList = $this->getKategorien($resultW->retval[0]->weiterbildung_id);
 				$resultW->retval[0]->kategorien = array_map(function($val) { return $val->weiterbildungskategorie_kurzbz; }, $katList);
+				$dokList = $this->WeiterbildungModel->getDokumente($resultW->retval[0]->weiterbildung_id);
+				if (isError($dokList)) 
+				{
+					$this->terminateWithError('failed to get documents');
+				}
+				$resultW->retval[0]->dokumente = getData($dokList) ?? [];
 				$this->terminateWithSuccess(getData($resultW));
 			}
 		} else {
@@ -169,29 +193,83 @@ class Weiterbildung extends FHCAPI_Controller
                  ->where('hr.tbl_weiterbildung_kategorie_rel.weiterbildung_id', $weiterbildung_id);
 
         return $this->db->get()->result();
-    }
+    }	
 
-	public function loadDokumente()
+	public function updateDokumente($weiterbildung_id)
 	{
-		$weiterbildung_id = $this->input->post('weiterbildung_id');
+		$this->load->library('form_validation');
+		$this->load->library('DmsLib');
 
-		$this->WeiterbildungModel->addSelect('campus.tbl_dms_version.*');
+		$uid = getAuthUID();
 
-		$this->WeiterbildungModel->addJoin('hr.tbl_weiterbildung_dokument', 'ON (hr.tbl_weiterbildung_dokument.weiterbildung_id = hr.tbl_weiterbildung.weiterbildung_id)');
-		$this->WeiterbildungModel->addJoin('campus.tbl_dms_version', 'ON (hr.tbl_weiterbildung_dokument.dms_id = campus.tbl_dms_version.dms_id)');
-
-		$result = $this->WeiterbildungModel->loadWhere(
-			array('hr.tbl_weiterbildung.weiterbildung_id' => $weiterbildung_id)
-		);
-		if (isError($result)) {
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-
-		if(!hasData($result))
+		if (isset($_POST['data']))
 		{
-			return $this->terminateWithError($this->p->t('ui','error_missingId', ['id'=> 'weiterbildung_id']), self::ERROR_TYPE_GENERAL);
+			$data = json_decode($_POST['data']);
+			unset($_POST['data']);
+			foreach ($data as $k => $v) {
+				$_POST[$k] = $v;
+			}
 		}
-		return $this->terminateWithSuccess(getData($result));
+
+		if(!$weiterbildung_id)
+		{
+			$this->terminateWithError($this->p->t('ui','error_missingId',['id'=>'weiterbildung_id']), self::ERROR_TYPE_GENERAL);
+		}
+
+		//update(1) loading all dms-entries with this weiterbildung_id
+		$dms_id_arr = [];
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Weiterbildungdokument_model', 'WeiterbildungdokumentModel');
+		$this->WeiterbildungdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
+
+		$result = $this->WeiterbildungdokumentModel->loadWhere(array('weiterbildung_id' => $weiterbildung_id));
+		$result = $this->getDataOrTerminateWithError($result);
+		foreach ($result as $doc) {
+			$dms_id_arr[$doc->dms_id] = array(
+				'name' => $doc->name,
+				'dms_id' => $doc->dms_id
+			);
+		}
+
+		$files = $_FILES['files'];
+		$file_count = count($files['name']);
+
+		for ($i = 0; $i < $file_count; $i++) {
+			$_FILES['files']['name'] = $files['name'][$i];
+			$_FILES['files']['type'] = $files['type'][$i];
+			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
+			$_FILES['files']['error'] = $files['error'][$i];
+			$_FILES['files']['size'] = $files['size'][$i];
+
+			$dms = [
+				"kategorie_kurzbz" => "weiterbildung",
+				"version" => 0,
+				"name" => $_FILES['files']['name'],
+				"mimetype" => $_FILES['files']['type'],
+				"beschreibung" => $uid . " Weiterbildung",
+				"insertvon" => $uid,
+				"insertamum" => "NOW()",
+			];
+
+			$tmp_res = $this->dmslib->upload($dms, 'files', array('*'));
+
+			$result = $this->getDataOrTerminateWithError($tmp_res);
+			$dms_id = $result['dms_id'];
+
+			$result = $this->WeiterbildungdokumentModel->insert(array('weiterbildung_id' => $weiterbildung_id, 'dms_id' => $dms_id));
+
+			$this->getDataOrTerminateWithError($result);
+			
+		}
+
+		//update(3) check if all files have been deleted
+		foreach ($dms_id_arr as $file)
+		{
+			$result = $this->dmslib->removeAll($file['dms_id']);
+
+			$this->getDataOrTerminateWithError($result);
+		}
+
+		return $this->terminateWithSuccess($result);
 	}
 
 }

@@ -49,7 +49,8 @@ export const EmployeeTrainingDialog = {
                 "bezeichnung":"",
                 "beantragt":false,
                 "intern_extern":false,
-                "hrfreigabe":false
+                "hrfreigabe":false,
+                "dokumente": []
             } 
         }
 

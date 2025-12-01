@@ -33,5 +33,18 @@ export default {
 			params: payload,
 		}
 	},
+    loadDokumente(weiterbildung_id){
+        return {
+			method: 'post',
+			url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/loadDokumente/${weiterbildung_id}`,
+		}
+	},
+    updateDokumente(weiterbildung_id, params) {
+        return {
+			method: 'post',
+			url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/updateDokumente/${weiterbildung_id}`,
+            params
+		}
+    }
 
 }  

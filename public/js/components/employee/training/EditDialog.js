@@ -21,14 +21,16 @@ export const EditDialog = {
     setup( props, { emit } ) {
 
         // Modal 
-        const { watch, ref, computed, inject } = Vue;
+        const { watch, ref, reactive, computed, inject } = Vue;
         const modalRef = ref();
         const frmRef = ref(null);
+        const fileFrmRef = ref(null);
         const searchExistingRef = ref();
         const schnellanlageRef = ref();
         const currentValue = ref({});
+        const currentFileDataValue = ref({fileData: []});
         const activeIndex = ref(0);
-        const $api = inject('$api');
+        const $api = inject('$api')
         const $fhcAlert = inject('$fhcAlert');
         const isFetching = ref(false);
 
@@ -41,6 +43,7 @@ export const EditDialog = {
 
         const showModal = (f) => {
             currentValue.value = f
+            currentFileDataValue.value = {fileData: []};
             // call bootstrap show function
             modalRef.value.show();
             return new Promise((resolve, reject) => {
@@ -83,9 +86,17 @@ export const EditDialog = {
         }
 
         const formSubmit = () => {
-            console.log(currentValue);
-            // call submit of subcomponent
-            frmRef?.value.submit();
+            if (activeIndex.value == 0) {
+                // form submit
+                console.log(currentValue);
+                // call submit of subcomponent
+                frmRef?.value.submit();
+            } else {
+                // document submit
+                // call submit of subcomponent
+                fileFrmRef?.value.submit();
+            }
+            
         }
 
         const searchCriteriaHandler = (e) => {
@@ -105,24 +116,50 @@ export const EditDialog = {
             console.log('handleSubmit',v);
             try {
                 const res = await $api.call(ApiWeiterbildung.upsertTraining(currentValue.value)); 
-            if (res?.meta?.status == 'success') {
-                $fhcAlert.alertSuccess('Weiterbildung gespeichert.');
-                currentValue.value = res.data[0];
-                emit('changed');
-            } else {
-                
-            }              
+                if (res?.meta?.status == 'success') {
+                    $fhcAlert.alertSuccess('Weiterbildung gespeichert.');
+                    currentValue.value = res.data[0];
+                    emit('changed');
+                } else {
+                    
+                }              
             } catch (error) {
                 $fhcAlert.handleSystemError(error)           
             } finally {
                 isFetching.value = false
             }
         }
+
+        const handleFileSubmit = async (val) => {
+            console.log('handleFileSubmit',val);
+            const formData = new FormData();
+            for (const file of val.fileData) {
+                formData.append("files[]", file);
+            }
+			//formData.append('data', JSON.stringify(val.fileData));
+			//Object.entries(val).forEach(([k, v]) => formData.append(k, v));
+
+            try {
+                const res = await $api.call(ApiWeiterbildung.updateDokumente(currentValue.value.weiterbildung_id, formData)); 
+                if (res?.meta?.status == 'success') {
+                    $fhcAlert.alertSuccess('Dokumente gespeichert.');
+                    currentValue.value = res.data[0];
+                    emit('changed');
+                } else {
+                    //
+                }              
+            } catch (error) {
+                $fhcAlert.handleSystemError(error)           
+            } finally {
+                isFetching.value = false
+            }
+
+        }
         
 
         return { modalRef, searchExistingRef, schnellanlageRef, showModal, hideModal, 
-            okHandler,cancelHandler, currentValue, formSubmit, activeIndex, frmRef,
-            searchCriteriaHandler, takeHandler, mode, modalTitle, handleSubmit };
+            okHandler,cancelHandler, currentValue, currentFileDataValue, formSubmit, activeIndex, frmRef, fileFrmRef,
+            searchCriteriaHandler, takeHandler, mode, modalTitle, handleSubmit, handleFileSubmit };
     },
     template: `
         <Modal :title="modalTitle" ref="modalRef" id="createWizardModal">
@@ -137,7 +174,7 @@ export const EditDialog = {
                     </TabPanel>
                     <TabPanel header="Dokumente" :disabled="currentValue.weiterbildung_id == 0">
                         <p class="m-0">
-                            <FileManager />
+                            <FileManager ref="fileFrmRef" @submit="handleFileSubmit" v-model="currentFileDataValue"/>
                         </p>
                     </TabPanel>                    
                 </TabView>
@@ -155,7 +192,7 @@ export const EditDialog = {
                         Schließen
                     </button>
                     <button type="button" class="btn btn-primary"  :disabled="currentValue==null || currentValue?.bezeichnung == '' || currentValue?.kategorien?.length == 0"  @click="formSubmit()" >
-                        Weiterbildung {{ currentValue?.weiterbildung_id > 0 ? 'speichern' : 'anlegen' }} <i class="fa fa-chevron-right"></i>
+                        {{ activeIndex == 0 ? 'Weiterbildung' : 'Dokumente' }} {{ currentValue?.weiterbildung_id > 0 ? 'speichern' : 'anlegen' }} <i class="fa fa-chevron-right" v-if="activeIndex == 0"></i>
                     </button>
                 </div>
             </template>

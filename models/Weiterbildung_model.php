@@ -110,4 +110,18 @@ class Weiterbildung_model extends DB_Model
         return $this->db->get()->result();
     }
 
+    public function getDokumente($weiterbildung_id)
+	{
+		$this->addSelect('campus.tbl_dms_version.*');
+
+		$this->addJoin('hr.tbl_weiterbildung_dokument', 'ON (hr.tbl_weiterbildung_dokument.weiterbildung_id = hr.tbl_weiterbildung.weiterbildung_id)');
+		$this->addJoin('campus.tbl_dms_version', 'ON (hr.tbl_weiterbildung_dokument.dms_id = campus.tbl_dms_version.dms_id)');
+
+		$result = $this->loadWhere(
+			array('hr.tbl_weiterbildung.weiterbildung_id' => $weiterbildung_id)
+		);
+
+		return $result;		
+	}
+
 }
