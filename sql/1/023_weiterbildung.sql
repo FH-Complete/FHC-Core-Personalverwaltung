@@ -83,7 +83,7 @@ ON DELETE RESTRICT ON UPDATE CASCADE;
 
 ALTER TABLE hr.tbl_weiterbildung_dokument ADD CONSTRAINT tbl_weiterbildung_dokument__dms_fk FOREIGN KEY (dms_id)
 REFERENCES campus.tbl_dms (dms_id) MATCH FULL
-ON DELETE RESTRICT ON UPDATE CASCADE;
+ON DELETE CASCADE ON UPDATE CASCADE;
 
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildungskategorie TO vilesci;
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildungskategorietyp TO vilesci;
