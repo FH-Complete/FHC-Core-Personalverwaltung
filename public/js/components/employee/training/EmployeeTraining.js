@@ -91,6 +91,28 @@ export const EmployeeTraining = {
                 return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
             }
 
+            const  iconForFile = (doc) => {
+                const ext = doc?.name.split(".").pop().toLowerCase();
+
+                switch (ext) {
+                    case "pdf": return '<i class="fas fa-file-pdf" class="item.icon"></i>';
+                    case "png":
+                    case "jpg":
+                    case "jpeg": return '<i class="fas fa-file-image" class="item.icon"></i>';
+                    default: return '<i class="fas fa-file" class="item.icon"></i>';
+                }
+            }
+
+            const dokFormatter = (cell) => {
+                const files = cell.getValue() || [];
+                return files.map(doc => {
+                    return `<a href="/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/downloadDoc/${doc.dms_id}" target="_blank">
+                                ${iconForFile(doc)} ${doc.name}
+                            </a>`;
+                }).join("<br>");
+            }
+
+
             const fetchKategorien = async () => {
                 const res = await $api.call(ApiWeiterbildung.getWeiterbildungkategorien());                 
                 kategorienList.value = res.data                       
@@ -169,7 +191,7 @@ export const EmployeeTraining = {
 						"tristate":true,elementAttributes:{"value":"true"}
 					}, headerFilterEmptyCheck:function(value){return value === null}
                  },        
-                 { title: 'Dokumente', field: "", hozAlign: "center", 
+                 { title: 'Dokumente', field: "dokumente", hozAlign: "center", formatter: dokFormatter,
                     width: 140, headerFilter:false },       
               ];
 

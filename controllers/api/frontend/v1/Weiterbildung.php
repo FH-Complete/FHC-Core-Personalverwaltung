@@ -22,7 +22,7 @@ class Weiterbildung extends FHCAPI_Controller
 				'upsertWeiterbildung' => Self::DEFAULT_PERMISSION,
 				'deleteWeiterbildung' => Self::DEFAULT_PERMISSION,
 				'updateDokumente' => Self::DEFAULT_PERMISSION,
-				'loadDokumente' => Self::DEFAULT_PERMISSION,
+				'downloadDoc' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -113,17 +113,40 @@ class Weiterbildung extends FHCAPI_Controller
 
 	public function deleteWeiterbildung($weiterbildung_id)
 	{
+		$this->load->library('DmsLib');
+		
 		if ($this->input->method() === 'post') {
 
 			if (isset($weiterbildung_id) && !is_numeric($weiterbildung_id))
 				show_error('weiterbildung_id is not numeric!');
+			
+			// remove docs | TODO refactor
+			$dms_id_arr = [];
+			$this->load->model('extensions/FHC-Core-Personalverwaltung/Weiterbildungdokument_model', 'WeiterbildungdokumentModel');
+			$this->WeiterbildungdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
 
-			$result = $this->WeiterbildungModel->deleteWeiterbildung($weiterbildung_id);
+			$result = $this->WeiterbildungdokumentModel->loadWhere(array('weiterbildung_id' => $weiterbildung_id));
+			$result = $this->getDataOrTerminateWithError($result);
+			foreach ($result as $doc) {
+				$dms_id_arr[$doc->dms_id] = array(
+					'name' => $doc->name,
+					'dms_id' => $doc->dms_id
+				);
+			}
+			foreach ($dms_id_arr as $file)
+			{
+				$resultDoc = $this->dmslib->removeAll($file['dms_id']);
 
-			if (isSuccess($result))
-				$this->terminateWithSuccess(getData($result));
-			else
+				$this->getDataOrTerminateWithError($resultDoc);
+			}
+			$resultWB = $this->WeiterbildungModel->deleteWeiterbildung($weiterbildung_id);
+			if (isSuccess($resultWB))
+			{
+				// return success
+				$this->terminateWithSuccess(getData($resultWB));
+			} else
 				$this->terminateWithError('Error when deleting employee training');
+
 		} else {
 			$this->terminateWithError('method not allowed', REST_Controller::HTTP_METHOD_NOT_ALLOWED);
 		}
@@ -272,4 +295,39 @@ class Weiterbildung extends FHCAPI_Controller
 		return $this->terminateWithSuccess($result);
 	}
 
+	public function downloadDoc($dms_id)
+	{
+		$this->load->library('DmsLib');
+
+		if (!is_numeric($dms_id))
+		{
+			show_error('Wrong parameter');
+		}
+
+		$result = $this->WeiterbildungModel->getByDocument($dms_id);
+		if (isError($result))
+		{
+			$this->terminateWithError('failed to get documents');
+		}
+		if (count($result->retval) == 0) {
+			$this->terminateWithError('permission denied');
+		}
+		
+		if (
+			$this->permissionlib->isBerechtigt('mitarbeiter/stammdaten:r')
+		) {
+			// Get file to be downloaded from DMS
+			$download = $this->dmslib->download($dms_id);
+			$download = $this->getDataOrTerminateWithError($download);
+			// Download file
+			  if (ob_get_level()) ob_end_clean();
+			$this->outputFile($download);
+			exit;
+		} else {
+			$this->terminateWithError('permission denied');
+		}
+
+		
+
+	}
 }

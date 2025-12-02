@@ -124,4 +124,22 @@ class Weiterbildung_model extends DB_Model
 		return $result;		
 	}
 
+    /**
+     * return training that belongs to a document. Needed to prevent download of documents that
+     * are not associated with trainings.
+     */
+    public function getByDocument($dms_id)
+	{
+		$this->addSelect('campus.tbl_dms_version.*');
+
+		$this->addJoin('hr.tbl_weiterbildung_dokument', 'ON (hr.tbl_weiterbildung_dokument.weiterbildung_id = hr.tbl_weiterbildung.weiterbildung_id)');
+		$this->addJoin('campus.tbl_dms_version', 'ON (hr.tbl_weiterbildung_dokument.dms_id = campus.tbl_dms_version.dms_id)');
+
+		$result = $this->loadWhere(
+			array('hr.tbl_weiterbildung_dokument.dms_id' => $dms_id)
+		);
+
+		return $result;
+	}
+
 }

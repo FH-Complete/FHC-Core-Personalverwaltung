@@ -39,6 +39,12 @@ export default {
 			url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/loadDokumente/${weiterbildung_id}`,
 		}
 	},
+    download(dms_id){
+        return {
+			method: 'get',
+			url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/downloadDoc/${dms_id}`,
+		}
+	},
     updateDokumente(weiterbildung_id, params) {
         return {
 			method: 'post',
