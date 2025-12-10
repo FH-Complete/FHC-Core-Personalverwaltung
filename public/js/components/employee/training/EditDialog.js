@@ -39,11 +39,24 @@ export const EditDialog = {
         let mode = 'CREATE';
         
 
+        const createFileList = (dokumente) => {
+            if (dokumente != null)
+            {
+                const files = dokumente.map(info => 
+                    new File([new Blob([""], { type: info.mimetype })], info.name, {
+                        type: info.mimetype,
+                        lastModified: Date.now()
+                    })
+                );
+                return files;
+            }
+            return [];
+        }
         
 
         const showModal = (f) => {
             currentValue.value = f
-            currentFileDataValue.value = {fileData: []};
+            currentFileDataValue.value = {fileData: createFileList(f.dokumente)};
             // call bootstrap show function
             modalRef.value.show();
             return new Promise((resolve, reject) => {
