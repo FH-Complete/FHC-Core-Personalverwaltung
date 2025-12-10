@@ -5,7 +5,7 @@
 			'title' => 'Personalverwaltung',
 			'bootstrap5' => true,
 			'fontawesome6' => true,
-			'tabulator5' => true,
+			'tabulator6' => true,
 			'primevue3' => true,
 			'axios027' => true,
 			'restclient' => true,

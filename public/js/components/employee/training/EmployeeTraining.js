@@ -46,6 +46,7 @@ export const EmployeeTraining = {
         const isFetching = ref(false);
         const interneChecked = ref(true);
         const trainingList = ref([]);
+        const kategorieFilterList = ref([]);
         
         const table = Vue.ref(null); // reference to your table element
         const tabulator = Vue.ref(null); // variable to hold your table
@@ -75,16 +76,15 @@ export const EmployeeTraining = {
 
             const kategorieFormatter = (cell) => {    
                 
-                const kategorien = cell.getRow().getData().kategorien;
+                const kategorien = cell.getValue() || [];
                 const kategorienExpanded = [];
 
                 kategorien?.forEach(weiterbildungskategorie_kurzbz => {
                     const k = kategorienList.value.find(kat => kat.weiterbildungskategorie_kurzbz == weiterbildungskategorie_kurzbz);
                     // const typ = kategorieTypen.value.find(kat => kat.weiterbildungskategorietyp_kurzbz == kategorie.weiterbildungskategorietyp_kurzbz);
-                    kategorienExpanded.push(k.bezeichnung);
+                    kategorienExpanded.push(`<span class="badge" style="background-color:#777">${k.bezeichnung}</span>`);
                 });
-                
-                return kategorienExpanded.join(', ');
+                return kategorienExpanded.join(' ');
             }
 
             const dateFormatter = (cell) => {
@@ -115,8 +115,15 @@ export const EmployeeTraining = {
 
             const fetchKategorien = async () => {
                 const res = await $api.call(ApiWeiterbildung.getWeiterbildungkategorien());                 
-                kategorienList.value = res.data                       
+                kategorienList.value = res.data       
+                const filterListe = Object.fromEntries(
+                        kategorienList.value.map(k => [k.weiterbildungskategorie_kurzbz, k.bezeichnung])
+                )             
+                tabulator.value?.updateColumnDefinition("kategorien", {
+                    headerFilterParams: { values: filterListe,  clearable: true },
+                });   
             }
+
             const fetchKategorieTypen = async () => {
                 const res = await $api.call(ApiWeiterbildung.getKategorieTypen());                 
                 kategorieTypen.value = res.data                
@@ -169,7 +176,12 @@ export const EmployeeTraining = {
             }
 
             const columnsDef = [
-                { title: 'Kategorie', field: "kategorie", headerFilter:"list", formatter: kategorieFormatter, width: 180, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: 'Kategorie', field: "kategorien", formatter: kategorieFormatter, width: 180, headerFilter: "list", 
+                    headerFilterParams: { values: [], clearable: true }, 
+                     headerFilterFunc: function(headerValue, rowValue){
+                        if(!headerValue) return true;  
+                        return rowValue.includes(headerValue);
+                    } },
                 { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", width: 140, headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
                 { title: 'Stunden', field: "stunden", hozAlign: "right", headerFilter:true },
                 { title: 'Von', field: "von", hozAlign: "center", 
