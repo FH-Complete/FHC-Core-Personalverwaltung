@@ -17,7 +17,7 @@ class EchteDienstverhaeltnisseOhneOeVertragsbestandteil extends PlausiChecker
 		$dienstverhaeltnis_id = isset($params['dienstverhaeltnis_id']) ? $params['dienstverhaeltnis_id'] : null;
 
 		// get start date from config
-		$this->_ci->load->config('extensions/FHC-Core-Personalverwaltung/issues');
+		$this->_ci->load->config('extensions/FHC-Core-Personalverwaltung/personalIssueParams');
 		$startDate = $this->_ci->config->item('OEZUORDNUNG_START_DATE');
 
 		// if config not set, do not execute check

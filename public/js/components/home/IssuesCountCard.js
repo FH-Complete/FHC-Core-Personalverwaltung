@@ -1,4 +1,4 @@
-import ApiIssue from '../../api/factory/issue.js';
+import ApiIssue from '../../api/factory/issueList.js';
 
 export const IssuesCountCard = {
 	name: 'IssuesCountCard',
@@ -25,7 +25,7 @@ export const IssuesCountCard = {
 
         const getOpenIssues = async () =>  {
             try {
-                let res = await $api.call(ApiIssue.openIssuesPersons());
+                let res = await $api.call(ApiIssue.getPersonenMitOffenenIssues());
                 issues.value = res.data;
                 return res;
             } catch(error) {

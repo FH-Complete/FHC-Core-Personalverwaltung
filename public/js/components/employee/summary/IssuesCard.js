@@ -1,12 +1,13 @@
-import ApiIssue from '../../../api/factory/issue.js';
+import ApiIssueList from '../../../api/factory/issueList.js';
 import ApiVertragsbestandteil from '../../../api/factory/vertragsbestandteil.js';
 import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
 import ApiDV from '../../../api/factory/dv.js';
+import IssueList from '../../../../../../js/components/Issues/IssueList.js';
 
 export const IssuesCard = {
 	name: 'IssuesCard',
      components: {
-        
+        IssueList
      },
      props: {
        
@@ -23,7 +24,9 @@ export const IssuesCard = {
         const vertragsbestandteiltypen = inject('vertragsbestandteiltypen');
         const gehaltstypen = inject('gehaltstypen');
         const vertragsarten = inject('vertragsarten');
-        const $api = inject('$api');  
+        const app = Vue.ref("personalverwaltung");
+        const $api = inject('$api');
+        const issuesEndpoint = ApiIssueList;
         
         const formatVertragsbestandteiltyp = (item) => {
           let va = vertragsbestandteiltypen.value.find(kt => kt.value == item);
@@ -47,31 +50,11 @@ export const IssuesCard = {
             return d.getDate()  + "." + (d.getMonth()+1) + "." + d.getFullYear()
         }
         
-        const fetchIssues = async () => {
-            if (currentPersonID.value == null) {
-                return;
-            }
-			try {
-              isFetching.value = true;
-              const response = await $api.call(ApiIssue.byPerson(currentPersonID.value));
-              isFetching.value = false;              
-              if (response?.meta?.status == 'success' && response?.data?.length>0) {
-                issues.value = response.data;
-                getBehebungData(issues.value);
-              } else {
-                issues.value = null;
-              }
-			} catch (error) {
-			  console.log(error);
-			} finally {
-                isFetching.value = false;
-            }	
-		}
+              isFetching.value = false;
 
         onMounted(() => {
             currentDate.value = props.date || new Date();
             currentPersonID.value = parseInt(route.params.id);
-            fetchIssues();
         })
 
         const getVB = async (vbid) =>  {
@@ -188,7 +171,7 @@ export const IssuesCard = {
 			params => {
 				currentPersonID.value = params.id;
                // currentPersonUID.value = params.uid;
-               fetchIssues();
+				issueListRef.value.fetchIssues();
 			}
 		)
 
@@ -202,8 +185,8 @@ export const IssuesCard = {
         const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
       
         return {
-            currentDate, isFetching, formatDate, title, currentPersonID, issues, fullPath, route, 
-            formatVertragsbestandteiltyp, formatGehaltstyp,formatVertragsart,
+            currentDate, isFetching, formatDate, title, currentPersonID, app, issues, fullPath, route, 
+            formatVertragsbestandteiltyp, formatGehaltstyp,formatVertragsart, getBehebungData, issuesEndpoint
         }
      },
      template: `
@@ -216,48 +199,47 @@ export const IssuesCard = {
             <div v-if="isFetching" class="spinner-border" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>     
-            <div v-if="!isFetching && issues!=null">
-                <table class="table table-bordered">
-                    <tbody>
-                        <tr><th>Datum</th><th>Inhalt</th></tr>                        
-                        <tr v-for="(item, index) in issues" :key="item.issue_id">
-
-                            <td>{{ formatDate(item.datum) }}</td>
-                            <td>{{ item.inhalt }} <br>
-                                <template v-if="item.behebung_data && item.behebung_data.vbs">
-                                     <span v-for="(vb, index) in item.behebung_data.vbs" > 
-                                            <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + vb.dienstverhaeltnis_id" 
-                                                class="flex-sm-fill text-sm-start">
-                                                VB {{ formatVertragsbestandteiltyp(vb.vertragsbestandteiltyp_kurzbz) }} ({{ formatDate(vb.von) }} - {{ formatDate(vb.bis) }})
-                                            </router-link>
-                                        </span>
-                                </template>
-                                <template v-if="item.behebung_data && item.behebung_data.gbs">
-                                     <span v-for="(gb, index) in item.behebung_data.gbs" > 
-                                            <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + gb.dienstverhaeltnis_id" 
-                                                class="flex-sm-fill text-sm-start">
-                                                GB {{ formatGehaltstyp(gb.gehaltstyp_kurzbz) }} ({{ formatDate(gb.von) }} - {{ formatDate(gb.bis) }})
-                                            </router-link>
-                                        </span>
-                                </template>
-                                <template v-if="item.behebung_data && item.behebung_data.dvs">
-                                     <span v-for="(dv, index) in item.behebung_data.dvs" > 
-                                            <router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + dv.dienstverhaeltnis_id" 
-                                                class="flex-sm-fill text-sm-start">
-                                                DV {{ formatVertragsart(dv.vertragsart_kurzbz) }}/{{ dv.unternehmen }} ({{ formatDate(dv.von) }} - {{ formatDate(dv.bis) }})
-                                            </router-link>
-                                        </span>
-                                </template>
-                            </td>
-                            
-                        </tr>
-                    </tbody>
-                </table>
+            <div v-if="!isFetching">
+            <issue-list
+				v-if = "currentPersonID"
+				ref="issueListRef" 
+                :person_id = "currentPersonID"
+                :apps = "app"
+                :endpoint="issuesEndpoint"
+                @issuesLoaded = "getBehebungData"
+            >
+				<template #additionalText="{ behebung_data }">
+				
+					<template v-if="behebung_data && behebung_data.vbs">
+						 <span v-for="(vb, index) in behebung_data.vbs" > 
+								<router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + vb.dienstverhaeltnis_id" 
+									class="flex-sm-fill text-sm-start">
+									VB {{ formatVertragsbestandteiltyp(vb.vertragsbestandteiltyp_kurzbz) }} ({{ formatDate(vb.von) }} - {{ formatDate(vb.bis) }})
+								</router-link>
+							</span>
+					</template>
+					<template v-if="behebung_data && behebung_data.gbs">
+						 <span v-for="(gb, index) in behebung_data.gbs" > 
+								<router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + gb.dienstverhaeltnis_id" 
+									class="flex-sm-fill text-sm-start">
+									GB {{ formatGehaltstyp(gb.gehaltstyp_kurzbz) }} ({{ formatDate(gb.von) }} - {{ formatDate(gb.bis) }})
+								</router-link>
+							</span>
+					</template>
+					<template v-if="behebung_data && behebung_data.dvs">
+						 <span v-for="(dv, index) in behebung_data.dvs" > 
+								<router-link :to="fullPath + route.params.id + '/' + route.params.uid + '/contract/' + dv.dienstverhaeltnis_id" 
+									class="flex-sm-fill text-sm-start">
+									DV {{ formatVertragsart(dv.vertragsart_kurzbz) }}/{{ dv.unternehmen }} ({{ formatDate(dv.von) }} - {{ formatDate(dv.bis) }})
+								</router-link>
+							</span>
+					</template>
+				</template>
+            </issue-list>
             </div>
         </div>
      </div>
      
      `
-   
 
 }

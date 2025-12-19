@@ -2,7 +2,8 @@ import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
 import ApiEmployee from '../../api/factory/employee.js';
-import ApiIssue from '../../api/factory/issue.js';
+import ApiIssueChecker from '../../api/factory/issueChecker.js';
+import IssueChecker from '../../../../../../public/js/components/Issues/IssueChecker.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeHeader = {
@@ -12,6 +13,7 @@ export const EmployeeHeader = {
         ModalDialog,
         "p-skeleton": primevue.skeleton,
         EmployeeStatus,
+        IssueChecker
 	},
     props: {
         personID: Number,
@@ -38,7 +40,8 @@ export const EmployeeHeader = {
         const isFetchingName = ref(false);
         const isFetchingIssues = ref(false);
         const $api = inject('$api')     
-        const $fhcAlert = Vue.inject('$fhcAlert')   
+        const $fhcAlert = Vue.inject('$fhcAlert')
+        const issueCheckerEndpoint = ApiIssueChecker;
 
        //const currentDate = ref(null);
 
@@ -70,34 +73,10 @@ export const EmployeeHeader = {
             }
         };
 
-        const fetchOpenIssuesCount = async(personID) => {
-            isFetchingIssues.value = true;
-            try {
-                const res = await $api.call(ApiIssue.countPersonOpenIssues(personID));
-                openissuescount.value = res.data.openissues;
-            } catch (error) {
-                console.log(error);
-            } finally {
-                isFetchingIssues.value = false;
-            }
-        };
-
-        const checkPerson = async() => {
-            isFetchingIssues.value = true;
-            try {
-                const res = await $api.call(ApiIssue.checkPerson(props.personID));
-                openissuescount.value = res.data.openissues;
-            } catch (error) {
-                console.log(error);
-            } finally {
-                isFetchingIssues.value = false;
-            }
-        };
-
         Vue.watch([currentPersonID, currentPersonUID], ([id,uid]) => {
             if (currentPersonID.value!=null) {
                 fetchHeaderData(id, uid);
-                fetchOpenIssuesCount(id);
+               issueCheckerRef.value.countPersonOpenIssues();
             } else {
                 previewImage.value = null;
                 fileInput.value.value = null;
@@ -108,7 +87,6 @@ export const EmployeeHeader = {
             //currentDate.value = route.query.d || new Date();
             if (props.personID, props.personUID) {
                 fetchHeaderData(props.personID, props.personUID);
-                fetchOpenIssuesCount(props.personID);
             }
 
             if (modalRef.value)
@@ -207,7 +185,7 @@ export const EmployeeHeader = {
 
         const refresh = () => {
             fetchHeaderData(props.personID, props.personUID);
-            checkPerson(props.personID);
+            issueCheckerRef.value.checkPerson();
             statusRef.value.refresh();
         }
 
@@ -244,9 +222,9 @@ export const EmployeeHeader = {
             // currentDate,
             formatDate,
             //setDateHandler,
-            checkPerson,
             refresh,
             openissuescount,
+            issueCheckerEndpoint
         }
     },
     template: `
@@ -313,11 +291,7 @@ export const EmployeeHeader = {
 
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
-                    <div class="px-2" v-if="!restricted">
-                        <h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
-                        <h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6>
-                        <h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6>
-                    </div>
+					<issue-checker ref="issueCheckerRef" :endpoint="issueCheckerEndpoint" :person_id="personID"></issue-checker>
                     <div class="px-2">
                         <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
