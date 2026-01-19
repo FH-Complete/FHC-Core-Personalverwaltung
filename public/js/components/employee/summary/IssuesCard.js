@@ -27,6 +27,7 @@ export const IssuesCard = {
         const app = Vue.ref("personalverwaltung");
         const $api = inject('$api');
         const issuesEndpoint = ApiIssueList;
+        const issueListRef = ref();
         
         const formatVertragsbestandteiltyp = (item) => {
           let va = vertragsbestandteiltypen.value.find(kt => kt.value == item);
@@ -186,7 +187,7 @@ export const IssuesCard = {
       
         return {
             currentDate, isFetching, formatDate, title, currentPersonID, app, issues, fullPath, route, 
-            formatVertragsbestandteiltyp, formatGehaltstyp,formatVertragsart, getBehebungData, issuesEndpoint
+            formatVertragsbestandteiltyp, formatGehaltstyp,formatVertragsart, getBehebungData, issuesEndpoint, issueListRef
         }
      },
      template: `

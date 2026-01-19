@@ -103,8 +103,8 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 					dienstverhaeltnisse dvs, dienstverhaeltnisse dvss
 				WHERE
 					dvss.dienstverhaeltnis_id <> dvs.dienstverhaeltnis_id -- different dienstverhaeltnis
-					AND dvss.person_id = dvs.person_id -- same person
-					AND dvss.oe_kurzbz = dvs.oe_kurzbz -- paralell in same unternehmen";
+					AND dvss.person_id = dvs.person_id /* same person */
+					AND dvss.oe_kurzbz = dvs.oe_kurzbz /* paralell in same unternehmen */";
 
 		if (isset($erste_dienstverhaeltnis_id) && isset($zweite_dienstverhaeltnis_id))
 		{
@@ -125,7 +125,7 @@ class ParalelleDienstverhaeltnisseEinUnternehmen extends PlausiChecker
 					LEAST(erste_vertragsart_kurzbz, zweite_vertragsart_kurzbz) = 'externerlehrender'
 					AND GREATEST(erste_vertragsart_kurzbz, zweite_vertragsart_kurzbz) = 'studentischehilfskr'
 				)
-				AND NOT EXISTS ( -- karenz time can be paralell
+				AND NOT EXISTS ( /* karenz time can be paralell */
 					SELECT 1
 					FROM
 						hr.tbl_vertragsbestandteil vtb_karenz

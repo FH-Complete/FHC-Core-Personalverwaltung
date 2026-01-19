@@ -34,6 +34,7 @@ export const EmployeeHeader = {
         const fileInput = ref();
         const previewImage = ref();
         const statusRef = ref();
+        const issueCheckerRef = ref();
         const { t } = usePhrasen();
 
         const isFetching = ref(false);
@@ -224,7 +225,8 @@ export const EmployeeHeader = {
             //setDateHandler,
             refresh,
             openissuescount,
-            issueCheckerEndpoint
+            issueCheckerEndpoint,
+            issueCheckerRef
         }
     },
     template: `

@@ -96,7 +96,7 @@ class UeberlappendeVertragsbestandteile extends PlausiChecker
 				GREATEST(vtbs.vertragsbestandteil_id, vtbss.vertragsbestandteil_id) AS zweite_vertragsbestandteil_id
 			FROM
 				vertragsbestandteile vtbs, vertragsbestandteile vtbss
-			WHERE -- there is overlapping vertragsbestandteil
+			WHERE /* there is overlapping vertragsbestandteil */
 			(
 				vtbs.dienstverhaeltnis_id = vtbss.dienstverhaeltnis_id -- same Dienstverhaeltnis
 				AND vtbs.vertragsbestandteil_id <> vtbss.vertragsbestandteil_id -- different Vertragsbestandteil
