@@ -264,7 +264,26 @@ export const EmployeeTraining = {
                 tabulator.value?.setData(trainingListArray.value);
         }, {deep: true})
 
-
+        const runWeiterbildungExpireJob = async (uid) => {
+            try {
+                const res = await $api.call(ApiWeiterbildung.runWeiterbildungExpireJob(uid));                
+                if (res.meta.status == "success") {
+                //    trainingList.value = trainingList.value.filter(val => val.weiterbildung_id != id);
+                    if (res.data.count > 0) {
+                        $fhcAlert.alertSuccess(res.data.count + ' Benachrichtigung(en) verschickt.');
+                    } else {
+                        $fhcAlert.alertSuccess('Keine Benachrichtigung verschickt.');
+                    }
+                    
+                } else {
+                    $fhcAlert.alertError('Keine Benachrichtigung verschickt.');
+                }
+            } catch (error) {
+                $fhcAlert.handleSystemError(error)             
+            } finally {
+                isFetching.value = false
+            }   
+        }
 
         // Modal 
         const modalRef = Vue.ref();
@@ -308,7 +327,7 @@ export const EmployeeTraining = {
                 
         }
 
-        return {currentPersonID, currentUID, isFetching, t, table, editDialogRef, refreshList,
+        return {currentPersonID, currentUID, isFetching, t, table, editDialogRef, refreshList, runWeiterbildungExpireJob, 
             readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorienList, kategorieTypen}
     },
     template: `
@@ -321,13 +340,16 @@ export const EmployeeTraining = {
                     <div class="col">
                         <div class="card">
                             <div class="card-header">
-                                <div class="h5"><h5>{{ t('person','weiterbildung') }} {{ t('ui','bezeichnung') }}</h5></div>        
+                                <div class="h5"><h5>{{ t('person','weiterbildung') }}</h5></div>        
                             </div>
 
                             <div class="card-body">
                                 <div class="d-grid d-md-flex justify-content-between pt-2 pb-3" v-if="readonlyMode === false">
                                     <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
                                         <i class="fa fa-plus"></i> {{ t('person','weiterbildung') }}
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-primary me-3" @click="runWeiterbildungExpireJob(currentUID)">
+                                        <i class="fa fa-envelope"></i> Benachrichtigung
                                     </button>
                                     <!--div class="form-check">
                                         <input class="form-check-input" type="checkbox" role="switch" id="interneChecked" v-model="interneChecked">

@@ -58,6 +58,16 @@ CREATE TABLE hr.tbl_weiterbildung_dokument
     dms_id int NOT NULL
 );
 
+CREATE TABLE hr.tbl_weiterbildung_msg_log
+(
+    weiterbildung_msg_log_id serial PRIMARY KEY,
+    weiterbildung_id int NOT NULL,
+    ablaufdatum date,
+    days int,
+    insertamum timestamp,
+    insertvon varchar(32)
+);
+
 
 -- tbl_weiterbildungskategorie->tbl_weiterbildungskategorietyp
 ALTER TABLE hr.tbl_weiterbildungskategorie ADD CONSTRAINT tbl_weiterbildungskategorie_typ_kurzbz_fk FOREIGN KEY (weiterbildungskategorietyp_kurzbz)
@@ -85,13 +95,20 @@ ALTER TABLE hr.tbl_weiterbildung_dokument ADD CONSTRAINT tbl_weiterbildung_dokum
 REFERENCES campus.tbl_dms (dms_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- tbl_weiterbildung->tbl_weiterbildung_msg_log
+ALTER TABLE hr.tbl_weiterbildung_msg_log ADD CONSTRAINT tbl_weiterbildung_msg_log_weiterbildung_id_fk FOREIGN KEY (weiterbildung_id)
+REFERENCES hr.tbl_weiterbildung (weiterbildung_id) MATCH FULL
+ON DELETE CASCADE ON UPDATE CASCADE;
+
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildungskategorie TO vilesci;
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildungskategorietyp TO vilesci;
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildung_kategorie_rel TO vilesci;
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildung TO vilesci;
 GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildung_dokument TO vilesci;
+GRANT SELECT, UPDATE, INSERT, DELETE ON hr.tbl_weiterbildung_msg_log TO vilesci;
 
 COMMENT ON TABLE hr.tbl_weiterbildung IS E'Interne und externe Weiterbildung von Mitarbeitern';
+COMMENT ON TABLE hr.tbl_weiterbildung_msg_log IS E'Log für die Benachrichtigung von Zertifikaten die in Kürze ablaufen';
 
 GRANT USAGE ON hr.tbl_weiterbildung_weiterbildung_id_seq TO vilesci;
 

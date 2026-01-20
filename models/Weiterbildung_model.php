@@ -142,4 +142,38 @@ class Weiterbildung_model extends DB_Model
 		return $result;
 	}
 
+    public function getExpiresWithinDays($days)
+    {
+
+        $days = (int) $days; 
+
+        $qry = "
+        SELECT
+            w.*
+        FROM hr.tbl_weiterbildung  w
+        WHERE ablaufdatum <= NOW() + (? * INTERVAL '1 day')
+         AND NOT EXISTS (select weiterbildung_id from hr.tbl_weiterbildung_msg_log log where log.days<=? and log.weiterbildung_id=w.weiterbildung_id)
+        ORDER BY w.weiterbildung_id
+        ";
+
+        return $this->execQuery($qry, array($days, $days));
+    }
+
+    public function getExpiresWithinDaysByUID($uid,$days)
+    {
+
+        $days = (int) $days; 
+
+        $qry = "
+        SELECT
+            w.*
+        FROM hr.tbl_weiterbildung w 
+        WHERE ablaufdatum <= NOW() + (? * INTERVAL '1 day') AND mitarbeiter_uid = ?
+         AND NOT EXISTS (select weiterbildung_id from hr.tbl_weiterbildung_msg_log log where log.days<=? and log.weiterbildung_id=w.weiterbildung_id)
+        ORDER BY w.weiterbildung_id
+        ";
+
+        return $this->execQuery($qry, array($days, $uid, $days));
+    }
+
 }

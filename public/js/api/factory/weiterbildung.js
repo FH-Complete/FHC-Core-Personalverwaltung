@@ -51,6 +51,12 @@ export default {
 			url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/updateDokumente/${weiterbildung_id}`,
             params
 		}
-    }
+    },
+    runWeiterbildungExpireJob(uid) {
+		return {
+			method: 'post',
+			url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/runWeiterbildungExpireJob/${uid}`,
+		}
+	},
 
 }  

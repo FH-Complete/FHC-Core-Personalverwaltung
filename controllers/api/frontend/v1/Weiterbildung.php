@@ -23,11 +23,15 @@ class Weiterbildung extends FHCAPI_Controller
 				'deleteWeiterbildung' => Self::DEFAULT_PERMISSION,
 				'updateDokumente' => Self::DEFAULT_PERMISSION,
 				'downloadDoc' => Self::DEFAULT_PERMISSION,
+				'runWeiterbildungExpireJob' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
 		// Loads authentication library and starts authenticationfetc
 		$this->load->library('AuthLib');
+		// load lib for sending notification mails
+		$this->load->library('extensions/FHC-Core-Personalverwaltung/weiterbildung/WeiterbildungMessageLib.php',
+			null, 'WeiterbildungMessageLib');
 
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Weiterbildung_model', 'WeiterbildungModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/Weiterbildungskategorie_model', 'WeiterbildungskategorieModel');
@@ -111,6 +115,18 @@ class Weiterbildung extends FHCAPI_Controller
 		}
 	}
 
+	public function runWeiterbildungExpireJob($uid)
+	{
+		if ($this->input->method() === 'post')
+		{
+			$insertvon = getAuthUID();
+			$count = $this->WeiterbildungMessageLib->sendAllMessagesMA($uid, $insertvon);
+			$this->terminateWithSuccess(array('uid' => $uid, 'count' => $count));
+		} else {
+			$this->terminateWithError('method not allowed', REST_Controller::HTTP_METHOD_NOT_ALLOWED);
+		}
+	}
+
 	public function deleteWeiterbildung($weiterbildung_id)
 	{
 		$this->load->library('DmsLib');
@@ -120,7 +136,7 @@ class Weiterbildung extends FHCAPI_Controller
 			if (isset($weiterbildung_id) && !is_numeric($weiterbildung_id))
 				show_error('weiterbildung_id is not numeric!');
 			
-			// remove docs | TODO refactor
+			// remove docs
 			$dms_id_arr = [];
 			$this->load->model('extensions/FHC-Core-Personalverwaltung/Weiterbildungdokument_model', 'WeiterbildungdokumentModel');
 			$this->WeiterbildungdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
