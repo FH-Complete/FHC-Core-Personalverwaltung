@@ -142,6 +142,9 @@ class Weiterbildung_model extends DB_Model
 		return $result;
 	}
 
+    /**
+     * @deprecated
+     */
     public function getExpiresWithinDays($days)
     {
 
@@ -159,6 +162,28 @@ class Weiterbildung_model extends DB_Model
         return $this->execQuery($qry, array($days, $days));
     }
 
+    /**
+     * @param dateTime $dt
+     * @param string $template
+     */
+    public function getExpiresUntilDate($dt, $template)
+    {
+
+        $qry = "
+         SELECT
+            w.*
+        FROM hr.tbl_weiterbildung w 
+        WHERE ablaufdatum > NOW() and ablaufdatum <= ? 
+         AND NOT EXISTS (select weiterbildung_id from hr.tbl_weiterbildung_msg_log log where log.template=? and log.weiterbildung_id=w.weiterbildung_id)
+        ORDER BY w.weiterbildung_id
+        ";
+
+        return $this->execQuery($qry, array($dt, $template));
+    }
+
+    /**
+     *  @deprecated use getExpiresUntilDateByUID($uid, $dt)
+     */
     public function getExpiresWithinDaysByUID($uid,$days)
     {
 
@@ -174,6 +199,21 @@ class Weiterbildung_model extends DB_Model
         ";
 
         return $this->execQuery($qry, array($days, $uid, $days));
+    }
+
+    public function getExpiresUntilDateByUID($uid, $dt, $template)
+    {
+         $qry = "
+        SELECT
+            w.*
+        FROM hr.tbl_weiterbildung w 
+        WHERE ablaufdatum > NOW() and ablaufdatum <= ? AND mitarbeiter_uid = ?
+         AND NOT EXISTS (select weiterbildung_id from hr.tbl_weiterbildung_msg_log log where log.template=? and log.weiterbildung_id=w.weiterbildung_id)
+        ORDER BY w.weiterbildung_id
+        ";
+
+        return $this->execQuery($qry, array($dt, $uid, $template));
+
     }
 
 }

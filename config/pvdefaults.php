@@ -24,4 +24,4 @@ $config['PV_SEND_WEITERBILDUNG_EXPIRE_MAILS'] = true;
  * 
  * array(90,60,30) means that 3 reminders will be sent: 90 days before expiration, 60 days, etc.
  */
-$config['PV_WEITERBILDUNG_REMINDER'] = array(90,60,30);
+$config['PV_WEITERBILDUNG_REMINDER'] = array(array('template' => 'weiterbildung_reminder_1','interval' => '3 Monate'),array('template'=>'weiterbildung_reminder_2','interval' => '2 Monate'), array('template' => 'weiterbildung_reminder_3', 'interval' => '1 Monat'));

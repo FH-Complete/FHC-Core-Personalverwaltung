@@ -17,12 +17,15 @@ class WeiterbildungMessageLib
     }
 
 	/**
-	 * send notification message of one person for training certificates that expire within $days
+	 * send notification message of one person for training certificates that expire within 
+	 * a date specified in param intervalConfig
 	 */
-	public function sendMessagesMA($uid, $insertvon, $days = 30)
+	public function sendMessagesMA($uid, $insertvon, $intervalConfig)
 	{		
-		
-		$result = $this->_ci->WeiterbildungModel->getExpiresWithinDaysByUID($uid, (int)$days);
+		$dt = new DateTime();
+		$dt->modify($intervalConfig['interval']);
+
+		$result = $this->_ci->WeiterbildungModel->getExpiresUntilDateByUID($uid, $dt, $intervalConfig['template']);
 		
 		if (isError($result))
 		{
@@ -38,7 +41,7 @@ class WeiterbildungMessageLib
 		else
 		{
 			$weiterbildungListe = getData($result);
-			$count = $this->sendmailLoop($weiterbildungListe, $insertvon, $days);
+			$count = $this->sendmailLoop($weiterbildungListe, $insertvon, $dt, $intervalConfig['template']);
 		}
 		
 		return $count;
@@ -57,11 +60,11 @@ class WeiterbildungMessageLib
 			return -1;
 		}
 
-		asort($intervalList);
+		// asort($intervalList);
 		$count = 0;
 
-		foreach ($intervalList as $days) {
-			$count += $this->sendMessagesMA($uid, $insertvon, $days);
+		foreach ($intervalList as $intervalConfig) {
+			$count += $this->sendMessagesMA($uid, $insertvon, $intervalConfig);
 		}
 
 		return $count;
@@ -80,8 +83,8 @@ class WeiterbildungMessageLib
 		asort($intervalList);
 		$count = 0;
 
-		foreach ($intervalList as $days) {
-			$count += $this->sendMessages($insertvon, $days);
+		foreach ($intervalList as $intervalConfig) {
+			$count += $this->sendMessages($insertvon, $intervalConfig);
 		}
 
 		return $count;
@@ -91,10 +94,12 @@ class WeiterbildungMessageLib
 	/**
 	 * send notification message for training certificates that expire within $days
 	 */
-	public function sendMessages($insertvon, $days = 30)
+	public function sendMessages($insertvon, $intervalConfig)
 	{		
-		
-		$result = $this->_ci->WeiterbildungModel->getExpiresWithinDays((int)$days);
+		$dt = new DateTime();
+		$dt->modify($intervalConfig['interval']);
+
+		$result = $this->_ci->WeiterbildungModel->getExpiresUntilDate($dt);
 		
 		if (isError($result))
 		{
@@ -110,30 +115,30 @@ class WeiterbildungMessageLib
 		else
 		{
 			$weiterbildungListe = getData($result);
-			$count = $this->sendmailLoop($weiterbildungListe, $insertvon, $days);
+			$count = $this->sendmailLoop($weiterbildungListe, $insertvon, $dt, $intervalConfig['template']);
 		}
 		
 		return $count;
 	}
 
-	private function sendmailLoop($weiterbildungListe, $insertvon, $days)
+	private function sendmailLoop($weiterbildungListe, $insertvon, $deadline, $template)
 	{
 		$count = 0;
 		$dt = new DateTimeImmutable();
 
 		foreach ($weiterbildungListe as $wb)
 		{
-			log_message('info',"versende Nachricht [weiterbildung_id=".$wb->weiterbildung_id."]");
+			log_message('info',"versende Nachricht [weiterbildung_id=".$wb->weiterbildung_id.", template='$template', deadline=".$deadline->format("Y-m-d")."]");
 
 			$result = $this->_ci->WeiterbildungMsgLogModel->insert(
-				array('weiterbildung_id' => $wb->weiterbildung_id, 'ablaufdatum' => $wb->ablaufdatum, 'days' => $days, 'insertamum' => $dt->format('Y-m-d H:i'), 'insertvon' => $insertvon)
+				array('weiterbildung_id' => $wb->weiterbildung_id, 'ablaufdatum' => $wb->ablaufdatum, 'template' => $template, 'insertamum' => $dt->format('Y-m-d H:i'), 'insertvon' => $insertvon)
 			);
 
 			if (isError($result))
 				log_message('error',getError($result));
 			else
 			{
-				$this->generateMail($wb);
+				$this->generateMail($wb, $template);
 				$count++;
 			}
 				
@@ -141,7 +146,7 @@ class WeiterbildungMessageLib
 		return $count;
 	}
 
-	private function generateMail($weiterbildung)
+	private function generateMail($weiterbildung, $template)
 	{
 		// var_dump($this->_ci->config);
 		if($this->_ci->config->item('PV_SEND_WEITERBILDUNG_EXPIRE_MAILS') !== true)
@@ -154,16 +159,16 @@ class WeiterbildungMessageLib
 		$email = $weiterbildung->mitarbeiter_uid . "@" . DOMAIN;
 
 
-		function languageQuery($language)
+		/* function languageQuery($language)
 		{
 			return "select index from public.tbl_sprache where sprache = '" . $language . "'";
 		}
-
+ */
 		
 		$href = $this->_ci->config->item('cis_base_url') . $this->_ci->config->item('cis_index_page') . '/Cis/Training';
 		$subject = "Weiterbildung '$weiterbildung->bezeichnung' läuft aus";
 		$mail_res = sendSanchoMail(
-			"weiterbildung_expire",
+			$template,
 			['weiterbildung' => $weiterbildung->bezeichnung,
 			 'expire_date' => date_format(date_create($weiterbildung->ablaufdatum), 'd.m.Y'),
 			 'href' => $href],
