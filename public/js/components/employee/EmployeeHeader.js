@@ -4,17 +4,18 @@ import { EmployeeStatus } from './EmployeeStatus.js';
 import ApiEmployee from '../../api/factory/employee.js';
 import ApiIssueChecker from '../../api/factory/issueChecker.js';
 import IssueChecker from '../../../../../../public/js/components/Issues/IssueChecker.js';
+import ApiIssueList from '../../api/factory/issueList.js';
 import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
 
 export const EmployeeHeader = {
-	name: 'EmployeeHeader',
+    name: 'EmployeeHeader',
     components: {
-		Modal,
+        Modal,
         ModalDialog,
         "p-skeleton": primevue.skeleton,
         EmployeeStatus,
         IssueChecker
-	},
+    },
     props: {
         personID: Number,
         personUID: String,
@@ -43,6 +44,7 @@ export const EmployeeHeader = {
         const $api = inject('$api')     
         const $fhcAlert = Vue.inject('$fhcAlert')
         const issueCheckerEndpoint = ApiIssueChecker;
+        const issueListEndpoint = ApiIssueList;
 
        //const currentDate = ref(null);
 
@@ -160,7 +162,7 @@ export const EmployeeHeader = {
             if (await $fhcAlert.confirm({
                     message:`Foto wirklich löschen?`,
                     acceptLabel: 'Löschen',
-				    acceptClass: 'p-button-danger'
+                    acceptClass: 'p-button-danger'
                 }) === false) {
                 return;
             }     
@@ -226,6 +228,7 @@ export const EmployeeHeader = {
             refresh,
             openissuescount,
             issueCheckerEndpoint,
+            issueListEndpoint,
             issueCheckerRef
         }
     },
@@ -293,7 +296,14 @@ export const EmployeeHeader = {
 
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
-					<issue-checker ref="issueCheckerRef" :endpoint="issueCheckerEndpoint" :person_id="personID"></issue-checker>
+                    <issue-checker
+                        ref="issueCheckerRef"
+                        :endpoint="issueCheckerEndpoint"
+                        :person_id="personID"
+                        :issueListEndpoint="issueListEndpoint"
+                        :issueListStyle = "{ width: '50%' }"
+                        :issueListStyleBreakpoints = "{ '650px': '100%' }">
+                    </issue-checker>
                     <div class="px-2">
                         <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
