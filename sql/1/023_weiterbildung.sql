@@ -63,7 +63,6 @@ CREATE TABLE hr.tbl_weiterbildung_msg_log
     weiterbildung_msg_log_id serial PRIMARY KEY,
     weiterbildung_id int NOT NULL,
     ablaufdatum date,
-    interval varchar(32),
     template varchar(255),
     insertamum timestamp,
     insertvon varchar(32)

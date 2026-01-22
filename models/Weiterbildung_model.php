@@ -178,7 +178,7 @@ class Weiterbildung_model extends DB_Model
         ORDER BY w.weiterbildung_id
         ";
 
-        return $this->execQuery($qry, array($dt, $template));
+        return $this->execQuery($qry, array($dt->format('Y-m-d'), $template));
     }
 
     /**
@@ -212,7 +212,7 @@ class Weiterbildung_model extends DB_Model
         ORDER BY w.weiterbildung_id
         ";
 
-        return $this->execQuery($qry, array($dt, $uid, $template));
+        return $this->execQuery($qry, array($dt->format('Y-m-d'), $uid, $template));
 
     }
 
