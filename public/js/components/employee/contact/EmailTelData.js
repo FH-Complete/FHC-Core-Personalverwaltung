@@ -1,6 +1,6 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 import ApiPerson from '../../../api/factory/person.js';
 
 export const EmailTelData = {

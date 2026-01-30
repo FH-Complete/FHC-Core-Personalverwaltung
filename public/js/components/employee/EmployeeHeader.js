@@ -3,7 +3,7 @@ import { ModalDialog } from '../ModalDialog.js';
 import { EmployeeStatus } from './EmployeeStatus.js';
 import ApiEmployee from '../../api/factory/employee.js';
 import ApiIssue from '../../api/factory/issue.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 
 export const EmployeeHeader = {
 	name: 'EmployeeHeader',
