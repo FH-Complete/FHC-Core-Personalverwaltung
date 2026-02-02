@@ -1,7 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import {OrgChooser} from "../organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
