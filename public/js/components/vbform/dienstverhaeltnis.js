@@ -1,6 +1,7 @@
 import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 import store from './vbsharedstate.js';
+import ApiDV from  '../../../js/api/factory/dv.js';
 
 export default {
   name: 'Dienstverhaeltnis',
@@ -67,7 +68,7 @@ export default {
         required: false
     }
   },
-  inject: ['$fhcApi','$fhcAlert'],
+  inject: ['$api','$fhcAlert'],
   data: function() {
     return {
       'vertragsart_kurzbz': '',
@@ -104,8 +105,8 @@ export default {
       return (optvalue === selvalue);
     },
     getUnternehmen: async function() {
-      const response = await this.$fhcApi.factory.DV.getUnternehmen();
-      const unternehmen = response.retval;
+      const response = await this.$api.call(ApiDV.getUnternehmen());
+      const unternehmen = response.data;
       unternehmen.unshift({
         value: '',
         label: 'Unternehmen wählen',
@@ -114,8 +115,8 @@ export default {
       this.lists.unternehmen = unternehmen;
     },
     getVertragsarten: async function() {
-      const response = await this.$fhcApi.factory.DV.getVertragsarten();
-      const vertragsarten = response.retval;
+      const response = await this.$api.call(ApiDV.getVertragsarten());
+      const vertragsarten = response.data;
       vertragsarten.unshift({
         value: '',
         label: 'Vertragsart wählen',
@@ -124,8 +125,8 @@ export default {
       return this.lists.vertragsarten = vertragsarten;
     },
     getDvEndeGruende: async function() {
-      const response = await this.$fhcApi.factory.DV.getDvEndeGruende();
-      const dvendegruende = response.retval;
+      const response = await this.$api.call(ApiDV.getDvEndeGruende());
+      const dvendegruende = response.data;
       dvendegruende.unshift({
         value: '',
         label: 'Beendigungsgrund wählen',

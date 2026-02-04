@@ -16,12 +16,40 @@ $config['navigation_header']['*']['Personen']['children']['Handyverwaltung'] = a
 	'requiredPermissions' => array('extension/pv21_handyverwaltung:r', 'basis/mitarbeiter:r')
 );
 
+$config['navigation_header']['*']['Personen']['children']['Schluesselverwaltung'] = array(
+	'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Schluesselverwaltung'),
+	'sort' => 27,
+	'description' => 'Schlüsselverwaltung',
+	'expand' => false,
+	'requiredPermissions' => array('extension/pv21_schluesselver:r', 'basis/mitarbeiter:r')
+);
+
+$config['navigation_header']['*']['Personen']['children']['Kontaktdatenverwaltung'] = array(
+	'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Kontaktdatenverwaltung'),
+	'sort' => 28,
+	'description' => 'Kontaktdatenverwaltung',
+	'expand' => false,
+	'requiredPermissions' => array('extension/pv21_kontaktdatenver:r', 'basis/mitarbeiter:r')
+);
+
 $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/restricted/*'] = array(
 	'Handyverwaltung' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Handyverwaltung'),
 		'description' => 'Handyverwaltung',
 		'icon' => 'home',
 		'requiredPermissions' => array('extension/pv21_handyverwaltung:r', 'basis/mitarbeiter:r')
+	),
+	'Schluesselverwaltung' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Schluesselverwaltung'),
+		'description' => 'Schlüsselverwaltung',
+		'icon' => 'key',
+		'requiredPermissions' => array('extension/pv21_schluesselver:r', 'basis/mitarbeiter:r')
+	),
+	'Kontaktdatenverwaltung' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Kontaktdatenverwaltung'),
+		'description' => 'Kontaktdatenverwaltung',
+		'icon' => 'users',
+		'requiredPermissions' => array('extension/pv21_kontaktdatenver:r', 'basis/mitarbeiter:r')
 	)
 );
 
@@ -75,3 +103,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'requiredPermissions' => 'basis/mitarbeiter:r'
 	)
 );
+
+$config['navigation_menu']['apps'] = [
+	'cdv' => [
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/restricted/Kontaktdatenverwaltung'),
+		'description' => 'Kontaktdatenverwaltung',
+		#'icon' => 'address-card',
+		'requiredPermissions' => 'extension/pv21_kontaktdatenver:rw'
+	]
+];

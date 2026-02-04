@@ -2,18 +2,20 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class FunctionsAPI extends Auth_Controller
+class FunctionsAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 
     public function __construct() {
         parent::__construct(array(
             'getAllFunctions' => FunctionsAPI::DEFAULT_PERMISSION,
 		    'getContractFunctions' => FunctionsAPI::DEFAULT_PERMISSION,
 		    'getCurrentFunctions' => FunctionsAPI::DEFAULT_PERMISSION,
-		    'getAllUserFunctions' => [FunctionsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		    'getAllUserFunctions' => [FunctionsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -41,16 +43,12 @@ class FunctionsAPI extends Auth_Controller
 EOSQL;
 
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) )
+		if (isError($fkts))
 		{
-			$this->outputJson($fkts);
-			return;
+			$this->terminateWithError('failed to fetch all functions');
 		}
-		else
-		{
-			$this->outputJsonError('no contract relevant funktionen found');
-			return;
-		}
+		$data = getData($fkts);
+		$this->terminateWithSuccess($data ?? array());
 	}
 
 	/*
@@ -86,16 +84,12 @@ EOSQL;
 EOSQL;
 
 		$fkts = $this->FunktionModel->execReadOnlyQuery($sql);
-		if( hasData($fkts) )
+		if (isError($fkts))
 		{
-			$this->outputJson($fkts);
-			return;
+			$this->terminateWithError('failed to fetch contract relevant functions');
 		}
-		else
-		{
-			$this->outputJsonError('no contract relevant funktionen found');
-			return;
-		}
+		$data = getData($fkts);
+		$this->terminateWithSuccess($data ?? array());
 	}
 
 	/*
@@ -106,12 +100,12 @@ EOSQL;
 	{
 		if( empty($uid) )
 		{
-			$this->outputJsonError('Missing Parameter <uid>');
+			$this->terminateWithError('Missing Parameter <uid>');
 		}
 
 		if( empty($companyOrgetkurzbz) )
 		{
-			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
+			$this->terminateWithError('Missing Parameter <companyOrgetkurzbz>');
 		}
 
 		$sql = <<<EOSQL
@@ -152,16 +146,12 @@ EOSQL;
 EOSQL;
 
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz, $uid));
-		if( hasData($benutzerfunktionen) )
+		if (isError($benutzerfunktionen))
 		{
-			$this->outputJson($benutzerfunktionen);
-			return;
+			$this->terminateWithError('failed to fetch benutzerfunktionen for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz);
 		}
-		else
-		{
-			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid . ' and oe_kurzbz ' . $companyOrgetkurzbz );
-			return;
-		}
+		$data = getData($benutzerfunktionen);
+		$this->terminateWithSuccess($data ?? array());
 	}
 
 	/*
@@ -172,7 +162,7 @@ EOSQL;
 	{
 		if( empty($uid) )
 		{
-			$this->outputJsonError('Missing Parameter <uid>');
+			$this->terminateWithError('Missing Parameter <uid>');
 		}
 
 		$sql = <<<EOSQL
@@ -217,21 +207,11 @@ EOSQL;
 EOSQL;
 
 		$benutzerfunktionen = $this->BenutzerfunktionModel->execReadOnlyQuery($sql, array($uid));
-		if( hasData($benutzerfunktionen) )
+		if (isError($benutzerfunktionen))
 		{
-			$this->outputJson($benutzerfunktionen);
-			return;
+			$this->terminateWithError('failed to fetch benutzerfunktionen for uid ' . $uid);
 		}
-		else
-		{
-			$this->outputJsonError('no benutzerfunktionen found for uid ' . $uid);
-			return;
-		}
+		$data = getData($benutzerfunktionen);
+		$this->terminateWithSuccess($data ?? array());
 	}
-
-
-	
-
-
-
 }

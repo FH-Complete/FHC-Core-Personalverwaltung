@@ -5,8 +5,8 @@ import { ContactData } from './contact/ContactData.js';
 import { MaterialExpensesData } from './MaterialExpensesData.js';
 import { HourlyRateData } from './HourlyRateData.js';
 import { JobFunction } from './JobFunction.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
-import FhcTabs from '../../../../../../public/js/components/Tabs.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
+import FhcTabs from '../../../../../js/components/Tabs.js';
 
 export const EmployeePerson = {
 	name: 'EmployeePerson',
@@ -16,9 +16,9 @@ export const EmployeePerson = {
 		BankData,
 		ContactData,
 		MaterialExpensesData,
-		HourlyRateData: HourlyRateData,
-        JobFunction,
-        FhcTabs,
+		HourlyRateData,
+    JobFunction,
+    FhcTabs,
 	},
     props: {
         id: Number,

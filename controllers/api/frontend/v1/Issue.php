@@ -3,7 +3,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 
-class Issue extends Auth_Controller
+class Issue extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
@@ -53,7 +53,7 @@ class Issue extends Auth_Controller
 
         if (isError($fehlercodeRes))
         {
-            $this->outputJsonError(getError($fehlercodeRes));
+            $this->terminateWithError(getError($fehlercodeRes));
             exit;
         }
 
@@ -66,11 +66,11 @@ class Issue extends Auth_Controller
 
 		if (isError($issueRes))
 		{
-			$this->outputJsonError(getError($issueRes));
+			$this->terminateWithError(getError($issueRes));
 			exit;
 		}
 
-        $this->outputJson($issueRes);
+        $this->terminateWithSuccess(getData($issueRes));
     }
 
 
@@ -109,13 +109,11 @@ EOSQL;
 		$personenmitissues = $this->IssueModel->execReadOnlyQuery($sql);
 		if( hasData($personenmitissues) ) 
 		{
-			$this->outputJson($personenmitissues);
-			return;
+			$this->terminateWithSuccess(getData($personenmitissues));
 		}
 		else
 		{
-			$this->outputJsonSuccess(array());
-			return;
+			$this->terminateWithSuccess(array());
 		}
 	}
 }

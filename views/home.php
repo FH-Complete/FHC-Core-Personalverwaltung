@@ -13,17 +13,11 @@
 			'navigationcomponent' => true, 
 			'customCSSs' => ['public/extensions/FHC-Core-Personalverwaltung/css/dashboard.css',
                        'public/extensions/FHC-Core-Personalverwaltung/css/components/EmployeeChooser.css',
-                       'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',       
+                       'public/extensions/FHC-Core-Personalverwaltung/css/components/ContractsExpiring.css',
                        'public/css/components/searchbar/searchbar.css',
 					   'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css'],
       'customJSs' => [
                       'public/extensions/FHC-Core-Personalverwaltung/js/components/Sidebar.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsExpiring.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsNew.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/ContractsCountCard.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/BirthdayCountCard.js',
-                      'public/extensions/FHC-Core-Personalverwaltung/js/components/home/IssuesCountCard.js',
-                      //'public/extensions/FHC-Core-Personalverwaltung/js/components/home/DeadlineIssueTable.js',
                       ],
       'customJSModules' => array('public/extensions/FHC-Core-Personalverwaltung/js/apps/Home.js'),
        

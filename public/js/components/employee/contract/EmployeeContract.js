@@ -6,7 +6,11 @@ import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
+import ApiEmployee from '../../../api/factory/employee.js';
+import ApiVertrag from '../../../api/factory/vertrag.js';
+import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
+import ApiValorisierungscheck from '../../../api/factory/valorisierungcheck.js';
 
 export const EmployeeContract = {
 	name: 'EmployeeContract',
@@ -92,7 +96,7 @@ export const EmployeeContract = {
         const readonly = ref(false);
         const valorisationValid = ref(true);
 
-        const fhcApi = inject('$fhcApi');  
+        const $api = Vue.inject('$api');
         const fhcAlert = inject('$fhcAlert');
 
         const convert2UnixTS = (ds) => {
@@ -182,9 +186,9 @@ export const EmployeeContract = {
             }
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.Employee.dvByPerson(uid);
-                dvList.value = res.retval;
-                isFetching.value = false;
+                const res = await $api.call(ApiEmployee.dvByPerson(uid));  
+                dvList.value = res.data || [];
+                
                 if (dvList.value.length > 0) {
                     if (props.dienstverhaeltnis_id != undefined) {
                         currentDVID.value = props.dienstverhaeltnis_id;
@@ -200,7 +204,8 @@ export const EmployeeContract = {
                 }
             } catch (error) {
                 console.log(error)
-                isFetching.value = false
+            } finally {
+                isFetching.value = false;
             }
 
 
@@ -209,8 +214,8 @@ export const EmployeeContract = {
         const fetchVertrag = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await fhcApi.factory.Vertrag.vertragByDV(dv_id, convert2UnixTS(date));
-                vertragList.value = res;
+                const res = await $api.call(ApiVertrag.vertragByDV(dv_id, convert2UnixTS(date))); 
+                vertragList.value = res.data;
                 getCurrentVertragsbestandteil();
                 //}
             } catch (error) {
@@ -225,8 +230,8 @@ export const EmployeeContract = {
 
             isFetching.value = true
             try {
-                const res = await fhcApi.factory.Gehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date));
-                gbtList.value = res;
+                const res = await $api.call(ApiGehaltsbestandteil.gbtByDV(dv_id, convert2UnixTS(date)));
+                gbtList.value = res.data;
             } catch (error) {
                 console.log(error)
             } finally {
@@ -241,17 +246,17 @@ export const EmployeeContract = {
             let tempData1 = [], tempData2 = [], tempData3 = [];
             try {
                 if (dv_id != null) {
-                    const res = await fhcApi.factory.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
-                    gbtChartData.value = res;
+                    const res = await $api.call(ApiGehaltsbestandteil.gbtChartDataByDV(dv_id));
+                    gbtChartData.value = res.data;
                     
                     // chartOptions.series[0].data.length = 0;
-					Object.keys(res.valorisiert).forEach(element => {
-						tempData1.push([new Date(element).getTime(), parseFloat(res.valorisiert[element])]);
+					Object.keys(res.data.valorisiert).forEach(element => {
+						tempData1.push([new Date(element).getTime(), parseFloat(res.data.valorisiert[element])]);
 					});
-                    Object.keys(res.gesamt).forEach(element => {
-                       tempData2.push([new Date(element).getTime(), parseFloat(res.gesamt[element])]);
+                    Object.keys(res.data.gesamt).forEach(element => {
+                       tempData2.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
                     });
-                    res.abgerechnet.forEach(element => {
+                    res.data.abgerechnet.forEach(element => {
                         tempData3.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
                     });
                 }
@@ -269,7 +274,7 @@ export const EmployeeContract = {
         const deleteDV = async (dv_id) => {
             isFetching.value = true
             try {
-                const res = await fhcApi.factory.Employee.deleteDV(dv_id);
+                const res = await $api.call(ApiEmployee.deleteDV(dv_id));
                 emit('updateHeader');
             } catch (error) {
                 console.log(error);
@@ -279,7 +284,7 @@ export const EmployeeContract = {
         }
 
         const activeDV = computed(() => {
-            return dvList.value.filter((dv) => {
+            return dvList.value?.filter((dv) => {
                 let von = new Date(dv.von);
                 let bis = dv.bis != null ? new Date(dv.bis) : null;
                 return von <= currentDate.value && (bis == null || bis >= currentDate.value);
@@ -648,7 +653,7 @@ export const EmployeeContract = {
 			if (currentDVID != null && currentDVID.value > 0) {
 				isFetching.value = true
 				try {
-					const res = await fhcApi.factory.ValorisierungCheck.checkValorisationValidityOfDv(currentDVID.value);
+                    const res = await $api.call(ApiValorisierungscheck.checkValorisationValidityOfDv(currentDVID.value));
 					valorisationValid.value = res.data;
 				} catch (error) {
 					console.log(error)

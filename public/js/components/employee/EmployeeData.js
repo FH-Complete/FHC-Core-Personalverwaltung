@@ -1,13 +1,12 @@
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
+import ApiPerson from '../../api/factory/person.js';
 
 
 export const EmployeeData= {
 	name: 'EmployeeData',
     components: {
         ModalDialog,
-        Toast,
     },
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
@@ -19,7 +18,8 @@ export const EmployeeData= {
     emits: ['updateHeader'],
     setup(props, { emit }) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');        
         const readonly = Vue.ref(true);
         const { t } = usePhrasen();
 
@@ -47,10 +47,10 @@ export const EmployeeData= {
             }
             isFetching.value = true;
             try {
-              const res = await fhcApi.factory.Person.personEmployeeData(theModel.value.personID || personID.value);                    
-              currentValue.value = res.retval[0];
+              const res = await $api.call(ApiPerson.personEmployeeData(theModel.value.personID || personID.value));
+              currentValue.value = res.data[0];
             } catch (error) {
-              console.log(error)              
+              $fhcAlert.handleSystemError(error)         
             } finally {
                 isFetching.value = false
             }   
@@ -92,13 +92,15 @@ export const EmployeeData= {
             if (!readonly.value) {
                 // cancel changes?
                 if (hasChanged.value) {
-                  const ok = await dialogRef.value.show();
-                  if (ok) {
-                    console.log("ok=", ok);
-                    currentValue.value = preservedValue.value;
-                  } else {
-                    return
-                  }
+
+                  if (await $fhcAlert.confirm({
+                        message:`t('person','mitarbeiterdatenGeandert')`,
+                        acceptLabel: 'OK',
+				        acceptClass: 'p-button-danger'
+                    }) === false) {
+                    return;
+                  }     
+                  currentValue.value = preservedValue.value;                  
                 }
               } else {
                 // switch to edit mode and preserve data
@@ -152,16 +154,16 @@ export const EmployeeData= {
                     isFetching.value = true;
 
                     try {
-                        fhcApi.factory.Person.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz).then((res) => {
+                        $api.call(ApiPerson.personEmployeeKurzbzExists(currentValue.value.mitarbeiter_uid, currentValue.value.kurzbz)).then((res) => {
                             if (res.error == 1) {
                                 console.error("error checking kurzbz", res.msg)
                             } else {                                
-                                validKurzbz.value = !res.retval
+                                validKurzbz.value = !res.data
                             }
                         })
                         
                     } catch (error) {
-                        console.log(error)              
+                        $fhcAlert.handleSystemError(error)             
                     } finally {
                         isFetching.value = false
                     }   
@@ -190,14 +192,14 @@ export const EmployeeData= {
 
                 // submit
                 try {
-                    const response = await fhcApi.factory.Person.updatePersonEmployeeData(currentValue.value);                    
+                    const response = await $api.call(ApiPerson.updatePersonEmployeeData(currentValue.value));
                     showToast();
-                    currentValue.value = response.retval[0];
+                    currentValue.value = response.data[0];
                     preservedValue.value = currentValue.value;
                     theModel.value.updateHeader();
                     toggleMode();  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)              
                 } finally {
                     isFetching.value = false
                 }
@@ -210,12 +212,9 @@ export const EmployeeData= {
         const hasChanged = Vue.computed(() => {
             return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
         });
-
-        // Toast 
-        const toastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+             $fhcAlert.alertSuccess(t('person','mitarbeiterdatenGespeichert'))
         }
 
         return {
@@ -224,9 +223,7 @@ export const EmployeeData= {
             readonly,
             frmState,
             dialogRef,
-            toastRef,
             employeeDataFrm,
-            showToast, 
             ausbildung,
             standorte,
             orte,
@@ -245,14 +242,6 @@ export const EmployeeData= {
 
     },
     template: `
-    <div class="row">
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="toastRef">
-                <template #body><h4>{{ t('person','mitarbeiterdatenGespeichert') }}</h4></template>
-            </Toast>
-        </div>
-    </div>
-
    <div class="row pt-md-4">      
              <div class="col">
                  <div class="card">
@@ -372,13 +361,6 @@ export const EmployeeData= {
                 </div>
             </div>
         </div>
-
-
-    <ModalDialog :title="t('global', 'warnung')" ref="dialogRef">
-      <template #body>
-        {{ t('t','mitarbeiterdatenGeandert') }}
-      </template>
-    </ModalDialog>
     `
 }
 

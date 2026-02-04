@@ -3,10 +3,11 @@ import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Naviga
 
 import verticalsplit from "../../../../../js/components/verticalsplit/verticalsplit.js";
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
+import ApiSearchbar from  '../../../../../js/api/factory/searchbar.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import {searchbaroptions} from "../../apps/common.js";
 import EmployeeEditor from "./EmployeeEditor.js";
 import { CreateWizard } from './create/CreateWizard.js';
-import { Toast } from '../Toast.js';
 
 // path to CI-Router without host and port (requires https!)
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -21,7 +22,6 @@ export default {
 		verticalsplit,
 		searchbar,
 		CreateWizard,
-		Toast,
 	},
     setup() {
 
@@ -34,17 +34,15 @@ export default {
 		const appSideMenuEntries = ref({});
 		const verticalsplitRef = ref(null);
 		const createWizardRef = ref();
-		const toastEmployeeCreatedRef = ref();
-		const toastEmployeeCreateFailedRef = ref();
-		const currentDate = ref(null);
-		const $fhcApi = inject("$fhcApi");
+		const $api = inject("$api");
+		const $fhcAlert = Vue.inject('$fhcAlert');
+		const { t } = usePhrasen();
 
 		watch(
 			() => route.params,
 			params => {
 				currentPersonID.value = parseInt(params.id);
 				currentPersonUID.value = params.uid;	
-				console.log('*** EmployeeHome params changed', currentPersonID.value);
 				if (verticalsplitRef.value.isCollapsed() == 'bottom') {
 					isEditorOpen.value = true; // TODO check notwendig? was macht isEditorOpen?
 					verticalsplitRef.value.collapseTop();
@@ -53,7 +51,7 @@ export default {
 		)
 
 		const personSelectedHandler = (id, uid, date) => {
-			console.log('personSelected: ', id, uid, date);
+			// console.log('personSelected: ', id, uid, date);
 
 			if (verticalsplitRef.value.isCollapsed() == 'bottom') {
 				verticalsplitRef.value.showBoth();
@@ -70,9 +68,9 @@ export default {
 			createWizardRef.value.showModal().then((action) => {
 
 				if (action !== false && action.type != "CANCELED") {
-					showEmployeeCreatedToast()
+					$fhcAlert.alertSuccess('Mitarbeiter erstellt.');
 				} else if (action === false) {
-					showEmployeeCreateFailedToast()
+					$fhcAlert.alertError('Mitarbeiter anlegen fehlgeschlagen!');
 				}
 			})
 		}
@@ -152,15 +150,7 @@ export default {
 				{title: "OE Key", field: "OE Key", headerFilter: true},
 			]
 		};
-
-		const showEmployeeCreatedToast = () => {
-            toastEmployeeCreatedRef.value.show();
-        }
-
-		const showEmployeeCreateFailedToast = () => {
-			toastEmployeeCreateFailedRef.value.show();
-		}
-
+		
 		Vue.onMounted(() => {
 			let person_id = route.params.id;
 			let person_uid = route.params.uid;
@@ -192,7 +182,7 @@ export default {
                     }
                 };
 				
-				const searchfunction = $fhcApi.factory.search.search;
+				const searchfunction = (params) => $api.call(ApiSearchbar.search(params));
 
 		return {
 			personSelectedHandler,
@@ -210,8 +200,6 @@ export default {
 			employeesTabulatorEvents,
 			employeesTabulatorOptions,
 			verticalsplitRef,
-			toastEmployeeCreatedRef,
-			toastEmployeeCreateFailedRef,
 			route,
 		}
 
@@ -252,15 +240,7 @@ export default {
                                     
                             <div class="flex-fill align-self-center">
                             <h1 class="h2" style="margin-bottom:0" > Mitarbeiter </h1>
-                            </div>
-							<div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-								<Toast ref="toastEmployeeCreatedRef">
-									<template #body><h4>Mitarbeiter erstellt.</h4></template>
-								</Toast>
-								<Toast ref="toastEmployeeCreateFailedRef" type="error">
-									<template #body><h4>Mitarbeiter anlegen fehlgeschlagen!</h4></template>
-								</Toast>
-							</div>
+                            </div>							
                         </div>
                             <!-- Filter component -->
                             <core-filter-cmpt

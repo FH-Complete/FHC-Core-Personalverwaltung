@@ -47,19 +47,6 @@ export const CreateWizard = {
 
         const okHandler = () => {
             
-            /*
-            postData()
-                .then((r) => {
-                    if (r.error == 0) {
-                        console.log('employee successfully saved');
-                        showToast();
-                    }                       
-                }
-                )
-                .catch((error) => {
-                    console.log(error.message);
-                });
-            */
             schnellanlageRef.value.save().then(() => {
                 console.log("employee successfully created")
                 stepsRef.value.reset()

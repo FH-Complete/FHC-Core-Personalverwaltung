@@ -1,13 +1,12 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import {OrgChooser} from "../organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';
 import {formatter} from '../bulk/valorisationformathelper.js';
-import { Toast } from '../Toast.js';
-
+import ApiSalaryExport from '../../api/factory/salaryexport.js';
 
 export const SalaryExport = {
 	name: 'SalaryExport',
@@ -18,7 +17,6 @@ export const SalaryExport = {
         Modal,
         ModalDialog,
         CoreFilterCmpt,
-        Toast,
         OrgChooser,
     },
     props: {
@@ -44,7 +42,8 @@ export const SalaryExport = {
 
         const abrechnungExists = ref(true);
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const $fhcAlert = inject('$fhcAlert');
 
 
         const startOfYear = () => {
@@ -100,9 +99,6 @@ export const SalaryExport = {
         }
         // Modal 
         const confirmDeleteRef = Vue.ref();
-        // Toast
-        const deleteToastRef = Vue.ref();
-
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
         const filterPerson = ref('');
@@ -119,7 +115,7 @@ export const SalaryExport = {
         const exportSalarylist = async () => {
             isFetching.value = true
             try {
-              const response = await fhcApi.factory.SalaryExport.getAll(filterPerson.value, getFilterInterval(), true);        
+              const response = await $api.call(ApiSalaryExport.getAll(filterPerson.value, getFilterInterval(), true));     
               
              /*  // create file link in browser's memory
               const href = URL.createObjectURL(response.data);
@@ -166,11 +162,14 @@ export const SalaryExport = {
             return value != null ? value.toString().replace('.', ',') : '';
         }
 
+		const arr2string = function(value, data, type, params, column){
+            return value.join(', ');
+        }
 
         const fetchAbrechnungExists = async () => {
             try {
                 let i = getFilterInterval();
-                const res = await fhcApi.factory.SalaryExport.abrechnungExists(i[0], currentOrgID.value);  
+                const res = await $api.call(ApiSalaryExport.abrechnungExists(i[0], currentOrgID.value));  
                 if (res.error !== 0) {                    
                     abrechnungExists.value = false;
                   } else {
@@ -195,32 +194,37 @@ export const SalaryExport = {
                 salaryTableRef.value.tabulator.dataLoader.alertLoader();
               }
               
-              const res = await fhcApi.factory.SalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false); 
+              const res = await $api.call(ApiSalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false)); 
               // merge live and history value into one field 
               let value = null;
               let source = '';
+              
               // helper to select the right value and add the index field
               // priority:
-              // 1. use data from history table
-              // 2. use data from valorisierung table
-              // 3. use data from gehaltsbestandteil ("live data")
+              // 1. use data from history table              
+              // 2. use data from valorisierung_historie
+              // 3. use data from gehaltsbestandteil
               const selectValue = (r, index) => {
-                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted !== "") {
+                if (r.hbetrag_decrypted !== undefined && r.hbetrag_decrypted != null && r.hbetrag_decrypted != "") {
                     // history data
                     value = r.hbetrag_decrypted
-                    source = 'h'
-                // TODO data from valorisierung table
-                } else if (r.betr_valorisiert_decrypted !== "") {
+                    source = 'h'    
+                } else if (r.betrag_valorisiert_historie_decrypted != null && r.betrag_valorisiert_historie_decrypted != "") {
                     // live data
-                    value = r.betr_valorisiert_decrypted
+                    value = r.betrag_valorisiert_historie_decrypted
+                    source = 'v'             
+                } else if (r.betr_valorisiert_decrypted	 != null && r.betr_valorisiert_decrypted != "") {
+                    // live data
+                    value = r.betr_valorisiert_decrypted	
                     source = 'l'
                 }
-                return {index, ...r, betrag: value, source}
+
+				return {index, ...r, betrag: value, source}
               }
 
-              let list = res.retval.map((row, index) => selectValue(row, index) )
+              let list = res.data.map((row, index) => selectValue(row, index) )
 
-              if (res.error !==1) {
+              if (res.meta.status == "success") {
                 salaryExportList.value = list // res.retval.map((item, index) => ({index, ...item}));
                 //salaryExportList.value = res.retval;
                 //fetchAbrechnungExists();
@@ -232,6 +236,7 @@ export const SalaryExport = {
             } finally {
                 isFetching.value = false
                 if (salaryTableRef.value.tabulator != null) {
+					salaryTableRef.value.tabulator.setData(salaryExportList.value);
                     salaryTableRef.value.tabulator.dataLoader.clearAlert();
                 }
             }
@@ -244,7 +249,7 @@ export const SalaryExport = {
                     salaryTableRef.value.tabulator.dataLoader.alertLoader();
                 }
                let i = getFilterInterval();
-               const res = await fhcApi.factory.SalaryExport.runAbrechnungJob(i[0]);      
+               const res = await $api.call(ApiSalaryExport.runAbrechnungJob(i[0]));  
 //               if (listType.value != 'history') {
 //                 listType.value = 'history';                          
 //               } else {
@@ -268,7 +273,7 @@ export const SalaryExport = {
                     salaryTableRef.value.tabulator.dataLoader.alertLoader();
                 }
                let i = getFilterInterval();
-               const res = await fhcApi.factory.SalaryExport.deleteAbrechnung(i[0], currentOrgID.value);      
+               const res = await $api.call(ApiSalaryExport.deleteAbrechnung(i[0], currentOrgID.value));   
 //               if (listType.value != 'history') {
 //                 listType.value = 'history';                          
 //               } else {
@@ -284,17 +289,7 @@ export const SalaryExport = {
                 }           
             }
         }
-        
 
-        // Workaround to update tabulator
-        Vue.watch(salaryExportList, (newVal, oldVal) => {
-            console.log('salaryExportList changed');
-            //tabulator.value?.setData(salaryExportList.value);
-            if( salaryTableRef.value?.tabulator !== null ) {
-                salaryTableRef.value.tabulator.setData(salaryExportList.value);
-            }
-        }, {deep: true}) 
-        
         Vue.watch(filterPerson, () => {
             if (filterDate.value == null) return;
             //fetchData();
@@ -335,20 +330,23 @@ export const SalaryExport = {
 
       const salaryTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },        
-        { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
-        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+		{ title: 'DVID', field: "dienstverhaeltnis_id", hozAlign: "left", sorter:"number", headerFilter: true, width:150, visible:false, download:true }, 
+        { title: 'GBSTID', field: "gehaltsbestandteil_id", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:false, download:true, accessorDownload: arr2string }, 
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+        { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Index', field: "index", visible:false, download:false, hozAlign: "left", sorter:"string", headerFilter:true, width:100  },        
-        { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
-        { title: 'Freitext', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
+        { title: 'Vertrag', field: "vertragsart_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
+        { title: 'Freitexttyp', field: "freitexttyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
+        { title: 'Freitext-Titel', field: "freitext_titel", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
         { title: 'DV Von', field: "dv_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'DV Bis', field: "dv_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 },
+        { title: 'Gehaltstyp', field: "gehaltstyp_bezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
+		{ title: 'Auszahlungen', field: "gehaltsbestandteil_auszahlungen", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
         { title: 'WS', field: "wochenstunden", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
-        { title: 'Teilzeittyp', field: "teilzeittyp", hozAlign: "left", sorter:"string", headerFilter:true, width:100 },
-        { title: 'Von', field: "von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Bis', field: "bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'Teilzeittyp', field: "teilzeittyp", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 },
+        { title: 'WS Von', field: "stunden_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'WS Bis', field: "stunden_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Grundbetrag', field: "grundbetr_decrypted", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload },  
         { title: 'Betrag', field: "betrag", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
@@ -359,10 +357,11 @@ export const SalaryExport = {
             formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload, visible: true, download: true },  */
         { title: 'Karenz Von', field: "karenz_von", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
         { title: 'Karenz Bis', field: "karenz_bis", hozAlign: "center",sorter:"string", formatter: formatDate, headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },
+        { title: 'Karenztyp', field: "karenztyp_bezeichnung", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, visible:true, download:true },
         { title: 'SVNr.', field: "svnr", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
-        { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:100 }, 
-        { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:true, width:150 }, 
+        { title: 'Kst. Typ', field: "ksttypbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
+        { title: 'Kst. Nr.', field: "kstnummer", hozAlign: "left", sorter:"number", headerFilter:true, width:100 }, 
+        { title: 'Kst. Bez.', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
       ];
 
       // Options
@@ -371,10 +370,13 @@ export const SalaryExport = {
           height: "700px",
           reactiveData: true,
           data: salaryExportList.value,
-         // index: 'index', 
+		  index: 'gehaltsbestandteil_id',
+		  persistenceID: 'pv21_gehaltsliste_2025042305',
           layout: 'fitColumns',
+		  footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
+		  movableColumns: false,
           columns: salaryTableColumnsDef,
-          rowFormatter: rowFormatter,
+        //  rowFormatter: rowFormatter,
           groupBy: "personalnummer",
           groupHeader:function(value, count, data, group) { return data[0].personalnummer + " " + data[0].name_gesamt + " (" + data[0].svnr + ") " },
           initialSort:[
@@ -393,7 +395,21 @@ export const SalaryExport = {
                 //fetchData();
 				fetchAbrechnungExists();
             }
-        }
+        },
+		{
+			event: "dataFiltered",
+			handler: function(filters, rows) {
+				var el = document.getElementById("search_count");
+				el.innerHTML = rows.length;
+			}
+		},
+		{
+			event: "dataLoaded",
+			handler: function(data) {
+				var el = document.getElementById("total_count");
+				el.innerHTML = data.length;
+			}
+		}
       ]);
 
       const downloadconfig = {
@@ -409,39 +425,35 @@ export const SalaryExport = {
         }
 
         const orgSelectedHandler = (orgID) => {
-            console.log('org selected:', orgID);
 			currentOrgID.value = orgID;
             if (!!filterMonth.value.year) {
-				//fetchData();
 				fetchAbrechnungExists();
 			}
         }
 
         const showDeleteModal = async () => {
             
-            const ok = await confirmDeleteRef.value.show();
+            if (await $fhcAlert.confirm({
+                    message: 'Gehaltshistorie von ' + filterMonth.month + '/' + filterMonth.year + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
             
-            if (ok) {   
-                await deleteAbrechnung()
-                deleteToastRef.value.show();
-            }
+            await deleteAbrechnung()
+            $fhcAlert.alertSuccess(t('person','gehaltshistoriegeloescht'));
         }
                 
 
         return { t, isFetching, salaryTableRef, tableRef, tabulator, currentDate, filterDate, filterMonth, exportSalarylist,
-            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler, deleteToastRef,
-            salaryTabulatorEvents, salaryTabulatorOptions, listType, confirmDeleteRef, showDeleteModal,
+            formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler, 
+            salaryTabulatorEvents, salaryTabulatorOptions, listType, showDeleteModal,
             currentBetrag, filterPerson, jobRunning,
             formatDateGerman, progressValue, abrechnungExists, runAbrechnungJob }
 
     },
-    template: `    
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person','gehaltshistoriegeloescht') }}</h4></template>
-            </Toast>
-        </div>
+    template: `            
 
         <core-filter-cmpt 
 			ref="salaryTableRef"
@@ -481,18 +493,11 @@ export const SalaryExport = {
                         <button  v-if="false" type="button" class="btn btn-sm btn-primary ms-2 text-nowrap" :disabled="filterMonth==null || abrechnungExists || jobRunning" @click="runAbrechnungJob">Gehaltshistorie erzeugen</button>	
                         <button  v-if="false" type="button" class="btn btn-sm btn-secondary me-2 text-nowrap" :disabled="filterMonth==null || !abrechnungExists || jobRunning" @click="showDeleteModal">Gehaltshistorie löschen</button>
 
-                        
-
                     </div>
 
 				</div>
 			</template>
 		</core-filter-cmpt>
 
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                Gehaltshistorie von {{ filterMonth.month }}/{{ filterMonth.year }} {{ t('person','wirklichLoeschen') }}?
-            </template>
-        </ModalDialog>
     `
 }

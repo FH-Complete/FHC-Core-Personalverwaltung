@@ -4,6 +4,8 @@ import searchbar from "../../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions} from "../../apps/common.js";
 import { Modal } from '../Modal.js';
 import {formatter} from './valorisationformathelper.js';
+import ApiSearchbar from  '../../../../../js/api/factory/searchbar.js';
+import ApiValorisierung from '../../api/factory/valorisierung.js';
 
 export const ValorisationSelection = {
 	name: 'ValorisationSelection',
@@ -14,11 +16,10 @@ export const ValorisationSelection = {
 			Modal,
 			datepicker: VueDatePicker
 		},
-		inject: ['$fhcApi', '$fhcAlert'],
+		inject: ['$api', '$fhcAlert'],
 		data() {
 			return 	{
 				searchbaroptions: searchbaroptions,
-				searchfunction: this.$fhcApi.factory.search.search,
 				appSideMenuEntries: {},
 				alleValorisierungsinstanzen: [],
 				valorisierungInfoData: [],
@@ -49,8 +50,11 @@ export const ValorisationSelection = {
 			this.getAllUnternehmen();
 		},
 		methods: {
+			searchfunction: function(params) {
+				return this.$api.call(ApiSearchbar.search(params));
+			},
 			getValorisierungsInstanzen: function() {
-				const res = this.$fhcApi.factory.Valorisierung.getValorisierungsInstanzen()
+				const res = this.$api.call(ApiValorisierung.getValorisierungsInstanzen())
 					.then((response) => {
 						this.alleValorisierungsinstanzen = response.data;
 						this.valorisierungsdatum = '';
@@ -70,7 +74,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$fhcApi.factory.Valorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz)
+				const res = this.$api.call(ApiValorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz))
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
@@ -83,7 +87,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$fhcApi.factory.Valorisierung.doValorisation(this.valorisierungsinstanz_kurzbz)
+				const res = this.$api.call(ApiValorisierung.doValorisation(this.valorisierungsinstanz_kurzbz))
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData([]);
 						this.getValorisierungsInstanzen();
@@ -98,7 +102,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$fhcApi.factory.Valorisierung.getGehaelter(this.gehaelter_stichtag, this.gehaelter_oe_kurzbz)
+				const res = this.$api.call(ApiValorisierung.getGehaelter(this.gehaelter_stichtag, this.gehaelter_oe_kurzbz))
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
@@ -110,7 +114,7 @@ export const ValorisationSelection = {
 					this.$fhcAlert.alertWarning('Keine ValorisierungsInstanz ausgewählt.');
 					return;
 				}
-				const res = this.$fhcApi.factory.Valorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz)
+				const res = this.$api.call(ApiValorisierung.getValorisationInfo(this.valorisierungsinstanz_kurzbz))
 					.then((response) => {
 						this.valorisierungInfoData = response.data;
 						this.$refs.infoModalRef.show();
@@ -129,7 +133,7 @@ export const ValorisationSelection = {
 					this.valorisierungsinstanz_kurzbz = valInstanzen[0].value;
 			},
 			getAllUnternehmen: function() {
-				const res = this.$fhcApi.factory.Valorisierung.getAllUnternehmen()
+				const res = this.$api.call(ApiValorisierung.getAllUnternehmen())
 					.then((response) => {
 						this.alleUnternehmen = response.data;
 						this.gehaelter_oe_kurzbz = '';
@@ -179,6 +183,12 @@ export const ValorisationSelection = {
 					}
 				};
 
+				const formatWochenstunden = function(cell) {
+					let value = cell.getValue();
+					let retval = (typeof value === 'string') ? value.replace(/\./, ',') : value;
+					return retval;
+				};
+
 				return {
 					height: '75vh',
 					// Unique ID
@@ -205,6 +215,8 @@ export const ValorisationSelection = {
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
+						{title: 'Wochenstunden', field: 'wochenstunden', headerFilter: true, frozen: true, formatter: formatWochenstunden, sorter: 'number'},
+						{title: 'Teilzeittyp', field: 'teilzeittyp', headerFilter: true, frozen: true},
 						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman},
 						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman}
 					]

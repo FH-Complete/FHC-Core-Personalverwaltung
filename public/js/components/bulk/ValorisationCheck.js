@@ -1,8 +1,10 @@
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
 import searchbar from "../../../../../js/components/searchbar/searchbar.js";
+import ApiSearchbar from  '../../../../../js/api/factory/searchbar.js';
 import {searchbaroptions} from "../../apps/common.js";
 import {Modal} from '../Modal.js';
 import {formatter} from './valorisationformathelper.js';
+import ApiValorisierungCheck from '../../api/factory/valorisierungcheck.js';
 
 export const ValorisationCheck = {
 	name: 'ValorisationCheck',
@@ -14,11 +16,10 @@ export const ValorisationCheck = {
 		CoreNavigationCmpt,
 		Modal
 	},
-	inject: ['$fhcApi', '$fhcAlert'],
+	inject: ['$api', '$fhcAlert'],
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
-			searchfunction: this.$fhcApi.factory.search.search,
 			appSideMenuEntries: {},
 			valorisierungCheckData: {},
 			dvData: {},
@@ -30,26 +31,29 @@ export const ValorisationCheck = {
 		this.getAllData();
 	},
 	methods: {
+		searchfunction: function(params) {
+			return this.$api.call(ApiSearchbar.search(params));
+		},
 		getAllData: function() {
 			this.getDvData();
 			this.getValorisierungCheckData();
 		},
 		getDvData: function() {
-			const res = this.$fhcApi.factory.ValorisierungCheck.getDvData(this.dienstverhaeltnis_id)
+			const res = this.$api.call(ApiValorisierungCheck.getDvData(this.dienstverhaeltnis_id))
 				.then((response) => {
 					this.dvData = response.data;
 				})
 				.catch(this.handleErrors);
 		},
 		getValorisierungCheckData: function() {
-			const res = this.$fhcApi.factory.ValorisierungCheck.getValorisierungCheckData(this.dienstverhaeltnis_id)
+			const res = this.$api.call(ApiValorisierungCheck.getValorisierungCheckData(this.dienstverhaeltnis_id))
 				.then((response) => {
 					this.valorisierungCheckData = response.data;
 				})
 				.catch(this.handleErrors);
 		},
 		redoValorisation: function() {
-			const res = this.$fhcApi.factory.ValorisierungCheck.redoValorisation(this.dienstverhaeltnis_id)
+			const res = this.$api.call(ApiValorisierungCheck.redoValorisation(this.dienstverhaeltnis_id))
 				.then((response) => {
 					this.getAllData();
 				})
