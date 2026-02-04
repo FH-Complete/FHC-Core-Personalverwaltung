@@ -1,17 +1,11 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
     id: 'werkvertrag',
     label: 'Werkvertrag',
-    description: 'Werkvertrag',
-    for_vertragsart_kurzbz: [
-        'werkvertrag'
-    ],
-    default_for_vertragsart_kurzbz: [
-        'werkvertrag'
-    ]
+    description: 'Werkvertrag'
   },
   children: [
     {
@@ -61,8 +55,6 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oestdkst'),
-                uuid.get_uuidbyname('oediszpl'),
                 uuid.get_uuidbyname('oefachl')
               ]
             }
@@ -97,7 +89,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: null,
+      vertragsart_kurzbz: 'werkvertrag',
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",
@@ -107,5 +99,21 @@ export default {
     }
   },
   vbs: {
+    [uuid.get_uuidbyname('oefachl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oefachl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'fachzuordnung'
+      }
+    }
   }
 }

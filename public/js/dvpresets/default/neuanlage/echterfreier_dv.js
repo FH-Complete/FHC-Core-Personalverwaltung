@@ -1,11 +1,11 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
-    id: 'gastlektor',
-    label: 'Gastlektor',
-    description: 'Freier DV für Gastlektor'
+    id: 'freierdv',
+    label: 'Echter Freier DV',
+    description: 'freier Dienstvertrag'
   },
   children: [
     {
@@ -89,7 +89,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'gastlektor',
+      vertragsart_kurzbz: 'echterfreier',
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",
@@ -104,7 +104,7 @@ export default {
       guioptions: {
         id: uuid.get_uuidbyname('oediszpl'),
         removable: false,
-        canhavegehaltsbestandteile: false,
+        canhavegehaltsbestandteile: true,
         nobottomborder: true,
         nobottommargin: true,
         disabled: [
@@ -113,7 +113,27 @@ export default {
       },
       data: {
         funktion: 'oezuordnung'
-      }
+      },
+      gbs: [
+        {
+          type: 'gehaltsbestandteil',
+          guioptions: {
+            id: uuid.get_uuid(),
+            infos: [],
+            errors: [],
+            disabled: [
+              'gehaltstyp',
+			  'auszahlungen'
+            ],
+            removeable: true
+          },
+          data: {
+            gehaltstyp: 'basisgehalt',
+			auszahlungen: 12,
+            valorisierung: true
+          }
+        }
+      ]
     }
   }
 }

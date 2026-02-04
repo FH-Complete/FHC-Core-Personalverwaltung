@@ -1,11 +1,17 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
-    id: 'werkvertrag',
-    label: 'Werkvertrag',
-    description: 'Werkvertrag'
+    id: 'ueberlassungsvertrag',
+    label: 'Überlassungsvertrag',
+    description: 'Ueberlassungsvertrag',
+    for_vertragsart_kurzbz: [
+        'ueberlassungsvertrag'
+    ],
+    default_for_vertragsart_kurzbz: [
+        'ueberlassungsvertrag'
+    ]
   },
   children: [
     {
@@ -26,6 +32,37 @@ export default {
 
       },
       children: [
+        {
+          type: 'tab',
+          guioptions: {
+            title: 'Arbeitszeit & Basisgehalt',
+            id: 'arbeitszeit'
+          },
+          children: [
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Arbeitszeit',
+                vertragsbestandteiltyp: 'vertragsbestandteilstunden',
+                errors: [],
+                infos: []
+              },
+              children: [
+              ]
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Zeitaufzeichnung',
+                vertragsbestandteiltyp: 'vertragsbestandteilzeitaufzeichnung',
+                errors: [],
+                infos: []
+              },
+              children: [
+              ]
+            }
+          ]
+        },
         {
           type: 'tab',
           guioptions: {
@@ -55,7 +92,6 @@ export default {
                 }
               },
               children: [
-                uuid.get_uuidbyname('oefachl')
               ]
             }
           ]
@@ -89,31 +125,15 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'werkvertrag',
+      vertragsart_kurzbz: 'ueberlassungsvertrag',
       gueltigkeit: {
         guioptions: {
-          sharedstatemode: "set",
+          sharedstatemode: "ignore",
           disabled: []
         }
       }
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('oefachl')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oefachl'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'fachzuordnung'
-      }
-    }
   }
 }

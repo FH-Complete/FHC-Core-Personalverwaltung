@@ -1,16 +1,16 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
-    id: 'freierdv',
-    label: 'Freier DV',
-    description: 'freier Dienstvertrag',
+    id: 'werkvertrag',
+    label: 'Werkvertrag',
+    description: 'Werkvertrag',
     for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+        'werkvertrag'
     ],
     default_for_vertragsart_kurzbz: [
-        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
+        'werkvertrag'
     ]
   },
   children: [
@@ -50,7 +50,9 @@ export default {
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
-                    disabled: [],
+                    disabled: [
+                      'funktion'
+                    ],
                     hidden: []
                   },
                   data: {
@@ -59,6 +61,9 @@ export default {
                 }
               },
               children: [
+                uuid.get_uuidbyname('oestdkst'),
+                uuid.get_uuidbyname('oediszpl'),
+                uuid.get_uuidbyname('oefachl')
               ]
             }
           ]

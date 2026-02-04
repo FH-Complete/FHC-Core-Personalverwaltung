@@ -1,11 +1,17 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
-    id: 'externerlehrender',
-    label: 'externe Lehrende',
-    description: 'freier Dienstvertrag fuer externe Lehrende'
+    id: 'studhilfskraft',
+    label: 'Studentische Hilfskraft',
+    description: 'Echter DV für Studentische Hilfskräfte',
+    for_vertragsart_kurzbz: [
+        'studentischehilfskr'
+    ],
+    default_for_vertragsart_kurzbz: [
+        'studentischehilfskr'
+    ]
   },
   children: [
     {
@@ -44,9 +50,7 @@ export default {
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
-                    disabled: [
-                      'funktion'
-                    ],
+                    disabled: [],
                     hidden: []
                   },
                   data: {
@@ -54,9 +58,25 @@ export default {
                   }
                 }
               },
-              children: [
-                uuid.get_uuidbyname('oediszpl')
-              ]
+              children: []
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Funktion',
+                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
+                filter: 'funktion',
+                errors: [],
+                infos: [],
+                childdefaults: {
+                  guioptions: {
+                    canhavegehaltsbestandteile: false,
+                    disabled: [],
+                    hidden: []
+                  }
+                }
+              },
+              children: []
             }
           ]
         },
@@ -89,7 +109,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'externerlehrender',
+      vertragsart_kurzbz: 'studentischehilfskr',
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",
@@ -99,21 +119,5 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('oediszpl')]: {
-      type: 'vertragsbestandteilfunktion',
-      guioptions: {
-        id: uuid.get_uuidbyname('oediszpl'),
-        removable: false,
-        canhavegehaltsbestandteile: false,
-        nobottomborder: true,
-        nobottommargin: true,
-        disabled: [
-          'funktion'
-        ]
-      },
-      data: {
-        funktion: 'oezuordnung'
-      }
-    }
   }
 }
