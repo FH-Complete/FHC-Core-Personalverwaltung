@@ -1,4 +1,4 @@
-import presets from '../../../../../../../../../index.ci.php/extensions/FHC-Core-Personalverwaltung/Presets';
+import presets from '../../../../../../../../index.ci.php/extensions/FHC-Core-Personalverwaltung/Presets';
 import debug_viewer from '../../../vbform/debug_viewer.js';
 import vbformhelper from '../../../vbform/vbformhelper.js';
 import store from '../../../vbform/vbsharedstate.js';

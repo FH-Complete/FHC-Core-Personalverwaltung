@@ -26,7 +26,7 @@ class Presets extends Auth_Controller
 
 	$basedir = $this->config->item('PRESETS_BASEDIR');
 	$baselocation = $this->config->item('PRESETS_BASELOCATION');
-	
+
 	$presets = array(
 		'neuanlage' => array(),
 		'aenderung' => array(),
@@ -41,8 +41,8 @@ class Presets extends Auth_Controller
 			if($fileInfo->isFile() && $fileInfo->getExtension() === 'js')
 			{
 				$key = $dir . '_' . $fileInfo->getBasename('.js'); 
-				$presets[$dir][$key] = $baselocation . '/' . $dir . '/' 
-					. $fileInfo->getFilename();
+				$presets[$dir][$key] = absoluteJsImportUrl($baselocation . '/' . $dir . '/' 
+					. $fileInfo->getFilename());
 			}
 		}
 		ksort($presets[$dir]);
