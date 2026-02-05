@@ -1,16 +1,16 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
-    id: 'studhilfskraft',
-    label: 'Studentische Hilfskraft',
-    description: 'Echter DV für Studentische Hilfskräfte',
+    id: 'freierdv',
+    label: 'Freier DV',
+    description: 'freier Dienstvertrag',
     for_vertragsart_kurzbz: [
-        'studentischehilfskr'
+        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
     ],
     default_for_vertragsart_kurzbz: [
-        'studentischehilfskr'
+        'externerlehrender', 'gastlektor', 'echterfreier', 'freierdv'
     ]
   },
   children: [
@@ -58,25 +58,8 @@ export default {
                   }
                 }
               },
-              children: []
-            },
-            {
-              type: 'vertragsbestandteillist',
-              guioptions: {
-                title: 'Funktion',
-                vertragsbestandteiltyp: 'vertragsbestandteilfunktion',
-                filter: 'funktion',
-                errors: [],
-                infos: [],
-                childdefaults: {
-                  guioptions: {
-                    canhavegehaltsbestandteile: false,
-                    disabled: [],
-                    hidden: []
-                  }
-                }
-              },
-              children: []
+              children: [
+              ]
             }
           ]
         },
@@ -109,7 +92,7 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: 'studentischehilfskr',
+      vertragsart_kurzbz: null,
       gueltigkeit: {
         guioptions: {
           sharedstatemode: "set",

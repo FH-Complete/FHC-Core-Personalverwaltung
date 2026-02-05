@@ -1,12 +1,11 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
     id: 'leer',
     label: 'Leere Vorlage',
-    description: 'Leere Vorlage. Alles muss manuell definiert werden.',
-    for_vertragsart_kurzbz: []
+    description: 'Leere Vorlage. Alles muss manuell definiert werden.'
   },
   children: [
     {
@@ -185,13 +184,13 @@ export default {
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
-      vertragsart_kurzbz: null,
+      vertragsart_kurzbz: '',
       gueltigkeit: {
         guioptions: {
-          sharedstatemode: "ignore",
+          sharedstatemode: "set",
           disabled: []
         }
-      }
+      }          
     }
   },
   vbs: {}

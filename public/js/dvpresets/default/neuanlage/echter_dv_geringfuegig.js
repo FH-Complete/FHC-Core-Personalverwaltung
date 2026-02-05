@@ -1,14 +1,11 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
-    id: 'echterdv2allin',
-    label: 'Echten DV auf Allin umstellen',
-    description: 'Änderungs-Vorlage um echten Dienstvertrag auf Allin umzustellen.',
-    for_vertragsart_kurzbz: [
-        'echterdv'
-    ]
+    id: 'echterdv',
+    label: 'Echter DV (geringfügig)',
+    description: 'Vorlage für geringfügige echte Dienstverträge'
   },
   children: [
     {
@@ -25,7 +22,9 @@ export default {
     },
     {
       type: 'tabs',
-      guioptions: {},
+      guioptions: {
+
+      },
       children: [
         {
           type: 'tab',
@@ -33,7 +32,7 @@ export default {
             title: 'Allgemein',
             id: 'allgemein'
           },
-          children: [            
+          children: [
             {
               type: 'vertragsbestandteillist',
               guioptions: {
@@ -47,11 +46,6 @@ export default {
               guioptions: {
                 title: 'Befristung',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
-                filter: {
-                  freitexttyp: [
-                    'befristung'
-                  ]
-                },
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
@@ -79,14 +73,6 @@ export default {
                 vertragsbestandteiltyp: 'vertragsbestandteilurlaubsanspruch'
               },
               children: []
-            },
-            {
-              type: 'vertragsbestandteillist',
-              guioptions: {
-                title: 'Karenz',
-                vertragsbestandteiltyp: 'vertragsbestandteilkarenz'
-              },
-              children: []
             }
           ]
         },
@@ -106,7 +92,7 @@ export default {
                 infos: []
               },
               children: [
-                uuid.get_uuidbyname('aenderung_allin_std')
+                uuid.get_uuidbyname('test1')
               ]
             },
             {
@@ -118,39 +104,7 @@ export default {
                 infos: []
               },
               children: [
-                uuid.get_uuidbyname('aenderung_allin_za')
-              ]
-            },
-            {
-              type: 'vertragsbestandteillist',
-              guioptions: {
-                title: 'All-In',
-                vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
-                filter: {
-                  freitexttyp: [
-                    'allin'
-                  ]
-                },
-                childdefaults: {
-                  guioptions: {
-                    canhavegehaltsbestandteile: true,
-                    disabled: [
-                      'freitexttyp'
-                    ],
-                    hidden: [
-                      'titel',
-                      'freitext'
-                    ]
-                  },
-                  data: {
-                    freitexttyp: "allin",
-                    titel: "All-In",
-                    freitext: "All-In Vertrag"
-                  }
-                }
-              },
-              children: [
-                uuid.get_uuidbyname('aenderung_allin_freitext')
+                uuid.get_uuidbyname('za1')
               ]
             }
           ]
@@ -173,13 +127,21 @@ export default {
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
-                    disabled: [],
+                    disabled: [
+                      'funktion'
+                    ],
                     hidden: []
                   },
-                  data: {}
+                  data: {
+                    funktion: "fachzuordnung"
+                  }
                 }
               },
-              children: []
+              children: [
+                uuid.get_uuidbyname('oestdkst'),
+                uuid.get_uuidbyname('oediszpl'),
+                uuid.get_uuidbyname('oefachl')
+              ]
             },
             {
               type: 'vertragsbestandteillist',
@@ -205,15 +167,7 @@ export default {
               type: 'vertragsbestandteillist',
               guioptions: {
                 title: 'Zusatzvereinbarungen',
-                vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
-                filter: {
-                    freitexttyp: [
-                      "zusatzvereinbarung", 
-                      "sonstiges"
-                    ],
-                },
-                errors: [],
-                infos: []
+                vertragsbestandteiltyp: 'vertragsbestandteilfreitext'
               },
               children: []
             }
@@ -227,33 +181,29 @@ export default {
     guioptions: {
         infos: [],
         errors: []
-    },  
+    },
     data: {
       dienstverhaeltnisid: null,
       unternehmen: '',
       vertragsart_kurzbz: 'echterdv',
       gueltigkeit: {
         guioptions: {
-          sharedstatemode: "ignore",
-          disabled: [
-            'gueltig_bis'
-          ]
+          sharedstatemode: "set",
+          disabled: []
         }
       }
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('aenderung_allin_std')]: {
+    [uuid.get_uuidbyname('test1')]: {
       type: 'vertragsbestandteilstunden',
       guioptions: {
-        id: uuid.get_uuidbyname('aenderung_allin_std'),
+        id: uuid.get_uuidbyname('test1'),
         infos: [],
-        errors: [],
-        removeable: true
+        errors: []
       },
       data: {
-        id: null,
-        stunden: ''
+        stunden: '5'
       },
       gbs: [
         {
@@ -262,69 +212,83 @@ export default {
             id: uuid.get_uuid(),
             infos: [],
             errors: [],
-            removeable: true,
             disabled: [
               'gehaltstyp'
-            ]
+            ],
+            removeable: true
           },
           data: {
-            gehaltstyp: 'grundgehalt',
+            gehaltstyp: 'basisgehalt',
             valorisierung: true
           }
         }
       ]
     },
-    [uuid.get_uuidbyname('aenderung_allin_freitext')]: {
-      type: 'vertragsbestandteilfreitext',
+    [uuid.get_uuidbyname('za1')]: {
+      type: "vertragsbestandteilzeitaufzeichnung",
       guioptions: {
-        id: uuid.get_uuidbyname('aenderung_allin_freitext'),
-        infos: [],
-        errors: [],
-        disabled: [
-          'freitexttyp'
-        ],
-        hidden: [
-          'titel',
-          'freitext'
-        ],
-        removeable: true
+        id: uuid.get_uuidbyname('za1')
       },
       data: {
         id: null,
-        freitexttyp: 'allin',
-        titel: 'All-In',
-        freitext: 'All-In Vertrag'
-      },
-      gbs: [
-        {
-          type: 'gehaltsbestandteil',
+        zeitaufzeichnung: true,
+        azgrelevant: true,
+        homeoffice: true,
+        gueltigkeit: {
           guioptions: {
-            id: uuid.get_uuid(),
-            infos: [],
-            errors: [],
-            removeable: true,
-            disabled: [
-              'gehaltstyp'
-            ]
+            sharedstatemode: "reflect"
           },
           data: {
-            gehaltstyp: 'zulage_allin',
-            valorisierung: true
+            "gueltig_ab": "",
+            "gueltig_bis": ""
           }
         }
-      ]
+      }
     },
-    [uuid.get_uuidbyname('aenderung_allin_za')]: {
-      "type": "vertragsbestandteilzeitaufzeichnung",
-      "guioptions": {
-        "id": uuid.get_uuidbyname('aenderung_allin_za'),
-        "removeable": true
+    [uuid.get_uuidbyname('oestdkst')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oestdkst'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
       },
-      "data": {
-        "id": null,
-        "zeitaufzeichnung": true,
-        "azgrelevant": "",
-        "homeoffice": true
+      data: {
+        funktion: 'kstzuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oediszpl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oediszpl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'oezuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oefachl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oefachl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'fachzuordnung'
       }
     }
   }

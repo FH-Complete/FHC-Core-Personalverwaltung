@@ -1,11 +1,13 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
     id: 'echterdv',
-    label: 'Echter DV',
-    description: 'Standard Vorlage für echte Dienstverträge'
+    label: 'Echter DV Allin',
+    description: 'Standard Vorlage für echte Dienstverträge',
+    infos: [],
+    errors:[]
   },
   children: [
     {
@@ -22,9 +24,7 @@ export default {
     },
     {
       type: 'tabs',
-      guioptions: {
-
-      },
+      guioptions: {},
       children: [
         {
           type: 'tab',
@@ -46,6 +46,9 @@ export default {
               guioptions: {
                 title: 'Befristung',
                 vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                apioptions: {
+                  freitexttyp: 'befristung'
+                },
                 childdefaults: {
                   guioptions: {
                     canhavegehaltsbestandteile: false,
@@ -92,7 +95,7 @@ export default {
                 infos: []
               },
               children: [
-                uuid.get_uuidbyname('std1')
+                uuid.get_uuidbyname('aenderung_allin_std')
               ]
             },
             {
@@ -104,7 +107,37 @@ export default {
                 infos: []
               },
               children: [
-                uuid.get_uuidbyname('za1')
+                uuid.get_uuidbyname('aenderung_allin_za')
+              ]
+            },
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'All-In',
+                vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                apioptions: {
+                  freitexttyp: 'allin'
+                },
+                childdefaults: {
+                  guioptions: {
+                    canhavegehaltsbestandteile: true,
+                    disabled: [
+                      'freitexttyp'
+                    ],
+                    hidden: [
+                      'titel',
+                      'freitext'
+                    ]
+                  },
+                  data: {
+                    freitexttyp: "allin",
+                    titel: "All-In",
+                    freitext: "All-In Vertrag"
+                  }
+                }
+              },
+              children: [
+                uuid.get_uuidbyname('aenderung_allin_freitext')
               ]
             }
           ]
@@ -152,7 +185,9 @@ export default {
                 errors: [],
                 infos: []
               },
-              children: []
+              children: [
+                uuid.get_uuidbyname('fktltg')
+              ]
             }
           ]
         },
@@ -167,7 +202,9 @@ export default {
               type: 'vertragsbestandteillist',
               guioptions: {
                 title: 'Zusatzvereinbarungen',
-                vertragsbestandteiltyp: 'vertragsbestandteilfreitext'
+                vertragsbestandteiltyp: 'vertragsbestandteilfreitext',
+                errors: [],
+                infos: []
               },
               children: []
             }
@@ -197,15 +234,16 @@ export default {
     }
   },
   vbs: {
-    [uuid.get_uuidbyname('std1')]: {
+    [uuid.get_uuidbyname('aenderung_allin_std')]: {
       type: 'vertragsbestandteilstunden',
       guioptions: {
-        id: uuid.get_uuidbyname('std1'),
+        id: uuid.get_uuidbyname('aenderung_allin_std'),
         infos: [],
         errors: []
       },
       data: {
-        stunden: '38,5'
+        id: null,
+        stunden: ''
       },
       gbs: [
         {
@@ -220,32 +258,75 @@ export default {
             removeable: true
           },
           data: {
-            gehaltstyp: 'basisgehalt',
+            gehaltstyp: 'grundgehalt',
             valorisierung: true
           }
         }
       ]
     },
-    [uuid.get_uuidbyname('za1')]: {
-      type: "vertragsbestandteilzeitaufzeichnung",
+    [uuid.get_uuidbyname('aenderung_allin_freitext')]: {
+      type: 'vertragsbestandteilfreitext',
       guioptions: {
-        id: uuid.get_uuidbyname('za1')
+        id: uuid.get_uuidbyname('aenderung_allin_freitext'),
+        infos: [],
+        errors: [],
+        disabled: [
+          'freitexttyp'
+        ],
+        hidden: [
+          'titel',
+          'freitext'
+        ]
       },
       data: {
         id: null,
-        zeitaufzeichnung: true,
-        azgrelevant: true,
-        homeoffice: true,
-        gueltigkeit: {
+        freitexttyp: 'allin',
+        titel: 'All-In',
+        freitext: 'All-In Vertrag'
+      },
+      gbs: [
+        {
+          type: 'gehaltsbestandteil',
           guioptions: {
-            sharedstatemode: "reflect"
+            id: uuid.get_uuid(),
+            infos: [],
+            errors: [],
+            removeable: false,
+            disabled: [
+              'gehaltstyp'
+            ],
+            removeable: true
           },
           data: {
-            "gueltig_ab": "",
-            "gueltig_bis": ""
+            gehaltstyp: 'zulage_allin',
+            valorisierung: true
           }
         }
+      ]
+    },
+    [uuid.get_uuidbyname('aenderung_allin_za')]: {
+      "type": "vertragsbestandteilzeitaufzeichnung",
+      "guioptions": {
+        "id": uuid.get_uuidbyname('aenderung_allin_za'),
+        "removeable": false
+      },
+      "data": {
+        "id": null,
+        "zeitaufzeichnung": true,
+        "azgrelevant": "",
+        "homeoffice": true
       }
+    },
+    [uuid.get_uuidbyname('fktltg')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('fktltg'),
+        removeable: true
+      },
+      data: {
+        funktion: 'Leitung'
+      },
+      gbs: []
     },
     [uuid.get_uuidbyname('oestdkst')]: {
       type: 'vertragsbestandteilfunktion',
