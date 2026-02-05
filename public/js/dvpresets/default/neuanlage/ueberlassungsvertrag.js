@@ -1,17 +1,11 @@
-import uuid from '../../../../helpers/vbform/uuid.js';
+import uuid from '../../../helpers/vbform/uuid.js';
 
 export default {
   type: 'preset',
   guioptions: {
     id: 'ueberlassungsvertrag',
     label: 'Überlassungsvertrag',
-    description: 'Ueberlassungsvertrag',
-    for_vertragsart_kurzbz: [
-        'ueberlassungsvertrag'
-    ],
-    default_for_vertragsart_kurzbz: [
-        'ueberlassungsvertrag'
-    ]
+    description: 'Ueberlassungsvertrag'
   },
   children: [
     {
@@ -48,6 +42,7 @@ export default {
                 infos: []
               },
               children: [
+                uuid.get_uuidbyname('std1')
               ]
             },
             {
@@ -59,6 +54,7 @@ export default {
                 infos: []
               },
               children: [
+                uuid.get_uuidbyname('za1')
               ]
             }
           ]
@@ -92,6 +88,8 @@ export default {
                 }
               },
               children: [
+                uuid.get_uuidbyname('oestdkst'),
+                uuid.get_uuidbyname('oediszpl')
               ]
             }
           ]
@@ -128,12 +126,79 @@ export default {
       vertragsart_kurzbz: 'ueberlassungsvertrag',
       gueltigkeit: {
         guioptions: {
-          sharedstatemode: "ignore",
+          sharedstatemode: "set",
           disabled: []
         }
       }
     }
   },
   vbs: {
+    [uuid.get_uuidbyname('std1')]: {
+      type: 'vertragsbestandteilstunden',
+      guioptions: {
+        id: uuid.get_uuidbyname('std1'),
+        canhavegehaltsbestandteile: false,
+        infos: [],
+        errors: []
+      },
+      data: {
+        stunden: '38,5'
+      },
+      gbs: [
+      ]
+    },
+    [uuid.get_uuidbyname('za1')]: {
+      type: "vertragsbestandteilzeitaufzeichnung",
+      guioptions: {
+        id: uuid.get_uuidbyname('za1')
+      },
+      data: {
+        id: null,
+        zeitaufzeichnung: true,
+        azgrelevant: true,
+        homeoffice: true,
+        gueltigkeit: {
+          guioptions: {
+            sharedstatemode: "reflect"
+          },
+          data: {
+            "gueltig_ab": "",
+            "gueltig_bis": ""
+          }
+        }
+      }
+    },
+    [uuid.get_uuidbyname('oestdkst')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oestdkst'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'kstzuordnung'
+      }
+    },
+    [uuid.get_uuidbyname('oediszpl')]: {
+      type: 'vertragsbestandteilfunktion',
+      guioptions: {
+        id: uuid.get_uuidbyname('oediszpl'),
+        removable: false,
+        canhavegehaltsbestandteile: false,
+        nobottomborder: true,
+        nobottommargin: true,
+        disabled: [
+          'funktion'
+        ]
+      },
+      data: {
+        funktion: 'oezuordnung'
+      }
+    }
   }
 }
