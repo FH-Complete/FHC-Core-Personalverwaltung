@@ -34,13 +34,4 @@ class IssueProducer extends PlausiIssueProducer_Controller
 			'funktionFaelltNichtInVertragsbestandteilZeitraum'
 		);
 	}
-
-	/**
-	 * Runs issue production job.
-	 */
-	public function run()
-	{
-		// producing issues
-		$this->producePlausicheckIssues(array());
-	}
 }
