@@ -20,7 +20,7 @@
 				JOIN system.tbl_fehler fehler USING (fehlercode)
 				JOIN public.tbl_person pers USING (person_id)
 			WHERE
-				EXISTS (SELECT 1 FROM system.tbl_fehler.app WHERE fehlercode = fehler.fehlercode AND app = \'personalverwaltung\')
+				EXISTS (SELECT 1 FROM system.tbl_fehler_app WHERE fehlercode = fehler.fehlercode AND app = \'personalverwaltung\')
 			ORDER BY
 				CASE
 					WHEN fehler.fehlertyp_kurzbz = \'error\' THEN 0

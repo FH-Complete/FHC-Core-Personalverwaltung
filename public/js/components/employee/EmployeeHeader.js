@@ -300,6 +300,7 @@ export const EmployeeHeader = {
                         ref="issueCheckerRef"
                         :endpoint="issueCheckerEndpoint"
                         :person_id="personID"
+                        :apps="['personalverwaltung']"
                         :issueListEndpoint="issueListEndpoint"
                         :issueListStyle = "{ width: '50%' }"
                         :issueListStyleBreakpoints = "{ '650px': '100%' }">
