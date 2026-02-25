@@ -1,6 +1,6 @@
 import { AddressData } from "./AddressData.js";
 import { EmailTelData } from "./EmailTelData.js";
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 
 export const ContactData = {
 	name: 'ContactData',

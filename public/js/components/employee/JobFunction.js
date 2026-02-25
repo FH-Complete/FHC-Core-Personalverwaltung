@@ -1,7 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import ApiFunktion from '../../api/factory/funktion.js';
 import ApiPerson from '../../api/factory/person.js';
 
