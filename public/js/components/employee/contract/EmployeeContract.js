@@ -6,7 +6,7 @@ import { DropDownButton } from '../../DropDownButton.js';
 import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 import ApiEmployee from '../../../api/factory/employee.js';
 import ApiVertrag from '../../../api/factory/vertrag.js';
 import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
