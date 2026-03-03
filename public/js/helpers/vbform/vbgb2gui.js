@@ -41,6 +41,9 @@ export default {
           case 'zeitaufzeichnung':
               this.zeitaufzeichnung2gui(vb, mode);
               break;
+          case 'lohnguide':
+                this.lohnguide2gui(vb, mode);
+                break;
           default:
               console.log('unknown Vertragsbestandteil ' 
                       + vb.vertragsbestandteiltyp_kurzbz);
@@ -250,6 +253,27 @@ export default {
             'zeitaufzeichnung',
             'azgrelevant',
             'homeoffice'
+        ];
+      }
+  },
+  lohnguide2gui: function(vb, mode) {
+      this.vbout.type = 'vertragsbestandteillohnguide';
+      this.vbout.data = {
+          id: vb.vertragsbestandteil_id,
+          kommentar_person: vb.kommentar_person,
+          kommentar_modellstelle: vb.kommentar_modellstelle,
+          stellenbezeichnung: vb.stellenbezeichnung,
+          fachrichtung_kurzbz: vb.fachrichtung_kurzbz,
+          modellstelle_kurzbz: vb.modellstelle_kurzbz,
+          gueltigkeit: this.gueltigkeit2gui(vb, mode)
+      };
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'kommentar_person',
+            'kommentar_modellstelle',
+            'stellenbezeichnung',
+            'fachrichtung_kurzbz',
+            'modellstelle_kurzbz'
         ];
       }
   },

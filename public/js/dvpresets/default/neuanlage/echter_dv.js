@@ -172,6 +172,23 @@ export default {
               children: []
             }
           ]
+        },
+        {
+          type: 'tab',
+          guioptions: {
+            title: 'Lohnguide',
+            id: 'lohnguide'
+          },
+          children: [
+            {
+              type: 'vertragsbestandteillist',
+              guioptions: {
+                title: 'Lohnguide',
+                vertragsbestandteiltyp: 'vertragsbestandteillohnguide'
+              },
+              children: []
+            }
+          ]
         }
       ]
     }
