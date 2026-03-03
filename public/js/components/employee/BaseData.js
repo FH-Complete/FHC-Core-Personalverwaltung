@@ -95,6 +95,7 @@ export const BaseData = {
                 nachname: "",
                 vorname: "",
                 vornamen: "",
+                wahlname: "",
                 geschlecht: "",
                 staatsbuergerschaft: "A",
                 geburtsnation: "A",
@@ -290,16 +291,16 @@ export const BaseData = {
                     <label for="titelPost" class="form-label">{{ t('person', 'titelpost' )}}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="titelPost" v-model="currentValue.titelpost">
                 </div>
-                <div class="col-lg-4"></div>
+                <div class="col-lg-5"></div>
                 <!--Name -->
-                <div class="col-lg-3 col-md-4">
+                <div class="col-lg-2 col-md-4">
                     <label for="nachname" class="required form-label">{{ t('person','nachname') }}</label>
                     <input type="text" required  @blur="frmState.nachnameBlured = true"  :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validNachname(currentValue.nachname) && frmState.nachnameBlured}" id="nachname" v-model="currentValue.nachname">
                     <div class="invalid-feedback" v-if="frmState.nachnameBlured && validNachname(currentValue.nachname)">
                       Bitte geben Sie den Nachnamen an.
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-4">
+                <div class="col-lg-2 col-md-4">
                     <label for="vorname" class="form-label">{{ t('person','vorname') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vorname" v-model="currentValue.vorname">
                 </div>
@@ -307,7 +308,12 @@ export const BaseData = {
                     <label for="vornamen" class="form-label">{{ t('person','vornamen') }}</label>
                     <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="vornamen" v-model="currentValue.vornamen">
                 </div>
-                <div class="col-lg-4"></div>
+                <div class="col-lg-2">
+                    <label for="wahlname" class="form-label">{{ t('person','wahlname') }}</label>
+                    <input type="text" :readonly="readonly" class="form-control-sm" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="wahlname" v-model="currentValue.wahlname">
+                </div>
+                <div class="col-lg-4">
+                </div>
     
                 <!-- Staatsbürgerschaft, etc. -->
                 <div class="col-lg-2 col-md-3">
