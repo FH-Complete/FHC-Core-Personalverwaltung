@@ -43,6 +43,9 @@ class CommonsAPI extends FHCAPI_Controller
 		'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+
+        'getFachbereiche' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+        'getModellstellen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -68,6 +71,10 @@ class CommonsAPI extends FHCAPI_Controller
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
+    $this->load->model('extensions/FHC-Core-Personalverwaltung/modellstelle/Modellstelle_model', 'ModellstelleModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/modellstelle/Modellfunktion_model', 'ModellfunktionModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/modellstelle/Jobfamilie_model', 'JobfamilieModel');
 	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
     }
 
@@ -459,6 +466,82 @@ class CommonsAPI extends FHCAPI_Controller
 		if (hasData($result))
 		{
 			return $this->terminateWithSuccess(getData($result));
+		}
+	}
+
+    // --------------------------------------
+    // Lohnguide
+    // --------------------------------------
+
+    public function getFachrichtungen()
+	{
+		$this->FachrichtungModel->resetQuery();
+		$this->FachrichtungModel->addSelect('fachrichtung_kurzbz AS value, bezeichnung AS label');
+		$this->FachrichtungModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->FachrichtungModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no fachrichtung types found');
+			return;
+		}
+	}
+
+    public function getModellstellen()
+	{
+		$this->ModellstelleModel->resetQuery();
+		$this->ModellstelleModel->addSelect('modellstelle_kurzbz AS value, bezeichnung AS label');
+		$this->ModellstelleModel->addOrder('sort', 'ASC');
+		$rows = $this->ModellstelleModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no modellstellen types found');
+			return;
+		}
+	}
+
+    public function getModellfunktionen()
+	{
+		$this->ModellfunktionModel->resetQuery();
+		$this->ModellfunktionModel->addSelect('modellfunktion_kurzbz AS value, bezeichnung AS label');
+		$this->ModellfunktionModel->addOrder('sort', 'ASC');
+		$rows = $this->ModellfunktionModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no modellfunktionen found');
+			return;
+		}
+	}
+
+    public function getJobfamilien()
+	{
+		$this->JobfamilieModel->resetQuery();
+		$this->JobfamilieModel->addSelect('jobfamilie_kurzbz AS value, bezeichnung AS label');
+		$this->JobfamilieModel->addOrder('sort', 'ASC');
+		$rows = $this->JobfamilieModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no jobfamilien found');
+			return;
 		}
 	}
 
