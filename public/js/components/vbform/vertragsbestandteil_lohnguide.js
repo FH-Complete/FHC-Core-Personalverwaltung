@@ -3,6 +3,7 @@ import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
+import store from './vbsharedstate.js';
 import ApiLohnguide from  '../../../js/api/factory/lohnguide.js';
 
 export default {
@@ -36,13 +37,14 @@ export default {
 
     <div class="row g-2 py-2" v-show="showinput('stellenbezeichnung')">
       <div class="col-6">
-        <select v-model="freitexttyp" :disabled="isinputdisabled('freitexttyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
-          <option value="" selected>Fachrichtung wählen</option>
-          <option value="allin">AllIn</option>
-          <option value="ersatzarbeitskraft">Ersatzarbeitskraft</option>
-          <option value="zusatzvereinbarung">Zusatzvereinbarung</option>
-          <option value="befristung">Befristung</option>
-          <option value="sonstiges">Sonstiges</option>
+        <select v-model="modellstelle_kurzbz" :disabled="isinputdisabled('modellstelle_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option
+            v-for="f in lists.modellstellen"
+            :value="f.value"
+            :selected="isselected(f.value, this.modellstelle_kurzbz)"
+            :disabled="f.disabled">
+            {{ f.label }}
+          </option>
         </select>
       </div>
       <div class="col-6">&nbsp;</div>
@@ -89,15 +91,26 @@ export default {
       stellenbezeichnung: '',
       kommentar_person: '',
       kommentar_modellstelle: '',
-      fachbereich_kurzbz: '',
+      fachrichtung_kurzbz: '',
       modellstelle_kurzbz: '',
-      db_delete: false
+      db_delete: false,
+      lists: {
+        modellstellen: [],
+        fachrichtungen: [],
+      },
+      store: store
     };
   },
   created: function() {
+    this.getModellstellen();
+    this.getFachrichtungen();
     this.setDataFromConfig();
   },
+  inject: ['$api'],
   methods: {
+    isselected: function(optvalue, selvalue) {
+      return (optvalue === selvalue);
+    },
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;
@@ -131,8 +144,8 @@ export default {
           });
           this.lists.fachrichtungen = fachrichtungen;
     },
-    getModellstelle: async function() {
-          const response = await this.$api.call(ApiLohnguide.getModellstelle());
+    getModellstellen: async function() {
+          const response = await this.$api.call(ApiLohnguide.getModellstellen());
           const modellstellen = response.data;
           modellstellen.unshift({
             value: '',
