@@ -1,7 +1,7 @@
 import { EmployeePerson } from './EmployeePerson.js';
 import { EmployeeNav } from './EmployeeNav.js';
 import { EmployeeStatus } from './EmployeeStatus.js'
-import CoreDetailsHeader from '../../../../../../public/js/components/DetailHeader/DetailHeader.js';
+import CoreDetailsHeader from '../../../../../js/components/DetailHeader/DetailHeader.js';
 import ApiIssue from "../../api/factory/issue.js";
 import ApiEmployee from "../../api/factory/employee.js";
 
@@ -11,7 +11,8 @@ export default {
 		EmployeePerson,
 		EmployeeNav,
 		EmployeeStatus,
-		CoreDetailsHeader
+		CoreDetailsHeader,
+		"p-skeleton": primevue.skeleton,
 	},
 	props: {
 		personid: Number,
@@ -146,14 +147,15 @@ export default {
         	typeHeader="mitarbeiter"
         	:domain="FHC_JS_CONFIG.domain"
         	fotoEditable
-        	@redirect="redirect"
+        	@redirectToLeitung="redirect"
         	>
 				<template #issues>
-					<h4 class="mb-1">Issues<a class="refresh-issues" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
-					<h6 class="text-muted">{{ openissuescount }}</h6>
+					<h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
+					<h6 v-if="!isFetchingIssues" class="text-muted">{{ openissuescount }}</h6>
+					<h6 v-else class="mb-2"><p-skeleton v-if="isFetchingIssues" style="width:45%"></p-skeleton></h6>
 				</template>
-				<template #titleAddTile>pNr</template>
-				<template #valueAddTile>{{ personalnummer }}</template>
+				<template #titleAlphaTile>PNr</template>
+				<template #valueAlphaTile>{{ personalnummer }}</template>
 				<template #uid>
 					{{personuid}}
 				</template>
