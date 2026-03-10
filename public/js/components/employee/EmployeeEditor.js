@@ -97,11 +97,16 @@ export default {
 			statusRef.value.refresh();
 		}
 
+		const updateHeaderHandler = () => {
+			fetchHeaderData(props.personid, props.personuid);
+			checkPerson(props.personid);
+			statusRef.value.refresh();
+		}
+
 		Vue.onMounted(() => {
 			if (props.personid, props.personuid) {
 				fetchHeaderData(props.personid, props.personuid);
 				fetchOpenIssuesCount(props.personid);
-				checkPerson(props.personid);
 			}
 		})
 
@@ -115,7 +120,6 @@ export default {
 				if (currentPersonID.value!=null) {
 					fetchHeaderData(currentPersonID.value, currentPersonUID.value);
 					fetchOpenIssuesCount(currentPersonID.value);
-					//checkPerson(currentPersonID.value);
 				}
 				refresh()
 			}
@@ -137,6 +141,7 @@ export default {
 			isFetchingName,
 			refresh,
 			personalnummer,
+			updateHeaderHandler
 		}
 	},
 	template: `    
