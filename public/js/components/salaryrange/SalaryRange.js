@@ -1,6 +1,6 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import { BetragDialog } from './BetragDialog.js';
 import { dateFilter } from '../../../../../js/tabulator/filters/Dates.js';

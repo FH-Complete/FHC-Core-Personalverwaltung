@@ -2,6 +2,7 @@ import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Naviga
 import CoreBaseLayout from '../../../../../js/components/layout/BaseLayout.js';
 import CoreVerticalSplit from '../../../../../js/components/verticalsplit/verticalsplit.js';
 import {CoreFilterCmpt} from "../../../../../js/components/filter/Filter.js";
+import AppMenu from "../../../../../js/components/AppMenu.js";
 import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
 import { ContactData } from '../../components/employee/contact/ContactData.js';
 import { EmployeeContractInfo } from "../../components/employee/contract/EmployeeContractInfo.js";
@@ -16,6 +17,7 @@ export default {
 		CoreBaseLayout,
 		CoreVerticalSplit,
 		CoreFilterCmpt,
+		AppMenu,
 		EmployeeHeader,
 		EmployeeContractInfo,
 		JobFunction,
@@ -220,9 +222,34 @@ export default {
 			}
 		}
 	},
-	template: `
+	template: /* html */`
 	<!-- Navigation -->
-	<core-navigation-cmpt></core-navigation-cmpt>
+	<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+		<div class="offcanvas-header">
+			Kontaktdatenverwaltung
+			<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+		</div>
+		<div class="offcanvas-body">
+			<app-menu app-identifier="cdv" />
+		</div>
+	</aside>
+
+	<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
+		<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
+			<button
+				class="btn btn-outline-light border-0 m-1 collapsed"
+				type="button"
+				data-bs-toggle="offcanvas"
+				data-bs-target="#appMenu"
+				aria-controls="appMenu"
+				aria-expanded="false"
+				:aria-label="$p.t('ui/toggle_nav')"
+			>
+				<span class="svg-icon svg-icon-apps"></span>
+			</button>
+			<a class="navbar-brand me-0">Kontaktdatenverwaltung</a>
+		</div>
+	</header>
 
 	<div class="content">
 		<core-vertical-split>

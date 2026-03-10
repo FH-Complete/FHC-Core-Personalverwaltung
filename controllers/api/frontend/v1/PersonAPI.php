@@ -624,6 +624,11 @@ class PersonAPI extends FHCAPI_Controller
                 $payload['standort_id'] = null;
             }
 
+            if($payload['ort_kurzbz'] === '')
+            {
+                $payload['ort_kurzbz'] = null;
+            }
+
             $result = $this->EmployeeModel->update($payload['mitarbeiter_uid'], $payload);
 
             if (isError($result))
