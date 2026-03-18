@@ -24,6 +24,19 @@ export default {
     }
   },
 
+  getAll(listType, orgID, stichtag, exportCSV) {
+		let url = '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/LohnguideExport/getAll';
 
+		return {
+			method: 'get',
+			url,
+			params: { 
+			  stichtag: stichtag, 
+			  export: !!exportCSV, 
+			  listType: listType,
+			  orgID: orgID,
+			}
+		}
+	},
   
 };
