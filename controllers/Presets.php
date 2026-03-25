@@ -21,7 +21,9 @@ class Presets extends Auth_Controller
      */
     public function index()
     {
-	ob_clean();
+	if (ob_get_level()) {
+    	ob_clean();
+	}
 	header('Content-Type: application/javascript');
 
 	$basedir = $this->config->item('PRESETS_BASEDIR');

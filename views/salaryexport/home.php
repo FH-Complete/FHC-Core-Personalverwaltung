@@ -90,6 +90,5 @@
 })()
 </script>
 
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
