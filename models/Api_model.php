@@ -468,6 +468,10 @@ class Api_model extends DB_Model
         {
             $personJson['staatsbuergerschaft'] = null;
         }
+        if ($personJson['wahlname'] == '')
+        {
+            $personJson['wahlname'] = null;
+        }
 
         $personJson['updatevon'] = getAuthUID();
         $personJson['updateamum'] = $this->escape('NOW()');
@@ -510,6 +514,11 @@ class Api_model extends DB_Model
         if (isset($personJson['svnr']) && $personJson['svnr'] == '')
         {
             $personJson['svnr'] = null;
+        }
+
+        if (isset($personJson['wahlname']) && $personJson['wahlname'] == '')
+        {
+            $personJson['wahlname'] = null;
         }
 
         $personJson['insertvon'] = getAuthUID();
