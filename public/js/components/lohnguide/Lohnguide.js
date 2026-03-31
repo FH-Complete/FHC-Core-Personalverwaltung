@@ -104,7 +104,7 @@ export const Lohnguide = {
         const filterDateHandler = (d) => {            
             console.log('stichtag set: ', d);
             stichtag.value = d;
-            //fetchData()
+            fetchData()
             
         }
 
@@ -132,7 +132,7 @@ export const Lohnguide = {
                 lohnguideTableRef.value.tabulator.dataLoader.alertLoader();
               }
               
-              const res = await $api.call(ApiSalaryExport.getAll(listType.value, currentOrgID.value, filterPerson.value, getFilterInterval(), false)); 
+              const res = await $api.call(ApiLohnguide.getAll(currentOrgID.value, stichtag.value, false)); 
               // merge live and history value into one field 
               let value = null;
               let source = '';
@@ -210,41 +210,31 @@ export const Lohnguide = {
         precision: 2
       };
 
-      const rowFormatter = (row) => {
-        let data = row.getData();
-        let now = new Date(new Date().setHours(0, 0, 0, 0));
-    
-        if(listType.value == 'history' && data.betr_valorisiert_decrypted != data.hbetrag_decrypted ){
-            row.getElement().style.color = "#871919"
-            row.getElement().style.fontWeight = "bold"
-        }
-      }
-
 
       const lohnguideTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },        
 		{ title: 'DVID', field: "dienstverhaeltnis_id", hozAlign: "left", sorter:"number", headerFilter: true, width:150, visible:false, download:true }, 
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
-        { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "left", sorter:"string", headerFilter:true, width:100  },        
-        { title: 'Geburtsdatum', field: "geburtsdatum", formatter: formatDate, hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
-        { title: 'Eintrittsdatum', field: "eintrittsdatum", formatter: formatDate, hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
-        { title: 'AllIn-Gehalt', field: "allin_gehalt_decrypt", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
-        { title: 'Beschäftigungsausmaß', field: "beschaeftigungsausmass", hozAlign: "center",sorter:"string",  headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "center", sorter:"string", headerFilter:true, width:100  },        
+        { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
+        { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
+        { title: 'AllIn-Gehalt', field: "betr_valorisiert_decrypted", hozAlign: "right", sorter:"string", formatter:"money", formatterParams:moneyFormatterParams, headerFilter:"list", width:100, accessorDownload: arr2string }, 
+        { title: 'Beschäftigungsausmaß', field: "wochenstunden", hozAlign: "center",sorter:"string",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'KV-Stufe', field: "kv_stufe", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
 		{ title: 'KV-Jahre', field: "kv_jahre", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
-        { title: 'Org.-Einheit (Allgm.)', field: "orgeinheit", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:moneyFormatterParams, width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
-        { title: 'Org.-Einheit (Detail)', field: "org_einheit_detail", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 },
-        { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Fachrichtung', field: "fachrichtung", hozAlign: "center",sorter:"string", headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Fachrichtung Code', field: "fachrichtung_code", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload },  
-        { title: 'Jobfamilie', field: "jobfamilie", sorter:"string", headerFilter:"list",hozAlign: "right", formatter:"money", 
-            formatterParams:moneyFormatterParams, width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
-        { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
-        { title: 'Berufserfahrung', field: "berufserfahrung", hozAlign: "center",sorter:"string", headerFilter: dateFilter, width:120, headerFilterFunc: 'dates', accessorDownload: formatter.formatDateGerman },
+        { title: 'Org.-Einheit (Allgm.)', field: "ksttypbezeichnung", sorter:"string", headerFilter:"list",hozAlign: "left", 
+             width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
+        { title: 'Org.-Einheit (Detail)', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 },
+        { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Fachrichtung', field: "fachrichtung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Fachrichtung Code', field: "fachrichtung_kurzbz", sorter:"string", headerFilter:"list",hozAlign: "right", 
+            width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload },  
+        { title: 'Jobfamilie', field: "jobfamilie", sorter:"string", headerFilter:"list",hozAlign: "left", 
+             width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
+        { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Berufserfahrung', field: "berufserfahrung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'Grundgehalt', field: "grundgehalt", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, visible:true, download:true },
         { title: 'Prämie', field: "praemie", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
         { title: 'Funktionszulage', field: "funktionszulage", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 

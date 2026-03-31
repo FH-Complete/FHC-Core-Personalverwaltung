@@ -47,18 +47,14 @@ class LohnguideExport extends FHCAPI_Controller
 	{
 		$export = $this->input->get('export') == 'true';
 
-		$von = $this->input->get('von', null);
-		$bis = $this->input->get('bis', null);
+		$stichtag = $this->input->get('stichtag', null);
 		$orgID = $this->input->get('orgID', null);
-		$listType = $this->input->get('listType', 'live');
-		$person = $this->input->get('filterPerson', null);
 
 		// validate 
-		$date_von = DateTime::createFromFormat( 'Y-m-d', $von );
-		$date_bis = DateTime::createFromFormat( 'Y-m-d', $bis );
+		$date_stichtag = DateTime::createFromFormat( 'Y-m-d', $stichtag );
 
-		if ($date_von === false || $date_bis === false) {
-			$this->terminateWithError('no date range selected');
+		if ($date_stichtag === false ) {
+			$this->terminateWithError('no date selected');
 			return;
 		}
 
@@ -72,13 +68,12 @@ class LohnguideExport extends FHCAPI_Controller
 		$oe_kurzbz_sap = $sapInstalled ? 'sap_org.oe_kurzbz_sap' : 'NULL';
 		$sap_join = $sapInstalled ? 'LEFT JOIN sync.tbl_sap_organisationsstruktur sap_org ON(kst.oe_kurzbz=sap_org.oe_kurzbz)' : '';
 
-        $von_datestring = $date_von->format("Y-m-d");
-		$bis_datestring = $date_bis->format("Y-m-d");
+        $stichtag_datestring = $date_stichtag->format("Y-m-d");
 
-		$vbs_where = 'AND ((vertragsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
+		$vbs_where = 'AND ((vertragsbestandteil.bis >= '. $this->_ci->db->escape($stichtag_datestring) .')
 							OR vertragsbestandteil.bis IS NULL)
 						AND
-						((vertragsbestandteil.von <= '. $this->_ci->db->escape($bis_datestring) .')
+						((vertragsbestandteil.von <= '. $this->_ci->db->escape($stichtag_datestring) .')
 							OR vertragsbestandteil.von IS NULL)';
 
 		$qry_live = '
@@ -92,12 +87,13 @@ class LohnguideExport extends FHCAPI_Controller
 				gehaltstyp.sort as gehaltstyp_sort,
 				vertragsart.bezeichnung as vertragsart_bezeichnung,dienstverhaeltnis.mitarbeiter_uid, 
 				mitarbeiter.personalnummer,person.vorname || \' \' || person.nachname as name_gesamt,person.svnr,
-				person.nachname,person.vorname,
+				person.nachname,person.vorname,person.geschlecht,person.gebdatum,
 				vertragsbestandteil_freitext.freitexttyp_kurzbz,vertragsbestandteil_freitext.titel freitext_titel, vertragsbestandteil_freitext.anmerkung as freitext_anmerkung,
 				vertragsbestandteil_freitext.freitexttyp_bezeichnung,
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
-				ksttypbezeichnung, kstorgbezeichnung, 
+				ksttypbezeichnung, kstorgbezeichnung,
+				stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion,
 				' . $oe_kurzbz_sap . ' AS kstnummer
 			FROM
 
@@ -158,29 +154,35 @@ class LohnguideExport extends FHCAPI_Controller
 						'.$vbs_where.'
 						-- ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id AND kst.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
+				LEFT JOIN (
+					SELECT
+						dienstverhaeltnis_id,vertragsbestandteil_id,stellenbezeichnung,kommentar_person, kommentar_modellstelle, fachrichtung_kurzbz, hr.tbl_lohnguide_fachrichtung.bezeichnung fachrichtung,
+						hr.tbl_lohnguide_modellstelle.bezeichnung modellstelle, hr.tbl_lohnguide_modellfunktion.bezeichnung modellfunktion, hr.tbl_lohnguide_jobfamilie.bezeichnung jobfamilie
+					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
+						JOIN hr.tbl_vertragsbestandteil_lohnguide USING(vertragsbestandteil_id)
+						LEFT JOIN hr.tbl_lohnguide_fachrichtung USING(fachrichtung_kurzbz)
+						LEFT JOIN hr.tbl_lohnguide_modellstelle USING(modellstelle_kurzbz)
+						LEFT JOIN hr.tbl_lohnguide_modellfunktion USING(modellfunktion_kurzbz)
+						LEFT JOIN hr.tbl_lohnguide_jobfamilie USING(jobfamilie_kurzbz)
+					WHERE 
+						vertragsbestandteiltyp_kurzbz=\'lohnguide\'
+						'.$vbs_where.'
+						
+				) as vertragsbestandteil_lg ON(dienstverhaeltnis.dienstverhaeltnis_id=vertragsbestandteil_lg.dienstverhaeltnis_id)
 
 				' . $sap_join . '
 				
 			WHERE
 				gehaltstyp.lvexport = true
-				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($von_datestring) .')
+				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($stichtag_datestring) .')
 					OR gehaltsbestandteil.bis IS NULL)
 				AND
-				((gehaltsbestandteil.von <= '. $this->_ci->db->escape($bis_datestring) .')
+				((gehaltsbestandteil.von <= '. $this->_ci->db->escape($stichtag_datestring) .')
 					OR gehaltsbestandteil.von IS NULL)
 
 		';
 
-		$where = '';
-		if ($person != null && $person !== '') {
-			if (!is_numeric($person)) {
-				$where .= " AND (nachname ~* ".$this->_ci->db->escape($person). ") ";
-			} else {
-				$where .= " AND (mitarbeiter.personalnummer = ".$this->_ci->db->escape($person). ") ";
-			}
-		}
-
-		$where .= " AND (dienstverhaeltnis.oe_kurzbz = ".$this->_ci->db->escape($orgID). ") ";
+		$where = " AND (dienstverhaeltnis.oe_kurzbz = ".$this->_ci->db->escape($orgID). ") ";
 
 		$qry_live = $qry_live.$where;
 
@@ -200,8 +202,8 @@ class LohnguideExport extends FHCAPI_Controller
 			LEFT JOIN (
 				SELECT * FROM hr.tbl_gehaltshistorie
 				WHERE
-				((datum >= '. $this->_ci->db->escape($von_datestring) .')
-					AND datum <= '. $this->_ci->db->escape($bis_datestring) .')
+				((datum >= '. $this->_ci->db->escape($stichtag_datestring) .')
+					AND datum <= '. $this->_ci->db->escape($stichtag_datestring) .')
 				) historie using(gehaltsbestandteil_id)
 			LEFT JOIN 
 				hr.tbl_valorisierung_historie vh ON vh.gehaltsbestandteil_id = live.gehaltsbestandteil_id AND vh.valorisierungsdatum = (
@@ -213,7 +215,7 @@ class LohnguideExport extends FHCAPI_Controller
 						hr.tbl_dienstverhaeltnis d ON d.dienstverhaeltnis_id = live.dienstverhaeltnis_id 
 						AND d.oe_kurzbz = vi.oe_kurzbz
 					WHERE 
-						'. $this->_ci->db->escape($bis_datestring) .' >= valorisierungsdatum 
+						'. $this->_ci->db->escape($stichtag_datestring) .' >= valorisierungsdatum 
 					ORDER BY 
 						valorisierungsdatum DESC 
 					LIMIT 1
@@ -231,14 +233,15 @@ class LohnguideExport extends FHCAPI_Controller
 					array_agg(gehaltstyp_bezeichnung ORDER BY gehaltstyp_sort ASC) as gehaltstyp_bezeichnung, 
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
-					nachname,vorname,
+					nachname,vorname,geschlecht,gebdatum,
 					array_remove(array_agg(freitexttyp_kurzbz), NULL) freitexttyp_kurzbz,
 					array_remove(array_agg(freitext_titel), NULL) freitext_titel, 
 					array_remove(array_agg(freitext_anmerkung), NULL) as freitext_anmerkung,
 					array_remove(array_agg(freitexttyp_bezeichnung), NULL) as freitexttyp_bezeichnung,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
-					ksttypbezeichnung, kstorgbezeichnung, kstnummer
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
+					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion
 				FROM ($qry_history) as hist
 
 			GROUP BY dienstverhaeltnis_id,
@@ -246,14 +249,15 @@ class LohnguideExport extends FHCAPI_Controller
                     dv_von, dv_bis,
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
-					nachname,vorname,
+					nachname,vorname,geschlecht,gebdatum,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
-					ksttypbezeichnung, kstorgbezeichnung, kstnummer
-			HAVING ((dv_bis >= ". $this->_ci->db->escape($von_datestring) .")
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
+					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion
+			HAVING ((dv_bis >= ". $this->_ci->db->escape($stichtag_datestring) .")
 							OR dv_bis IS NULL)
 						AND
-						((dv_von <= ". $this->_ci->db->escape($bis_datestring) .")
+						((dv_von <= ". $this->_ci->db->escape($stichtag_datestring) .")
 							OR dv_von IS NULL)
 		";
 		/* switch ($listType) {
