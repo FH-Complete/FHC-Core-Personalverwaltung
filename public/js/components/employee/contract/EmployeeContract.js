@@ -13,7 +13,7 @@ import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
 import ApiValorisierungscheck from '../../../api/factory/valorisierungcheck.js';
 
 export const EmployeeContract = {
-	name: 'EmployeeContract',
+    name: 'EmployeeContract',
     components: {
         'vbform_wrapper': vbform_wrapper,
         'enddvmodal': enddvmodal,
@@ -29,8 +29,8 @@ export const EmployeeContract = {
     props: {
         id: Number,
         uid: String,
-        dienstverhaeltnis_id: {type: Number, required: false},
-        openhistory: {type: Boolean, required: false},
+        dienstverhaeltnis_id: { type: Number, required: false },
+        openhistory: { type: Boolean, required: false },
     },
     emits: ['updateHeader'],
     setup(props, { emit }) {
@@ -61,6 +61,7 @@ export const EmployeeContract = {
             urlaubsanspruch: [],
             zusatzvereinbarung: [],
             karenz: [],
+            lohnguide: null
         });
         //const dienstverhaeltnisDialogRef = ref();
         const VbformWrapperRef = ref();
@@ -92,6 +93,8 @@ export const EmployeeContract = {
         const freitexttypen = inject('freitexttypen');
         const beendigungsgruende = inject('beendigungsgruende');
         const teilzeittypen = inject('teilzeittypen');
+        const modellstellen = inject('modellstellen');
+        const fachrichtungen = inject('fachrichtungen');
 
         const readonly = ref(false);
         const valorisationValid = ref(true);
@@ -119,23 +122,23 @@ export const EmployeeContract = {
                 text: 'Gehalt'
             },
             series: [{
-                    name: 'Gehalt',
-                    data: [],
-                    color: '#6fcd98',
-                    step: 'left' // or 'center' or 'right'
-                },{
-                    name: 'Gehalt (ohne Val.)',
-                    data: [],
-                    color: '#d6af02',
-                    step: 'left', // or 'center' or 'right'
-                    visible: false,
-                },
-                {
-                    name: 'Abgerechnet',
-                    data: [],
-                    color: '#cd6fca',
-                    step: 'left' // or 'center' or 'right'
-                },
+                name: 'Gehalt',
+                data: [],
+                color: '#6fcd98',
+                step: 'left' // or 'center' or 'right'
+            }, {
+                name: 'Gehalt (ohne Val.)',
+                data: [],
+                color: '#d6af02',
+                step: 'left', // or 'center' or 'right'
+                visible: false,
+            },
+            {
+                name: 'Abgerechnet',
+                data: [],
+                color: '#cd6fca',
+                step: 'left' // or 'center' or 'right'
+            },
             ],
             xAxis: {
                 type: 'datetime',
@@ -144,15 +147,15 @@ export const EmployeeContract = {
                     dashStyle: 'dot',
                     color: 'red',
                     label: {
-                      format: '%d.%m.%Y'
+                        format: '%d.%m.%Y'
                     }
                 },
                 labels: {
-                  // Format the date
-                  formatter: function() {
-                    return Highcharts.dateFormat('%d.%m.%Y', this.value);
-                  },
-                  rotation: 90
+                    // Format the date
+                    formatter: function () {
+                        return Highcharts.dateFormat('%d.%m.%Y', this.value);
+                    },
+                    rotation: 90
                 },
                 /*tickPositioner: function() {
                   return dates.value.map(function(date) {
@@ -172,11 +175,11 @@ export const EmployeeContract = {
             },
             credits: {
                 enabled: false
-              },
+            },
 
 
 
-        })        
+        })
 
         const fetchData = async (uid) => {
             if (uid == null) {
@@ -186,9 +189,9 @@ export const EmployeeContract = {
             }
             isFetching.value = true
             try {
-                const res = await $api.call(ApiEmployee.dvByPerson(uid));  
+                const res = await $api.call(ApiEmployee.dvByPerson(uid));
                 dvList.value = res.data || [];
-                
+
                 if (dvList.value.length > 0) {
                     if (props.dienstverhaeltnis_id != undefined) {
                         currentDVID.value = props.dienstverhaeltnis_id;
@@ -197,7 +200,7 @@ export const EmployeeContract = {
                         currentDVID.value = dvList.value[0].dienstverhaeltnis_id;
                         currentDV.value = dvList.value[0];
                     }
-                    
+
                 } else {
                     currentDVID.value = null;
                     currentDV.value = null;
@@ -214,7 +217,7 @@ export const EmployeeContract = {
         const fetchVertrag = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await $api.call(ApiVertrag.vertragByDV(dv_id, convert2UnixTS(date))); 
+                const res = await $api.call(ApiVertrag.vertragByDV(dv_id, convert2UnixTS(date)));
                 vertragList.value = res.data;
                 getCurrentVertragsbestandteil();
                 //}
@@ -248,13 +251,13 @@ export const EmployeeContract = {
                 if (dv_id != null) {
                     const res = await $api.call(ApiGehaltsbestandteil.gbtChartDataByDV(dv_id));
                     gbtChartData.value = res.data;
-                    
+
                     // chartOptions.series[0].data.length = 0;
-					Object.keys(res.data.valorisiert).forEach(element => {
-						tempData1.push([new Date(element).getTime(), parseFloat(res.data.valorisiert[element])]);
-					});
+                    Object.keys(res.data.valorisiert).forEach(element => {
+                        tempData1.push([new Date(element).getTime(), parseFloat(res.data.valorisiert[element])]);
+                    });
                     Object.keys(res.data.gesamt).forEach(element => {
-                       tempData2.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
+                        tempData2.push([new Date(element).getTime(), parseFloat(res.data.gesamt[element])]);
                     });
                     res.data.abgerechnet.forEach(element => {
                         tempData3.push([new Date(element.datum).getTime(), parseFloat(element.sum)]);
@@ -265,7 +268,7 @@ export const EmployeeContract = {
             } finally {
                 chartOptions.series[0].data = tempData1;
                 chartOptions.series[1].data = tempData2;
-				chartOptions.series[2].data = tempData3;
+                chartOptions.series[2].data = tempData3;
                 isFetching.value = false
             }
 
@@ -350,11 +353,11 @@ export const EmployeeContract = {
             currentDV.value = dvList.value[e.target.selectedIndex];
             currentDVID.value = currentDV.value.dienstverhaeltnis_id;
             let url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '/')
-                    + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-                    + '/extensions/FHC-Core-Personalverwaltung/Employees/'
-                    + props.id + '/' + props.uid
-                    + '/contract/' + currentDV.value.dienstverhaeltnis_id;
-            router.push( url );
+                + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+                + '/extensions/FHC-Core-Personalverwaltung/Employees/'
+                + props.id + '/' + props.uid
+                + '/contract/' + currentDV.value.dienstverhaeltnis_id;
+            router.push(url);
         }
 
 
@@ -369,12 +372,12 @@ export const EmployeeContract = {
 
         const formatDateISO = (ds) => {
             let padNum = (n) => {
-                if (n<10) return '0' + n;
+                if (n < 10) return '0' + n;
                 return n;
             }
             if (ds == null) return '';
             var d = new Date(ds);
-            return d.getFullYear() + "-" + padNum((d.getMonth()+1)) + "-" + padNum(d.getDate());
+            return d.getFullYear() + "-" + padNum((d.getMonth() + 1)) + "-" + padNum(d.getDate());
         }
 
         const filterVertragsbestandteil = (vertragsbestandteile, kurzbz) => {
@@ -402,36 +405,36 @@ export const EmployeeContract = {
 
         const endDVDialog = () => {
             endDV.value = {
-                    dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
-                    unternehmen: currentDV.value.oe_kurzbz,
-                    vertragsart_kurzbz: currentDV.value.vertragsart_kurzbz,
-                    dvendegrund_kurzbz: currentDV.value.dvendegrund_kurzbz,
-                    dvendegrund_anmerkung: currentDV.value.dvendegrund_anmerkung,
-                    gueltigkeit: {
-                        guioptions: {
-                           sharedstatemode: 'ignore',
-                           disabled: [
-                               'gueltig_ab'
-                           ]
-                        },
-                        data: {
-                            gueltig_ab: currentDV.value.von,
-                            gueltig_bis: currentDV.value.bis,
-                        }
+                dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
+                unternehmen: currentDV.value.oe_kurzbz,
+                vertragsart_kurzbz: currentDV.value.vertragsart_kurzbz,
+                dvendegrund_kurzbz: currentDV.value.dvendegrund_kurzbz,
+                dvendegrund_anmerkung: currentDV.value.dvendegrund_anmerkung,
+                gueltigkeit: {
+                    guioptions: {
+                        sharedstatemode: 'ignore',
+                        disabled: [
+                            'gueltig_ab'
+                        ]
                     },
-                    unruly: currentDV.value.unruly,
-                    person_id: currentDV.value.person_id
-                };
+                    data: {
+                        gueltig_ab: currentDV.value.von,
+                        gueltig_bis: currentDV.value.bis,
+                    }
+                },
+                unruly: currentDV.value.unruly,
+                person_id: currentDV.value.person_id
+            };
             enddvmodalRef.value.showModal();
         }
 
         const deleteDVDialog = () => {
             delDV.value = {
-                    dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
-                    label: formatVertragsart(currentDV.value.vertragsart_kurzbz) + '/' +
-                           currentDV.value.oe_bezeichnung + ', ' +
-                           formatDate(currentDV.value.von) + ' - ' +
-                           formatDate(currentDV.value.bis)
+                dienstverhaeltnisid: currentDV.value.dienstverhaeltnis_id,
+                label: formatVertragsart(currentDV.value.vertragsart_kurzbz) + '/' +
+                    currentDV.value.oe_bezeichnung + ', ' +
+                    formatDate(currentDV.value.von) + ' - ' +
+                    formatDate(currentDV.value.bis)
             };
             deletedvmodalRef.value.showModal();
         }
@@ -446,27 +449,27 @@ export const EmployeeContract = {
 
         const karenzDialog = () => {
             curKarenz.value = {
-                    type: 'vertragsbestandteilkarenz',
-                    guioptions: {
-                        id: 'test'
-                    },
-                    data: {
-                        id: null,
-                        karenztyp_kurzbz: '',
-                        geplanter_geburtstermin: '',
-                        tatsaechlicher_geburtstermin: '',
-                        gueltigkeit: {
-                            guioptions: {
-                               sharedstatemode: 'ignore',
-                               disabled: []
-                            },
-                            data: {
-                                gueltig_ab: '',
-                                gueltig_bis: '',
-                            }
+                type: 'vertragsbestandteilkarenz',
+                guioptions: {
+                    id: 'test'
+                },
+                data: {
+                    id: null,
+                    karenztyp_kurzbz: '',
+                    geplanter_geburtstermin: '',
+                    tatsaechlicher_geburtstermin: '',
+                    gueltigkeit: {
+                        guioptions: {
+                            sharedstatemode: 'ignore',
+                            disabled: []
+                        },
+                        data: {
+                            gueltig_ab: '',
+                            gueltig_bis: '',
                         }
                     }
-                };
+                }
+            };
             karenzmodalRef.value.showModal();
         }
 
@@ -474,7 +477,7 @@ export const EmployeeContract = {
             offCanvasRef.value.show();
         }
 
-        
+
 
         const handleDvSaved = async () => {
             fetchData(props.uid).then(() => {
@@ -506,7 +509,7 @@ export const EmployeeContract = {
                 + '/extensions/FHC-Core-Personalverwaltung/Employees/'
                 + props.id + '/' + props.uid
                 + '/contract';
-            router.push( url ).then(() => {
+            router.push(url).then(() => {
                 router.go(0);
             });
         }
@@ -550,6 +553,7 @@ export const EmployeeContract = {
             let urlaubsanspruch = [];
             let zusatzvereinbarung = [];
             let karenz = [];
+            let lohnguide = null;
             vertragList.value.forEach(vbs => {
                 if (vbs.vertragsbestandteiltyp_kurzbz == 'funktion') {
                     if (vbs.benutzerfunktiondata.funktion_kurzbz.match(/.*zuordnung/)) {
@@ -575,6 +579,8 @@ export const EmployeeContract = {
                     zeitaufzeichnung.push(vbs);
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'karenz') {
                     karenz.push(vbs);
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'lohnguide') {
+                    lohnguide = vbs;
                 }
             });
             currentVBS.funktion.zuordnung = zuordnung;
@@ -587,7 +593,7 @@ export const EmployeeContract = {
             currentVBS.zusatzvereinbarung = zusatzvereinbarung;
             currentVBS.urlaubsanspruch = urlaubsanspruch;
             currentVBS.karenz = karenz;
-
+            currentVBS.lohnguide = lohnguide;
 
         }
 
@@ -604,7 +610,7 @@ export const EmployeeContract = {
                     + '/extensions/FHC-Core-Personalverwaltung/Employees/'
                     + props.id + '/' + props.uid
                     + '/contract';
-                await router.push( url )
+                await router.push(url)
             });
         }
 
@@ -614,9 +620,9 @@ export const EmployeeContract = {
 
         const formatGBTGrund = (item) => {
             if (!item) return ''
-            if (item.vertragsbestandteiltyp_kurzbz=='funktion') {
-                return item.fkt_beschreibung + '/' + (item.fb_bezeichnung!=null?item.fb_bezeichnung:'') + (item.org_bezeichnung!=null?item.org_bezeichnung:'')
-            } else if (item.vertragsbestandteiltyp_kurzbz=='freitext') {
+            if (item.vertragsbestandteiltyp_kurzbz == 'funktion') {
+                return item.fkt_beschreibung + '/' + (item.fb_bezeichnung != null ? item.fb_bezeichnung : '') + (item.org_bezeichnung != null ? item.org_bezeichnung : '')
+            } else if (item.vertragsbestandteiltyp_kurzbz == 'freitext') {
                 return capitalize(item.freitexttyp_kurzbz) + '/' + item.freitext_titel
             }
             return capitalize(item.vertragsbestandteiltyp_kurzbz)
@@ -647,26 +653,36 @@ export const EmployeeContract = {
             return va != undefined ? va.label : item;
         }
 
+        const formatFachrichtung = (item) => {
+            let va = fachrichtungen.value.find(kt => kt.value == item);
+            return va != undefined ? `${va.label } (${item})` : item;
+        }
+
+        const formatModellstelle = (item) => {
+            let va = modellstellen.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         const checkValorisation = async () => {
-			if (currentDVID != null && currentDVID.value > 0) {
-				isFetching.value = true
-				try {
+            if (currentDVID != null && currentDVID.value > 0) {
+                isFetching.value = true
+                try {
                     const res = await $api.call(ApiValorisierungscheck.checkValorisationValidityOfDv(currentDVID.value));
-					valorisationValid.value = res.data;
-				} catch (error) {
-					console.log(error)
-				} finally {
-					isFetching.value = false
-				}
-			}
+                    valorisationValid.value = res.data;
+                } catch (error) {
+                    console.log(error)
+                } finally {
+                    isFetching.value = false
+                }
+            }
         }
         checkValorisation();
 
         const valorisationCheckPath = computed(() => {
-			const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-			return `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/`+currentDVID.value;
+            const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+            return `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/` + currentDVID.value;
         });
 
         return {
@@ -677,7 +693,8 @@ export const EmployeeContract = {
             currentDate, chartOptions, enddvmodalRef, endDVDialog, endDV, handleDvEnded, handleUpdateUnruly, showOffCanvas, dateSelectedHandler,
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
-            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid
+            deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
+            formatModellstelle, formatFachrichtung
         }
     },
     template: `
@@ -1162,6 +1179,67 @@ export const EmployeeContract = {
                                     <figure>
                                         <highcharts class="chart" :options="chartOptions"></highcharts>
                                     </figure>
+                                </div>
+                            </div><!-- card-body -->
+                        </div><!-- card -->
+
+                        <!-- Lohnguide -->
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Lohnguide</h5>
+                            </div>
+                            <div class="card-body" >
+                                <div class="col-md-12 py-3" v-if="currentVBS.lohnguide === null">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                </div>
+                                <div ref="baseDataFrm" class="row g-3" v-else>
+
+                                    <div class="col-md-12">
+                                        <label class="col-sm-6 form-label">Interne Stellenbezeichnung</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentVBS.lohnguide.stellenbezeichnung" >
+                                    </div>
+                                                                        
+
+                                    <div class="col-md-4">
+                                        <label for="dvArt" class="col-sm-6 form-label">Fachrichtung</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="formatFachrichtung(currentVBS.lohnguide.fachrichtung_kurzbz)">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label for="dvArt" class="col-sm-6 form-label">Modellstelle</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="formatModellstelle(currentVBS.lohnguide.modellstelle_kurzbz)">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label  class="form-label" >Von</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(currentVBS.lohnguide.von)">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label" >Bis</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(currentVBS.lohnguide.bis)">
+                                    </div>
+
+                                    <div class="col-md-12" v-if="!!currentVBS.lohnguide.kommentar_modellstelle">
+                                        <label for="dvArt" class="col-sm-6 form-label">Kommentar zur Modellstelle</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="currentVBS.lohnguide.kommentar_modellstelle">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12" v-if="!!currentVBS.lohnguide.kommentar_person">
+                                        <label for="dvArt" class="col-sm-6 form-label">Kommentar zur Person</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="currentVBS.lohnguide.kommentar_person">
+                                        </div>
+                                    </div>
+
+                                    
+                                    
                                 </div>
                             </div><!-- card-body -->
                         </div><!-- card -->

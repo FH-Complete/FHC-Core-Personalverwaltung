@@ -11,6 +11,7 @@ import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 import ApiCommon from '../api/factory/common.js';
 import ApiDV from  '../api/factory/dv.js';
+import ApiLohnguide from '../api/factory/lohnguide.js';
 
 var personSelectedRef = { callback: () => {}};
 
@@ -71,6 +72,8 @@ const gehaltstypen = Vue.ref([]);
 const hourlyratetypes = Vue.ref([]);
 const unternehmen = Vue.ref([]);
 const beendigungsgruende = Vue.ref([]);
+const modellstellen = Vue.ref([]);
+const fachrichtungen = Vue.ref([]);
 
 const pvApp = Vue.createApp({
 	name: 'PV21Employee',
@@ -95,6 +98,8 @@ const pvApp = Vue.createApp({
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
 		Vue.provide('beendigungsgruende',beendigungsgruende);
+		Vue.provide('modellstellen',modellstellen);
+		Vue.provide('fachrichtungen', fachrichtungen);
 	}
 }).use(router);
 
@@ -156,6 +161,12 @@ pvApp.config.globalProperties.$api.call(ApiDV.getUnternehmen()).then((r) => {
 })
 pvApp.config.globalProperties.$api.call(ApiDV.getDvEndeGruende()).then((r) => {
 	beendigungsgruende.value = r.data
+}) 
+pvApp.config.globalProperties.$api.call(ApiLohnguide.getFachrichtungen()).then((r) => {
+	fachrichtungen.value = r.data
+}) 
+pvApp.config.globalProperties.$api.call(ApiLohnguide.getModellstellen()).then((r) => {
+	modellstellen.value = r.data
 }) 
 
 
