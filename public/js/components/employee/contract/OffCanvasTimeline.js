@@ -33,7 +33,9 @@ export const OffCanvasTimeline = {
         const selectedGBSTypen = Vue.ref([]);
         const vertragsarten = Vue.inject('vertragsarten');
         const vertragsbestandteiltypen = Vue.inject('vertragsbestandteiltypen');
-        const gehaltstypen = Vue.inject('gehaltstypen');        
+        const gehaltstypen = Vue.inject('gehaltstypen'); 
+        const modellstellen = Vue.inject('modellstellen');
+        const fachrichtungen = Vue.inject('fachrichtungen');
 
         const formatDate = (ds) => {
             if (!ds) return ""
@@ -140,8 +142,10 @@ export const OffCanvasTimeline = {
                         label = 'Zuordnung';
                     } else {
                         label = 'Tätigkeit';
-                    }
-                    
+                    }                    
+                    break;
+                case 'lohnguide':
+                    label = 'Lohnguide';
                     break;
 
                 default:
@@ -271,6 +275,16 @@ export const OffCanvasTimeline = {
             return va != undefined ? va.label : item;
         }
 
+        const formatFachrichtung = (item) => {
+            let va = fachrichtungen.value.find(kt => kt.value == item);
+            return va != undefined ? `${va.label } (${item})` : item;
+        }
+
+        const formatModellstelle = (item) => {
+            let va = modellstellen.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
@@ -282,7 +296,7 @@ export const OffCanvasTimeline = {
             courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, 
             title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden, 
             selectedVBSTypen, vertragsbestandteiltypen, selectedGBSTypen, gehaltstypen,              
-            showAllDVChecked, colorPalette, formatVertragsart,
+            showAllDVChecked, colorPalette, formatVertragsart, formatFachrichtung, formatModellstelle
         }
      },
      template: `
@@ -381,6 +395,10 @@ export const OffCanvasTimeline = {
                                                 <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='kuendigungsfrist'">
                                                     AG: {{ bestandteil.vbs.arbeitgeber_frist }} Wochen<br/>
                                                     AN: {{ bestandteil.vbs.arbeitnehmer_frist }} Wochen
+                                                </template>
+                                                <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='lohnguide'">
+                                                    Fachrichtung: {{ formatFachrichtung(bestandteil.vbs.fachrichtung_kurzbz) }}<br/>
+                                                    Modellstelle: {{ formatModellstelle(bestandteil.vbs.modellstelle_kurzbz) }}
                                                 </template>
                                                 
                                             </div>
