@@ -275,11 +275,99 @@ class LohnguideExport extends FHCAPI_Controller
 
 		$qry = $qry_grouped;
 		$encryptedCols = array_merge($this->_ci->GehaltsbestandteilModel->getEncryptedColumns(), $this->_ci->GehaltshistorieModel->getEncryptedColumns());
+		// group result and create json array
+	    $qry_json = "
+			WITH base AS (
+				$qry
+			)	
+			SELECT
+				mitarbeiter_uid,
+				personalnummer,
+				dienstverhaeltnis_id,
+				nachname,
+				vorname,
+				name_gesamt,
+				svnr,
+				geschlecht,
+				gebdatum,
+				dv_von,
+				dv_bis,
+				wochenstunden,
+				karenz_von,
+				karenz_bis,
+				karenztyp_kurzbz,
+				karenztyp_bezeichnung,
+				stunden_von,
+				stunden_bis,
+				teilzeittyp,
+				kstnummer,
+				ksttypbezeichnung,
+				kstorgbezeichnung,
+				stellenbezeichnung,
+				kommentar_person,
+				kommentar_modellstelle,
+				fachrichtung,
+				fachrichtung_kurzbz,
+				modellstelle,
+				jobfamilie,
+				modellfunktion,
 
+				json_agg(
+					jsonb_build_object(
+						'gehaltsbestandteil_id', gehaltsbestandteil_id,
+						'gehaltsbestandteil_auszahlungen', gehaltsbestandteil_auszahlungen,
+						'lvexport_sum', lvexport_sum,
+						'grundbetr_decrypted', grundbetr_decrypted,
+						'betr_valorisiert_decrypted', betr_valorisiert_decrypted,
+						'hbetrag_decrypted', hbetrag_decrypted,
+						'betrag_valorisiert_historie_decrypted', betrag_valorisiert_historie_decrypted,
+						'gehaltstyp_bezeichnung', gehaltstyp_bezeichnung,
+						'vertragsart_bezeichnung', vertragsart_bezeichnung,
+						'freitexttyp_kurzbz', freitexttyp_kurzbz,
+						'freitext_titel', freitext_titel,
+						'freitext_anmerkung', freitext_anmerkung,
+						'freitexttyp_bezeichnung', freitexttyp_bezeichnung
+					)
+				) AS daten
+
+			FROM base
+
+			GROUP BY
+				mitarbeiter_uid,
+				personalnummer,
+				dienstverhaeltnis_id,
+				nachname,
+				vorname,
+				name_gesamt,
+				svnr,
+				geschlecht,
+				gebdatum,
+				dv_von,
+				dv_bis,
+				wochenstunden,
+				karenz_von,
+				karenz_bis,
+				karenztyp_kurzbz,
+				karenztyp_bezeichnung,
+				stunden_von,
+				stunden_bis,
+				teilzeittyp,
+				kstnummer,
+				ksttypbezeichnung,
+				kstorgbezeichnung,
+				stellenbezeichnung,
+				kommentar_person,
+				kommentar_modellstelle,
+				fachrichtung,
+				fachrichtung_kurzbz,
+				modellstelle,
+				jobfamilie,
+				modellfunktion
+		";
 
 
 		$result = $this->_ci->GehaltsbestandteilModel->execReadOnlyQuery(
-			$qry,
+			$qry_json,
 			[],
 			$encryptedCols
 		);
@@ -287,6 +375,19 @@ class LohnguideExport extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError('query failed');
 			return;
+		}
+
+		// convert json string to real json
+		foreach ($result->retval as &$row) {
+			if (isset($row->daten) && is_string($row->daten)) {
+				$decoded = json_decode($row->daten, true);
+
+				if (json_last_error() === JSON_ERROR_NONE) {
+					$row->daten = $decoded;
+				} else {
+					$row->daten = [];
+				}
+			}
 		}
 
 		if (!$export) {
