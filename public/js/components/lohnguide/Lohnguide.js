@@ -25,7 +25,7 @@ export const Lohnguide = {
     setup( props, context ) {
 
         const { ref, inject } = Vue
-        const salaryExportList = ref([])
+        const lohnguideExportList = ref([])
         const currentBetrag = ref();
         const isFetching = ref(false);
         const jobRunning = ref(false);
@@ -116,12 +116,64 @@ export const Lohnguide = {
             return formatter.formatDateGerman(cell.getValue());
         };
 
+        const formatNumber = function(cell) {
+            const value = cell.getValue();      
+            if (value == null) return "";
+
+            return Number(value).toLocaleString("de-DE", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
         const sumsDownload = function(value, data, type, params, column){
             return value != null ? value.toString().replace('.', ',') : '';
         }
 
 		const arr2string = function(value, data, type, params, column){
             return value.join(', ');
+        }
+
+        // sucht z.B. Basisgehalt
+        function getProperty(data, propName, propVal) {
+            if (!Array.isArray(data)) return null;
+
+            for (const item of data) {
+                const val = item[propName];
+
+                let match = false;
+
+                if (Array.isArray(val)) {
+                    match = val.some(v =>
+                        v?.toLowerCase().includes(propVal.toLowerCase())
+                    );
+                } else if (typeof val === "string") {
+                    match = val.toLowerCase().includes(propVal.toLowerCase());
+                }
+
+                if (match) {
+                    return item.betr_valorisiert_decrypted ?? null;
+                }
+            }
+
+            return null;
+        }
+
+        function funktionzulagenFormatter(cell) {
+            const value = cell.getValue(); 
+            if (!Array.isArray(value)) return null;
+
+            
+            let sum = 0.0;
+
+            for (const item of value) {
+                const val = item.benutzerfunktion_id;
+                if (Array.isArray(val) && val.length>0 && item.betr_valorisiert_decrypted > 0) {
+                    sum += item.betr_valorisiert_decrypted;
+                } 
+            }
+
+            return sum > 0 ? sum : null;
         }
 
         function checkProperty(data, propName, propVal) {
@@ -141,8 +193,8 @@ export const Lohnguide = {
         }
 
         function allInHeaderFilter(headerValue, rowValue) {
-            if (headerValue === true)  return checkProperty(value,'freitexttyp_kurzbz','allin');
-            if (headerValue === false) return !checkProperty(value,'freitexttyp_kurzbz','allin');
+            if (headerValue === true)  return checkProperty(rowValue,'freitexttyp_kurzbz','allin');
+            if (headerValue === false) return !checkProperty(rowValue,'freitexttyp_kurzbz','allin');
             return true; // null = tristate "alle anzeigen"
         }
 
@@ -151,6 +203,12 @@ export const Lohnguide = {
             const value = cell.getValue();            
             const tickElement = '<i class="fas fa-check text-success"></i>';
             return checkProperty(value,'freitexttyp_kurzbz','allin') ? tickElement : '';
+        }
+
+        function grundgehaltFormatter(cell) {
+            
+            const value = cell.getValue();                       
+            return formatter.formatCurrencyGerman(getProperty(value,'gehaltstyp_bezeichnung','Basisgehalt'));
         }
 
         const fetchData = async () => {
@@ -192,18 +250,18 @@ export const Lohnguide = {
               let list = res.data.map((row, index) => selectValue(row, index) )
 
               if (res.meta.status == "success") {
-                salaryExportList.value = list // res.retval.map((item, index) => ({index, ...item}));
-                //salaryExportList.value = res.retval;
+                lohnguideExportList.value = list // res.retval.map((item, index) => ({index, ...item}));
+                //lohnguideExportList.value = res.retval;
                 //fetchAbrechnungExists();
               } else {
-                salaryExportList.value = [];
+                lohnguideExportList.value = [];
               }              
             } catch (error) {
               console.log(error)              
             } finally {
                 isFetching.value = false
                 if (lohnguideTableRef.value.tabulator != null) {
-					lohnguideTableRef.value.tabulator.setData(salaryExportList.value);
+					lohnguideTableRef.value.tabulator.setData(lohnguideExportList.value);
                     lohnguideTableRef.value.tabulator.dataLoader.clearAlert();
                 }
             }
@@ -261,16 +319,16 @@ export const Lohnguide = {
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "center", sorter:"string", formatter:sexformatter, headerFilter:true, headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}}, width:100  },        
-        { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, hozAlign: "left", sorter:"string", width:100 }, 
-        { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, accessorDownload: arr2string }, 
+        { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, headerFilter:dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
+        { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, headerFilter: dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
         { title: 'AllIn-Gehalt', field: "daten", hozAlign: "center", formatter: allInFormatter, headerFilter:"tickCross", headerFilterFunc: allInHeaderFilter,  headerFilterParams: {tristate: true,indeterminate: true}, headerFilterEmptyCheck:function(value){return value === null}, width:100}, 
-        { title: 'Beschäftigungsausmaß', field: "wochenstunden", hozAlign: "center",sorter:"string",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Beschäftigungsausmaß', field: "wochenstunden", hozAlign: "center",sorter:"number",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120, formatter: formatNumber, accessorDownload: formatter.formatCurrencyGerman },
         { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'KV-Stufe', field: "kv_stufe", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
 		{ title: 'KV-Jahre', field: "kv_jahre", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
         { title: 'Org.-Einheit (Allgm.)', field: "ksttypbezeichnung", sorter:"string", headerFilter:"list",hozAlign: "left", 
-             width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
-        { title: 'Org.-Einheit (Detail)', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 },
+             width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
+        { title: 'Org.-Einheit (Detail)', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
         { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'Fachrichtung', field: "fachrichtung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'Fachrichtung Code', field: "fachrichtung_kurzbz", sorter:"string", headerFilter:"list",hozAlign: "right", 
@@ -278,11 +336,12 @@ export const Lohnguide = {
         { title: 'Jobfamilie', field: "jobfamilie", sorter:"string", headerFilter:"list",hozAlign: "left", 
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
         { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
-        { title: 'Berufserfahrung', field: "berufserfahrung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
-        { title: 'Grundgehalt', field: "grundgehalt", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100, visible:true, download:true },
+        { title: 'Berufserfahrung', field: "berufserfahrung", hozAlign: "center", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Grundgehalt', field: "daten", hozAlign: "right", formatter:grundgehaltFormatter,headerFilter:"list", width:150, visible:true, download:true },
+       
         { title: 'Prämie', field: "praemie", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
-        { title: 'Funktionszulage', field: "funktionszulage", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:100 }, 
-        { title: 'Sachbezug', field: "sachbezug", hozAlign: "left", sorter:"number", headerFilter:true, width:100 }, 
+        { title: 'Funktionszulage', field: "daten", hozAlign: "right", sorter:"string", formatter: funktionzulagenFormatter,width:150 }, 
+        { title: 'Sachbezug', field: "sachbezug", hozAlign: "left", sorter:"number", headerFilter:true, width:150 }, 
         { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "ueberstundenpauschale", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Kommentar zur Person', field: "kommentar_person", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
@@ -295,9 +354,9 @@ export const Lohnguide = {
       const lohnguideTabulatorOptions = Vue.reactive({
           height: "700px",
           reactiveData: true,
-          data: salaryExportList.value,
+          data: lohnguideExportList.value,
 		  index: 'dienstverhaeltnis_id',
-		  persistenceID: 'pv21_lohnguide_2026031201',
+		  persistenceID: 'pv21_lohnguide_2026031202',
           layout: 'fitColumns',
 		  footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 		  movableColumns: false,

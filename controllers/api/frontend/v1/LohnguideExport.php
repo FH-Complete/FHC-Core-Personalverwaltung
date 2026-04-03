@@ -94,6 +94,7 @@ class LohnguideExport extends FHCAPI_Controller
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
 				ksttypbezeichnung, kstorgbezeichnung,
 				stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion,
+				benutzerfunktion_id,
 				' . $oe_kurzbz_sap . ' AS kstnummer
 			FROM
 
@@ -154,6 +155,20 @@ class LohnguideExport extends FHCAPI_Controller
 						'.$vbs_where.'
 						-- ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id AND kst.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
 			    ) kst ON(dienstverhaeltnis.dienstverhaeltnis_id=kst.dienstverhaeltnis_id)
+				
+				LEFT JOIN (
+					SELECT 
+						vbf.benutzerfunktion_id,vertragsbestandteil.dienstverhaeltnis_id,vbf.vertragsbestandteil_id
+					FROM hr.tbl_vertragsbestandteil_funktion vbf						
+						JOIN hr.tbl_vertragsbestandteil vertragsbestandteil ON vbf.vertragsbestandteil_id = vertragsbestandteil.vertragsbestandteil_id
+					WHERE 
+						vertragsbestandteiltyp_kurzbz=\'funktion\'
+						'.$vbs_where.'
+						-- ) funktion ON(dienstverhaeltnis.dienstverhaeltnis_id=funktion.dienstverhaeltnis_id AND funktion.vertragsbestandteil_id = gehaltsbestandteil.vertragsbestandteil_id)
+			    ) funktion ON(dienstverhaeltnis.dienstverhaeltnis_id=funktion.dienstverhaeltnis_id 
+				 AND gehaltsbestandteil.vertragsbestandteil_id=funktion.vertragsbestandteil_id)
+
+			
 				LEFT JOIN (
 					SELECT
 						dienstverhaeltnis_id,vertragsbestandteil_id,stellenbezeichnung,kommentar_person, kommentar_modellstelle, fachrichtung_kurzbz, hr.tbl_lohnguide_fachrichtung.bezeichnung fachrichtung,
@@ -241,7 +256,8 @@ class LohnguideExport extends FHCAPI_Controller
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
-					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion
+					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion,
+					array_remove(array_agg(benutzerfunktion_id), NULL) as benutzerfunktion_id
 				FROM ($qry_history) as hist
 
 			GROUP BY dienstverhaeltnis_id,
@@ -253,7 +269,7 @@ class LohnguideExport extends FHCAPI_Controller
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
-					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion
+					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion, benutzerfunktion_id
 			HAVING ((dv_bis >= ". $this->_ci->db->escape($stichtag_datestring) .")
 							OR dv_bis IS NULL)
 						AND
@@ -292,6 +308,7 @@ class LohnguideExport extends FHCAPI_Controller
 				gebdatum,
 				dv_von,
 				dv_bis,
+				vertragsart_bezeichnung,
 				wochenstunden,
 				karenz_von,
 				karenz_bis,
@@ -322,11 +339,11 @@ class LohnguideExport extends FHCAPI_Controller
 						'hbetrag_decrypted', hbetrag_decrypted,
 						'betrag_valorisiert_historie_decrypted', betrag_valorisiert_historie_decrypted,
 						'gehaltstyp_bezeichnung', gehaltstyp_bezeichnung,
-						'vertragsart_bezeichnung', vertragsart_bezeichnung,
 						'freitexttyp_kurzbz', freitexttyp_kurzbz,
 						'freitext_titel', freitext_titel,
 						'freitext_anmerkung', freitext_anmerkung,
-						'freitexttyp_bezeichnung', freitexttyp_bezeichnung
+						'freitexttyp_bezeichnung', freitexttyp_bezeichnung,
+						'benutzerfunktion_id', benutzerfunktion_id
 					)
 				) AS daten
 
@@ -345,6 +362,7 @@ class LohnguideExport extends FHCAPI_Controller
 				dv_von,
 				dv_bis,
 				wochenstunden,
+				vertragsart_bezeichnung,
 				karenz_von,
 				karenz_bis,
 				karenztyp_kurzbz,
