@@ -190,19 +190,17 @@ export const Lohnguide = {
 
                 return val?.toLowerCase().includes(propVal);
             })
-        }
+        }      
 
-        function allInHeaderFilter(headerValue, rowValue) {
-            if (headerValue === true)  return checkProperty(rowValue,'freitexttyp_kurzbz','allin');
-            if (headerValue === false) return !checkProperty(rowValue,'freitexttyp_kurzbz','allin');
-            return true; // null = tristate "alle anzeigen"
-        }
+        function allInMutator(value, data){
+            const daten = data.daten;
+            return checkProperty(daten,'freitexttyp_kurzbz','allin');
+        }        
 
         function allInFormatter(cell) {
-            cell.getElement().style.textAlign = "center";
             const value = cell.getValue();            
             const tickElement = '<i class="fas fa-check text-success"></i>';
-            return checkProperty(value,'freitexttyp_kurzbz','allin') ? tickElement : '';
+            return value ? tickElement : '';
         }
 
         function grundgehaltFormatter(cell) {
@@ -289,18 +287,13 @@ export const Lohnguide = {
       const lohnguideTableRef = ref(null);   
 
       const sexformatter = function(cell, formatterParams, onRendered) {
-			var value = cell.getValue();
-			if( value === 'm') {
-				return 'männlich';
-			} else if( value === 'w' ) {
-				return 'weiblich';
-			} else if( value === 'x' ) {
-				return 'divers';
-			} else if( value === 'u' ) {
-				return 'unbekannt';
-			} else {
-				return value;
-			}
+			const map = {
+                'm': 'männlich',
+                'w': 'weiblich', 
+                'x': 'divers',
+                'u': 'unbekannt'
+            };
+            return map[cell.getValue()] ?? cell.getValue();
 		};
       
       const moneyFormatterParams = {
@@ -318,10 +311,10 @@ export const Lohnguide = {
 		{ title: 'DVID', field: "dienstverhaeltnis_id", hozAlign: "left", sorter:"number", headerFilter: true, width:150, visible:false, download:true }, 
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
-        { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "center", sorter:"string", formatter:sexformatter, headerFilter:true, headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}}, width:100  },        
+        { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "center", sorter:"string", formatter:sexformatter, headerFilter:"list", headerFilterParams: {values:{'': 'Alle','m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'},clearable:true}, width:100  },        
         { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, headerFilter:dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
         { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, headerFilter: dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
-        { title: 'AllIn-Gehalt', field: "daten", hozAlign: "center", formatter: allInFormatter, headerFilter:"tickCross", headerFilterFunc: allInHeaderFilter,  headerFilterParams: {tristate: true,indeterminate: true}, headerFilterEmptyCheck:function(value){return value === null}, width:100}, 
+        { title: 'AllIn-Gehalt', field: "daten_allIn", hozAlign: "center",  mutatorData: allInMutator, formatter: allInFormatter, headerFilter:"tickCross", headerFilterParams: {tristate: true,indeterminate: true}, headerFilterEmptyCheck:function(value){return value === null}, width:100}, 
         { title: 'Beschäftigungsausmaß', field: "wochenstunden", hozAlign: "center",sorter:"number",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120, formatter: formatNumber, accessorDownload: formatter.formatCurrencyGerman },
         { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'KV-Stufe', field: "kv_stufe", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: arr2string },
