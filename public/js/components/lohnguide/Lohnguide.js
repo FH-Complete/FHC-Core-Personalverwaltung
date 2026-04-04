@@ -159,14 +159,14 @@ export const Lohnguide = {
             return null;
         }
 
-        function funktionzulagenFormatter(cell) {
-            const value = cell.getValue(); 
-            if (!Array.isArray(value)) return null;
+        function funktionszulageMutator(value, data) {
+            const daten = data.daten;
+            if (!Array.isArray(daten)) return null;
 
             
             let sum = 0.0;
 
-            for (const item of value) {
+            for (const item of daten) {
                 const val = item.benutzerfunktion_id;
                 if (Array.isArray(val) && val.length>0 && item.betr_valorisiert_decrypted > 0) {
                     sum += item.betr_valorisiert_decrypted;
@@ -174,6 +174,11 @@ export const Lohnguide = {
             }
 
             return sum > 0 ? sum : null;
+        }
+
+        function funktionzulagenFormatter(cell) {
+            const value = cell.getValue(); 
+            return value > 0 ? formatter.formatCurrencyGerman(value) : '';
         }
 
         function checkProperty(data, propName, propVal) {
@@ -208,6 +213,15 @@ export const Lohnguide = {
             const value = cell.getValue();                       
             return formatter.formatCurrencyGerman(getProperty(value,'gehaltstyp_bezeichnung','Basisgehalt'));
         }
+
+        const presetDates = ref([
+            { label: 'Heute', value: new Date() },
+            { label: 'Ende letztes Quartal', value: (() => {
+                const now = new Date();
+                const quarter = Math.floor(now.getMonth() / 3);
+                return new Date(now.getFullYear(), quarter * 3, 0);
+            })() }
+          ]);
 
         const fetchData = async () => {
             
@@ -330,10 +344,10 @@ export const Lohnguide = {
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
         { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'Berufserfahrung', field: "berufserfahrung", hozAlign: "center", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
-        { title: 'Grundgehalt', field: "daten", hozAlign: "right", formatter:grundgehaltFormatter,headerFilter:"list", width:150, visible:true, download:true },
+        { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: (value, data) => data.daten, formatter:grundgehaltFormatter,headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true },
        
         { title: 'Prämie', field: "praemie", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
-        { title: 'Funktionszulage', field: "daten", hozAlign: "right", sorter:"string", formatter: funktionzulagenFormatter,width:150 }, 
+        { title: 'Funktionszulage', field: "daten_funktionszulage", hozAlign: "right", sorter:"string", mutatorData: funktionszulageMutator, formatter: funktionzulagenFormatter, headerFilter:true, headerFilterFunc: ">=", width:150 }, 
         { title: 'Sachbezug', field: "sachbezug", hozAlign: "left", sorter:"number", headerFilter:true, width:150 }, 
         { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "ueberstundenpauschale", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
@@ -345,7 +359,7 @@ export const Lohnguide = {
       // Options
 
       const lohnguideTabulatorOptions = Vue.reactive({
-          height: "700px",
+          height: "calc(100vh - 200px)",
           reactiveData: true,
           data: lohnguideExportList.value,
 		  index: 'dienstverhaeltnis_id',
@@ -414,7 +428,7 @@ export const Lohnguide = {
         return { t, isFetching, lohnguideTableRef, tableRef, tabulator, currentDate, filterDate, stichtag, exportList,
             formatDateISO, filterDateHandler, modalRef, downloadconfig, orgSelectedHandler, 
             lohnguideTabulatorEvents, lohnguideTabulatorOptions, listType, 
-            currentBetrag, filterPerson, jobRunning,
+            currentBetrag, filterPerson, jobRunning, presetDates,
             formatDateGerman, progressValue, abrechnungExists }
 
     },
@@ -437,7 +451,8 @@ export const Lohnguide = {
                         <label for="filter_zeitraum" class="ms-1">Stichtag: </label>
                         <datepicker id="filter" :modelValue="stichtag" 
                             @update:model-value="filterDateHandler"                            
-                            :clearable="true"                                       
+                            :clearable="true"     
+                            :preset-dates="presetDates"                                  
                             auto-apply 
                             locale="de"
                             format="dd.MM.yyyy"
