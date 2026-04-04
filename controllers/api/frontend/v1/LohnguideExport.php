@@ -213,7 +213,7 @@ class LohnguideExport extends FHCAPI_Controller
 		$qry_history = '
 			SELECT live.*, historie.datum hdatum, historie.gehaltsbestandteil_von, historie.gehaltsbestandteil_bis, betrag hbetrag_decrypted, 
 				vh.betrag_valorisiert as betrag_valorisiert_historie_decrypted
-			FROM (select * FROM ('.$qry_live.') t) live 
+			FROM ('.$qry_live.') live 
 			LEFT JOIN (
 				SELECT * FROM hr.tbl_gehaltshistorie
 				WHERE
@@ -269,7 +269,7 @@ class LohnguideExport extends FHCAPI_Controller
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
-					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion, benutzerfunktion_id
+					stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion
 			HAVING ((dv_bis >= ". $this->_ci->db->escape($stichtag_datestring) .")
 							OR dv_bis IS NULL)
 						AND
