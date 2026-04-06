@@ -263,6 +263,7 @@ export default {
           kommentar_person: vb.kommentar_person,
           kommentar_modellstelle: vb.kommentar_modellstelle,
           stellenbezeichnung: vb.stellenbezeichnung,
+          vordienstzeit: vb.vordienstzeit,
           fachrichtung_kurzbz: vb.fachrichtung_kurzbz,
           modellstelle_kurzbz: vb.modellstelle_kurzbz,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
@@ -272,6 +273,7 @@ export default {
             'kommentar_person',
             'kommentar_modellstelle',
             'stellenbezeichnung',
+            'vordienstzeit',
             'fachrichtung_kurzbz',
             'modellstelle_kurzbz'
         ];

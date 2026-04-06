@@ -57,6 +57,13 @@ export default {
       <div class="col-6">&nbsp;</div>
     </div>
 
+    <div class="row g-2 py-2" v-show="showinput('vordienstzeit')">
+      <div class="col-6">
+        <input v-model="vordienstzeit" type="text" class="form-control form-control-sm" placeholder="Vordienstzeit" aria-label="Vordienstzeit">
+      </div>
+      <div class="col-6">&nbsp;</div>
+    </div>
+
     <div class="row g-2 py-2" v-show="showinput('kommentar_person')">
       <div class="col-6">
         <textarea v-model="kommentar_person" rows="2" class="form-control form-control-sm" placeholder="Kommentar zur Person" aria-label="Kommentar zur Person"></textarea>
@@ -88,6 +95,7 @@ export default {
   data: function () {
     return {
       id: null,
+      vordienstzeit: '',
       stellenbezeichnung: '',
       kommentar_person: '',
       kommentar_modellstelle: '',
@@ -114,6 +122,9 @@ export default {
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;
+      }
+      if( this.config?.data?.vordienstzeit !== undefined ) {
+        this.vordienstzeit = this.config.data.vordienstzeit;
       }
       if( this.config?.data?.stellenbezeichnung !== undefined ) {
         this.stellenbezeichnung = this.config.data.stellenbezeichnung;
@@ -164,6 +175,7 @@ export default {
         data: {
           id: this.id,
           stellenbezeichnung: this.stellenbezeichnung,
+          vordienstzeit: this.vordienstzeit,
           kommentar_modellstelle: this.kommentar_modellstelle,
           kommentar_person: this.kommentar_person,
           fachrichtung_kurzbz: this.fachrichtung_kurzbz,  

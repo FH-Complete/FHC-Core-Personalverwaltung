@@ -37,6 +37,7 @@ class GUIVertragsbestandteilLohnguide extends AbstractGUIVertragsbestandteil imp
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = ["stellenbezeichnung" => "",
+                       "vordienstzeit" => "",
                        "fachrichtung_kurzbz" => "",
                        "modellstelle_kurzbz" => "",
                        "kommentar_person" => "",
@@ -59,6 +60,7 @@ class GUIVertragsbestandteilLohnguide extends AbstractGUIVertragsbestandteil imp
         }
 		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONDataString($this->data['stellenbezeichnung'], $decodedData, 'stellenbezeichnung');
+        $this->getJSONDataString($this->data['vordienstzeit'], $decodedData, 'vordienstzeit');
         $this->getJSONDataString($this->data['fachrichtung_kurzbz'], $decodedData, 'fachrichtung_kurzbz');
         $this->getJSONDataString($this->data['modellstelle_kurzbz'], $decodedData, 'modellstelle_kurzbz');
         $this->getJSONDataString($this->data['kommentar_person'], $decodedData, 'kommentar_person');
@@ -81,6 +83,7 @@ class GUIVertragsbestandteilLohnguide extends AbstractGUIVertragsbestandteil imp
              $vbs =  $handler->VertragsbestandteilLib->fetchVertragsbestandteil($id);
              // merge
              $vbs->setStellenbezeichnung($this->data['stellenbezeichnung']);
+             $vbs->setVordienstzeit($this->data['vordienstzeit']);
              $vbs->setFachrichtung_kurzbz($this->data['fachrichtung_kurzbz']);
              $vbs->setModellstelle_kurzbz($this->data['modellstelle_kurzbz']);
              $vbs->setKommentar_person($this->data['kommentar_person']);
@@ -95,6 +98,7 @@ class GUIVertragsbestandteilLohnguide extends AbstractGUIVertragsbestandteil imp
              $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
              
              $data->stellenbezeichnung = $this->data['stellenbezeichnung'];
+             $data->vordienstzeit = $this->data['vordienstzeit'];
              $data->fachrichtung_kurzbz = $this->data['fachrichtung_kurzbz'];
              $data->modellstelle_kurzbz = $this->data['modellstelle_kurzbz'];
              $data->kommentar_person = $this->data['kommentar_person'];

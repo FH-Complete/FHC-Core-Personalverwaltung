@@ -1198,7 +1198,11 @@ export const EmployeeContract = {
                                         <label class="col-sm-6 form-label">Interne Stellenbezeichnung</label>
                                         <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentVBS.lohnguide.stellenbezeichnung" >
                                     </div>
-                                                                        
+
+                                    <div class="col-md-12">
+                                        <label class="col-sm-6 form-label">Vordienstzeit</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentVBS.lohnguide.vordienstzeit" >
+                                    </div>                                                                        
 
                                     <div class="col-md-4">
                                         <label for="dvArt" class="col-sm-6 form-label">Fachrichtung</label>
