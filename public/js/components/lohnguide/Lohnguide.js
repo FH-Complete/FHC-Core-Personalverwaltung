@@ -208,6 +208,10 @@ export const Lohnguide = {
             return value ? tickElement : '';
         }
 
+        function beschaeftigungsausmassMutator(value,data) {
+            return data.wochenstunden / 38.5;
+        }
+
         function grundgehaltFormatter(cell) {
             
             const value = cell.getValue();                       
@@ -329,7 +333,7 @@ export const Lohnguide = {
         { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, headerFilter:dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
         { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, headerFilter: dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
         { title: 'AllIn-Gehalt', field: "daten_allIn", hozAlign: "center",  mutatorData: allInMutator, formatter: allInFormatter, headerFilter:"tickCross", headerFilterParams: {tristate: true,indeterminate: true}, headerFilterEmptyCheck:function(value){return value === null}, width:100}, 
-        { title: 'Beschäftigungsausmaß', field: "wochenstunden", hozAlign: "center",sorter:"number",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120, formatter: formatNumber, accessorDownload: formatter.formatCurrencyGerman },
+        { title: 'Beschäftigungsausmaß', field: "daten_beschaeftigung", hozAlign: "center", mutatorData: beschaeftigungsausmassMutator,sorter:"number",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120, formatter: (cell) => (cell.getValue() * 100).toFixed(1) + " %", accessorDownload: formatter.formatCurrencyGerman },
         { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'KV-Stufe', field: "kv_stufe", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
 		{ title: 'KV-Jahre', field: "kv_jahre", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
