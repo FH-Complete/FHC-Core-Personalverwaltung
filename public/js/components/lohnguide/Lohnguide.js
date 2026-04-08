@@ -212,6 +212,29 @@ export const Lohnguide = {
             return data.wochenstunden / 38.5;
         }
 
+        
+
+        function berechneZeitspanneInJahren(vonDatum, stichtag) {
+            const von = new Date(vonDatum);
+            const bis = new Date(stichtag);
+
+            let jahre = bis.getFullYear() - von.getFullYear();
+
+            // Noch nicht im gleichen Kalendermonat/-tag angekommen → ein Jahr abziehen
+            const monatErreicht = bis.getMonth() > von.getMonth() ||
+                (bis.getMonth() === von.getMonth() && bis.getDate() >= von.getDate());
+
+            if (!monatErreicht) jahre--;
+
+            return jahre;
+        }
+
+        function berufserfahrungMutator(value, data) {
+            const vonDatum = data.lg_von
+            if (vonDatum === null) return null
+            return (data.vordienstzeit ?? 0) + berechneZeitspanneInJahren(vonDatum, stichtag.value)
+        }
+
         function grundgehaltFormatter(cell) {
             
             const value = cell.getValue();                       
@@ -347,7 +370,7 @@ export const Lohnguide = {
         { title: 'Jobfamilie', field: "jobfamilie", sorter:"string", headerFilter:"list",hozAlign: "left", 
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
         { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
-        { title: 'Berufserfahrung', field: "berufserfahrung", hozAlign: "center", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Berufserfahrung', field: "daten_berufserfahrung", hozAlign: "center", mutatorData:berufserfahrungMutator, headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: (value, data) => data.daten, formatter:grundgehaltFormatter,headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true },
        
         { title: 'Prämie', field: "praemie", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
