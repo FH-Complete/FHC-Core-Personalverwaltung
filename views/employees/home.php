@@ -56,6 +56,5 @@ var FHC_JS_CONFIG = { domain: '<?php echo DOMAIN; ?>'};
 })()
 </script>
 
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
