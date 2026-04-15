@@ -88,20 +88,20 @@ export default {
 				event: "rowClick",
 				handler: selectRecordHandler
 			},
-                        {
-                                event: "dataFiltered",
-                                handler: function(filters, rows) {
-                                    var el = document.getElementById("search_count");
-                                    el.innerHTML = rows.length;
-                                }
-                        },
-                        {
-                                event: "dataLoaded",
-                                handler: function(data) {
-                                    var el = document.getElementById("total_count");
-                                    el.innerHTML = data.length;
-                                }
-                        }
+			{
+					event: "dataFiltered",
+					handler: function(filters, rows) {
+						var el = document.getElementById("search_count");
+						el.innerHTML = rows.length;
+					}
+			},
+			{
+					event: "dataLoaded",
+					handler: function(data) {
+						var el = document.getElementById("total_count");
+						el.innerHTML = data.length;
+					}
+			}
 		];
 
 		const sexformatter = function(cell, formatterParams, onRendered) {
@@ -182,7 +182,7 @@ export default {
                     }
                 };
 				
-				const searchfunction = (params) => $api.call(ApiSearchbar.search(params));
+				const searchfunction = (params) => $api.call(ApiSearchbar.searchPV(params));
 
 		return {
 			personSelectedHandler,

@@ -51,7 +51,7 @@ export const ValorisationSelection = {
 		},
 		methods: {
 			searchfunction: function(params) {
-				return this.$api.call(ApiSearchbar.search(params));
+				return this.$api.call(ApiSearchbar.searchPV(params));
 			},
 			getValorisierungsInstanzen: function() {
 				const res = this.$api.call(ApiValorisierung.getValorisierungsInstanzen())

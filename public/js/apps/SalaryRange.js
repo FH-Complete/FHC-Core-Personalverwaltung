@@ -16,7 +16,7 @@ const pvApp = Vue.createApp(	{
 	data() {
 		return 	{
 			searchbaroptions: searchbaroptions,
-			searchfunction: (params) => this.$api.call(ApiSearchbar.search(params)),
+			searchfunction: (params) => this.$api.call(ApiSearchbar.searchPV(params)),
 			appSideMenuEntries: {},
 		}
 	},

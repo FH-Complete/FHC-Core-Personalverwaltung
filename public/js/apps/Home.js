@@ -20,7 +20,7 @@ const pvApp = Vue.createApp(	{
 	},
 	setup() {
 		const $api = Vue.inject('$api');
-		const searchfunction = (params) => $api.call(ApiSearchbar.search(params));
+		const searchfunction = (params) => $api.call(ApiSearchbar.searchPV(params));
 		let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;	 
 
 		const appSideMenuEntries = Vue.ref({});

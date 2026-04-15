@@ -32,7 +32,7 @@ export const ValorisationCheck = {
 	},
 	methods: {
 		searchfunction: function(params) {
-			return this.$api.call(ApiSearchbar.search(params));
+			return this.$api.call(ApiSearchbar.searchPV(params));
 		},
 		getAllData: function() {
 			this.getDvData();

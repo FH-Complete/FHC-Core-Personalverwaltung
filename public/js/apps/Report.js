@@ -19,7 +19,7 @@ const pvApp = Vue.createApp(	{
 			currentPersonID: null,	
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
-			searchfunction: (params) => this.$api.call(ApiSearchbar.search(params)),
+			searchfunction: (params) => this.$api.call(ApiSearchbar.searchPV(params)),
 			appSideMenuEntries: {},
 		}
 	},

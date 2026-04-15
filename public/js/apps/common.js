@@ -5,47 +5,25 @@ let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OB
 export const searchbaroptions = {
     cssclass: "position-relative",
     origin: 'pv21',
-    types: [
-        "person",
-        "raum",
-        "mitarbeiter",
-        "mitarbeiter_ohne_zuordnung",
-/*
-        "student",
-        "prestudent",
-        "document",
-        "cms",
-*/
-        "organisationunit"
-    ],
+    types: { 
+		// cant access phrasen yet at this point in the setup
+		person: 'Person',
+		employee: 'Mitarbeiter',
+		unassigned_employee: 'Mitarbeiter ohne Zuordnung',
+		room: 'Raum',
+		organisationunit: 'Organisationseinheit'
+	},
     actions: {
-        person: {
-            defaultaction: {
-                type: "link",
-                action: function(data) { 
-                    return data.profil;
-                }
-            },
-            childactions: [
-                {
-                    label: "testchildaction1",
-                    icon: "fas fa-check-circle",
-                    type: "function",
-                    action: function(data) { 
-                        alert('person testchildaction 01 ' + JSON.stringify(data)); 
-                    }
-                },
-                {
-                    label: "testchildaction2",
-                    icon: "fas fa-file-csv",
-                    type: "function",
-                    action: function(data) { 
-                        alert('person testchildaction 02 ' + JSON.stringify(data)); 
-                    }
-                }
-            ]
-        },
-		raum: {
+		person: {
+			defaultaction: {
+				type: "link",
+				action: function(data) {
+					return data.profil;
+				}
+			},
+			childactions: []
+		},
+		room: {
 			defaultaction: {
 				type: "link",
 				renderif: function(data) {
@@ -120,25 +98,7 @@ export const searchbaroptions = {
                     action: function(data) {
                         return `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees/${data.person_id}/${data.uid}/contract#dvhistory`;
                     }
-                },
-/*
-                {
-                    label: "testchildaction3",
-                    icon: "fas fa-bell",
-                    type: "function",
-                    action: function(data) { 
-                        alert('employee testchildaction 03 ' + JSON.stringify(data)); 
-                    }
-                },
-                {
-                    label: "testchildaction4",
-                    icon: "fas fa-calculator",
-                    type: "function",
-                    action: function(data) { 
-                        alert('employee testchildaction 04 ' + JSON.stringify(data)); 
-                    }
                 }
- */
             ]
         },
         organisationunit: {
