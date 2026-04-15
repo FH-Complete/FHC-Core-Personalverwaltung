@@ -90,6 +90,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'icon' => 'file-export',
 		'requiredPermissions' => 'basis/gehaelter:r'
 	),
+	'Lohnguide' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Lohnguide'),
+		'description' => 'Lohnguide',
+		'icon' => 'file-export',
+		'requiredPermissions' => 'extension/pv21_lohnguide_export:r'
+	),
 	'Valorisierung' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Valorisation'),
 		'description' => 'Valorisierung',
