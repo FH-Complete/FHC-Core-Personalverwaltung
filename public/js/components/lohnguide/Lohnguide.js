@@ -360,7 +360,7 @@ export const Lohnguide = {
         { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
         { title: 'KV-Stufe', field: "kv_stufe", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
 		{ title: 'KV-Jahre', field: "kv_jahre", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
-        { title: 'Org.-Einheit (Allgm.)', field: "ksttypbezeichnung", sorter:"string", headerFilter:"list",hozAlign: "left", 
+        { title: 'Org.-Einheit (Allgm.)', field: "oe_bezeichnung_hr", sorter:"string", headerFilter:"list",hozAlign: "left", 
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
         { title: 'Org.-Einheit (Detail)', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
         { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },

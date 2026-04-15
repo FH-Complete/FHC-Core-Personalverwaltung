@@ -95,7 +95,34 @@ class LohnguideExport extends FHCAPI_Controller
 				ksttypbezeichnung, kstorgbezeichnung,
 				lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion,
 				benutzerfunktion_id,
-				' . $oe_kurzbz_sap . ' AS kstnummer
+				' . $oe_kurzbz_sap . ' AS kstnummer,
+				COALESCE(( WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz, standort) AS (
+						SELECT tbl_organisationseinheit.oe_kurzbz,
+							tbl_organisationseinheit.oe_parent_kurzbz,
+							tbl_organisationseinheit.bezeichnung,
+							tbl_organisationseinheit.organisationseinheittyp_kurzbz,
+							tbl_organisationseinheit.standort
+						FROM tbl_organisationseinheit
+						WHERE tbl_organisationseinheit.oe_kurzbz::text = ((( SELECT tbl_benutzerfunktion.oe_kurzbz
+								FROM tbl_benutzerfunktion
+								WHERE tbl_benutzerfunktion.uid::text = dienstverhaeltnis.mitarbeiter_uid::text AND tbl_benutzerfunktion.funktion_kurzbz::text = \'oezuordnung\'::text
+								ORDER BY tbl_benutzerfunktion.datum_bis DESC
+								LIMIT 1))::text) AND tbl_organisationseinheit.aktiv = true
+						UNION ALL
+						SELECT o.oe_kurzbz,
+							o.oe_parent_kurzbz,
+							o.bezeichnung,
+							o.organisationseinheittyp_kurzbz,
+							o.standort
+						FROM tbl_organisationseinheit o,
+							oes oes_1
+						WHERE o.oe_kurzbz::text = oes_1.oe_parent_kurzbz::text AND o.aktiv = true
+						)
+				SELECT oes.bezeichnung AS "OE_HR"
+				FROM oes
+				WHERE oes.standort::text = \'1\'::text
+				LIMIT 1), \'Keine\'::character varying) AS oe_bezeichnung_hr
+				
 			FROM
 
 				hr.tbl_dienstverhaeltnis dienstverhaeltnis 
@@ -246,16 +273,17 @@ class LohnguideExport extends FHCAPI_Controller
 					sum(hbetrag_decrypted) as hbetrag_decrypted,sum(betrag_valorisiert_historie_decrypted) as betrag_valorisiert_historie_decrypted,
 					dv_von, dv_bis, 
 					array_agg(gehaltstyp_bezeichnung ORDER BY gehaltstyp_sort ASC) as gehaltstyp_bezeichnung, 
+					array_agg(gehaltstyp_kurzbz ORDER BY gehaltstyp_sort ASC) as gehaltstyp_kurzbz, 
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
 					nachname,vorname,geschlecht,gebdatum,
-					array_remove(array_agg(freitexttyp_kurzbz), NULL) freitexttyp_kurzbz,
-					array_remove(array_agg(freitext_titel), NULL) freitext_titel, 
-					array_remove(array_agg(freitext_anmerkung), NULL) as freitext_anmerkung,
-					array_remove(array_agg(freitexttyp_bezeichnung), NULL) as freitexttyp_bezeichnung,
+					array_agg(freitexttyp_kurzbz) FILTER (WHERE freitexttyp_kurzbz IS NOT NULL) freitexttyp_kurzbz,
+					array_agg(freitext_titel) FILTER (WHERE freitext_titel IS NOT NULL)  freitext_titel, 
+					array_agg(freitext_anmerkung) FILTER (WHERE freitext_anmerkung IS NOT NULL)  as freitext_anmerkung,
+					array_agg(freitexttyp_bezeichnung) FILTER (WHERE freitexttyp_bezeichnung IS NOT NULL)  as freitexttyp_bezeichnung,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
-					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer,oe_bezeichnung_hr,
 					lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion,
 					array_remove(array_agg(benutzerfunktion_id), NULL) as benutzerfunktion_id
 				FROM ($qry_history) as hist
@@ -268,7 +296,7 @@ class LohnguideExport extends FHCAPI_Controller
 					nachname,vorname,geschlecht,gebdatum,
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
-					ksttypbezeichnung, kstorgbezeichnung, kstnummer,
+					ksttypbezeichnung, kstorgbezeichnung, kstnummer,oe_bezeichnung_hr,
 					lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle, jobfamilie, modellfunktion
 			HAVING ((dv_bis >= ". $this->_ci->db->escape($stichtag_datestring) .")
 							OR dv_bis IS NULL)
@@ -320,6 +348,7 @@ class LohnguideExport extends FHCAPI_Controller
 				kstnummer,
 				ksttypbezeichnung,
 				kstorgbezeichnung,
+				oe_bezeichnung_hr,
 				stellenbezeichnung,
 				kommentar_person,
 				kommentar_modellstelle,
@@ -341,6 +370,7 @@ class LohnguideExport extends FHCAPI_Controller
 						'betr_valorisiert_decrypted', betr_valorisiert_decrypted,
 						'hbetrag_decrypted', hbetrag_decrypted,
 						'betrag_valorisiert_historie_decrypted', betrag_valorisiert_historie_decrypted,
+						'gehaltstyp_kurzbz', gehaltstyp_kurzbz,
 						'gehaltstyp_bezeichnung', gehaltstyp_bezeichnung,
 						'freitexttyp_kurzbz', freitexttyp_kurzbz,
 						'freitext_titel', freitext_titel,
@@ -376,6 +406,7 @@ class LohnguideExport extends FHCAPI_Controller
 				kstnummer,
 				ksttypbezeichnung,
 				kstorgbezeichnung,
+				oe_bezeichnung_hr,
 				lg_von,
 				lg_bis,
 				vordienstzeit,
