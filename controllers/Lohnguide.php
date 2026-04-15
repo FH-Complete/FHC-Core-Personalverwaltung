@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Lohnguide extends Auth_Controller
 {
 
-	const DEFAULT_PERMISSION = 'basis/gehaelter:r';
+	const DEFAULT_PERMISSION = 'extension/pv21_lohnguide_export:r';
 	private $_ci; // Code igniter instance
 
 	/**

@@ -6,7 +6,7 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class LohnguideExport extends FHCAPI_Controller
 {
 
-    const DEFAULT_PERMISSION = 'basis/gehaelter:r';
+    const DEFAULT_PERMISSION = 'extension/pv21_lohnguide_export:r';
     // code igniter
     protected $_ci;
 
@@ -16,9 +16,6 @@ class LohnguideExport extends FHCAPI_Controller
 			array(
 				'index' => Self::DEFAULT_PERMISSION,
 				'getAll' => Self::DEFAULT_PERMISSION,
-				'existsAnyGehaltshistorie' => Self::DEFAULT_PERMISSION,
-				'runGehaltshistorieJob' => Self::DEFAULT_PERMISSION,
-				'deleteGehaltshistorie' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
