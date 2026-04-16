@@ -270,6 +270,12 @@ export const Lohnguide = {
             return val
         }
 
+        function praemieMutator(value, data) {
+            const d = data.daten
+            const val = getProperty(d,'gehaltstyp_kurzbz','praemie')
+            return val
+        }
+
         const presetDates = ref([
             { label: 'Heute', value: new Date() },
             { label: 'Ende letztes Quartal', value: (() => {
@@ -402,7 +408,7 @@ export const Lohnguide = {
         { title: 'Berufserfahrung', field: "daten_berufserfahrung", hozAlign: "center", mutatorData:berufserfahrungMutator, headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: grundgehaltMutator, formatterParams:moneyFormatterParams,formatter:"money",headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true, accessorDownload: sumsDownload },
        
-        { title: 'Prämie', field: "praemie", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
+        { title: 'Prämie', field: "daten_praemie", mutatorData:praemieMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true, accessorDownload: sumsDownload },
         { title: 'Funktionszulage', field: "daten_funktionszulage", hozAlign: "right", sorter:"string", mutatorData: funktionszulageMutator, formatter: funktionzulagenFormatter, headerFilter:true, headerFilterFunc: ">=", width:150 }, 
         { title: 'Sachbezug', field: "sachbezug", hozAlign: "left", mutatorData:sachbezugMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"number", headerFilter:true, width:150, accessorDownload: sumsDownload }, 
         { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", mutatorData:sonstigeZulagenMutator, formatter:"money", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: sumsDownload }, 
