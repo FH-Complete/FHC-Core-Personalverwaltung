@@ -520,8 +520,8 @@ export const Lohnguide = {
                             format="dd.MM.yyyy"
                             model-type="yyyy-MM-dd"
                             input-class-name="dp-custom-input"
-                            style="max-width:150px;min-width:150px" >
-                            
+                            style="max-width:150px;min-width:150px" 
+                            text-input >
                         </datepicker>
                        
                     </div>
