@@ -212,8 +212,7 @@ class LohnguideExport extends FHCAPI_Controller
 				' . $sap_join . '
 				
 			WHERE
-				gehaltstyp.lvexport = true
-				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($stichtag_datestring) .')
+				((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($stichtag_datestring) .')
 					OR gehaltsbestandteil.bis IS NULL)
 				AND
 				((gehaltsbestandteil.von <= '. $this->_ci->db->escape($stichtag_datestring) .')

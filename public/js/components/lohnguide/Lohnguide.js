@@ -254,8 +254,9 @@ export const Lohnguide = {
 
         function sonstigeZulagenMutator(value, data) {
             const d = data.daten
-            const val = getProperty(d,'freitexttyp_kurzbz','allin')
-            return val
+            const valAllIn = getProperty(d,'freitexttyp_kurzbz','allin')
+            const valATZ = getProperty(d,'gehaltstyp_kurzbz','lohnausgleichatz')
+            return (valAllIn ?? 0) + (valATZ ?? 0)
         }
 
         function ueberstundenpauschaleMutator(value, data) {
@@ -410,9 +411,9 @@ export const Lohnguide = {
        
         { title: 'Prämie', field: "daten_praemie", mutatorData:praemieMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true, accessorDownload: sumsDownload },
         { title: 'Funktionszulage', field: "daten_funktionszulage", hozAlign: "right", sorter:"string", mutatorData: funktionszulageMutator, formatter: funktionzulagenFormatter, headerFilter:true, headerFilterFunc: ">=", width:150 }, 
-        { title: 'Sachbezug', field: "sachbezug", hozAlign: "left", mutatorData:sachbezugMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"number", headerFilter:true, width:150, accessorDownload: sumsDownload }, 
-        { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", mutatorData:sonstigeZulagenMutator, formatter:"money", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150, accessorDownload: sumsDownload }, 
-        { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "daten_ueberstundenpauschale", mutatorData:ueberstundenpauschaleMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "left", sorter:"string", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
+        { title: 'Sachbezug', field: "sachbezug", hozAlign: "right", mutatorData:sachbezugMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"number", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
+        { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", mutatorData:sonstigeZulagenMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "right", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
+        { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "daten_ueberstundenpauschale", mutatorData:ueberstundenpauschaleMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "left", sorter:"number", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
         { title: 'Kommentar zur Person', field: "kommentar_person", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Kommentar zur Modellstelle', field: "kommentar_modellstelle", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Standort', field: "standort", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
