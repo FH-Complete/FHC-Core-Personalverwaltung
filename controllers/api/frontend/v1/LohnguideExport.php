@@ -285,7 +285,8 @@ class LohnguideExport extends FHCAPI_Controller
 				FROM ($qry_history) as hist
 
 			GROUP BY dienstverhaeltnis_id,
-					coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+					-- coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+					gehaltsbestandteil_id::text,lvexport_sum,
                     dv_von, dv_bis,
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
