@@ -407,7 +407,7 @@ export const Lohnguide = {
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
         { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Modellstelle', field: "modellstelle", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
-        { title: 'Modellstelle Code', field: "modellstelle_kurzbz", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
+        { title: 'Modellstelle Code', field: "code", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Berufserfahrung', field: "daten_berufserfahrung", hozAlign: "center", mutatorData:berufserfahrungMutator, headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: grundgehaltMutator, formatterParams:moneyFormatterParams,formatter:"money",headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true, accessorDownload: sumsDownload },
        
