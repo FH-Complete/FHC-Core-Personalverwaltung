@@ -130,6 +130,12 @@ export const Lohnguide = {
             return value != null ? value.toString().replace('.', ',') : '';
         }
 
+        const dateDownload = function(value, data, type, params, column){
+            if (!value) return "";
+            const d = new Date(value);
+            return d.toLocaleDateString("de-AT"); 
+        }
+
 		const arr2string = function(value, data, type, params, column){
             return value.join(', ');
         }
@@ -208,8 +214,12 @@ export const Lohnguide = {
             return value ? tickElement : '';
         }
 
+        function allInDownload(value) {
+            return value ? 'ja':'nein';
+        }
+
         function beschaeftigungsausmassMutator(value,data) {
-            return data.wochenstunden / 38.5;
+            return (data.wochenstunden / 38.5 * 100).toFixed(1);
         }
 
         
@@ -235,10 +245,36 @@ export const Lohnguide = {
             return (data.vordienstzeit ?? 0) + berechneZeitspanneInJahren(vonDatum, stichtag.value)
         }
 
-        function grundgehaltFormatter(cell) {
-            
-            const value = cell.getValue();                       
-            return formatter.formatCurrencyGerman(getProperty(value,'gehaltstyp_bezeichnung','Basisgehalt'));
+        function grundgehaltMutator(value, data) {
+            const d = data.daten
+            const basisgehalt = getProperty(d,'gehaltstyp_kurzbz','basisgehalt')
+            const grundgehalt = getProperty(d,'gehaltstyp_kurzbz','grundgehalt')
+            return !!basisgehalt ? basisgehalt : grundgehalt
+        }
+
+        function sonstigeZulagenMutator(value, data) {
+            const d = data.daten
+            const valAllIn = getProperty(d,'freitexttyp_kurzbz','allin')
+            const valATZ = getProperty(d,'gehaltstyp_kurzbz','lohnausgleichatz')
+            return (valAllIn ?? 0) + (valATZ ?? 0)
+        }
+
+        function ueberstundenpauschaleMutator(value, data) {
+            const d = data.daten
+            const val = getProperty(d,'gehaltstyp_kurzbz','ueberstundenpauschale')
+            return val
+        }
+
+        function sachbezugMutator(value, data) {
+            const d = data.daten
+            const val = getProperty(d,'gehaltstyp_kurzbz','sachbezug_pkw')
+            return val
+        }
+
+        function praemieMutator(value, data) {
+            const d = data.daten
+            const val = getProperty(d,'gehaltstyp_kurzbz','praemie')
+            return val
         }
 
         const presetDates = ref([
@@ -353,31 +389,31 @@ export const Lohnguide = {
         { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "center", sorter:"string", formatter:sexformatter, headerFilter:"list", headerFilterParams: {values:{'': 'Alle','m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'},clearable:true}, width:100  },        
-        { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, headerFilter:dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
-        { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, headerFilter: dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100 }, 
-        { title: 'AllIn-Gehalt', field: "daten_allIn", hozAlign: "center",  mutatorData: allInMutator, formatter: allInFormatter, headerFilter:"tickCross", headerFilterParams: {tristate: true,indeterminate: true}, headerFilterEmptyCheck:function(value){return value === null}, width:100}, 
-        { title: 'Beschäftigungsausmaß', field: "daten_beschaeftigung", hozAlign: "center", mutatorData: beschaeftigungsausmassMutator,sorter:"number",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120, formatter: (cell) => (cell.getValue() * 100).toFixed(1) + " %", accessorDownload: formatter.formatCurrencyGerman },
-        { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, headerFilter:dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100, accessorDownload: dateDownload }, 
+        { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, headerFilter: dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100, accessorDownload: dateDownload }, 
+        { title: 'AllIn-Gehalt', field: "daten_allIn", hozAlign: "center",  mutatorData: allInMutator, formatter: allInFormatter, headerFilter:"tickCross", headerFilterParams: {tristate: true,indeterminate: true}, headerFilterEmptyCheck:function(value){return value === null}, width:100, accessorDownload: allInDownload}, 
+        { title: 'Beschäftigungsausmaß', field: "daten_beschaeftigung", hozAlign: "center", mutatorData: beschaeftigungsausmassMutator,sorter:"number",  headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120, formatter: (cell) => cell.getValue() + " %", accessorDownload: sumsDownload },
+        { title: 'KV-Gruppe', field: "kv_gruppe", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'KV-Stufe', field: "kv_stufe", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
 		{ title: 'KV-Jahre', field: "kv_jahre", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
         { title: 'Org.-Einheit (Allgm.)', field: "oe_bezeichnung_hr", sorter:"string", headerFilter:"list",hozAlign: "left", 
-             width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, accessorDownload: sumsDownload },    
+             width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}},    
         { title: 'Org.-Einheit (Detail)', field: "kstorgbezeichnung", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 },
-        { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
-        { title: 'Fachrichtung', field: "fachrichtung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
+        { title: 'Fachrichtung', field: "fachrichtung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Fachrichtung Code', field: "fachrichtung_kurzbz", sorter:"string", headerFilter:"list",hozAlign: "right", 
             width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload },  
         { title: 'Jobfamilie', field: "jobfamilie", sorter:"string", headerFilter:"list",hozAlign: "left", 
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
-        { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120,  accessorDownload: formatter.formatDateGerman },
+        { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Berufserfahrung', field: "daten_berufserfahrung", hozAlign: "center", mutatorData:berufserfahrungMutator, headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
-        { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: (value, data) => data.daten, formatter:grundgehaltFormatter,headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true },
+        { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: grundgehaltMutator, formatterParams:moneyFormatterParams,formatter:"money",headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true, accessorDownload: sumsDownload },
        
-        { title: 'Prämie', field: "praemie", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:false, download:true },
+        { title: 'Prämie', field: "daten_praemie", mutatorData:praemieMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true, accessorDownload: sumsDownload },
         { title: 'Funktionszulage', field: "daten_funktionszulage", hozAlign: "right", sorter:"string", mutatorData: funktionszulageMutator, formatter: funktionzulagenFormatter, headerFilter:true, headerFilterFunc: ">=", width:150 }, 
-        { title: 'Sachbezug', field: "sachbezug", hozAlign: "left", sorter:"number", headerFilter:true, width:150 }, 
-        { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
-        { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "ueberstundenpauschale", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
+        { title: 'Sachbezug', field: "sachbezug", hozAlign: "right", mutatorData:sachbezugMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"number", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
+        { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", mutatorData:sonstigeZulagenMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "right", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
+        { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "daten_ueberstundenpauschale", mutatorData:ueberstundenpauschaleMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "left", sorter:"number", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
         { title: 'Kommentar zur Person', field: "kommentar_person", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Kommentar zur Modellstelle', field: "kommentar_modellstelle", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Standort', field: "standort", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
@@ -485,8 +521,8 @@ export const Lohnguide = {
                             format="dd.MM.yyyy"
                             model-type="yyyy-MM-dd"
                             input-class-name="dp-custom-input"
-                            style="max-width:150px;min-width:150px" >
-                            
+                            style="max-width:150px;min-width:150px" 
+                            text-input >
                         </datepicker>
                        
                     </div>

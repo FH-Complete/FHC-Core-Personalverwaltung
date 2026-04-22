@@ -212,8 +212,7 @@ class LohnguideExport extends FHCAPI_Controller
 				' . $sap_join . '
 				
 			WHERE
-				gehaltstyp.lvexport = true
-				AND ((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($stichtag_datestring) .')
+				((gehaltsbestandteil.bis >= '. $this->_ci->db->escape($stichtag_datestring) .')
 					OR gehaltsbestandteil.bis IS NULL)
 				AND
 				((gehaltsbestandteil.von <= '. $this->_ci->db->escape($stichtag_datestring) .')
@@ -286,7 +285,8 @@ class LohnguideExport extends FHCAPI_Controller
 				FROM ($qry_history) as hist
 
 			GROUP BY dienstverhaeltnis_id,
-					coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+					-- coalesce(lvexport_sum,gehaltsbestandteil_id::text),lvexport_sum,
+					gehaltsbestandteil_id::text,lvexport_sum,
                     dv_von, dv_bis,
 					vertragsart_bezeichnung,mitarbeiter_uid, 
 					personalnummer,name_gesamt,svnr,
