@@ -90,7 +90,7 @@ class LohnguideExport extends FHCAPI_Controller
 				vertragsbestandteil_karenz.von as karenz_von, vertragsbestandteil_karenz.bis as karenz_bis, vertragsbestandteil_karenz.karenztyp_kurzbz, vertragsbestandteil_karenz.bezeichnung karenztyp_bezeichnung,
 				vertragsbestandteil_stunden.von as stunden_von, vertragsbestandteil_stunden.bis as stunden_bis, vertragsbestandteil_stunden.wochenstunden, vertragsbestandteil_stunden.bezeichnung as teilzeittyp,
 				ksttypbezeichnung, kstorgbezeichnung,
-				lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle_kurzbz, modellstelle, jobfamilie, modellfunktion,
+				lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, code, modellstelle_kurzbz, modellstelle, jobfamilie, modellfunktion,
 				benutzerfunktion_id,
 				' . $oe_kurzbz_sap . ' AS kstnummer,
 				COALESCE(( WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz, bezeichnung, organisationseinheittyp_kurzbz, standort) AS (
@@ -196,7 +196,7 @@ class LohnguideExport extends FHCAPI_Controller
 				LEFT JOIN (
 					SELECT
 						dienstverhaeltnis_id,vertragsbestandteil_id,stellenbezeichnung,kommentar_person, kommentar_modellstelle, fachrichtung_kurzbz, hr.tbl_lohnguide_fachrichtung.bezeichnung fachrichtung,
-						vertragsbestandteil.von lg_von, vertragsbestandteil.bis lg_bis, vordienstzeit, hr.tbl_lohnguide_modellstelle.modellstelle_kurzbz, hr.tbl_lohnguide_modellstelle.bezeichnung modellstelle, hr.tbl_lohnguide_modellfunktion.bezeichnung modellfunktion, hr.tbl_lohnguide_jobfamilie.bezeichnung jobfamilie
+						vertragsbestandteil.von lg_von, vertragsbestandteil.bis lg_bis, vordienstzeit, hr.tbl_lohnguide_modellstelle.code, hr.tbl_lohnguide_modellstelle.modellstelle_kurzbz, hr.tbl_lohnguide_modellstelle.bezeichnung modellstelle, hr.tbl_lohnguide_modellfunktion.bezeichnung modellfunktion, hr.tbl_lohnguide_jobfamilie.bezeichnung jobfamilie
 					FROM hr.tbl_vertragsbestandteil vertragsbestandteil
 						JOIN hr.tbl_vertragsbestandteil_lohnguide USING(vertragsbestandteil_id)
 						LEFT JOIN hr.tbl_lohnguide_fachrichtung USING(fachrichtung_kurzbz)
@@ -280,7 +280,7 @@ class LohnguideExport extends FHCAPI_Controller
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer,oe_bezeichnung_hr,
-					lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle_kurzbz, modellstelle, jobfamilie, modellfunktion,
+					lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, code, modellstelle_kurzbz, modellstelle, jobfamilie, modellfunktion,
 					array_remove(array_agg(benutzerfunktion_id), NULL) as benutzerfunktion_id
 				FROM ($qry_history) as hist
 
@@ -294,7 +294,7 @@ class LohnguideExport extends FHCAPI_Controller
 					karenz_von, karenz_bis, karenztyp_kurzbz, karenztyp_bezeichnung,
 					stunden_von, stunden_bis, wochenstunden, teilzeittyp, 
 					ksttypbezeichnung, kstorgbezeichnung, kstnummer,oe_bezeichnung_hr,
-					lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, modellstelle_kurzbz, modellstelle, jobfamilie, modellfunktion
+					lg_von, lg_bis, vordienstzeit, stellenbezeichnung, kommentar_person, kommentar_modellstelle, fachrichtung, fachrichtung_kurzbz, code, modellstelle_kurzbz, modellstelle, jobfamilie, modellfunktion
 			HAVING ((dv_bis >= ". $this->_ci->db->escape($stichtag_datestring) .")
 							OR dv_bis IS NULL)
 						AND
@@ -351,6 +351,7 @@ class LohnguideExport extends FHCAPI_Controller
 				kommentar_modellstelle,
 				fachrichtung,
 				fachrichtung_kurzbz,
+				code,
 				modellstelle,
 				modellstelle_kurzbz,
 				jobfamilie,
@@ -414,6 +415,7 @@ class LohnguideExport extends FHCAPI_Controller
 				kommentar_modellstelle,
 				fachrichtung,
 				fachrichtung_kurzbz,
+				code,
 				modellstelle,
 				modellstelle_kurzbz,
 				jobfamilie,
