@@ -85,3 +85,6 @@ CREATE TRIGGER log_generic AFTER INSERT OR UPDATE OR DELETE ON hr.tbl_vertragsbe
 
 DROP TRIGGER IF EXISTS log_generic ON hr.tbl_gehaltsbestandteil;
 CREATE TRIGGER log_generic AFTER INSERT OR UPDATE OR DELETE ON hr.tbl_gehaltsbestandteil FOR EACH ROW EXECUTE FUNCTION hr.generic_log_diffed();
+
+DROP TRIGGER IF EXISTS log_generic ON hr.tbl_vertragsbestandteil_lohnguide;
+CREATE TRIGGER log_generic AFTER INSERT OR UPDATE OR DELETE ON hr.tbl_vertragsbestandteil_lohnguide FOR EACH ROW EXECUTE FUNCTION hr.generic_log_diffed();
