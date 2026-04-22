@@ -378,16 +378,16 @@ export const Lohnguide = {
         thousand: ".",
         symbol: false,
         symbolAfter: false,
-        negativeSign: true,
+        negativeSign: "-",
         precision: 2
       };
 
 
       const lohnguideTableColumnsDef =  [        
         { title: 'P#', field: "personalnummer", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible:true, download:true },        
-		{ title: 'DVID', field: "dienstverhaeltnis_id", hozAlign: "left", sorter:"number", headerFilter: true, width:150, visible:false, download:true }, 
-        { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+		{ title: 'DVID', field: "dienstverhaeltnis_id", hozAlign: "left", sorter:"number", headerFilter: true, width:150, visible:false, download:false }, 
         { title: 'Vorname', field: "vorname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
+        { title: 'Nachname', field: "nachname", hozAlign: "left", sorter:"string", headerFilter: true, width:150, visible:true, download:true }, 
         { title: 'Geschlecht', field: "geschlecht", visible:true, download:true, hozAlign: "center", sorter:"string", formatter:sexformatter, headerFilter:"list", headerFilterParams: {values:{'': 'Alle','m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'},clearable:true}, width:100  },        
         { title: 'Geburtsdatum', field: "gebdatum", formatter: formatDate, headerFilter:dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100, accessorDownload: dateDownload }, 
         { title: 'Eintrittsdatum', field: "dv_von", formatter: formatDate, headerFilter: dateFilter, headerFilterFunc: 'dates', hozAlign: "center", sorter:"string", width:100, accessorDownload: dateDownload }, 
@@ -402,10 +402,12 @@ export const Lohnguide = {
         { title: 'Stellenbezeichnung (intern)', field: "stellenbezeichnung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Fachrichtung', field: "fachrichtung", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Fachrichtung Code', field: "fachrichtung_kurzbz", sorter:"string", headerFilter:"list",hozAlign: "right", 
-            width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload },  
+					width:150, headerFilterParams: {valuesLookup:true, autocomplete:true}, visible: false, accessorDownload: sumsDownload,download:true },  
         { title: 'Jobfamilie', field: "jobfamilie", sorter:"string", headerFilter:"list",hozAlign: "left", 
              width:150, headerFilterParams: {valuesLookup:true, autocomplete:true},  accessorDownload: sumsDownload },          
         { title: 'Modellfunktion', field: "modellfunktion", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
+        { title: 'Modellstelle', field: "modellstelle", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
+        { title: 'Modellstelle Code', field: "modellstelle_kurzbz", hozAlign: "center",sorter:"string", headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Berufserfahrung', field: "daten_berufserfahrung", hozAlign: "center", mutatorData:berufserfahrungMutator, headerFilterParams: {valuesLookup:true, autocomplete:true}, headerFilter:"list", width:120 },
         { title: 'Grundgehalt', field: "daten_grundgehalt", hozAlign: "right", mutatorData: grundgehaltMutator, formatterParams:moneyFormatterParams,formatter:"money",headerFilter:true, headerFilterFunc: ">=", width:150, visible:true, download:true, accessorDownload: sumsDownload },
        
@@ -414,6 +416,7 @@ export const Lohnguide = {
         { title: 'Sachbezug', field: "sachbezug", hozAlign: "right", mutatorData:sachbezugMutator, formatterParams:moneyFormatterParams, formatter:"money", sorter:"number", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
         { title: 'Sonst. Gehaltsbestandteile', field: "sonst_gehaltsbst", mutatorData:sonstigeZulagenMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "right", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
         { title: 'Überstundenpauschale/Durchschn. Überstunden in €', field: "daten_ueberstundenpauschale", mutatorData:ueberstundenpauschaleMutator, formatterParams:moneyFormatterParams, formatter:"money", hozAlign: "left", sorter:"number", headerFilter:true, headerFilterFunc: ">=", width:150, accessorDownload: sumsDownload }, 
+        { title: 'Leistungsbeurteilung in Punkten', field: "leistungsbeurteilung", hozAlign: "left", width:150, download:true }, 
         { title: 'Kommentar zur Person', field: "kommentar_person", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Kommentar zur Modellstelle', field: "kommentar_modellstelle", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
         { title: 'Standort', field: "standort", hozAlign: "left", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true}, width:150 }, 
@@ -426,7 +429,7 @@ export const Lohnguide = {
           reactiveData: true,
           data: lohnguideExportList.value,
 		  index: 'dienstverhaeltnis_id',
-		  persistenceID: 'pv21_lohnguide_2026031202',
+		  persistenceID: 'pv21_lohnguide_2026042202',
           layout: 'fitColumns',
 		  footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 		  movableColumns: false,
