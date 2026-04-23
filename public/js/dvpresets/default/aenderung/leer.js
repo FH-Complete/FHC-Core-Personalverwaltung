@@ -172,6 +172,19 @@ export default {
             infos: []
           },
           children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Lohnguide',
+            vertragsbestandteiltyp: 'vertragsbestandteillohnguide',
+            childdefaults: {
+              data: {
+                fachrichtung_kurzbz: "FA00"
+              }
+            }
+          },
+          children: []
         }
       ]
     },    
