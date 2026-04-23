@@ -429,7 +429,7 @@ export const Lohnguide = {
           reactiveData: true,
           data: lohnguideExportList.value,
 		  index: 'dienstverhaeltnis_id',
-		  persistenceID: 'pv21_lohnguide_2026042202',
+		  persistenceID: 'pv21_lohnguide_2026042203',
           layout: 'fitColumns',
 		  footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 		  movableColumns: false,
