@@ -296,15 +296,17 @@ export const EmployeeHeader = {
 
             <div class="d-flex flex-column">
                 <div class="d-flex py-1">
-                    <issue-checker
-                        ref="issueCheckerRef"
-                        :endpoint="issueCheckerEndpoint"
-                        :person_id="personID"
-                        :apps="['personalverwaltung']"
-                        :issueListEndpoint="issueListEndpoint"
-                        :issueListStyle = "{ width: '50%' }"
-                        :issueListStyleBreakpoints = "{ '650px': '100%' }">
-                    </issue-checker>
+                    <div class="px-2">
+                        <issue-checker
+                            ref="issueCheckerRef"
+                            :endpoint="issueCheckerEndpoint"
+                            :person_id="personID"
+                            :apps="['personalverwaltung']"
+                            :issueListEndpoint="issueListEndpoint"
+                            :issueListStyle = "{ width: '50%' }"
+                            :issueListStyleBreakpoints = "{ '650px': '100%' }">
+                        </issue-checker>
+                    </div>
                     <div class="px-2 border-start">
                         <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
