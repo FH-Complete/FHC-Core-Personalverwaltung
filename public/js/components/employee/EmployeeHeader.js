@@ -305,12 +305,12 @@ export const EmployeeHeader = {
                         :issueListStyle = "{ width: '50%' }"
                         :issueListStyleBreakpoints = "{ '650px': '100%' }">
                     </issue-checker>
-                    <div class="px-2">
+                    <div class="px-2 border-start">
                         <h4 class="mb-1">PNr</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.personalnummer }}</h6>
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>
                     </div>
-                    <div class="px-2" style="border-left: 1px solid #EEE">
+                    <div class="px-2 border-start">
                         <h4 class="mb-1">UID</h4>
                         <h6 v-if="!isFetchingName" class="text-muted">{{ employee?.uid }}</h6>
                         <h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>
