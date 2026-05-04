@@ -37,7 +37,7 @@ class GUIVertragsbestandteilLohnguide extends AbstractGUIVertragsbestandteil imp
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
         $this->data = ["stellenbezeichnung" => "",
-                       "vordienstzeit" => "",
+                       "vordienstzeit" => null,
                        "fachrichtung_kurzbz" => "",
                        "modellstelle_kurzbz" => "",
                        "kommentar_person" => "",
@@ -60,7 +60,7 @@ class GUIVertragsbestandteilLohnguide extends AbstractGUIVertragsbestandteil imp
         }
 		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONDataString($this->data['stellenbezeichnung'], $decodedData, 'stellenbezeichnung');
-        $this->getJSONDataString($this->data['vordienstzeit'], $decodedData, 'vordienstzeit');
+        $this->getJSONDataInt($this->data['vordienstzeit'], $decodedData, 'vordienstzeit');
         $this->getJSONDataString($this->data['fachrichtung_kurzbz'], $decodedData, 'fachrichtung_kurzbz');
         $this->getJSONDataString($this->data['modellstelle_kurzbz'], $decodedData, 'modellstelle_kurzbz');
         $this->getJSONDataString($this->data['kommentar_person'], $decodedData, 'kommentar_person');
