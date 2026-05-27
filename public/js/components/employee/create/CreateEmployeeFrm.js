@@ -238,7 +238,7 @@ export const CreateEmployeeFrm = {
         <div class="col-md-8">
             <h6>Stammdaten Mindestanforderung</h6>
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-3">
                     <label for="surname" class="required form-label">Nachname</label>
                     <input id="surname" 
                         @blur="frmState.nachnameBlured = true"
@@ -272,6 +272,15 @@ export const CreateEmployeeFrm = {
                         type="text" 
                         class="form-control form-control-sm" 
                         aria-label="vornamen">
+                </div>
+
+                <div class="col-md-3">
+                    <label for="wahlname" class="form-label">Wahlname</label>
+                    <input id="wahlname" 
+                        v-model="currentValue.wahlname" 
+                        type="text" 
+                        class="form-control form-control-sm" 
+                        aria-label="wahlname">
                 </div>
             </div>
             
@@ -310,7 +319,7 @@ export const CreateEmployeeFrm = {
                         Pflichtfeld
                         </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <label for="svnr" class="form-label">SVNR</label>
                     <input id="svnr" 
                         v-model="currentValue.svnr" 
@@ -333,7 +342,7 @@ export const CreateEmployeeFrm = {
                     </select>
                 </div>
                 <!-- Email -->
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <label for="email" class="required form-label">Email</label>
                     <input id="email" 
                         v-model="currentValue.email" 
@@ -349,7 +358,7 @@ export const CreateEmployeeFrm = {
             </div>
             
             <div class="row">
-                <div class="col-md-11">
+                <div class="col-md-12">
                     <label for="inputAddress" class="form-label">Anmerkung</label>
                     <textarea type="text" class="form-control form-control-sm"  id="anmerkungen" v-model="currentValue.anmerkung"/>
                 </div>
