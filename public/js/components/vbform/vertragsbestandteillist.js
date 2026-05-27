@@ -6,6 +6,7 @@ import vertragsbestandteilkuendigungsfrist from './vertragsbestandteil_kuendigun
 import vertragsbestandteilurlaubsanspruch from './vertragsbestandteil_urlaubsanspruch.js';
 import vertragsbestandteilkarenz from './vertragsbestandteil_karenz.js';
 import vertragsbestandteillohnguide from './vertragsbestandteil_lohnguide.js';
+import vertragsbestandteilkollektivvertrag from './vertragsbestandteil_kollektivvertrag.js';
 import presetable from '../../mixins/vbform/presetable.js';
 import uuid from '../../helpers/vbform/uuid.js';
 import errors from './errors.js';
@@ -58,6 +59,7 @@ export default {
     'vertragsbestandteilurlaubsanspruch': vertragsbestandteilurlaubsanspruch,
     'vertragsbestandteilkarenz': vertragsbestandteilkarenz,
     'vertragsbestandteillohnguide': vertragsbestandteillohnguide,
+    'vertragsbestandteilkollektivvertrag': vertragsbestandteilkollektivvertrag,
     'infos': infos,
     'errors': errors
   },

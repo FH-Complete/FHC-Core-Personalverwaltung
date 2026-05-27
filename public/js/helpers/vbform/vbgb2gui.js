@@ -44,6 +44,9 @@ export default {
           case 'lohnguide':
                 this.lohnguide2gui(vb, mode);
                 break;
+          case 'kollektivvertrag':
+                this.kollektivvertrag2gui(vb, mode);
+                break;
           default:
               console.log('unknown Vertragsbestandteil ' 
                       + vb.vertragsbestandteiltyp_kurzbz);
@@ -276,6 +279,23 @@ export default {
             'vordienstzeit',
             'fachrichtung_kurzbz',
             'modellstelle_kurzbz'
+        ];
+      }
+  },
+  kollektivvertrag2gui: function(vb, mode) {
+      this.vbout.type = 'vertragsbestandteilkollektivvertrag';
+      this.vbout.data = {
+          id: vb.vertragsbestandteil_id,
+          kommentar: vb.kommentar,
+          verwendungsgruppe_kurzbz: vb.verwendungsgruppe_kurzbz,
+          kv_jahre: vb.kv_jahre,
+          gueltigkeit: this.gueltigkeit2gui(vb, mode)
+      };
+      if( this.isEndable(vb) && !this.isFuture(vb) ) {
+        this.vbout.guioptions.disabled = [
+            'kommentar',
+            'verwendungsgruppe_kurzbz',
+            'kv_jahre'
         ];
       }
   },

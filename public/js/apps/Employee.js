@@ -12,6 +12,7 @@ import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 import ApiCommon from '../api/factory/common.js';
 import ApiDV from  '../api/factory/dv.js';
 import ApiLohnguide from '../api/factory/lohnguide.js';
+import ApiKollektivvertrag from '../api/factory/kollektivvertrag.js';
 
 var personSelectedRef = { callback: () => {}};
 
@@ -74,6 +75,8 @@ const unternehmen = Vue.ref([]);
 const beendigungsgruende = Vue.ref([]);
 const modellstellen = Vue.ref([]);
 const fachrichtungen = Vue.ref([]);
+const verwendungsgruppen =  Vue.ref([]);
+const verwendungsgruppenjahre =  Vue.ref([]);
 
 const pvApp = Vue.createApp({
 	name: 'PV21Employee',
@@ -100,6 +103,8 @@ const pvApp = Vue.createApp({
 		Vue.provide('beendigungsgruende',beendigungsgruende);
 		Vue.provide('modellstellen',modellstellen);
 		Vue.provide('fachrichtungen', fachrichtungen);
+		Vue.provide('verwendungsgruppen', verwendungsgruppen);
+		Vue.provide('verwendungsgruppenjahre', verwendungsgruppenjahre);
 	}
 }).use(router);
 
@@ -168,6 +173,12 @@ pvApp.config.globalProperties.$api.call(ApiLohnguide.getFachrichtungen()).then((
 pvApp.config.globalProperties.$api.call(ApiLohnguide.getModellstellen()).then((r) => {
 	modellstellen.value = r.data
 }) 
+pvApp.config.globalProperties.$api.call(ApiKollektivvertrag.getVerwendungsgruppen()).then((r) => {
+	verwendungsgruppen.value = r.data
+})
+pvApp.config.globalProperties.$api.call(ApiKollektivvertrag.getVerwendungsgruppenjahre()).then((r) => {
+	verwendungsgruppenjahre.value = r.data
+})
 
 
 

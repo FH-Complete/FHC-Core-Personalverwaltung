@@ -4,6 +4,7 @@ import TmpStore from "./tmpstore.js";
 import DV from "./dv.js";
 import Karenz from "./karenz.js";
 import Lohnguide from "./lohnguide.js";
+import Kollektivvertrag from "./kollektivvertrag.js";
 import Stunden from "./stunden.js";
 import Freitext from "./freitext.js";
 import Funktion from "./funktion.js";
@@ -29,6 +30,7 @@ export default {
     "DV": DV,
     "Karenz": Karenz,
     "Lohnguide": Lohnguide,
+    "Kollektivvertrag": Kollektivvertrag,
     "Stunden": Stunden,
     "Freitext": Freitext,
     "Funktion": Funktion,

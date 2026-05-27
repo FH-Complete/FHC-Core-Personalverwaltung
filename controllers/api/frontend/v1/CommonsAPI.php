@@ -48,6 +48,9 @@ class CommonsAPI extends FHCAPI_Controller
         'getModellstellen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getModellfunktionen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getJobfamilien' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+
+		'getVerwendungsgruppen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVerwendungsgruppenjahre' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -70,14 +73,17 @@ class CommonsAPI extends FHCAPI_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
-    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
-    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellstelle_model', 'ModellstelleModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
-	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+    	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
+    	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellstelle_model', 'ModellstelleModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
+		$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/kollektivvertrag/Verwendungsgruppe_model', 'VerwendungsgruppeModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/kollektivvertrag/Verwendungsgruppenjahr_model', 'VerwendungsgruppenjahrModel');
     }
 
 
@@ -543,6 +549,47 @@ class CommonsAPI extends FHCAPI_Controller
 		else
 		{
 			$this->terminateWithError('no jobfamilien found');
+			return;
+		}
+	}
+
+
+    // --------------------------------------
+    // Kollektivvertrag
+    // --------------------------------------
+
+	public function getVerwendungsgruppen()
+	{
+		$this->VerwendungsgruppeModel->resetQuery();
+		$this->VerwendungsgruppeModel->addSelect('verwendungsgruppe_kurzbz AS value, bezeichnung AS label');
+		$this->VerwendungsgruppeModel->addOrder('sort', 'ASC');
+		$rows = $this->VerwendungsgruppeModel->loadWhere(array('aktiv' => true));
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no verwendungsgruppen found');
+			return;
+		}
+	}
+
+	public function getVerwendungsgruppenjahre()
+	{
+		$this->VerwendungsgruppenjahrModel->resetQuery();
+		$this->VerwendungsgruppenjahrModel->addSelect('kv_jahre AS value, bezeichnung AS label');
+		$this->VerwendungsgruppenjahrModel->addOrder('kv_jahre', 'ASC');
+		$rows = $this->VerwendungsgruppenjahrModel->loadWhere(array('aktiv' => true));
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no verwendungsgruppenjahre found');
 			return;
 		}
 	}
