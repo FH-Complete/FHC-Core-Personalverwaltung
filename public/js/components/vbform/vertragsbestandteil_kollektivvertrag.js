@@ -37,11 +37,11 @@ export default {
 
     <div class="row g-2 py-2" v-show="showinput('verwendungsgruppenjahr')">
       <div class="col-6">
-        <select v-model="kv_jahr" :disabled="isinputdisabled('kv_jahr')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select v-model="kv_jahre" :disabled="isinputdisabled('kv_jahre')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.verwendungsgruppenjahre"
             :value="f.value"
-            :selected="isselected(f.value, this.kv_jahr)"
+            :selected="isselected(f.value, this.kv_jahre)"
             :disabled="f.disabled">
             {{ f.label }}
           </option>
@@ -77,7 +77,7 @@ export default {
       id: null,
       kommentar: '',
       verwendungsgruppe_kurzbz: '',
-      kv_jahr: null,
+      kv_jahre: null,
       db_delete: false,
       lists: {
         verwendungsgruppen: [],
@@ -106,8 +106,8 @@ export default {
       if( this.config?.data?.verwendungsgruppe_kurzbz !== undefined ) {
         this.verwendungsgruppe_kurzbz = this.config.data.verwendungsgruppe_kurzbz;
       }
-      if( this.config?.data?.kv_jahr !== undefined ) {
-        this.kv_jahr = this.config.data.kv_jahr;
+      if( this.config?.data?.kv_jahre !== undefined ) {
+        this.kv_jahre = this.config.data.kv_jahre;
       }  
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
@@ -143,7 +143,7 @@ export default {
         data: {
           id: this.id,
           verwendungsgruppe_kurzbz: this.verwendungsgruppe_kurzbz,  
-          kv_jahr: this.kv_jahr,
+          kv_jahre: this.kv_jahre,
           kommentar: this.kommentar,
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),

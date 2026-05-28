@@ -35,8 +35,7 @@ class GUIVertragsbestandteilKollektivvertrag extends AbstractGUIVertragsbestandt
         $this->type = self::TYPE_STRING;
         $this->hasGBS = false;
         $this-> guioptions = ["id" => null, "infos" => [], "errors" => [], "removeable" => true];
-        $this->data = ["kollektivvertrag_kurzbz" => "IT",
-                       "verwendungsgruppe_kurzbz" => "",
+        $this->data = ["verwendungsgruppe_kurzbz" => "",
                        "kv_jahre" => "",
                        "kommentar" => "",
                        "gueltigkeit" => [

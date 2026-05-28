@@ -61,7 +61,8 @@ export const EmployeeContract = {
             urlaubsanspruch: [],
             zusatzvereinbarung: [],
             karenz: [],
-            lohnguide: null
+            lohnguide: null,
+            kollektivvertrag: null,
         });
         //const dienstverhaeltnisDialogRef = ref();
         const VbformWrapperRef = ref();
@@ -95,6 +96,7 @@ export const EmployeeContract = {
         const teilzeittypen = inject('teilzeittypen');
         const modellstellen = inject('modellstellen');
         const fachrichtungen = inject('fachrichtungen');
+        const verwendungsgruppen = inject('verwendungsgruppen');
 
         const readonly = ref(false);
         const valorisationValid = ref(true);
@@ -554,6 +556,7 @@ export const EmployeeContract = {
             let zusatzvereinbarung = [];
             let karenz = [];
             let lohnguide = null;
+            let kollektivvertrag = null;
             vertragList.value.forEach(vbs => {
                 if (vbs.vertragsbestandteiltyp_kurzbz == 'funktion') {
                     if (vbs.benutzerfunktiondata.funktion_kurzbz.match(/.*zuordnung/)) {
@@ -581,6 +584,8 @@ export const EmployeeContract = {
                     karenz.push(vbs);
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'lohnguide') {
                     lohnguide = vbs;
+                } else if (vbs.vertragsbestandteiltyp_kurzbz == 'kollektivvertrag') {
+                    kollektivvertrag = vbs;
                 }
             });
             currentVBS.funktion.zuordnung = zuordnung;
@@ -594,7 +599,7 @@ export const EmployeeContract = {
             currentVBS.urlaubsanspruch = urlaubsanspruch;
             currentVBS.karenz = karenz;
             currentVBS.lohnguide = lohnguide;
-
+            currentVBS.kollektivvertrag = kollektivvertrag;
         }
 
         const dropdownLink1 = () => {
@@ -663,6 +668,11 @@ export const EmployeeContract = {
             return va != undefined ? va.label : item;
         }
 
+        const formatVerwendungsgruppe = (item) => {
+            let va = verwendungsgruppen.value.find(kt => kt.value == item);
+            return va != undefined ? `${va.label } (${item})` : item;
+        }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         const checkValorisation = async () => {
@@ -694,7 +704,7 @@ export const EmployeeContract = {
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
-            formatModellstelle, formatFachrichtung
+            formatModellstelle, formatFachrichtung, formatVerwendungsgruppe
         }
     },
     template: `
@@ -1243,6 +1253,51 @@ export const EmployeeContract = {
                                     </div>
 
                                     
+                                    
+                                </div>
+                            </div><!-- card-body -->
+                        </div><!-- card -->
+
+
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <h5 class="mb-0">Kollektivvertrag</h5>
+                            </div>
+                            <div class="card-body" >
+                                <div class="col-md-12 py-3" v-if="currentVBS.kollektivvertrag === null">
+                                        Kein aktiver Vertragsbestandteil vorhanden.
+                                </div>
+                                <div ref="baseDataFrm" class="row g-3" v-else>
+
+                                    <div class="col-md-2">
+                                        <label class="col-sm-6 form-label">VG-Jahr</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentVBS.kollektivvertrag.kv_jahre" >
+                                    </div>                                                                        
+
+                                    <div class="col-md-6">
+                                        <label for="dvArt" class="col-sm-6 form-label">Verwendungsgruppe</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="formatVerwendungsgruppe(currentVBS.kollektivvertrag.verwendungsgruppe_kurzbz)">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label  class="form-label" >Von</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(currentVBS.kollektivvertrag.von)">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label" >Bis</label>
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatDate(currentVBS.kollektivvertrag.bis)">
+                                    </div>
+
+                                    <div class="col-md-12" v-if="!!currentVBS.kollektivvertrag.kommentar">
+                                        <label for="dvArt" class="col-sm-6 form-label">Kommentar</label>
+                                        <div class="col-sm-12">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="dvArt" :value="currentVBS.kollektivvertrag.kommentar">
+                                        </div>
+                                    </div>
+
                                     
                                 </div>
                             </div><!-- card-body -->

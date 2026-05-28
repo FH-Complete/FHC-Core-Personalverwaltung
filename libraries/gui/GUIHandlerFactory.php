@@ -9,6 +9,7 @@ require_once __DIR__ .'/GUIVertragsbestandteilZeitaufzeichnung.php';
 require_once __DIR__ .'/GUIVertragsbestandteilFreitext.php';
 require_once __DIR__ .'/GUIVertragsbestandteilKarenz.php';
 require_once __DIR__ .'/GUIVertragsbestandteilLohnguide.php';
+require_once __DIR__ .'/GUIVertragsbestandteilKollektivvertrag.php';
 require_once __DIR__ .'/GUIGehaltsbestandteil.php';
 
 class GUIHandlerFactory {
@@ -49,6 +50,9 @@ class GUIHandlerFactory {
 				break;
             case GUIVertragsbestandteilLohnguide::TYPE_STRING:
 				$handler = new GUIVertragsbestandteilLohnguide();
+				break;
+            case GUIVertragsbestandteilKollektivvertrag::TYPE_STRING:
+				$handler = new GUIVertragsbestandteilKollektivvertrag();
 				break;
             default:
 				throw new \Exception('type not found: '.$type);
