@@ -97,6 +97,8 @@ export const EmployeeContract = {
         const modellstellen = inject('modellstellen');
         const fachrichtungen = inject('fachrichtungen');
         const verwendungsgruppen = inject('verwendungsgruppen');
+        const verwendungsgruppenjahre = inject('verwendungsgruppenjahre');
+
 
         const readonly = ref(false);
         const valorisationValid = ref(true);
@@ -673,6 +675,11 @@ export const EmployeeContract = {
             return va != undefined ? `${va.label } (${item})` : item;
         }
 
+        const formatVerwendungsgruppenjahr = (item) => {
+            let va = verwendungsgruppenjahre.value.find(kt => kt.value == item);
+            return va != undefined ? `${va.label } (${item})` : item;
+        }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         const checkValorisation = async () => {
@@ -704,7 +711,7 @@ export const EmployeeContract = {
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
-            formatModellstelle, formatFachrichtung, formatVerwendungsgruppe
+            formatModellstelle, formatFachrichtung, formatVerwendungsgruppe, formatVerwendungsgruppenjahr
         }
     },
     template: `
@@ -1271,7 +1278,7 @@ export const EmployeeContract = {
 
                                     <div class="col-md-2">
                                         <label class="col-sm-6 form-label">VG-Jahr</label>
-                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="currentVBS.kollektivvertrag.kv_jahre" >
+                                        <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatVerwendungsgruppenjahr(currentVBS.kollektivvertrag.kv_jahre)" >
                                     </div>                                                                        
 
                                     <div class="col-md-6">
