@@ -36,6 +36,8 @@ export const OffCanvasTimeline = {
         const gehaltstypen = Vue.inject('gehaltstypen'); 
         const modellstellen = Vue.inject('modellstellen');
         const fachrichtungen = Vue.inject('fachrichtungen');
+        const verwendungsgruppen = Vue.inject('verwendungsgruppen');
+        const verwendungsgruppenjahre = Vue.inject('verwendungsgruppenjahre');
 
         const formatDate = (ds) => {
             if (!ds) return ""
@@ -146,6 +148,9 @@ export const OffCanvasTimeline = {
                     break;
                 case 'lohnguide':
                     label = 'Lohnguide';
+                    break;
+                case 'kollektivvertrag':
+                    label = 'Kollektivvertrag';
                     break;
 
                 default:
@@ -285,6 +290,16 @@ export const OffCanvasTimeline = {
             return va != undefined ? va.label : item;
         }
 
+        const formatVerwendungsgruppe = (item) => {
+            let va = verwendungsgruppen.value.find(kt => kt.value == item);
+            return va != undefined ? `${va.label } (${item})` : item;
+        }
+
+        const formatVerwendungsgruppenjahr = (item) => {
+            let va = verwendungsgruppenjahre.value.find(kt => kt.value == item);
+            return va != undefined ? `${va.label } (${item})` : item;
+        }
+
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
@@ -296,7 +311,8 @@ export const OffCanvasTimeline = {
             courseData, isFetching, formatDate, formatNumber, dateSelected, currentSemester, 
             title, currentUID, events, offCanvasEle, show, hide, toggle, isHidden, 
             selectedVBSTypen, vertragsbestandteiltypen, selectedGBSTypen, gehaltstypen,              
-            showAllDVChecked, colorPalette, formatVertragsart, formatFachrichtung, formatModellstelle
+            showAllDVChecked, colorPalette, formatVertragsart, formatFachrichtung, formatModellstelle,
+            formatVerwendungsgruppe, formatVerwendungsgruppenjahr
         }
      },
      template: `
@@ -399,6 +415,10 @@ export const OffCanvasTimeline = {
                                                 <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='lohnguide'">
                                                     Fachrichtung: {{ formatFachrichtung(bestandteil.vbs.fachrichtung_kurzbz) }}<br/>
                                                     Modellstelle: {{ formatModellstelle(bestandteil.vbs.modellstelle_kurzbz) }}
+                                                </template>
+                                                <template v-if="bestandteil.vbs.vertragsbestandteiltyp_kurzbz=='kollektivvertrag'">
+                                                    Verwendungsgruppe: {{ formatVerwendungsgruppe(bestandteil.vbs.verwendungsgruppe_kurzbz) }}<br/>
+                                                    VG-Jahre: {{ formatVerwendungsgruppenjahr(bestandteil.vbs.kv_jahre) }}
                                                 </template>
                                                 
                                             </div>

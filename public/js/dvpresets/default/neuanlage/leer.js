@@ -184,6 +184,19 @@ export default {
             }
           },
           children: []
+        },
+        {
+          type: 'vertragsbestandteillist',
+          guioptions: {
+            title: 'Kollektivvertrag',
+            vertragsbestandteiltyp: 'vertragsbestandteilkollektivvertrag',
+            childdefaults: {
+              data: {
+                verwendungsgruppe_kurzbz: "VGI"
+              }
+            }
+          },
+          children: []
         }
       ]
     },    
