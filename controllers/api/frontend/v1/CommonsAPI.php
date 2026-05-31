@@ -547,6 +547,28 @@ class CommonsAPI extends FHCAPI_Controller
 		}
 	}
 
+	// --------------------------------------
+    // Zeitaufzeichnung
+    // --------------------------------------
+
+    public function getZeitmodelle()
+	{
+		$this->ZeitmodellModel->resetQuery();
+		$this->ZeitmodellModel->addSelect('zeitmodell_id AS value, bezeichnung AS label');
+		$this->ZeitmodellModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->ZeitmodellModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no zeitmodell types found');
+			return;
+		}
+	}
+
     // --------------------------------------
     // Report
     // --------------------------------------

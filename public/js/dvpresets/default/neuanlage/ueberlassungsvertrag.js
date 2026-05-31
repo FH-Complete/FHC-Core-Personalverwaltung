@@ -157,6 +157,7 @@ export default {
         zeitaufzeichnung: true,
         azgrelevant: true,
         homeoffice: true,
+        zeitmodell_id: null,
         gueltigkeit: {
           guioptions: {
             sharedstatemode: "reflect"

@@ -246,13 +246,15 @@ export default {
           zeitaufzeichnung: vb.zeitaufzeichnung,
           azgrelevant: vb.azgrelevant,
           homeoffice: vb.homeoffice,
+          zeitmodell_id: vb.zeitmodell_id,
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
       };
       if( this.isEndable(vb) && !this.isFuture(vb) ) {
         this.vbout.guioptions.disabled = [
             'zeitaufzeichnung',
             'azgrelevant',
-            'homeoffice'
+            'homeoffice',
+            'zeitmodell_id'
         ];
       }
   },

@@ -336,7 +336,8 @@ export default {
         "id": null,
         "zeitaufzeichnung": true,
         "azgrelevant": "",
-        "homeoffice": true
+        "homeoffice": true,
+        "zeitmodell_id": null,
       }
     },
     [uuid.get_uuidbyname('fktltg')]: {

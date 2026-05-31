@@ -17,6 +17,7 @@ use vertragsbestandteil\VertragsbestandteilFactory;
  *   "zeitaufzeichnung": true,
  *   "azgrelevant": false,
  *   "homeoffice": true,
+ *   "zeitmodell_id": 1,
  *   "gueltigkeit": {
  *     "guioptions": {
  *       "sharedstatemode": "reflect"
@@ -52,6 +53,7 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
         $this->getJSONDataBool($this->data['zeitaufzeichnung'], $decodedData, 'zeitaufzeichnung');
         $this->getJSONDataBool($this->data['azgrelevant'], $decodedData, 'azgrelevant');
         $this->getJSONDataBool($this->data['homeoffice'], $decodedData, 'homeoffice');
+        $this->getJSONDataInt($this->data['zeitmodell_id'], $decodedData, 'zeitmodell_id');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
         $this->data['gueltigkeit'] = $gueltigkeit;
@@ -82,6 +84,7 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
             $data->zeitaufzeichnung = $this->data['zeitaufzeichnung'];
             $data->azgrelevant = $this->data['azgrelevant'];
             $data->homeoffice = $this->data['homeoffice'];
+            $data->zeitmodell_id = $this->data['zeitmodell_id'];
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG;
             
             $vbs = VertragsbestandteilFactory::getVertragsbestandteil($data);

@@ -42,6 +42,14 @@ export default {
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
       </div>
+      <div class="col-2">
+        <div class="form-check form-control-sm">
+            <input v-model="zeitmodell_id" :disabled="isinputdisabled('zeitmodell_id')" class="form-check-input" type="checkbox" value="" :id="'zeitmodell_id_' + config.guioptions.id">
+            <label class="form-check-label" :for="'zeitmodell_id_' + config.guioptions.id">
+              Zeitmodell
+            </label>
+        </div>
+      </div>
     </div>
    </div>
   </div>
@@ -63,6 +71,7 @@ export default {
       zeitaufzeichnung: true,
       azgrelevant: true,
       homeoffice: true,
+      zeitmodell_id: null,
       db_delete: false
     };
   },
@@ -83,6 +92,9 @@ export default {
       if( this.config?.data?.homeoffice !== undefined ) {
         this.homeoffice = this.config.data.homeoffice
       }
+      if( this.config?.data?.zeitmodell_id !== undefined ) {
+        this.zeitmodell_id = this.config.data.zeitmodell_id;
+      }
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
       }
@@ -99,6 +111,7 @@ export default {
           zeitaufzeichnung: Boolean(this.zeitaufzeichnung),
           azgrelevant: Boolean(this.azgrelevant),
           homeoffice: Boolean(this.homeoffice),
+          zeitmodell_id: this.zeitmodell_id,
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         }

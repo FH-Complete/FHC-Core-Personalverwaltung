@@ -28,7 +28,8 @@ export default {
        'vertragsbestandteilzeitaufzeichnung': [
             'zeitaufzeichnung',
             'azgrelevant',
-            'homeoffice'
+            'homeoffice',
+            'zeitmodell_id'
         ],
         'gehaltsbestandteil': [
             'gehaltstyp',
