@@ -41,16 +41,22 @@ export default {
         <span v-if="db_delete" class="badge bg-danger">wird gelöscht</span>
         <button v-if="isremoveable" type="button" class="btn-close btn-sm p-2 float-end" @click="removeVB" aria-label="Close"></button>
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
-      </div>
-      <div class="col-2">
-        <div class="form-check form-control-sm">
-            <input v-model="zeitmodell_id" :disabled="isinputdisabled('zeitmodell_id')" class="form-check-input" type="checkbox" value="" :id="'zeitmodell_id_' + config.guioptions.id">
-            <label class="form-check-label" :for="'zeitmodell_id_' + config.guioptions.id">
-              Zeitmodell
-            </label>
+      </div>      
+    </div>  <!-- row -->
+    <div class="row g-2" style="padding-right: 1rem;">
+        <div class="col-4">          
+              <select v-model="zeitmodell_id" :disabled="isinputdisabled('zeitmodell_id')" class="form-select form-select-sm" aria-label=".form-select-sm ">
+                <option
+                  v-for="f in lists.zeitmodelle"
+                  :value="f.value"
+                  :selected="isselected(f.value, this.zeitmodell_id)"
+                  :disabled="f.disabled">
+                  {{ f.label }}
+                </option>
+              </select>                      
         </div>
-      </div>
-    </div>
+        <div class="col-8"></div>
+    </div>  <!-- row -->
    </div>
   </div>
   `,
@@ -62,6 +68,17 @@ export default {
   mixins: [
     configurable
   ],
+  inject: ['zeitmodelle'],
+  mounted() {
+    const zeitmodelle = [
+        {
+            value: null,
+            label: 'Bitte Zeitmodell wählen'
+        },
+        ...this.zeitmodelle
+    ];
+    this.lists.zeitmodelle = zeitmodelle;
+  },
   emits: {
     removeVB: null
   },
@@ -72,13 +89,19 @@ export default {
       azgrelevant: true,
       homeoffice: true,
       zeitmodell_id: null,
-      db_delete: false
+      db_delete: false,
+      lists: {
+        zeitmodelle: []
+      }
     };
   },
   created: function() {
     this.setDataFromConfig();
   },
   methods: {
+    isselected: function(optvalue, selvalue) {
+      return (optvalue === selvalue);
+    },
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
         this.id = this.config.data.id;

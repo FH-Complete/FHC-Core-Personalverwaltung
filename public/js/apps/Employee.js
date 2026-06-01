@@ -12,7 +12,7 @@ import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
 import ApiCommon from '../api/factory/common.js';
 import ApiDV from  '../api/factory/dv.js';
 import ApiLohnguide from '../api/factory/lohnguide.js';
-import ApiZeitaufzeichnung from '../factory/zeitaufzeichnung.js';
+import ApiZeitaufzeichnung from '../api/factory/zeitaufzeichnung.js';
 
 var personSelectedRef = { callback: () => {}};
 

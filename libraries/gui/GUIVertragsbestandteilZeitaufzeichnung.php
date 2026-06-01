@@ -73,6 +73,7 @@ class GUIVertragsbestandteilZeitaufzeichnung extends AbstractGUIVertragsbestandt
             $vbs->setZeitaufzeichnung($this->data['zeitaufzeichnung']);
             $vbs->setAzgrelevant($this->data['azgrelevant']);
             $vbs->setHomeoffice($this->data['homeoffice']);
+            $vbs->setZeitmodell_id($this->data['zeitmodell_id']);
             $vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {

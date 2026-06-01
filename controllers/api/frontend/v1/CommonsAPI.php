@@ -48,6 +48,8 @@ class CommonsAPI extends FHCAPI_Controller
         'getModellstellen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getModellfunktionen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getJobfamilien' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+
+		'getZeitmodelle' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -70,14 +72,15 @@ class CommonsAPI extends FHCAPI_Controller
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
-    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
-    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellstelle_model', 'ModellstelleModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
-	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
-	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellstelle_model', 'ModellstelleModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
+		$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Zeitmodell_model', 'ZeitmodellModel');
     }
 
 
