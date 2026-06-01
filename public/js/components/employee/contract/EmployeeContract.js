@@ -95,6 +95,7 @@ export const EmployeeContract = {
         const teilzeittypen = inject('teilzeittypen');
         const modellstellen = inject('modellstellen');
         const fachrichtungen = inject('fachrichtungen');
+        const zeitmodelle = inject('zeitmodelle');
 
         const readonly = ref(false);
         const valorisationValid = ref(true);
@@ -663,6 +664,11 @@ export const EmployeeContract = {
             return va != undefined ? va.label : item;
         }
 
+        const formatZeitmodell = (item) => {
+            let va = zeitmodelle.value.find(kt => kt.value == item);
+            return va != undefined ? va.label : item;
+        }
+
         const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
 
         const checkValorisation = async () => {
@@ -694,7 +700,7 @@ export const EmployeeContract = {
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
-            formatModellstelle, formatFachrichtung
+            formatModellstelle, formatFachrichtung, formatZeitmodell
         }
     },
     template: `
@@ -933,25 +939,32 @@ export const EmployeeContract = {
                                  <div class="col-md-12 py-3" v-if="currentVBS.zeitaufzeichnung.length == 0">
                                     Kein aktiver Vertragsbestandteil vorhanden.
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <template v-for="(item, index) in currentVBS.zeitaufzeichnung"  >
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung" disabled>
-                                                <label class="form-check-label" >Zeitaufzeichnungspflichtig</label>
+                                <template v-for="(item, index) in currentVBS.zeitaufzeichnung"  >
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="zapflichtigCheck" :checked="item.zeitaufzeichnung" disabled>
+                                                    <label class="form-check-label" >Zeitaufzeichnungspflichtig</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant" disabled>
+                                                    <label class="form-check-label" >AZG relevant</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="homeofficeCheck" :checked="item.homeoffice" disabled>
+                                                    <label class="form-check-label" >Homeoffice</label>
+                                                </div>
+                                            
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="col-md-6">
+                                                <label class="form-label" >Zeitmodell</label>
+                                                <input type="text" readonly class="form-control-sm form-control-plaintext" :value="formatZeitmodell(item.zeitmodell_id)" >
                                             </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="azgCheck" :checked="item.azgrelevant" disabled>
-                                                <label class="form-check-label" >AZG relevant</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="homeofficeCheck" :checked="item.homeoffice" disabled>
-                                                <label class="form-check-label" >Homeoffice</label>
-                                            </div>
-                                        </template>
+                                        </div>
                                     </div>
-                                    <div class="col-md-8"></div>
-                                </div>
+                                </template>
                             </div><!-- card body -->
                         </div><!-- card -->
 
