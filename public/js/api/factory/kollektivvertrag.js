@@ -1,8 +1,8 @@
 export default {
-  getVerwendungsgruppen() {
+  getVerwendungsgruppen(oe_kurzbz) {
     return {
       method: 'get',
-      url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVerwendungsgruppen',
+      url: `/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVerwendungsgruppen?oe_kurzbz=${oe_kurzbz}`,
     }
   },
   getVerwendungsgruppenjahre() {

@@ -561,9 +561,22 @@ class CommonsAPI extends FHCAPI_Controller
 	public function getVerwendungsgruppen()
 	{
 		$this->VerwendungsgruppeModel->resetQuery();
-		$this->VerwendungsgruppeModel->addSelect('verwendungsgruppe_kurzbz AS value, bezeichnung AS label');
-		$this->VerwendungsgruppeModel->addOrder('sort', 'ASC');
-		$rows = $this->VerwendungsgruppeModel->loadWhere(array('aktiv' => true));
+		$this->VerwendungsgruppeModel->addSelect('verwendungsgruppe_kurzbz AS value, hr.tbl_kollektivvertrag_verwendungsgruppe.bezeichnung AS label');
+		$this->VerwendungsgruppeModel->addOrder('hr.tbl_kollektivvertrag_verwendungsgruppe.sort', 'ASC');
+		$where = array('hr.tbl_kollektivvertrag_verwendungsgruppe.aktiv' => true);
+
+		$oe_kurzbz = $this->input->get('oe_kurzbz');
+		if (!empty($oe_kurzbz))
+		{
+			$this->VerwendungsgruppeModel->addJoin(
+				'hr.tbl_kollektivvertrag',
+				'hr.tbl_kollektivvertrag.kollektivvertrag_kurzbz = hr.tbl_kollektivvertrag_verwendungsgruppe.kollektivvertrag_kurzbz'
+			);
+			$where['hr.tbl_kollektivvertrag.oe_kurzbz'] = $oe_kurzbz;
+		}
+
+		$rows = $this->VerwendungsgruppeModel->loadWhere($where);
+
 		if( hasData($rows) )
 		{
 			$this->terminateWithSuccess(getData($rows));

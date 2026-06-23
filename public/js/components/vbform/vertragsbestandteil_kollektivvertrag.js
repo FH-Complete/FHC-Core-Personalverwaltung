@@ -114,7 +114,7 @@ export default {
       }
     },
     getVerwendungsgruppen: async function() {
-          const response = await this.$api.call(ApiKollektivvertrag.getVerwendungsgruppen());
+          const response = await this.$api.call(ApiKollektivvertrag.getVerwendungsgruppen(this.store.unternehmen));
           const verwendungsgruppen = response.data;
           verwendungsgruppen.unshift({
             value: '',
