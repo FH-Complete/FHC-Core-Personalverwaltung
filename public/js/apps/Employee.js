@@ -173,7 +173,7 @@ pvApp.config.globalProperties.$api.call(ApiLohnguide.getFachrichtungen()).then((
 pvApp.config.globalProperties.$api.call(ApiLohnguide.getModellstellen()).then((r) => {
 	modellstellen.value = r.data
 }) 
-pvApp.config.globalProperties.$api.call(ApiKollektivvertrag.getVerwendungsgruppen()).then((r) => {
+pvApp.config.globalProperties.$api.call(ApiKollektivvertrag.getVerwendungsgruppen('')).then((r) => {
 	verwendungsgruppen.value = r.data
 })
 pvApp.config.globalProperties.$api.call(ApiKollektivvertrag.getVerwendungsgruppenjahre()).then((r) => {

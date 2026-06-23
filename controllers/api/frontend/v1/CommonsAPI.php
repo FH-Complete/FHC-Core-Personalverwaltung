@@ -49,6 +49,7 @@ class CommonsAPI extends FHCAPI_Controller
 		'getModellfunktionen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getJobfamilien' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
+		'getKollektivvertrag' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getVerwendungsgruppen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getVerwendungsgruppenjahre' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
@@ -81,7 +82,7 @@ class CommonsAPI extends FHCAPI_Controller
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
 		$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
-
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/kollektivvertrag/Kollektivvertrag_model', 'KollektivvertragModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/kollektivvertrag/Verwendungsgruppe_model', 'VerwendungsgruppeModel');
 		$this->load->model('extensions/FHC-Core-Personalverwaltung/kollektivvertrag/Verwendungsgruppenjahr_model', 'VerwendungsgruppenjahrModel');
     }
@@ -557,6 +558,27 @@ class CommonsAPI extends FHCAPI_Controller
     // --------------------------------------
     // Kollektivvertrag
     // --------------------------------------
+
+	public function getKollektivvertrag()
+	{
+		$oe_kurzbz = $this->input->get('oe_kurzbz');
+
+		$this->KollektivvertragModel->resetQuery();
+		$this->KollektivvertragModel->addSelect('kollektivvertrag_kurzbz AS value, bezeichnung AS label');
+		$this->KollektivvertragModel->addOrder('sort', 'ASC');
+		$rows = $this->KollektivvertragModel->loadWhere(array('aktiv' => true, 'oe_kurzbz' => $oe_kurzbz));
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no kollektivvertrag found');
+			return;
+		}
+	}
+
 
 	public function getVerwendungsgruppen()
 	{

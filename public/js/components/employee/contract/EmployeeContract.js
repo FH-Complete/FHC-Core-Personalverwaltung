@@ -7,10 +7,12 @@ import { ModalDialog } from '../../ModalDialog.js';
 import { OffCanvasTimeline } from './OffCanvasTimeline.js';
 import { Toast } from '../../Toast.js';
 import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
+import ApiKollektivvertrag from '../../../api/factory/kollektivvertrag.js';
 import ApiEmployee from '../../../api/factory/employee.js';
 import ApiVertrag from '../../../api/factory/vertrag.js';
 import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
 import ApiValorisierungscheck from '../../../api/factory/valorisierungcheck.js';
+import kollektivvertrag from '../../../api/factory/kollektivvertrag.js';
 
 export const EmployeeContract = {
     name: 'EmployeeContract',
@@ -40,6 +42,7 @@ export const EmployeeContract = {
         const router = VueRouter.useRouter();
         const { t } = usePhrasen();
         const dvList = ref([]);
+        const kollektivvertrag = ref();
         const vertragList = ref([]);
         const gbtList = ref([]);
         const gbtChartData = ref([]);
@@ -218,6 +221,18 @@ export const EmployeeContract = {
 
         }
 
+        const fetchKollektivvertrag = async () => {
+            isFetching.value = true
+            try {
+                const res = await $api.call(ApiKollektivvertrag.getKollektivvertrag(currentDV.value.oe_kurzbz)); 
+                kollektivvertrag.value = Array.isArray(res.data) ? res.data[0] : null;                
+            } catch (error) {
+                console.log(error)
+            } finally {
+                isFetching.value = false
+            }
+        }
+
         const fetchVertrag = async (dv_id, date) => {
             isFetching.value = true
             try {
@@ -319,10 +334,11 @@ export const EmployeeContract = {
         watch(
             currentDVID,
             (newVal) => {
-                if (newVal == null) return
+                if (newVal == null) return                
                 fetchVertrag(newVal, currentDate.value);
                 fetchGBT(newVal, currentDate.value);
                 fetchGBTChartData(newVal);
+                fetchKollektivvertrag();
                 checkValorisation();
                 if (openhistoryFlag.value) {
                     console.log('*** watch currentDVID ***');
@@ -711,7 +727,7 @@ export const EmployeeContract = {
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
-            formatModellstelle, formatFachrichtung, formatVerwendungsgruppe, formatVerwendungsgruppenjahr
+            formatModellstelle, formatFachrichtung, formatVerwendungsgruppe, formatVerwendungsgruppenjahr, kollektivvertrag
         }
     },
     template: `
@@ -1268,7 +1284,7 @@ export const EmployeeContract = {
 
                         <div class="card mt-3">
                             <div class="card-header">
-                                <h5 class="mb-0">Kollektivvertrag</h5>
+                                <h5 class="mb-0">Kollektivvertrag <span v-if="!!kollektivvertrag">({{ kollektivvertrag?.label }})</span></h5>
                             </div>
                             <div class="card-body" >
                                 <div class="col-md-12 py-3" v-if="currentVBS.kollektivvertrag === null">
