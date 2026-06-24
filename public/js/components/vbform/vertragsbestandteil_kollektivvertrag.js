@@ -28,7 +28,7 @@ export default {
     </div>   
 
     <div class="row g-2 py-2">
-      <div class="col-6">
+      <div class="col-3">
         <select v-model="verwendungsgruppe_kurzbz" :disabled="isinputdisabled('verwendungsgruppe_kurzbz')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.verwendungsgruppen"
@@ -39,13 +39,7 @@ export default {
           </option>
         </select>
       </div>
-      <div class="col-1">&nbsp;</div>      
-      <div class="col-1 pe-3">        
-      </div>
-    </div>      
-
-    <div class="row g-2 py-2" v-show="showinput('verwendungsgruppenjahr')">
-      <div class="col-6">
+      <div class="col-3">
         <select v-model="kv_jahre" :disabled="isinputdisabled('kv_jahre') || !verwendungsgruppe_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.verwendungsgruppenjahre"
@@ -56,9 +50,10 @@ export default {
           </option>
         </select>
       </div>
-      <div class="col-6">&nbsp;</div>
-    </div>
-
+      <div class="col-1">&nbsp;</div>      
+      <div class="col-1 pe-3">        
+      </div>
+    </div>      
 
     <div class="row g-2 py-2" v-show="showinput('kommentar')">
       <div class="col-6">
