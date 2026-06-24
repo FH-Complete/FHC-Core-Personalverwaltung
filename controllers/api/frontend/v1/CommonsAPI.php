@@ -613,10 +613,20 @@ class CommonsAPI extends FHCAPI_Controller
 
 	public function getVerwendungsgruppenjahre()
 	{
+			
 		$this->VerwendungsgruppenjahrModel->resetQuery();
 		$this->VerwendungsgruppenjahrModel->addSelect('kv_jahre AS value, bezeichnung AS label');
 		$this->VerwendungsgruppenjahrModel->addOrder('kv_jahre', 'ASC');
-		$rows = $this->VerwendungsgruppenjahrModel->loadWhere(array('aktiv' => true));
+		$where = array('aktiv' => true);
+
+		$verwendungsgruppe_kurzbz = $this->input->get('verwendungsgruppe_kurzbz');
+		if (!empty($verwendungsgruppe_kurzbz))
+		{
+			$where['verwendungsgruppe_kurzbz'] = $verwendungsgruppe_kurzbz;
+		}
+
+		$rows = $this->VerwendungsgruppenjahrModel->loadWhere($where);
+
 		if( hasData($rows) )
 		{
 			$this->terminateWithSuccess(getData($rows));

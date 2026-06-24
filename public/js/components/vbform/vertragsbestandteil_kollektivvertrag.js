@@ -46,7 +46,7 @@ export default {
 
     <div class="row g-2 py-2" v-show="showinput('verwendungsgruppenjahr')">
       <div class="col-6">
-        <select v-model="kv_jahre" :disabled="isinputdisabled('kv_jahre')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+        <select v-model="kv_jahre" :disabled="isinputdisabled('kv_jahre') || !verwendungsgruppe_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option
             v-for="f in lists.verwendungsgruppenjahre"
             :value="f.value"
@@ -98,11 +98,34 @@ export default {
   },
   created: function() {
     this.getVerwendungsgruppen();
-    this.getVerwendungsgruppenjahre();
+    //this.getVerwendungsgruppenjahre();
     this.getKollektivvertrag();
     this.setDataFromConfig();
+
+    if (this.verwendungsgruppe_kurzbz) {
+      this.getVerwendungsgruppenjahre(this.verwendungsgruppe_kurzbz);
+    }
+
+    this.$nextTick(() => {
+      this._initializing = false;
+    });
   },
   inject: ['$api'],
+  watch: {
+    verwendungsgruppe_kurzbz: function(newval, oldval) {
+      if (this._initializing) {
+        return;
+      }
+
+      // this.kv_jahre = '';
+
+      if (newval) {
+        this.getVerwendungsgruppenjahre(newval);
+      } else {
+        this.lists.verwendungsgruppenjahre = [];
+      }
+    }
+  },
   methods: {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
@@ -134,8 +157,8 @@ export default {
           });
           this.lists.verwendungsgruppen = verwendungsgruppen;
     },
-    getVerwendungsgruppenjahre: async function() {
-          const response = await this.$api.call(ApiKollektivvertrag.getVerwendungsgruppenjahre());
+    getVerwendungsgruppenjahre: async function(verwendungsgruppe_kurzbz) {
+          const response = await this.$api.call(ApiKollektivvertrag.getVerwendungsgruppenjahre(verwendungsgruppe_kurzbz));
           const verwendungsgruppenjahre = response.data;
           verwendungsgruppenjahre.unshift({
             value: '',

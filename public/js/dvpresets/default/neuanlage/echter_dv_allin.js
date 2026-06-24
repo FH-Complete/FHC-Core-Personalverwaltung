@@ -246,7 +246,7 @@ export default {
                 vertragsbestandteiltyp: 'vertragsbestandteilkollektivvertrag',
                 childdefaults: {
                   data: {
-                    verwendungsgruppe_kurzbz: "VGI"
+                    verwendungsgruppe_kurzbz: ""
                   }
                 }
               },
