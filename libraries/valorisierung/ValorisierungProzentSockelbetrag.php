@@ -49,22 +49,31 @@ class ValorisierungProzentSockelbetrag extends AbstractValorisationMethod
 		// get sum of valorisation amounts of all applicable Gehaltsbestandteile
 		$sumsalary = $this->calcSummeGehaltsbestandteile(AbstractValorisationMethod::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS);
 
-		// calculate percent amount
+		// calculate percent amount for sum
 		$betrag_prozent = $sumsalary * $this->params->valorisierung->prozent / 100;
 
-		// if percent amount is smaller than threshold, use threshold
-		$valorisierung_betrag = $betrag_prozent < $sockelbetrag_scaled ? $sockelbetrag_scaled : $betrag_prozent;
+		// if percent amount is lower than threshold, use threshold
+		$useThreshold = $betrag_prozent < $sockelbetrag_scaled;
 
 		// for each applicable Gehaltsbestandsteil
 		foreach ($this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil)
 		{
 			$gehaltsbestandteil instanceof \vertragsbestandteil\Gehaltsbestandteil;
 
-			// get fraction to distribute Betrag correctly for each Gehaltsbestandteil
-			$fraction = $gehaltsbestandteil->getBetrag_valorisiert() / $sumsalary;
+			if ($useThreshold)
+			{
+				// get fraction to distribute Betrag correctly for each Gehaltsbestandteil
+				$fraction = $gehaltsbestandteil->getBetrag_valorisiert() / $sumsalary;
 
-			// add fraction of Betrag
-			$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() + ($valorisierung_betrag * $fraction);
+				// add fraction of Betrag
+				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() + ($sockelbetrag_scaled * $fraction);
+			}
+			else
+			{
+				// add percent
+				$betrag_valorisiert = $gehaltsbestandteil->getBetrag_valorisiert() * (1 + $this->params->valorisierung->prozent / 100);
+			}
+
 			$gehaltsbestandteil->setBetrag_valorisiert(round($betrag_valorisiert, 2));
 		}
 
