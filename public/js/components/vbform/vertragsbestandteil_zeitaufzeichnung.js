@@ -2,6 +2,7 @@ import gueltigkeit from './gueltigkeit.js';
 import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
+import store from './vbsharedstate.js';
 
 export default {
   name: 'VertragsbestandteilZeitaufzeichnung',
@@ -45,15 +46,18 @@ export default {
     </div>  <!-- row -->
     <div class="row g-2" style="padding-right: 1rem;">
         <div class="col-4">          
-              <select v-model="zeitmodell_id" :disabled="isinputdisabled('zeitmodell_id')" class="form-select form-select-sm" aria-label=".form-select-sm ">
-                <option
-                  v-for="f in lists.zeitmodelle"
-                  :value="f.value"
-                  :selected="isselected(f.value, this.zeitmodell_id)"
-                  :disabled="f.disabled">
-                  {{ f.label }}
-                </option>
-              </select>                      
+              <p-autocomplete 
+                v-model="autocomplete.selectedzeitmodell" 
+                dropdown
+                dropdownMode="current" 
+                :suggestions="autocomplete.zeitmodelle" 
+                @complete="searchZeitmodell"
+                optionLabel="label"
+                optionDisabled="disabled"
+                forceSelection
+                :disabled="isinputdisabled('zeitmodell_id')"
+                :placeholder="getZeitmodellDropdownPlaceholder"
+            ></p-autocomplete>
         </div>
         <div class="col-8"></div>
     </div>  <!-- row -->
@@ -63,22 +67,13 @@ export default {
   components: {
     'gueltigkeit': gueltigkeit,
     'infos': infos,
-    'errors': errors
+    'errors': errors,
+    'p-autocomplete': primevue.autocomplete
   },
   mixins: [
     configurable
   ],
   inject: ['zeitmodelle'],
-  mounted() {
-    const zeitmodelle = [
-        {
-            value: null,
-            label: 'Bitte Zeitmodell wählen'
-        },
-        ...this.zeitmodelle
-    ];
-    this.lists.zeitmodelle = zeitmodelle;
-  },
   emits: {
     removeVB: null
   },
@@ -92,15 +87,62 @@ export default {
       db_delete: false,
       lists: {
         zeitmodelle: []
-      }
+      },
+      autocomplete: {
+        zeitmodelle: [],
+        selectedzeitmodell: ''
+      },
+      store: store
     };
   },
   created: function() {
+    const zeitmodelle = [
+        {
+            value: null,
+            label: 'Bitte Zeitmodell wählen'
+        },
+        ...this.zeitmodelle
+    ];
+    this.lists.zeitmodelle = zeitmodelle;
+
     this.setDataFromConfig();
+    this.autocomplete.zeitmodelle = [...this.lists.zeitmodelle];
+    this.setAutocompleteZeitmodell();
+  },
+  watch: {
+    'autocomplete.selectedzeitmodell': function() {
+        if(this.autocomplete.selectedzeitmodell?.value !== undefined) {
+          this.zeitmodell_id = this.autocomplete.selectedzeitmodell.value;
+        } else {
+          this.zeitmodell_id = null;
+        }
+      },
+  },computed: {
+      getZeitmodellDropdownPlaceholder: function() {
+          let stunden = null;
+          Object.entries(this.store.vbs).forEach(([key, value]) => {
+              if (value.type == 'vertragsbestandteilstunden') {
+                  console.log(`key= ${key} value = ${value}`)
+                  stunden = value.data.stunden;
+              }              
+          })
+          if( stunden === null ) {
+            return 'Bitte zuerst ein Stunden/Woche eingeben';
+          } else {
+            console.log("stunden=",stunden)
+          }
+          return 'Zeitmodell wählen';
+      },      
   },
   methods: {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
+    },
+    resetDropdowns: function() {
+      if(!this.isinputdisabled('zeitmodell_id')) {
+        this.autocomplete.selectedzeitmodell = null;
+      }
+      this.zeitmodell_id = null;
     },
     setDataFromConfig: function() {
       if( this.config?.data?.id !== undefined ) {
@@ -121,6 +163,27 @@ export default {
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
       }
+    },
+    setAutocompleteZeitmodell: function() {
+        if( !!this.zeitmodell_id && this.autocomplete.zeitmodelle.length > 0 ) {
+          var that = this;
+          this.autocomplete.selectedzeitmodell = this.autocomplete.zeitmodelle.find((item) => {
+              return that.zeitmodell_id === item.value;
+          });
+        }
+    },
+    searchZeitmodell: function(event) {
+        var that = this;
+        
+        setTimeout(function() {
+            if (!event.query.trim().length) {
+                that.autocomplete.zeitmodelle = [...that.lists.zeitmodelle];
+            } else {
+                that.autocomplete.zeitmodelle = that.lists.zeitmodelle.filter((item) => {
+                    return item.label.toLowerCase().includes(event.query.toLowerCase());
+                });
+            }
+        }, 250);
     },
     removeVB: function() {
       this.$emit('removeVB', {id: this.config.guioptions.id});

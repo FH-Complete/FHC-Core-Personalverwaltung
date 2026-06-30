@@ -557,7 +557,7 @@ class CommonsAPI extends FHCAPI_Controller
     public function getZeitmodelle()
 	{
 		$this->ZeitmodellModel->resetQuery();
-		$this->ZeitmodellModel->addSelect('zeitmodell_id AS value, bezeichnung AS label');
+		$this->ZeitmodellModel->addSelect("zeitmodell_id AS value, bezeichnung || ' (' || stundenanzahl || 'h)'  AS label");
 		$this->ZeitmodellModel->addOrder('bezeichnung', 'ASC');
 		$rows = $this->ZeitmodellModel->load();
 		if( hasData($rows) )
