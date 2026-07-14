@@ -16,7 +16,8 @@ class Valorisierung extends FHCAPI_Controller
 				'getValorisierungsInstanzen' => self::DEFAULT_PERMISSION,
 				'getGehaelter' => self::DEFAULT_PERMISSION,
 				'getValorisationInfo' => self::DEFAULT_PERMISSION,
-				'getAllUnternehmen' => self::DEFAULT_PERMISSION
+				'getAllUnternehmen' => self::DEFAULT_PERMISSION,
+				'getValorisationDetails' => self::DEFAULT_PERMISSION
 			)
 		);
 
@@ -57,6 +58,21 @@ class Valorisierung extends FHCAPI_Controller
 		$this->ValorisierungLib->initialize(['valorisierung_kurzbz' => $data['valorisierunginstanz_kurzbz']]);
 
 		$this->terminateWithSuccess($this->ValorisierungLib->calculateAllValorisation());
+	}
+
+	/**
+	 * Get gehaltsbestandteil valorisation details for a Dienstverhältnis
+	 */
+	public function getValorisationDetails()
+	{
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsbestandteil_model', 'GehaltsbestandteilModel');
+		$dienstverhaeltnis_id = $this->input->get('dienstverhaeltnis_id');
+
+		$gehaltsbestandteile = $this->GehaltsbestandteilModel->getGehaltsbestandteile(
+			$dienstverhaeltnis_id, $stichtag=null, $includefuture=false, $withvalorisationhistory=false
+		);
+
+		$this->terminateWithSuccess($gehaltsbestandteile);
 	}
 
 	/**
