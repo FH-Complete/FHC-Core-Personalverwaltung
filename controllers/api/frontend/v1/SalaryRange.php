@@ -50,7 +50,7 @@ class SalaryRange extends FHCAPI_Controller
 		} else {
 			$rows = $this->SalaryRangeModel->getAllByDateRange($von, $bis);
 		}
-		if( hasData($rows) )
+		if( !isError($rows) )
 		{
 			$this->terminateWithSuccess(getData($rows) ?? []);
 		}

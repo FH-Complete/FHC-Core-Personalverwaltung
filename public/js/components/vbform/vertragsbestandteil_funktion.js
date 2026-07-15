@@ -222,7 +222,7 @@ export default {
     getFunktionen: async function() {
       const filter = (this.config.guioptions?.filter) ? this.config.guioptions?.filter : 'all';
       const response = await this.$api.call(ApiFunktion.getContractFunctions(filter));
-      const funktionen = response.retval;
+      const funktionen = response.data;
       funktionen.unshift({
         value: '',
         label: 'Funktion wählen',
@@ -237,7 +237,7 @@ export default {
           return;
       }
       const response = await this.$api.call(ApiFunktion.getOrgetsForCompany(this.store.unternehmen));
-      const orgets = response.retval;
+      const orgets = response.data;
       orgets.unshift({
         value: '',
         label: 'OrgEinheit wählen',
@@ -252,7 +252,7 @@ export default {
         return;  
       }
       const response = await this.$api.call(ApiFunktion.getCurrentFunctions(this.store.mitarbeiter_uid, this.store.unternehmen));
-      const benutzerfunktionen = (response.error === 1) ? [] : response.retval;
+      const benutzerfunktionen = (response.error === 1) ? [] : response.data;
       benutzerfunktionen.unshift({
         value: '',
         label: 'Benutzerfunktion wählen',

@@ -1,8 +1,7 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
 import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 import ApiZeit from '../../../api/factory/zeit.js';
 
 export const OffTime = {
@@ -10,7 +9,6 @@ export const OffTime = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
         OrgChooser,
         "datepicker": VueDatePicker
     },
@@ -76,9 +74,9 @@ export const OffTime = {
               isFetching.value = true;
               const response = await $api.call(ApiZeit.personAbwesenheitenByYear(currentPersonUID.value, currentYear.value));
               isFetching.value = false;              
-              console.log('abwesenheiten', response.retval);	  
-              if (response.retval.length>0) {
-                offTimeList.value = response.retval;
+              console.log('abwesenheiten', response.data);	  
+              if (response?.data?.length>0) {
+                offTimeList.value = response.data;
               } else {
                 offTimeList.value = [];
               }

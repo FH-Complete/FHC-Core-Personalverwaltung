@@ -24,7 +24,7 @@ export const OrgChooser = {
             'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgHeads');
           orgList.value = CoreRESTClient.getData(res.data); */
           const res = await $api.call(ApiOrgViewer.getOrgHeads());
-          orgList.value = res.retval;
+          orgList.value = res.data;
           if (orgList.value.length > 0)  {
             //orgList.value.reverse();
             if (props.oe == undefined || (props.oe != null && props.oe == '')) {

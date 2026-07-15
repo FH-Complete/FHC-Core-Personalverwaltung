@@ -1,4 +1,3 @@
-import { Toast } from "../Toast.js";
 import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 import ApiDeadline from '../../api/factory/deadline.js';
@@ -6,7 +5,6 @@ import ApiDeadline from '../../api/factory/deadline.js';
 export const DeadlineIssueTable = {
   name: 'DeadlineIssueTable',
   components: {
-    Toast,
   },
   props: {
   },
@@ -24,6 +22,7 @@ export const DeadlineIssueTable = {
       const current_status_kurzbz = Vue.ref("");
 
       const $api = Vue.inject('$api');
+      const $fhcAlert = Vue.inject('$fhcAlert');
 
       const dateFormatter = (cell) => {
         return cell.getValue()?.replace(/(.*)-(.*)-(.*)/, '$3.$2.$1');
@@ -44,7 +43,7 @@ export const DeadlineIssueTable = {
           }
           isFetching.value = true;
           const res = await $api.call(ApiDeadline.all()); 
-          fristen.value = res;
+          fristen.value = res.data;
           isFetching.value = false;
         } catch (error) {const columnsDef = [
           { title: 'Ereignis', field: "ereignis_bezeichnung", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
@@ -85,7 +84,7 @@ export const DeadlineIssueTable = {
         try {
             isFetching.value = true;
             const res = await $api.call(ApiDeadline.getFristenStatus()); 
-            fristStatus.value = res.retval;
+            fristStatus.value = res.data;
             isFetching.value = false;
         } catch (error) {
             console.log(error);
@@ -188,7 +187,6 @@ export const DeadlineIssueTable = {
 
           // Workaround to update tabulator
           Vue.watch(fristen, (newVal, oldVal) => {
-              console.log('fristenList changed');
               tabulator.value?.setData(fristen.value);
           }, {deep: true})
 
@@ -241,34 +239,19 @@ export const DeadlineIssueTable = {
       }
 
       // Toast
-      const updateStatusToastRef = Vue.ref()
-      const refreshDeadlinesToastRef = Vue.ref()
 
       const showToast = () => {
-        updateStatusToastRef.value.show()
+        $fhcAlert.alertSuccess(t('fristenmanagement','fristStatusGespeichert'));
       }
 
       const showRefreshToast = () => {
-        refreshDeadlinesToastRef.value.show()
+        $fhcAlert.alertSuccess(t('fristenmanagement','fristenAktualisiert'));
       }
 
       return { onPersonSelect, fristen, formatDate, updateDeadlines, tabulator, tableRef, isFetching, fristStatus, current_status_kurzbz,
-        updateStatus, updateStatusToastRef, refreshDeadlinesToastRef, t, selectedData }
+        updateStatus, t, selectedData }
     },
   template: `
-
-    <div class="toast-container position-absolute z-3 top-0 end-0 pt-4 pe-2">
-      <Toast ref="updateStatusToastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristStatusGespeichert') }}</h4></template>
-      </Toast>
-    </div>
-
-    <div class="toast-container position-fixed top-0 end-0 pt-5 pe-2">
-      <Toast ref="refreshDeadlinesToastRef">
-          <template #body><h4>{{ t('fristenmanagement','fristenAktualisiert') }}</h4></template>
-      </Toast>
-    </div>
-
     <div id="master" class="d-flex flex-column  pt-4 pb-1 mb-1">
 
       <div class="me-auto">

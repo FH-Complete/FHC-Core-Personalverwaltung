@@ -1,7 +1,6 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 import ApiPerson from '../../../api/factory/person.js';
 import ApiCommon from '../../../api/factory/common.js';
 
@@ -11,7 +10,6 @@ export const AddressData = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
     },
     props: {
         personID: { type: Number, required: true },
@@ -21,6 +19,7 @@ export const AddressData = {
 
         const { personID } = Vue.toRefs(props);
         const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
 
         const { t } = usePhrasen();
 
@@ -33,8 +32,6 @@ export const AddressData = {
         const isEditActive = Vue.ref(false);
 
         const currentAddress = Vue.ref();
-
-        const confirmDeleteRef = Vue.ref();
 
         const nations = Vue.inject('nations');
         const adressentyp = Vue.inject('adressentyp');
@@ -59,7 +56,7 @@ export const AddressData = {
             // submit
             try {
                 const response = await $api.call(ApiPerson.personAddressData(personID.value)); 
-                addressList.value = response.retval;
+                addressList.value = response.data;
             } catch (error) {
                 console.log(error)              
             } finally {
@@ -74,7 +71,7 @@ export const AddressData = {
                 try  {
                     isFetching.value = true
                     const response = await $api.call(ApiCommon.getGemeinden(currentAddress.value.plz));     
-                    gemeinden.value = response.retval;
+                    gemeinden.value = response.data;
                 } catch (error) {
                     console.log(error)                    
                 } finally {
@@ -88,7 +85,7 @@ export const AddressData = {
                 try  {
                     isFetching.value = true
                     const response = await $api.call(ApiCommon.getOrtschaften(currentAddress.value.plz));     
-                    ortschaften.value = response.retval;
+                    ortschaften.value = response.data;
                 } catch (error) {
                     console.log(error)                    
                 } finally {
@@ -115,13 +112,20 @@ export const AddressData = {
 
         const showDeleteModal = async (id) => {
             currentAddress.value = { ...addressList.value[id] };
-            const ok = await confirmDeleteRef.value.show();
+
+            if (await $fhcAlert.confirm({
+                    message:`${currentAddress.value?.plz} ${currentAddress.value?.ort}, ${currentAddress.value?.strasse} wirklich löschen?`,
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }     
             
-            if (ok && !currentAddress.value.heimatadresse) {   
+            if (!currentAddress.value.heimatadresse) {   
 
                 try {
                     const res = await $api.call(ApiPerson.deletePersonAddressData(id));   
-                    if (res.error == 0) {
+                    if (res?.meta?.status == 'success') {
                         delete addressList.value[id];
                         showDeletedToast();
                     }
@@ -131,6 +135,8 @@ export const AddressData = {
                       isFetching.value = false
                 }                  
                 
+            } else {
+                $fhcAlert.alertInfo(t('person','heimatadresse') + ' ' + t('person','kannNichtGeloeschtWerden'));
             }
         }
 
@@ -186,8 +192,8 @@ export const AddressData = {
                 // submit
                 try {
                     const r = await $api.call(ApiPerson.upsertPersonAddressData(currentAddress.value))
-                    if (r.error == 0) {
-                        addressList.value[r.retval[0].adresse_id] = r.retval[0];
+                    if (r?.meta?.status == 'success') {
+                        addressList.value[r.data[0].adresse_id] = r.data[0];
                         console.log('address successfully saved');
                         showToast();
                     }
@@ -230,23 +236,19 @@ export const AddressData = {
             }
             return false;
         }
-
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','adresseGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','adresseGeloescht'));
         }
 
         return {
             addressList, addressListArray, isEditActive, showAddModal, 
-            showDeleteModal, showEditModal, confirmDeleteRef, currentAddress, 
-            modalRef,hideModal, okHandler, toastRef, deleteToastRef, nations,
+            showDeleteModal, showEditModal, currentAddress, 
+            modalRef,hideModal, okHandler, nations,
             gemeinden, ortschaften, adressentyp, t,
             // form handling
             validOrt, validPLZ, validTyp, frmState, addressDataFrm, readonly
@@ -255,18 +257,6 @@ export const AddressData = {
     },
     template: ` 
         <div class="row">
-
-            <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                <Toast ref="toastRef">
-                    <template #body><h4>{{ t('person','adresseGespeichert') }}</h4></template>
-                </Toast>
-            </div>
-
-            <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-                <Toast ref="deleteToastRef">
-                    <template #body><h4>{{ t('person','adresseGeloescht') }}</h4></template>
-                </Toast>
-            </div>
 
             <div class="d-flex bd-highlight">
                 <div class="py-2 bd-highlight">                   
@@ -403,17 +393,6 @@ export const AddressData = {
                 </button>
             </template>
         </Modal>
-
-        <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef">
-            <template #body>
-                <span v-if="!currentAddress?.heimatadresse">
-                   {{ t('person','adresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','wirklichLoeschen') }}?
-                </span>
-                <span v-else>
-                    {{ t('person','heimatadresse') }} '{{ currentAddress?.plz }} {{ currentAddress?.ort }}, {{ currentAddress?.strasse }}' {{ t('person','kannNichtGeloeschtWerden') }}!
-                </span>
-            </template>
-        </ModalDialog>
 
         
         `

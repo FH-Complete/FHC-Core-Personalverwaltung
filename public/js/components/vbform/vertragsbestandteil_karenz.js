@@ -131,7 +131,7 @@ export default {
     },
     getKarenztypen: async function() {
       const response = await this.$api.call(ApiKarenz.getKarenztypen());
-      const karenztypen = response.retval;
+      const karenztypen = response.data;
       karenztypen.unshift({
         value: '',
         label: 'Karenztyp wählen',

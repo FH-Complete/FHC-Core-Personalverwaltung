@@ -142,12 +142,13 @@ export const LehreCard = {
               isFetching.value = true;
               const response = await $api.call(ApiCommon.getAllCourseHours(currentUID.value));
               isFetching.value = false;         
-              let tempData1 = [], tempData2 = [];     
-			  console.log(response.retval);	  
-              response.retval.forEach(element => {
-                tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
-            });
-                chartOptions.series[0].data = tempData1;			  			  
+              let tempData1 = [], tempData2 = [];   
+              if (response.data != null) {  			  
+                response.data.forEach(element => {
+                  tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);              
+                });
+              }
+              chartOptions.series[0].data = tempData1;			  			  
 			} catch (error) {
 			  console.log(error);
               isFetching.value = false;           
@@ -163,11 +164,12 @@ export const LehreCard = {
               const response = await $api.call(ApiCommon.getAllSupportHours(currentUID.value));
               isFetching.value = false;         
               let tempData1 = [], tempData2 = [];     
-			  console.log(response.retval);	  
-              response.retval.forEach(element => {
-                tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
-            });
-                chartOptions.series[1].data = tempData1;
+              if (response?.meta?.status == 'success' && response.data != null) {
+                response.data.forEach(element => {
+                    tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
+                });
+              }
+              chartOptions.series[1].data = tempData1;
 			  			  
 			} catch (error) {
 			  console.log(error);

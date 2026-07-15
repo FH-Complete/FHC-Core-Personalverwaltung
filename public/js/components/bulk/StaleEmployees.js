@@ -1,5 +1,5 @@
 import { Modal } from '../Modal.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import ApiEmployee from '../../api/factory/employee.js';
 import ApiDV from '../../api/factory/dv.js';
@@ -54,7 +54,7 @@ export const StaleEmployees = {
             isFetching.value = true
             try {
               const res = await $api.call(ApiEmployee.getEmployeesWithoutContract());                 
-              employeeList.value = res.retval;
+              employeeList.value = res.data;
             } catch (error) {
               console.log(error)              
             } finally {

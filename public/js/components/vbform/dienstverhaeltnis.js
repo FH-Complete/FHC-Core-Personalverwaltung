@@ -106,7 +106,7 @@ export default {
     },
     getUnternehmen: async function() {
       const response = await this.$api.call(ApiDV.getUnternehmen());
-      const unternehmen = response.retval;
+      const unternehmen = response.data;
       unternehmen.unshift({
         value: '',
         label: 'Unternehmen wählen',
@@ -116,7 +116,7 @@ export default {
     },
     getVertragsarten: async function() {
       const response = await this.$api.call(ApiDV.getVertragsarten());
-      const vertragsarten = response.retval;
+      const vertragsarten = response.data;
       vertragsarten.unshift({
         value: '',
         label: 'Vertragsart wählen',
@@ -126,7 +126,7 @@ export default {
     },
     getDvEndeGruende: async function() {
       const response = await this.$api.call(ApiDV.getDvEndeGruende());
-      const dvendegruende = response.retval;
+      const dvendegruende = response.data;
       dvendegruende.unshift({
         value: '',
         label: 'Beendigungsgrund wählen',

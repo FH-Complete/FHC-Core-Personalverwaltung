@@ -1,7 +1,6 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 import ApiDeadline from '../../../api/factory/deadline.js';
 
 
@@ -10,7 +9,6 @@ export const DeadlineIssueDialog = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
         "datepicker": VueDatePicker
     },
     props: {
@@ -58,7 +56,7 @@ export const DeadlineIssueDialog = {
                 $api.call(
 			        ApiDeadline.getFristenStatus())
 			        .then(result => {
-                        fristStatus.value = result.error !== 1 ? result.retval : [];				        	
+                        fristStatus.value = result.meta.status == "success" ? result.data : [];			        	
 			        })
 			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        
@@ -74,7 +72,7 @@ export const DeadlineIssueDialog = {
                 $api.call(
 			        ApiDeadline.getFristenEreignisseManuell())
 			        .then(result => {
-                        fristEreignisse.value = result.error !== 1 ? result.retval : [];
+                        fristEreignisse.value = result.meta.status == "success" ? result.data : [];
 			        })
 			        .catch(fhcAlert.handleSystemError);  	  
                 isFetching.value = false;                        

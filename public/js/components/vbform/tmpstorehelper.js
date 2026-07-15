@@ -84,6 +84,8 @@ export default {
             
             this.$api.call(ApiTmpstore.deleteFromTmpStore(tmpstoreid))
             .then((response) => {
+              this.selectedtmpstoreidx = -1;
+              this.store.setTmpStoreId(null);
               this.fetchTmpStoreList();
               console.log('deleteFromTmpStore executed.');
             });

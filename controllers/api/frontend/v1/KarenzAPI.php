@@ -3,7 +3,7 @@
 defined('BASEPATH') || exit('No direct script access allowed');
 
 
-class KarenzAPI extends Auth_Controller
+class KarenzAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
@@ -30,7 +30,7 @@ class KarenzAPI extends Auth_Controller
 
         if (!is_numeric($payload->id))
         {
-            $this->outputJsonError('invalid parameter vertragsbestandteil_id');
+            $this->terminateWithError('invalid parameter vertragsbestandteil_id');
             return;
         }
 		// TODO implement
@@ -39,10 +39,10 @@ class KarenzAPI extends Auth_Controller
         $ret = $this->VertragsbestandteilLib->endDienstverhaeltnis($dv, $payload->gueltigkeit->data->gueltig_bis);
 */
         if ( $ret !== TRUE) {
-            return $this->outputJsonError($ret);
+            return $this->terminateWithError($ret);
         }
 
-        return $this->outputJsonSuccess('Karenz gespeichert');
+        return $this->terminateWithSuccess('Karenz gespeichert');
     }
 
 }

@@ -74,7 +74,7 @@ export const ValorisationSelection = {
 					return;
 				}
 				this.$refs.valorisationTabulator.tabulator.dataLoader.alertLoader();
-				const res = this.$api.call(bValorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz))
+				const res = this.$api.call(ApiValorisierung.calculateValorisation(this.valorisierungsinstanz_kurzbz))
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
@@ -183,6 +183,12 @@ export const ValorisationSelection = {
 					}
 				};
 
+				const formatWochenstunden = function(cell) {
+					let value = cell.getValue();
+					let retval = (typeof value === 'string') ? value.replace(/\./, ',') : value;
+					return retval;
+				};
+
 				return {
 					height: '75vh',
 					// Unique ID
@@ -209,6 +215,8 @@ export const ValorisationSelection = {
 						{title: 'DVId', field: 'dienstverhaeltnis_id', visible: false},
 						{title: 'Vertragsart', field: 'vertragsart', headerFilter: true, frozen: true},
 						{title: 'Unternehmen', field: 'unternehmen', headerFilter: true, frozen: true},
+						{title: 'Wochenstunden', field: 'wochenstunden', headerFilter: true, frozen: true, formatter: formatWochenstunden, sorter: 'number'},
+						{title: 'Teilzeittyp', field: 'teilzeittyp', headerFilter: true, frozen: true},
 						{title: 'DV-Beginn', field: 'dvvon', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman},
 						{title: 'DV-Ende', field: 'dvbis', headerFilter: true, hozAlign: 'center', frozen: true, formatter: formatDate, accessorDownload: formatter.formatDateGerman}
 					]

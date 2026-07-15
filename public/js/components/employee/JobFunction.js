@@ -1,8 +1,7 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
 import {OrgChooser} from "../../components/organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import ApiFunktion from '../../api/factory/funktion.js';
 import ApiPerson from '../../api/factory/person.js';
 
@@ -11,7 +10,6 @@ export const JobFunction = {
     components: {
         Modal,
         ModalDialog,
-        Toast,
         OrgChooser,
         "datepicker": VueDatePicker
     },
@@ -27,8 +25,7 @@ export const JobFunction = {
     setup( props, { emit } ) {
 
         const $api = Vue.inject('$api');
-        //const fhcAlert = Vue.inject('$fhcAlert');
-
+        const $fhcAlert = Vue.inject('$fhcAlert');
 
         const readonly = Vue.ref(false);
 
@@ -82,13 +79,13 @@ export const JobFunction = {
             // fetch data and map them for easier access
             try {
                 const response = await $api.call(ApiFunktion.getAllUserFunctions(theModel.value.personUID || currentPersonUID.value));
-                if(response.error === 1) {
+                if(response.meta.status != "success") {
                     let rawList = [];
                     tableData.value = [];
                     jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
                 } else {
-                    let rawList = response.retval;
-                    tableData.value = response.retval;
+                    let rawList = response.data;
+                    tableData.value = response.data;
                     jobfunctionList.value = convertArrayToObject(rawList, 'benutzerfunktion_id');
                 }
             } catch (error) {
@@ -255,15 +252,18 @@ export const JobFunction = {
             return filtered;
         });
 
+        const getJobFunction = (kurzbz) => {
+            let t = jobfunctionListArray.value.filter((item) => item.funktion_kurzbz == kurzbz);
+            return t.length > 0 ? t[0].bezeichnung : ''
+        }
+
         // Workaround to update tabulator
         Vue.watch(jobfunctionListArray, (newVal, oldVal) => {
-            console.log('jobfunctionList changed');
             tabulator.value?.setData(jobfunctionListArray.value);
         }, {deep: true})
 
         // Modal 
         const modalRef = Vue.ref();
-        const confirmDeleteRef = Vue.ref();
 
         const showAddModal = () => {
             currentValue.value = createShape();
@@ -285,14 +285,14 @@ export const JobFunction = {
             isFetching.value = true;
             try {
                 const res = await $api.call(ApiFunktion.getCompanyByOrget(currentValue.value.oe_kurzbz));
-                if (res.error == 0) {
-                    unternehmen.value = res.retval[0].oe_kurzbz;
+                if (res.meta.status == "success") {
+                    unternehmen.value = res.data[0].oe_kurzbz;
                 } else {
                     console.log('company not found for orget!');
                 }
 
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)           
             } finally {
                   isFetching.value = false
             }   
@@ -302,24 +302,28 @@ export const JobFunction = {
 
         const showDeleteModal = async (id) => {
             currentValue.value = { ...jobfunctionList.value[id] };
-            const ok = await confirmDeleteRef.value.show();
             
-            if (ok) {   
+            if (await $fhcAlert.confirm({
+                    message: t('person','funktion') + ' ' + getJobFunction(currentValue.value?.funktion_kurzbz) + '  (' + formatDate(currentValue.value?.datum_von) + '-' + (currentValue.value.datum_bis != null ? formatDate(currentValue.value.datum_bis) : '?') + ') ' + t('person', 'wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
 
-                try {
-                    const res = await $api.call(ApiPerson.deletePersonJobFunction(id));                
-                    if (res.error == 0) {
-                        delete jobfunctionList.value[id];
-                        showDeletedToast();
-                        theModel.value.updateHeader();
-                    }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                      isFetching.value = false
-                }   
+            try {
+                const res = await $api.call(ApiPerson.deletePersonJobFunction(id));                
+                if (res.meta.status == "success") {
+                    delete jobfunctionList.value[id];
+                    showDeletedToast();
+                    theModel.value.updateHeader();
+                }
+            } catch (error) {
+                $fhcAlert.handleSystemError(error)             
+            } finally {
+                    isFetching.value = false
+            }   
                 
-            }
         }
 
 
@@ -340,7 +344,7 @@ export const JobFunction = {
                     delete payload.aktiv;
                     delete payload.funktion_beschreibung;
                     const r = await $api.call(ApiPerson.upsertPersonJobFunction(payload));
-                    if (r.error == 0) {
+                    if (r.meta.status == "success") {
                         // fetch all data because of all the references in the changed record
                         await fetchData();
                         console.log('job function successfully saved');
@@ -348,7 +352,7 @@ export const JobFunction = {
                         showToast();
                     }  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)            
                 } finally {
                     isFetching.value = false
                 }
@@ -390,17 +394,13 @@ export const JobFunction = {
                 return ''
             }
         }
-
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
         
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','funktionGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','funktionGeloescht'));
         }
 
         const fetchOrgUnits = async (unternehmen_kurzbz) => {
@@ -408,7 +408,7 @@ export const JobFunction = {
                 return;
             }
             const response = await $api.call(ApiFunktion.getOrgetsForCompany(unternehmen_kurzbz));
-            const orgets = response.retval;
+            const orgets = response.data;
             orgets.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),
@@ -421,7 +421,7 @@ export const JobFunction = {
               return;  
             }
             const response = await $api.call(ApiFunktion.getAllFunctions());
-            const benutzerfunktionen = response.retval;
+            const benutzerfunktionen = response.data;
             benutzerfunktionen.unshift({
               value: '',
               label: t('ui','bitteWaehlen'),
@@ -430,7 +430,6 @@ export const JobFunction = {
           }
 
         const unternehmenSelectedHandler = (e) => {
-            console.log('unternhemen selected: ',e);
             unternehmen.value = e;
         }
  
@@ -444,7 +443,6 @@ export const JobFunction = {
             readonly,
             frmState,
             dialogRef,
-            toastRef, deleteToastRef,
             jobFunctionFrm,
             modalRef,
             fullPath,
@@ -454,26 +452,14 @@ export const JobFunction = {
             tabulator,
             table,
             
-            toggleMode, formatDate, notEmpty,
-            showToast, showDeletedToast,
+            toggleMode, formatDate, notEmpty,            
             showAddModal, hideModal, okHandler,
-            showDeleteModal, showEditModal, confirmDeleteRef, t, unternehmenSelectedHandler,
+            showEditModal, t, unternehmenSelectedHandler,
          }
     },
     template: `
     <div class="row" v-if="readonlyMode === false">
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-          <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','funktionGespeichert') }}</h4></template>
-          </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person', 'funktionGeloescht') }}</h4></template>
-            </Toast>
-        </div>
+        
     </div>
     <div class="row pt-md-4">      
          <div class="col">
@@ -606,11 +592,6 @@ export const JobFunction = {
       </template>
     </ModalDialog>
 
-    <ModalDialog :title="t('global','warnung')" ref="confirmDeleteRef" v-if="readonlyMode === false">
-        <template #body>
-            {{ t('person','funktion') }} '{{ currentValue?.funktion_kurzbz }} ({{ currentValue?.datum_von }}-{{ currentValue?.datum_bis }})' {{ t('person', 'wirklichLoeschen') }}?
-        </template>
-    </ModalDialog>
     `
 }
 

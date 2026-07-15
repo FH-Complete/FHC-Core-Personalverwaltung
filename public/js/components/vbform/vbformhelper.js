@@ -80,7 +80,7 @@ export default {
     },
     getFreitexttypen: async function() {
       const response = await this.$api.call(ApiFreitext.getFreitexttypen());
-      const freitexttypen = response.retval;
+      const freitexttypen = response.data;
       freitexttypen.unshift({
         value: '',
         label: 'Freitexttyp wählen',
@@ -90,7 +90,7 @@ export default {
     },
     getGehaltstypen: async function() {
       const response = await this.$api.call(ApiGehaltsbestandteil.getGehaltstypen());
-      const gehaltstypen = response.retval;
+      const gehaltstypen = response.data;
       gehaltstypen.unshift({
         value: '',
         label: 'Gehaltstyp wählen',

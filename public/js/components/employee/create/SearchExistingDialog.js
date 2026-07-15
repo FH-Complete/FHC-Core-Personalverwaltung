@@ -49,7 +49,7 @@ export const SearchExistingDialog = {
                 isFetching.value = true;
                 const res = await $api.call(ApiEmployee.filterPerson(currentValue));        
                 isFetching.value = false;              
-			    personList.value = res.retval;
+			    personList.value = res.data.retval;
 
             } catch (error) {
                 console.log(error);
@@ -74,17 +74,19 @@ export const SearchExistingDialog = {
                 const res = await $api.call(ApiEmployee.createEmployee({ action: "take", payload: { person_id, uid, vorname, nachname}})); 
                 isFetching.value = false;    
 
-                if (!res.error) {            
-                    personSelectedHandler(person_id, res.retval.uid, 'take');
+                if (res?.meta?.status == 'success') {        
+                    personSelectedHandler(person_id, res.data.uid, 'take');
                     filterPerson();
                 } else {
-                    console.log("Fehler beim Anlegen: ", res.retval);
+                    console.log("Fehler beim Anlegen: ", res);
+                    $fhcAlert.handleSystemError('Fehler beim Anlegen.')  
                 }
 
             } catch (error) {
-                console.log(error);
-                isFetching.value = false;           
-            }	
+                $fhcAlert.handleSystemError(error)                
+            } finally {
+                isFetching.value = false
+            }
             
         }
 

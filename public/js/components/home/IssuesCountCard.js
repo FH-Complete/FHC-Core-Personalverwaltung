@@ -26,7 +26,7 @@ export const IssuesCountCard = {
         const getOpenIssues = async () =>  {
             try {
                 let res = await $api.call(ApiIssue.openIssuesPersons());
-                issues.value = res.retval;
+                issues.value = res.data;
                 return res;
             } catch(error) {
                 console.log(error);
