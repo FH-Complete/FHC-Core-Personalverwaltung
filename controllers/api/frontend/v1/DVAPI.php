@@ -14,23 +14,25 @@ class DVAPI extends FHCAPI_Controller
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const READ_ONLY_PERMISSION = 'basis/mitarbeiter:r';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 	const DV_CREATE_EDIT_PERMISSION = 'extension/pv21_dv:rw';
 	const DV_CORRECTION_PERMISSION = 'extension/pv21_dv_korr:rw';
 
     public function __construct() {
         parent::__construct(array(
             'getCurrentDV' => DVAPI::DEFAULT_PERMISSION,
-            'dvByPerson' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'dvByPerson' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             'dvByID'=> DVAPI::DEFAULT_PERMISSION,
-            'dvInfoByPerson' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'dvInfoByPerson' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             'createDV'  => self::DV_CREATE_EDIT_PERMISSION,
             'deleteDV'  => self::DV_CREATE_EDIT_PERMISSION,
             'endDV'  => self::DV_CREATE_EDIT_PERMISSION,
             'deactivateDV'  => self::DV_CREATE_EDIT_PERMISSION,
-            'vertragByDV' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'vertragByDV' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             'saveVertrag' => [self::DV_CREATE_EDIT_PERMISSION, self::DV_CORRECTION_PERMISSION],
             // 
-            'getCurrentVBs' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'getCurrentVBs' => [DVAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		    'getCurrentAndFutureVBs' => DVAPI::DEFAULT_PERMISSION,
 		    'getAllVBs' => DVAPI::DEFAULT_PERMISSION,
             //
@@ -47,7 +49,7 @@ class DVAPI extends FHCAPI_Controller
             //
             'getEmployeesWithoutContract' => DVAPI::DEFAULT_PERMISSION,
             //
-            'getDvEndeGruende' => DVAPI::READ_ONLY_PERMISSION
+            'getDvEndeGruende' => [DVAPI::READ_ONLY_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
                 
             )
         );
@@ -176,7 +178,7 @@ class DVAPI extends FHCAPI_Controller
         if (is_array($dvData->retval) && count($dvData->retval) > 0) {
             $dvList = $dvData->retval;
         } else {
-            $this->terminateWithError('no DV found');
+            //$this->terminateWithError('no DV found');
             return;
         }
 

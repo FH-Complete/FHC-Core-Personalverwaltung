@@ -7,13 +7,15 @@ class FunctionsAPI extends FHCAPI_Controller
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 
     public function __construct() {
         parent::__construct(array(
             'getAllFunctions' => FunctionsAPI::DEFAULT_PERMISSION,
 		    'getContractFunctions' => FunctionsAPI::DEFAULT_PERMISSION,
 		    'getCurrentFunctions' => FunctionsAPI::DEFAULT_PERMISSION,
-		    'getAllUserFunctions' => [FunctionsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		    'getAllUserFunctions' => [FunctionsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');

@@ -1,4 +1,4 @@
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
 import ApiEmployee from '../../../api/factory/employee.js';
 
 export const EmployeeContractInfo = {
