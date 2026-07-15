@@ -5,6 +5,7 @@ require_once 'ValorisierungKeine.php';
 require_once 'ValorisierungProzent.php';
 require_once 'ValorisierungFixBetrag.php';
 require_once 'ValorisierungGestaffelt.php';
+require_once 'ValorisierungProzentSockelbetrag.php';
 
 /**
  * Factory for retrieving correct valorisation method
@@ -15,6 +16,7 @@ class ValorisationFactory
 	const VALORISATION_PROZENT	= 'ValorisierungProzent';
 	const VALORISATION_FIXBETRAG	= 'ValorisierungFixBetrag';
 	const VALORISATION_STAGGERED	= 'ValorisierungGestaffelt';
+	const VALORISATION_PROZENT_SOCKELBETRAG	= 'ValorisierungProzentSockelbetrag';
 
 	/**
 	* Get the valorisation method object.
@@ -39,6 +41,10 @@ class ValorisationFactory
 
 			case self::VALORISATION_STAGGERED:
 				$instance = new ValorisierungGestaffelt();
+				break;
+
+			case self::VALORISATION_PROZENT_SOCKELBETRAG:
+				$instance = new ValorisierungProzentSockelbetrag();
 				break;
 
 			default:

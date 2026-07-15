@@ -5,7 +5,7 @@ import ApiEmployee from '../../api/factory/employee.js';
 import ApiIssueChecker from '../../api/factory/issueChecker.js';
 import IssueChecker from '../../../../../../public/js/components/Issues/IssueChecker.js';
 import ApiIssueList from '../../api/factory/issueList.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 
 export const EmployeeHeader = {
     name: 'EmployeeHeader',
