@@ -1,4 +1,4 @@
-const ContractNew = {
+export const ContractNew = {
 	name: 'ContractNew',
      props: {
         columns:  { type: Array, required: true },

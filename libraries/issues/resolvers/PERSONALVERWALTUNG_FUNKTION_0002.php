@@ -15,7 +15,7 @@ class PERSONALVERWALTUNG_FUNKTION_0002 implements IIssueResolvedChecker
 			return error('Person Id missing, issue_id: '.$params['issue_id']);
 
 		if (!isset($params['vertragsbestandteil_id']) || !is_numeric($params['vertragsbestandteil_id']))
-			return error('Dienstverhältnis Id missing, issue_id: '.$params['issue_id']);
+			return error('Vertragsbestandteil Id missing, issue_id: '.$params['issue_id']);
 
 		$this->_ci =& get_instance(); // get code igniter instance
 

@@ -1,11 +1,13 @@
 <?php
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class IssueChecker extends Auth_Controller
+class IssueChecker extends FHCAPI_Controller
 {
 	const DEBUG = false;
-    	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
+	const DEFAULT_PERMISSION = 'basis/mitarbeiter:r';
 	const RESTRICTED_PERMISSION = 'extension/pv21_handyverwaltung:r';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:r';
+    	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:r';
 
 	protected $personid;
 	protected $_app;
@@ -21,7 +23,7 @@ class IssueChecker extends Auth_Controller
 		parent::__construct(
 			array(
 				'checkPerson' => self::DEFAULT_PERMISSION,
-				'countPersonOpenIssues' => [self::DEFAULT_PERMISSION, self::RESTRICTED_PERMISSION]
+				'countPersonOpenIssues' => [self::DEFAULT_PERMISSION, self::RESTRICTED_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION]
 			)
 		);
 
@@ -121,23 +123,16 @@ class IssueChecker extends Auth_Controller
 			'openissues' => $openissues
 		);
 
-		$meta = array(
-			'errors' => $this->errors,
-			'infos' => $this->infos
-		);
 		if(self::DEBUG)
 		{
-			$meta['mapping'] = $this->PlausicheckDefinitionLib->getFehlerLibMappings();
-			$meta['debug'] = $this->debug;
+			$this->addMeta('mapping', $this->PlausicheckDefinitionLib->getFehlerLibMappings());
+			$this->addMeta('debug', $this->debug);
 		}
 
-		$this->outputJson(
-			array(
-				'data' => $data,
-				'meta' => $meta
-			)
-		);
-		return;
+		$this->addMeta('errors', $this->errors);
+		$this->addMeta('infos', $this->infos);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	public function countPersonOpenIssues($personid)
@@ -159,23 +154,16 @@ class IssueChecker extends Auth_Controller
 			'openissues' => $openissues
 		);
 
-		$meta = array(
-			'errors' => $this->errors,
-			'infos' => $this->infos
-		);
 		if(self::DEBUG)
 		{
-			$meta['mapping'] = $this->PlausicheckDefinitionLib->getFehlerLibMappings();
-			$meta['debug'] = $this->debug;
+			$this->addMeta('mapping', $this->PlausicheckDefinitionLib->getFehlerLibMappings());
+			$this->addMeta('debug', $this->debug);
 		}
 
-		$this->outputJson(
-			array(
-				'data' => $data,
-				'meta' => $meta
-			)
-		);
-		return;
+		$this->addMeta('errors', $this->errors);
+		$this->addMeta('infos', $this->infos);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	protected function produceIssues()

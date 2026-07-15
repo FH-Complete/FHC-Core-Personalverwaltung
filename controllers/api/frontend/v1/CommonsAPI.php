@@ -2,24 +2,26 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class CommonsAPI extends Auth_Controller
+class CommonsAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+    const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+    const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 
     public function __construct() {
         parent::__construct(
 	    array(
-		'getSprache' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getSachaufwandtyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getNations' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getAusbildung' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getStandorteIntern' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getOrtschaften' => CommonsAPI::DEFAULT_PERMISSION,
-		'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getSprache' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getSachaufwandtyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getNations' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getAusbildung' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getStandorteIntern' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getOrtschaften' => [CommonsAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
 		'getContractExpire' => CommonsAPI::DEFAULT_PERMISSION,
 		'getContractNew' => CommonsAPI::DEFAULT_PERMISSION,
@@ -30,17 +32,22 @@ class CommonsAPI extends Auth_Controller
 		'getAllCourseHours' => CommonsAPI::DEFAULT_PERMISSION,
 		'getAllSupportHours' => CommonsAPI::DEFAULT_PERMISSION,
 		'getReportData' => CommonsAPI::DEFAULT_PERMISSION,
-		'getKontakttyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getKontakttyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
-		'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
-		'getKarenztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getKarenztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+
+        'getFachrichtungen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+        'getModellstellen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getModellfunktionen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getJobfamilien' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -66,6 +73,10 @@ class CommonsAPI extends Auth_Controller
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
+    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellstelle_model', 'ModellstelleModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
 	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
     }
 
@@ -73,15 +84,15 @@ class CommonsAPI extends Auth_Controller
     function getSprache()
     {
         //$this->SpracheModel->addOrder("sprache");
-	$spracheRes = $this->SpracheModel->load();
+        $spracheRes = $this->SpracheModel->load();
 
-	if (isError($spracheRes))
-	{
-		$this->outputJsonError(getError($spracheRes));
-		exit;
-	}
+        if (isError($spracheRes))
+        {
+            $this->terminateWithError(getError($spracheRes));
+            exit;
+        }
 
-        $this->outputJson($spracheRes);
+        $this->terminateWithSuccess(getData($spracheRes));
     }
 
 
@@ -93,11 +104,11 @@ class CommonsAPI extends Auth_Controller
 
 	if (isError($sachaufwandTypRes))
 	{
-		$this->outputJsonError(getError($sachaufwandTypRes));
+		$this->terminateWithError(getError($sachaufwandTypRes));
 		exit;
 	}
 
-        $this->outputJson($sachaufwandTypRes);
+        $this->terminateWithSuccess(getData($sachaufwandTypRes));
     }
 
     function getNations()
@@ -112,11 +123,11 @@ class CommonsAPI extends Auth_Controller
 
 	if (isError($nationRes))
 	{
-	    $this->outputJsonError(getError($nationRes));
+	    $this->terminateWithError(getError($nationRes));
 	    exit;
 	}
 
-        $this->outputJson($nationRes);
+        $this->terminateWithSuccess(getData($nationRes));
     }
 
     function getAusbildung()
@@ -126,24 +137,24 @@ class CommonsAPI extends Auth_Controller
 
 	if (isError($result))
 	{
-	    $this->outputJsonError(getError($result));
+	    $this->terminateWithError(getError($result));
 	    exit;
 	}
 
-        $this->outputJson($result);
+        $this->terminateWithSuccess(getData($result));
     }
 
     function getStandorteIntern()
     {
         $data = $this->ApiModel->getStandorteIntern();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getOrte()
     {
         $this->OrtModel->addOrder("ort_kurzbz");
         $data = $this->OrtModel->load();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getGemeinden()
@@ -152,10 +163,10 @@ class CommonsAPI extends Auth_Controller
 
         if (!is_numeric($plz))
         {
-            $this->outputJsonError("plz '$plz' is not numeric!'");
+            $this->terminateWithError("plz '$plz' is not numeric!'");
         } else {
             $data = $this->ApiModel->getGemeinden($plz);
-            $this->outputJson($data);
+            $this->terminateWithSuccess(getData($data));
         }
     }
 
@@ -164,10 +175,10 @@ class CommonsAPI extends Auth_Controller
         $plz = $this->input->get('plz', TRUE);
 
         if (!is_numeric($plz))
-            $this->outputJsonError("plz '$plz' is not numeric!'");
+            $this->terminateWithError("plz '$plz' is not numeric!'");
 
         $data = $this->ApiModel->getOrtschaften($plz);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     
@@ -179,7 +190,7 @@ class CommonsAPI extends Auth_Controller
     {
         $this->VertragsartModel->addOrder("sort");
         $data = $this->VertragsartModel->load();
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
 
@@ -194,11 +205,11 @@ class CommonsAPI extends Auth_Controller
 
 		if (isError($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			exit;
 		}
 
-        $this->outputJson($result);
+        $this->terminateWithSuccess(getData($result));
     }
 
     //  ------------------------------------------
@@ -212,11 +223,11 @@ class CommonsAPI extends Auth_Controller
 
 		if (isError($result))
 		{
-			$this->outputJsonError(getError($result));
+			$this->terminateWithError(getError($result));
 			exit;
 		}
 
-        $this->outputJson($result);
+        $this->terminateWithSuccess(getData($result));
     }
 
     // -----------------------------------------
@@ -235,7 +246,7 @@ class CommonsAPI extends Auth_Controller
 			show_error('month is not numeric!');
 
         $data = $this->ApiModel->getContractExpire($year, $month);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getContractNew()
@@ -251,14 +262,14 @@ class CommonsAPI extends Auth_Controller
 			show_error('month is not numeric!');
 
         $data = $this->ApiModel->getContractNew($year, $month);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getBirthdays()
     {
         $date = $this->input->get('date', TRUE);
         $data = $this->ApiModel->getBirthdays($date);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getCovidState()
@@ -267,7 +278,7 @@ class CommonsAPI extends Auth_Controller
 
         if (!is_numeric($person_id))
         {
-            $this->outputJsonError("person_id is not numeric!'");
+            $this->terminateWithError("person_id is not numeric!'");
             return;
         }
 
@@ -280,7 +291,7 @@ class CommonsAPI extends Auth_Controller
 
 
         $data = $this->ApiModel->getCovidDate($person_id, $date);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getCourseHours()
@@ -290,18 +301,18 @@ class CommonsAPI extends Auth_Controller
 
         if ($uid == '')
         {
-            $this->outputJsonError("uid is missing!'");
+            $this->terminateWithError("uid is missing!'");
             return;
         }
 
         if ($semester == '')
         {
-            $this->outputJsonError("semester is missing!'");
+            $this->terminateWithError("semester is missing!'");
             return;
         }
 
         $data = $this->LVAModel->getCourseHours($uid, $semester);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getAllCourseHours()
@@ -310,12 +321,12 @@ class CommonsAPI extends Auth_Controller
 
         if ($uid == '')
         {
-            $this->outputJsonError("uid is missing!'");
+            $this->terminateWithError("uid is missing!'");
             return;
         }
 
         $data = $this->LVAModel->getAllCourseHours($uid);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
     function getAllSupportHours()
@@ -324,12 +335,12 @@ class CommonsAPI extends Auth_Controller
 
         if ($uid == '')
         {
-            $this->outputJsonError("uid is missing!'");
+            $this->terminateWithError("uid is missing!'");
             return;
         }
 
         $data = $this->LVAModel->getAllSupportHours($uid);
-        $this->outputJson($data);
+        $this->terminateWithSuccess(getData($data));
     }
 
 
@@ -342,12 +353,12 @@ class CommonsAPI extends Auth_Controller
 		$gehaltstypen = $this->GehaltstypModel->load();
 		if( hasData($gehaltstypen) )
 		{
-			$this->outputJson($gehaltstypen);
+			$this->terminateWithSuccess(getData($gehaltstypen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no contract types found');
+			$this->terminateWithError('no contract types found');
 			return;
 		}
 	}
@@ -360,12 +371,12 @@ class CommonsAPI extends Auth_Controller
 		$unternehmen = $this->VertragsartModel->loadWhere('dienstverhaeltnis = true');
 		if( hasData($unternehmen) )
 		{
-			$this->outputJson($unternehmen);
+			$this->terminateWithSuccess(getData($unternehmen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no contract types found');
+			$this->terminateWithError('no contract types found');
 			return;
 		}
 	}
@@ -377,12 +388,12 @@ class CommonsAPI extends Auth_Controller
         $vbtypen = $this->VertragsbestandteiltypModel->load();
 		if( hasData($vbtypen) )
 		{
-			$this->outputJson($vbtypen);
+			$this->terminateWithSuccess(getData($vbtypen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no contract types found');
+			$this->terminateWithError('no contract types found');
 			return;
 		}
 	}
@@ -397,12 +408,12 @@ class CommonsAPI extends Auth_Controller
 		$rows = $this->KarenztypModel->load();
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no karenz types found');
+			$this->terminateWithError('no karenz types found');
 			return;
 		}
 	}
@@ -415,12 +426,12 @@ class CommonsAPI extends Auth_Controller
 		$rows = $this->TeilzeittypModel->load();
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no teilzeit types found');
+			$this->terminateWithError('no teilzeit types found');
 			return;
 		}
 	}
@@ -433,12 +444,12 @@ class CommonsAPI extends Auth_Controller
 		$rows = $this->FreitexttypModel->load();
 		if( hasData($rows) )
 		{
-			$this->outputJson($rows);
+			$this->terminateWithSuccess(getData($rows));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no freitext types found');
+			$this->terminateWithError('no freitext types found');
 			return;
 		}
 	}
@@ -451,12 +462,88 @@ class CommonsAPI extends Auth_Controller
 
 		if (isError($result))
 		{
-			return $this->outputJsonError('Keine Stundensatztypen gefunden');
+			return $this->terminateWithError('Keine Stundensatztypen gefunden');
 		}
 
 		if (hasData($result))
 		{
-			return $this->outputJson($result);
+			return $this->terminateWithSuccess(getData($result));
+		}
+	}
+
+    // --------------------------------------
+    // Lohnguide
+    // --------------------------------------
+
+    public function getFachrichtungen()
+	{
+		$this->FachrichtungModel->resetQuery();
+		$this->FachrichtungModel->addSelect('fachrichtung_kurzbz AS value, bezeichnung AS label');
+		$this->FachrichtungModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->FachrichtungModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no fachrichtung types found');
+			return;
+		}
+	}
+
+    public function getModellstellen()
+	{
+		$this->ModellstelleModel->resetQuery();
+		$this->ModellstelleModel->addSelect('modellstelle_kurzbz AS value, bezeichnung AS label');
+		$this->ModellstelleModel->addOrder('sort', 'ASC');
+		$rows = $this->ModellstelleModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no modellstellen types found');
+			return;
+		}
+	}
+
+    public function getModellfunktionen()
+	{
+		$this->ModellfunktionModel->resetQuery();
+		$this->ModellfunktionModel->addSelect('modellfunktion_kurzbz AS value, bezeichnung AS label');
+		$this->ModellfunktionModel->addOrder('sort', 'ASC');
+		$rows = $this->ModellfunktionModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no modellfunktionen found');
+			return;
+		}
+	}
+
+    public function getJobfamilien()
+	{
+		$this->JobfamilieModel->resetQuery();
+		$this->JobfamilieModel->addSelect('jobfamilie_kurzbz AS value, bezeichnung AS label');
+		$this->JobfamilieModel->addOrder('sort', 'ASC');
+		$rows = $this->JobfamilieModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no jobfamilien found');
+			return;
 		}
 	}
 
@@ -480,7 +567,7 @@ class CommonsAPI extends Auth_Controller
             // TODO validate param
 
             $result = $this->StatistikModel->load($payload['report']);
-            $this->outputJson($this->ApiModel->runReport($result->retval[0]->sql, $payload['filter']));
+            $this->terminateWithSuccess(getData($this->ApiModel->runReport($result->retval[0]->sql, $payload['filter'])));
         }  else {
             $this->output->set_status_header('405');
         }

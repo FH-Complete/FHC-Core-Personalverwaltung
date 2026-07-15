@@ -1,4 +1,4 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiDeadline from '../../../api/factory/deadline.js';
 
 export const DeadlineCard = {
 	name: 'DeadlineCard',
@@ -18,7 +18,7 @@ export const DeadlineCard = {
         const currentDate = Vue.ref(null);        
         const deadlineList = ref([]);
         const currentUID = toRefs(props).uid;  
-        const fhcApi = inject('$fhcApi')  
+        const $api = Vue.inject('$api');
         
         const formatDate = (ds) => {
             if (ds == undefined) return '';
@@ -32,7 +32,7 @@ export const DeadlineCard = {
             }
 			try {
               isFetching.value = true;
-              const response = await fhcApi.factory.Deadline.allByPerson(currentUID.value);
+              const response = await $api.call(ApiDeadline.allByPerson(currentUID.value));
               isFetching.value = false;              
 			  console.log('fristen', response.data);	  
               if (response.data.length>0) {

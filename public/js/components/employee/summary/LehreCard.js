@@ -1,4 +1,5 @@
-import {CoreRESTClient} from '../../../../../../js/RESTClient.js';
+import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
+import ApiCommon from '../../../api/factory/common.js';
 
 export const LehreCard = {
 	name: 'LehreCard',
@@ -8,7 +9,7 @@ export const LehreCard = {
      },
      setup( props ) {
         
-        const fhcApi = Vue.inject('$fhcApi');  
+        const $api = Vue.inject('$api');    
         const courseData = Vue.ref();
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Lehre/Betreuung");
@@ -113,7 +114,7 @@ export const LehreCard = {
         const fetchAllCourseHours = async (dv_id, date) => {
             isFetching.value = true
             try {
-                const res = await fhcApi.factory.Gehaltsbestandteil.gbtChartDataByDV(dv_id);
+                const res = await $api.call(ApiGehaltsbestandteil.gbtChartDataByDV(dv_id));
                 gbtChartData.value = res;
                 let tempData1 = [], tempData2 = [];
                 // chartOptions.series[0].data.length = 0;
@@ -138,18 +139,16 @@ export const LehreCard = {
                 return;
             }
 			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllCourseHours?uid=${currentUID.value}`;
               isFetching.value = true;
-			  const res = await fetch(url)
-			  let response = await res.json();
+              const response = await $api.call(ApiCommon.getAllCourseHours(currentUID.value));
               isFetching.value = false;         
-              let tempData1 = [], tempData2 = [];     
-			  console.log(response.retval);	  
-              response.retval.forEach(element => {
-                tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
-            });
-                chartOptions.series[0].data = tempData1;			  			  
+              let tempData1 = [], tempData2 = [];   
+              if (response.data != null) {  			  
+                response.data.forEach(element => {
+                  tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);              
+                });
+              }
+              chartOptions.series[0].data = tempData1;			  			  
 			} catch (error) {
 			  console.log(error);
               isFetching.value = false;           
@@ -161,18 +160,16 @@ export const LehreCard = {
                 return;
             }
 			try {
-			  let full = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;                
-			  const url = `${full}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getAllSupportHours?uid=${currentUID.value}`;
               isFetching.value = true;
-			  const res = await fetch(url)
-			  let response = await res.json();
+              const response = await $api.call(ApiCommon.getAllSupportHours(currentUID.value));
               isFetching.value = false;         
               let tempData1 = [], tempData2 = [];     
-			  console.log(response.retval);	  
-              response.retval.forEach(element => {
-                tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
-            });
-                chartOptions.series[1].data = tempData1;
+              if (response?.meta?.status == 'success' && response.data != null) {
+                response.data.forEach(element => {
+                    tempData1.push([element.studiensemester_kurzbz, element.semesterstunden]);
+                });
+              }
+              chartOptions.series[1].data = tempData1;
 			  			  
 			} catch (error) {
 			  console.log(error);

@@ -1,5 +1,4 @@
 
-import { CovidCard } from './CovidCard.js';
 import { DvCard } from './DVCard.js';
 import { LehreCard } from './LehreCard.js';
 import { IssuesCard } from './IssuesCard.js';
@@ -10,7 +9,6 @@ import { DeadlineIssueTable } from './DeadlineIssueTable.js'
 export const EmployeeSummary = {
 	name: 'EmployeeSummary',
     components: {
-        CovidCard,
         DvCard,
         LehreCard,
         IssuesCard,
