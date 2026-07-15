@@ -9,6 +9,7 @@ import Phrasen from '../../../../js/plugins/Phrasen.js';
 import FhcAlert from '../../../../js/plugins/FhcAlert.js';
 import * as typeDefinition from '../helpers/typeDefinition/loader.js';
 import {ValorisationCheck} from "../components/bulk/ValorisationCheck.js";
+import highchartsPlugin from "../../../../js/plugin/highchartsVue.js"
 import ApiCommon from '../api/factory/common.js';
 import ApiDV from  '../api/factory/dv.js';
 import ApiLohnguide from '../api/factory/lohnguide.js';
