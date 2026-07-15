@@ -5,10 +5,10 @@ import uuid from '../../helpers/vbform/uuid.js';
 export default {
   name: 'GehaltsbestandteilHelper',
   inject: [
-	  'hassalarypermission'
+	  'hassalarypermission_write'
   ],
   template: `
-  <template v-if="hassalarypermission">
+  <template v-if="hassalarypermission_write">
   <div class="row pt-3 pb-1">
     <div class="col-12">
       <div class="position-relative">

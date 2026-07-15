@@ -11,7 +11,7 @@ import ApiEmployee from '../../../api/factory/employee.js';
 import ApiVertrag from '../../../api/factory/vertrag.js';
 import ApiGehaltsbestandteil from '../../../api/factory/gehaltsbestandteil.js';
 import ApiValorisierungscheck from '../../../api/factory/valorisierungcheck.js';
-import ApiPermission from '../../../../../../../public/js/api/factory/permission.js';
+import ApiPermission from '../../../../../../js/api/factory/permission.js';
 
 export const EmployeeContract = {
     name: 'EmployeeContract',
@@ -100,11 +100,13 @@ export const EmployeeContract = {
         const readonly = ref(false);
         const valorisationValid = ref(true);
 		
-        const hassalarypermission = ref(false);
+        const hassalarypermission_read = ref(false);
+		const hassalarypermission_write = ref(false);
 		const hasdvpermission = ref(false);
 		const hasdvkorrpermission = ref(false);
 
-		provide('hassalarypermission', hassalarypermission);
+		provide('hassalarypermission_read', hassalarypermission_read);
+		provide('hassalarypermission_write', hassalarypermission_write);
 		provide('hasdvpermission', hasdvpermission);
 		provide('hasdvkorrpermission', hasdvkorrpermission);
 
@@ -239,7 +241,7 @@ export const EmployeeContract = {
 
         // Gehaltsbestandteile
         const fetchGBT = async (dv_id, date) => {
-            if(!hassalarypermission.value) {
+            if(!hassalarypermission_read.value) {
                 gbtList.value = [];
                 return;
             }
@@ -258,7 +260,7 @@ export const EmployeeContract = {
 
         // fetch chart data
         const fetchGBTChartData = async (dv_id, date) => {
-            if(!hassalarypermission.value) {
+            if(!hassalarypermission_read.value) {
                 gbtChartData.value = [];
                 return;
             }
@@ -335,7 +337,8 @@ export const EmployeeContract = {
             async (newVal) => {
                 if (newVal == null) return
                 fetchVertrag(newVal, currentDate.value);
-                await checkSalaryPermission();
+                await checkSalaryPermissionRead();
+				await checkSalaryPermissionWrite();
 				await checkDvPermission();
 				await checkDvKorrPermission();
                 fetchGBT(newVal, currentDate.value);
@@ -688,7 +691,7 @@ export const EmployeeContract = {
 
         const checkValorisation = async () => {
             if (currentDVID != null && currentDVID.value > 0) {
-                if(!hassalarypermission.value) {
+                if(!hassalarypermission_write.value) {
                     valorisationValid.value = true;
                     return;
                 }
@@ -710,7 +713,7 @@ export const EmployeeContract = {
             return `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Valorisation/Check/` + currentDVID.value;
         });
 
-        const checkSalaryPermission = async () => {
+        const checkSalaryPermissionRead = async () => {
             var isBerechtigt = false;
             if (currentDVID != null && currentDVID.value > 0) {
                 try {
@@ -726,10 +729,31 @@ export const EmployeeContract = {
                     console.log(error)
                 }
             }
-            hassalarypermission.value = isBerechtigt;
+            hassalarypermission_read.value = isBerechtigt;
             return isBerechtigt;
         };
-        checkSalaryPermission();
+        checkSalaryPermissionRead();
+
+        const checkSalaryPermissionWrite = async () => {
+            var isBerechtigt = false;
+            if (currentDVID != null && currentDVID.value > 0) {
+                try {
+                    const res = await $api.call(ApiPermission.isBerechtigt(
+                        'basis/gehaelter',
+                        'suid',
+                        currentDV.value.oe_kurzbz,
+                        null
+                    ));
+                    isBerechtigt = res.data.isBerechtigt;
+                } catch (error) {
+                    isBerechtigt = false;
+                    console.log(error)
+                }
+            }
+            hassalarypermission_write.value = isBerechtigt;
+            return isBerechtigt;
+        };
+        checkSalaryPermissionWrite();
 		
 		const checkDvPermission = async() => {
 			var isBerechtigt = false;
@@ -737,7 +761,7 @@ export const EmployeeContract = {
 				try {
 					const res = await $api.call(ApiPermission.isBerechtigt(
 						'extension/pv21_dv', 
-						's',
+						'suid',
 						currentDV.value.oe_kurzbz, 
 						null
 					));
@@ -758,7 +782,7 @@ export const EmployeeContract = {
 				try {
 					const res = await $api.call(ApiPermission.isBerechtigt(
 						'extension/pv21_dv_korr', 
-						's',
+						'suid',
 						currentDV.value.oe_kurzbz, 
 						null
 					));
@@ -782,7 +806,7 @@ export const EmployeeContract = {
             karenzmodalRef, karenzDialog, curKarenz, handleKarenzSaved, formatKarenztyp, formatVertragsart, formatFreitexttyp,
             readonly, t, linkToLehrtaetigkeitsbestaetigungODT, linkToLehrtaetigkeitsbestaetigungPDF, formatBeendigungsgrund,
             deletedvmodalRef, deleteDVDialog, delDV, handleDvDeleted, formatTeilzeittyp, valorisationCheckPath, valorisationValid,
-            hassalarypermission, hasdvpermission, hasdvkorrpermission,
+            hassalarypermission_read, hassalarypermission_write, hasdvpermission, hasdvkorrpermission,
             formatModellstelle, formatFachrichtung
         }
     },
@@ -1202,7 +1226,7 @@ export const EmployeeContract = {
                         </div><!-- card -->
 
                         <!-- Bruttomonatsgehalt  -->
-                        <div class="card mt-3" v-if="hassalarypermission">
+                        <div class="card mt-3" v-if="hassalarypermission_read">
                             <div class="card-header">
 								<div class="d-flex justify-content-between align-items-center">
 									<div><h5 class="mb-0">Bruttomonatsgehalt</h5></div>
@@ -1259,7 +1283,7 @@ export const EmployeeContract = {
                         </div> <!-- card -->
 
                         <!-- Gehalt -->
-                        <div class="card mt-3" v-if="hassalarypermission">
+                        <div class="card mt-3" v-if="hassalarypermission_read">
                             <div class="card-header">
                                 <h5 class="mb-0">Gehalt</h5>
                             </div>
