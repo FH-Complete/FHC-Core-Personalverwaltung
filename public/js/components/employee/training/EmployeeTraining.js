@@ -106,7 +106,7 @@ export const EmployeeTraining = {
             const dokFormatter = (cell) => {
                 const files = cell.getValue() || [];
                 return files.map(doc => {
-                    return `<a href="/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/downloadDoc/${doc.dms_id}" target="_blank">
+                    return `<a href="${FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router}/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Weiterbildung/downloadDoc/${doc.dms_id}" target="_blank">
                                 ${iconForFile(doc)} ${doc.name}
                             </a>`;
                 }).join("<br>");
