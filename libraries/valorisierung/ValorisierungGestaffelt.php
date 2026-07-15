@@ -4,8 +4,6 @@
  */
 class ValorisierungGestaffelt extends AbstractValorisationMethod
 {
-	const DEBUG = false;
-
 	protected $wochenstunden;
 	protected $valorisation;
 
@@ -182,22 +180,6 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		}
 	}
 
-	protected function calcScaleFactor_FTE2PT()
-	{
-		if( $this->wochenstunden < floatval($this->fulltimehours)
-			&& $this->wochenstunden > 0
-			&& floatval($this->fulltimehours) > 0 )
-		{
-			// get scale factor if week hours are under fulltime hours
-			$this->scalefactor_fte2pt = 1 / floatval($this->fulltimehours) * floatval($this->wochenstunden);
-		}
-
-		if(self::DEBUG)
-		{
-			echo "ScaleFactor FTE2PT: " . $this->scalefactor_fte2pt . PHP_EOL;
-		}
-	}
-
 	protected function fetchGehaltstypen()
 	{
 		$this->ci->load->model('vertragsbestandteil/GehaltsTyp_model');
@@ -220,38 +202,6 @@ class ValorisierungGestaffelt extends AbstractValorisationMethod
 		{
 			print_r($this->gehaltstypen);
 			echo PHP_EOL;
-		}
-	}
-
-	protected function fetchWochenstunden()
-	{
-		foreach($this->vertragsbestandteile as $vb)
-		{
-			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'stunden' )
-			{
-				if( $vb->getTeilzeittyp_kurzbz() === 'altersteilzeit' )
-				{
-					$lvbbatz = $this->ci->VertragsbestandteilLib->fetchLastVertragsbestandteilStundenBeforeAltersteilzeit($vb->getDienstverhaeltnis_id());
-					if($lvbbatz)
-					{
-						$this->wochenstunden = $lvbbatz->getWochenstunden();
-					}
-					else
-					{
-						throw new Exception(__CLASS__ . ' can not determine ATZ Wochenstunden.');
-					}
-				}
-				else
-				{
-					$this->wochenstunden = $vb->getWochenstunden();
-				}
-			}
-		}
-
-		if(self::DEBUG)
-		{
-			echo "Wochenstunden: " . $this->wochenstunden . PHP_EOL;
-			echo "Vollzeitstunden: " . $this->fulltimehours . PHP_EOL;
 		}
 	}
 
