@@ -427,6 +427,7 @@ class Api_model extends DB_Model
             p.nachname,
             p.vorname,
             p.vornamen,
+            p.wahlname,
             p.geschlecht,
             p.sprache,
             p.gebdatum,
@@ -466,6 +467,10 @@ class Api_model extends DB_Model
         if ($personJson['staatsbuergerschaft'] == '')
         {
             $personJson['staatsbuergerschaft'] = null;
+        }
+        if ($personJson['wahlname'] == '')
+        {
+            $personJson['wahlname'] = null;
         }
 
         $personJson['updatevon'] = getAuthUID();
@@ -509,6 +514,11 @@ class Api_model extends DB_Model
         if (isset($personJson['svnr']) && $personJson['svnr'] == '')
         {
             $personJson['svnr'] = null;
+        }
+
+        if (isset($personJson['wahlname']) && $personJson['wahlname'] == '')
+        {
+            $personJson['wahlname'] = null;
         }
 
         $personJson['insertvon'] = getAuthUID();

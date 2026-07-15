@@ -1,5 +1,5 @@
 import { Modal } from '../Modal.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import ApiEmployee from '../../api/factory/employee.js';
 import ApiDV from '../../api/factory/dv.js';

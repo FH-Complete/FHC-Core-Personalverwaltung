@@ -7,19 +7,21 @@ class CommonsAPI extends FHCAPI_Controller
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+    const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+    const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 
     public function __construct() {
         parent::__construct(
 	    array(
-		'getSprache' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getSachaufwandtyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getNations' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getAusbildung' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getStandorteIntern' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getOrtschaften' => CommonsAPI::DEFAULT_PERMISSION,
-		'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getSprache' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getSachaufwandtyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getNations' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getAusbildung' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getStandorteIntern' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getOrtschaften' => [CommonsAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
 		'getContractExpire' => CommonsAPI::DEFAULT_PERMISSION,
 		'getContractNew' => CommonsAPI::DEFAULT_PERMISSION,
@@ -30,17 +32,22 @@ class CommonsAPI extends FHCAPI_Controller
 		'getAllCourseHours' => CommonsAPI::DEFAULT_PERMISSION,
 		'getAllSupportHours' => CommonsAPI::DEFAULT_PERMISSION,
 		'getReportData' => CommonsAPI::DEFAULT_PERMISSION,
-		'getKontakttyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getKontakttyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
-		'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
-		'getKarenztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
-		'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+		'getKarenztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getTeilzeittypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getFreitexttypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getStundensatztypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+
+        'getFachrichtungen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+        'getModellstellen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getModellfunktionen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getJobfamilien' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -66,6 +73,10 @@ class CommonsAPI extends FHCAPI_Controller
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Karenztyp_model', 'KarenztypModel');
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Teilzeittyp_model', 'TeilzeittypModel');
 	$this->load->model('extensions/FHC-Core-Personalverwaltung/Freitexttyp_model', 'FreitexttypModel');
+    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Fachrichtung_model', 'FachrichtungModel');
+    $this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellstelle_model', 'ModellstelleModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Modellfunktion_model', 'ModellfunktionModel');
+	$this->load->model('extensions/FHC-Core-Personalverwaltung/lohnguide/Jobfamilie_model', 'JobfamilieModel');
 	$this->load->model('ressource/Stundensatztyp_model', 'StundensatztypModel');
     }
 
@@ -457,6 +468,82 @@ class CommonsAPI extends FHCAPI_Controller
 		if (hasData($result))
 		{
 			return $this->terminateWithSuccess(getData($result));
+		}
+	}
+
+    // --------------------------------------
+    // Lohnguide
+    // --------------------------------------
+
+    public function getFachrichtungen()
+	{
+		$this->FachrichtungModel->resetQuery();
+		$this->FachrichtungModel->addSelect('fachrichtung_kurzbz AS value, bezeichnung AS label');
+		$this->FachrichtungModel->addOrder('bezeichnung', 'ASC');
+		$rows = $this->FachrichtungModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no fachrichtung types found');
+			return;
+		}
+	}
+
+    public function getModellstellen()
+	{
+		$this->ModellstelleModel->resetQuery();
+		$this->ModellstelleModel->addSelect('modellstelle_kurzbz AS value, bezeichnung AS label');
+		$this->ModellstelleModel->addOrder('sort', 'ASC');
+		$rows = $this->ModellstelleModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no modellstellen types found');
+			return;
+		}
+	}
+
+    public function getModellfunktionen()
+	{
+		$this->ModellfunktionModel->resetQuery();
+		$this->ModellfunktionModel->addSelect('modellfunktion_kurzbz AS value, bezeichnung AS label');
+		$this->ModellfunktionModel->addOrder('sort', 'ASC');
+		$rows = $this->ModellfunktionModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no modellfunktionen found');
+			return;
+		}
+	}
+
+    public function getJobfamilien()
+	{
+		$this->JobfamilieModel->resetQuery();
+		$this->JobfamilieModel->addSelect('jobfamilie_kurzbz AS value, bezeichnung AS label');
+		$this->JobfamilieModel->addOrder('sort', 'ASC');
+		$rows = $this->JobfamilieModel->load();
+		if( hasData($rows) )
+		{
+			$this->terminateWithSuccess(getData($rows));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no jobfamilien found');
+			return;
 		}
 	}
 
