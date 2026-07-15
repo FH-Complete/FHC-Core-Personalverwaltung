@@ -1,4 +1,4 @@
-import FormUploadDms from '../../../../../../../public/js/components/Form/Upload/Dms.js';
+import FormUploadDms from '../../../../../../js/components/Form/Upload/Dms.js';
 
 export const FileManager = {
 	name: 'FileManager',
