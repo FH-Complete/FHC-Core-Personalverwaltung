@@ -35,6 +35,7 @@ export default {
 		const openissuescount = Vue.ref(null);
 		const personalnummer = Vue.ref(null);
 		const statusRef = Vue.ref(null);
+		const CoreDetailsHeaderRef = Vue.ref(null);
 		const $api = Vue.inject('$api');
 
 		const redirect = (params) => {
@@ -101,6 +102,7 @@ export default {
 			fetchHeaderData(props.personid, props.personuid);
 			checkPerson(props.personid);
 			statusRef.value.refresh();
+			CoreDetailsHeaderRef.value.reload();
 		}
 
 		Vue.onMounted(() => {
@@ -131,6 +133,7 @@ export default {
 			currentPersonUID,
 			fetchHeaderData,
 			statusRef,
+			CoreDetailsHeaderRef,
 			getStatusTags,
 			isFetchingIssues,
 			checkPerson,
