@@ -1,4 +1,6 @@
-const IssuesCountCard = {
+import ApiIssue from '../../api/factory/issue.js';
+
+export const IssuesCountCard = {
 	name: 'IssuesCountCard',
      components: {
         "p-overlaypanel": primevue.overlaypanel,
@@ -9,7 +11,7 @@ const IssuesCountCard = {
      },
      setup( props ) {
         
-        const fhcApi = Vue.inject('$fhcApi');  
+        const $api = Vue.inject('$api');  
         const isFetching = Vue.ref(false);
         const title = Vue.ref("Mitarbeiter*innen mit Issues");
         const issues = Vue.ref([]);
@@ -23,8 +25,8 @@ const IssuesCountCard = {
 
         const getOpenIssues = async () =>  {
             try {
-                let res = await fhcApi.factory.Issue.openIssuesPersons();
-                issues.value = res.retval;
+                let res = await $api.call(ApiIssue.openIssuesPersons());
+                issues.value = res.data;
                 return res;
             } catch(error) {
                 console.log(error);

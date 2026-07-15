@@ -1,4 +1,5 @@
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
+import ApiEmployee from '../../../api/factory/employee.js';
 
 export const EmployeeContractInfo = {
 	name: 'EmployeeContractInfo',
@@ -34,7 +35,7 @@ export const EmployeeContractInfo = {
 
         const karenztypen = Vue.inject('karenztypen');
         const vertragsarten = inject('vertragsarten');
-		const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
 
         const fetchData = async (uid) => {
             if (uid == null) {
@@ -44,8 +45,8 @@ export const EmployeeContractInfo = {
             }
             isFetching.value = true
             try {
-                const res = await fhcApi.factory.Employee.dvInfoByPerson(uid);
-                dvList.value = res.retval.dvList;
+                const res = await $api.call(ApiEmployee.dvInfoByPerson(uid));
+                dvList.value = res.data.dvList;
                 isFetching.value = false;                   
             } catch (error) {
                 console.log(error)

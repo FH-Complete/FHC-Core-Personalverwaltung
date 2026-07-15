@@ -11,13 +11,11 @@ export const EmployeeNav = {
             emit("close-editor", route.params.id)
         }
         Vue.onMounted(() => {
-			console.log('EmployeeNav mounted', route.path);
             currentDate.value = route.query.d;
         })
         Vue.watch(
 			() => route.query.d,
 			d => {
-                console.log('EmployeeNav watch route.query.d', d)
 				currentDate.value = d;
 			}
 		)

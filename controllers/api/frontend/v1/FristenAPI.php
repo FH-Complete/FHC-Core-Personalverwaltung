@@ -2,7 +2,7 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class FristenAPI extends Auth_Controller
+class FristenAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
@@ -33,21 +33,21 @@ class FristenAPI extends Auth_Controller
     public function getFristenListe()
     {
         $result = $this->FristenLib->getFristenListe();
-        return $this->outputJson($result);
+        return $this->terminateWithSuccess($result);
     }
 
     public function getPersonFristenListe($uid)
     {
 	$all = filter_var($this->input->get('all'), FILTER_VALIDATE_BOOLEAN);
         $result = $this->FristenLib->getFristenListe($uid, $all);
-        return $this->outputJsonSuccess($result);
+        return $this->terminateWithSuccess($result);
     }
 
     public function updateFristenListe()
     {
 		$d = new DateTime();
 		$result = $this->FristenLib->updateFristen($d);
-        return $this->outputJsonSuccess($result);
+        return $this->terminateWithSuccess($result);
     }
 
     public function updateFristStatus()
@@ -66,12 +66,12 @@ class FristenAPI extends Auth_Controller
     	);
 
 		if (isError($result))
-			return $this->outputJsonError('Fehler beim Speichern von Friststatus');
+			return $this->terminateWithError('Fehler beim Speichern von Friststatus');
 
 		$frist = $this->FristModel->load($result->retval);
 
 		if (hasData($frist))
-			$this->outputJsonSuccess($frist->retval);
+			$this->terminateWithSuccess($frist->retval);
     }
 
 
@@ -90,9 +90,9 @@ class FristenAPI extends Auth_Controller
             $result = $this->FristModel->batchUpdateStatus($payload['fristen'], $payload['status_kurzbz'], getAuthUID());
 
             if ($result === true)
-                $this->outputJsonSuccess($result);
+                $this->terminateWithSuccess($result);
             else
-                $this->outputJsonError('Error when updating deadlines');
+                $this->terminateWithError('Error when updating deadlines');
 
         } else {
             $this->output->set_status_header('405');
@@ -133,9 +133,9 @@ class FristenAPI extends Auth_Controller
             }
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when updating deadline');
+			    $this->terminateWithError('Error when updating deadline');
         } else {
             $this->output->set_status_header('405');
         }
@@ -149,9 +149,9 @@ class FristenAPI extends Auth_Controller
 	{
 		$result = $this->FristenLib->getFristenStatus();
         if ($result !== FALSE) {
-            return $this->outputJsonSuccess($result);
+            return $this->terminateWithSuccess($result);
         } 
-		return $this->outputJsonError('Error fetching frist status');
+		return $this->terminateWithError('Error fetching frist status');
 	}
 
     public function getFristenEreignisse()
@@ -159,9 +159,9 @@ class FristenAPI extends Auth_Controller
         $manuell = $this->input->get('manuell', FALSE);
 		$result = $this->FristenLib->getFristenEreignis($manuell);
         if ($result !== FALSE) {
-            return $this->outputJsonSuccess($result);
+            return $this->terminateWithSuccess($result);
         } 
-		return $this->outputJsonError('Error fetching deadline events');
+		return $this->terminateWithError('Error fetching deadline events');
 	}
 
     public function deleteFrist()
@@ -176,9 +176,9 @@ class FristenAPI extends Auth_Controller
             $result = $this->FristModel->delete($payload['frist_id']);
 
             if (isSuccess($result))
-			    $this->outputJsonSuccess($result->retval);
+			    $this->terminateWithSuccess($result->retval);
 		    else
-			    $this->outputJsonError('Error when deleting frist');
+			    $this->terminateWithError('Error when deleting frist');
 
         } else {
             $this->output->set_status_header('405');

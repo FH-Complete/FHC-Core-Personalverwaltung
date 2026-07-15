@@ -1,15 +1,14 @@
 import { Modal } from '../../Modal.js';
 import { ModalDialog } from '../../ModalDialog.js';
-import { Toast } from '../../Toast.js';
 import {OrgChooser} from "../../../components/organisation/OrgChooser.js";
-import { usePhrasen } from '../../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../../js/mixins/Phrasen.js';
+import ApiZeit from '../../../api/factory/zeit.js';
 
 export const TimeRecording = {
 	name: 'TimeRecording',
     components: {
         Modal,
         ModalDialog,
-        Toast,
         OrgChooser,
         "datepicker": VueDatePicker
     },
@@ -20,7 +19,7 @@ export const TimeRecording = {
     emits: ['updateHeader'],
     setup( props, { emit } ) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -67,11 +66,10 @@ export const TimeRecording = {
             }
             try {
               isFetching.value = true;
-              const response = await fhcApi.factory.Zeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value);
+              const response = await $api.call(ApiZeit.personZeiterfassungByWeek(currentPersonUID.value, currentYear.value, currentWeek.value));
               isFetching.value = false;              
-              console.log('zeiterfassung', response.retval);	  
-              if (response.retval.length>0) {
-                timeRecordList.value = response.retval;
+              if (response.data.length>0) {
+                timeRecordList.value = response.data;
               } else {
                 timeRecordList.value = [];
               }

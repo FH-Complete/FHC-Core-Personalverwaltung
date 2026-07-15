@@ -2,20 +2,22 @@
 
 defined('BASEPATH') || exit('No direct script access allowed');
 
-class OrgAPI extends Auth_Controller
+class OrgAPI extends FHCAPI_Controller
 {
 
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
+	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
+	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
 
-    public function __construct() {
+	public function __construct() {
         parent::__construct(array(
             'getOrgHeads' => OrgAPI::DEFAULT_PERMISSION,
             'getOrgStructure' => OrgAPI::DEFAULT_PERMISSION,
             'getOrgPersonen' => OrgAPI::DEFAULT_PERMISSION,
-            'getCompanyByOrget'  => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'getCompanyByOrget'  => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		    'getOrgetsForCompany' => OrgAPI::DEFAULT_PERMISSION,
-            'getUnternehmen' => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'getUnternehmen' => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             )
         );
         $this->load->library('AuthLib');
@@ -30,7 +32,7 @@ class OrgAPI extends Auth_Controller
     function getOrgHeads()
     {
         $data = $this->OrganisationseinheitModel->getHeads();
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
     function getOrgStructure()
@@ -38,7 +40,7 @@ class OrgAPI extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getOrgStructure($oe);
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess($data);
     }
 
     function getOrgPersonen()
@@ -46,7 +48,7 @@ class OrgAPI extends Auth_Controller
         $oe = $this->input->get('oe', TRUE);
 
         $data = $this->OrganisationseinheitModel->getPersonen($oe);
-        return $this->outputJson($data);
+        return $this->terminateWithSuccess(getData($data));
     }
 
 
@@ -72,12 +74,12 @@ EOSQL;
         $childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($oe_kurzbz));
         if( hasData($childorgets) )
         {
-            $this->outputJson($childorgets);
+            $this->terminateWithSuccess(getData($childorgets));
             return;
         }
         else
         {
-            $this->outputJsonError('no orgets found for parent oe_kurzbz ' . $oe_kurzbz );
+            $this->terminateWithError('no orgets found for parent oe_kurzbz ' . $oe_kurzbz );
             return;
         }
     }
@@ -90,7 +92,7 @@ EOSQL;
 	{
 		if( empty($companyOrgetkurzbz) )
 		{
-			$this->outputJsonError('Missing Parameter <companyOrgetkurzbz>');
+			$this->terminateWithError('Missing Parameter <companyOrgetkurzbz>');
 			return;
 		}
 
@@ -121,12 +123,12 @@ EOSQL;
 		$childorgets = $this->OrganisationseinheitModel->execReadOnlyQuery($sql, array($companyOrgetkurzbz));
 		if( hasData($childorgets) )
 		{
-			$this->outputJson($childorgets);
+			$this->terminateWithSuccess(getData($childorgets));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no orgets found for parent oe_kurzbz ' . $companyOrgetkurzbz );
+			$this->terminateWithError('no orgets found for parent oe_kurzbz ' . $companyOrgetkurzbz );
 			return;
 		}
 	}
@@ -140,12 +142,12 @@ EOSQL;
 		$unternehmen = $this->OrganisationseinheitModel->loadWhere('oe_parent_kurzbz IS NULL');
 		if( hasData($unternehmen) )
 		{
-			$this->outputJson($unternehmen);
+			$this->terminateWithSuccess(getData($unternehmen));
 			return;
 		}
 		else
 		{
-			$this->outputJsonError('no companies (orgets with parent NULL) found');
+			$this->terminateWithError('no companies (orgets with parent NULL) found');
 			return;
 		}
 	}

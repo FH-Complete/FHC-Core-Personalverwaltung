@@ -3,6 +3,7 @@ import configurable from '../../mixins/vbform/configurable.js';
 import errors from './errors.js';
 import infos from './infos.js';
 import store from './vbsharedstate.js';
+import ApiKarenz from  '../../../js/api/factory/karenz.js';
 
 export default {
   name: 'VertragsbestandteilKarenz',
@@ -101,7 +102,7 @@ export default {
     this.getKarenztypen();
     this.setDataFromConfig();
   },
-  inject: ['$fhcApi'],
+  inject: ['$api'],
   methods: {
     isselected: function(optvalue, selvalue) {
       return (optvalue === selvalue);
@@ -129,8 +130,8 @@ export default {
       }
     },
     getKarenztypen: async function() {
-      const response = await this.$fhcApi.factory.Karenz.getKarenztypen();
-      const karenztypen = response.retval;
+      const response = await this.$api.call(ApiKarenz.getKarenztypen());
+      const karenztypen = response.data;
       karenztypen.unshift({
         value: '',
         label: 'Karenztyp wählen',

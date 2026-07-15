@@ -1,4 +1,6 @@
 import { Modal } from '../Modal.js';
+import ApiOrgViewer from '../../api/factory/orgviewer.js';
+import ApiFilter from '../../../../../js/api/factory/filter.js';
 
 export const OrgViewer = {
 	name: 'OrgViewer',
@@ -26,12 +28,12 @@ export const OrgViewer = {
         const currentValue = ref({});
         const currentPersons = ref([]);
 
-        const fhcApi = inject('$fhcApi');
+        const $api = Vue.inject('$api');
 
         const fetchOrg = async (oe) => {
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.OrgViewer.getOrgStructure(oe);
+              const res = await $api.call(ApiOrgViewer.getOrgStructure(oe));
               return res;
             } catch (error) {
               console.log(error)              
@@ -43,7 +45,7 @@ export const OrgViewer = {
         const fetchPersons = async (oe) => {
             isFetching.value = true
             try {
-              const res = await fhcApi.factory.OrgViewer.getOrgPersonen(oe);
+              const res = await $api.call(ApiOrgViewer.getOrgPersonen(oe));
               return res;
             } catch (error) {
               console.log(error)              
@@ -81,8 +83,8 @@ export const OrgViewer = {
             console.log(d);
             currentValue.value = d;
             modalRef.value.show();
-            const result = fetchPersons(d.oe_kurzbz).then((data) => {
-                currentPersons.value = data.retval;
+            const result = fetchPersons(d.oe_kurzbz).then((res) => {
+                currentPersons.value = res.data;
             })
         }
 
@@ -98,8 +100,8 @@ export const OrgViewer = {
  
 
         Vue.watch(oe, (currentVal, oldVal) => {            
-            fetchOrg(currentVal).then((data) => {
-                nodes.value = [data];
+            fetchOrg(currentVal).then((res) => {
+                nodes.value = [res.data];
                 expandedKeys.value[nodes.value[0].key] = true;
                 
               }
@@ -125,7 +127,7 @@ export const OrgViewer = {
                 "filterType":"EmployeeViewer",
                 "filterFields":[{"name":"OE Key","operation":"equal","condition":oe_kurzbz}]
             };
-            fhcApi.factory.filter.applyFilterFields(filterFields).then(function() {
+            $api.call(ApiFilter.applyFilterFields(filterFields)).then(function() {
                 // redirect
                 let protocol_host = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
                 window.location.href = `${protocol_host}/extensions/FHC-Core-Personalverwaltung/Employees`;

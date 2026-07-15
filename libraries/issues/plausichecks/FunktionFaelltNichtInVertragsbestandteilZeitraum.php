@@ -69,7 +69,7 @@ class FunktionFaelltNichtInVertragsbestandteilZeitraum extends PlausiChecker
 				JOIN public.tbl_benutzerfunktion ben_funktion USING (benutzerfunktion_id)
 			WHERE
 				--benutzerfunktion date span does not overlap with vertragsbestandteil date span
-				vtb.von > ben_funktion.datum_bis OR vtb.bis < ben_funktion.datum_von";
+				(vtb.von > ben_funktion.datum_bis OR vtb.bis < ben_funktion.datum_von)";
 
 		if (isset($person_id))
 		{

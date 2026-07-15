@@ -1,7 +1,8 @@
 import {CoreNavigationCmpt} from '../../../../js/components/navigation/Navigation.js';
+import ApiSearchbar from  '../../../../js/api/factory/searchbar.js';
 import searchbar from "../../../../js/components/searchbar/searchbar.js";
 import {searchbaroptions} from "./common.js";
-import Phrasen from '../../../../js/plugin/Phrasen.js';
+import Phrasen from '../../../../js/plugins/Phrasen.js';
 
 const pvApp = Vue.createApp(	{
 	name: 'PV21Report',
@@ -11,13 +12,14 @@ const pvApp = Vue.createApp(	{
 		PivotReport,
 		CoreNavigationCmpt,
 	},
+	inject: ['$api', '$fhcAlert'],
 	data() {
 		return 	{
 			isEditorOpen: false,
 			currentPersonID: null,	
 			currentOrg: '',
 			searchbaroptions: searchbaroptions,
-			searchfunction: this.$fhcApi.factory.search.search,
+			searchfunction: (params) => this.$api.call(ApiSearchbar.search(params)),
 			appSideMenuEntries: {},
 		}
 	},

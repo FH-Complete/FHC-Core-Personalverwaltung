@@ -1,14 +1,13 @@
 import { Modal } from '../Modal.js';
 import { ModalDialog } from '../ModalDialog.js';
-import { Toast } from '../Toast.js';
-import { usePhrasen } from '../../../../../../public/js/mixins/Phrasen.js';
+import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
+import ApiPerson from '../../api/factory/person.js';
 
 export const MaterialExpensesData = {
 	name: 'MaterialExpensesData',
     components: {
         Modal,
         ModalDialog,
-        Toast,
         "datepicker": VueDatePicker
     },
     props: {
@@ -18,7 +17,8 @@ export const MaterialExpensesData = {
     },
     setup( props ) {
 
-        const fhcApi = Vue.inject('$fhcApi');
+        const $api = Vue.inject('$api');
+        const $fhcAlert = Vue.inject('$fhcAlert');
         const readonly = Vue.ref(false);
 
         const { t } = usePhrasen();
@@ -56,10 +56,10 @@ export const MaterialExpensesData = {
  
             // submit
             try {
-                const response = await fhcApi.factory.Person.personMaterialExpenses(theModel.value.personID, theModel.value.personUID);
-                materialdataList.value = response.retval;
+                const response = await $api.call(ApiPerson.personMaterialExpenses(theModel.value.personID, theModel.value.personUID));
+                materialdataList.value = response.data;
             } catch (error) {
-                console.log(error)              
+                $fhcAlert.handleSystemError(error)            
             } finally {
                 isFetching.value = false
             }
@@ -142,23 +142,26 @@ export const MaterialExpensesData = {
 			if(currentValue.value.betrag !== null) {
 				currentValue.value.betrag = (String(currentValue.value.betrag)).replace('.', ',');
 			}
-            const ok = await confirmDeleteRef.value.show();
+            if (await $fhcAlert.confirm({
+                    //message: t('person','sachaufwand') + ' ' + getType(currentValue.value?.sachaufwandtyp_kurzbz) + ' ' + currentValue.value?.beginn - currentValue.value?.ende + ' ' + t('person','wirklichLoeschen'),
+                    message: t('person','sachaufwand') + ' ' + getType(currentValue.value?.sachaufwandtyp_kurzbz) + ' ' + t('person','wirklichLoeschen'),
+                    acceptLabel: 'Löschen',
+				    acceptClass: 'p-button-danger'
+                }) === false) {
+                return;
+            }    
             
-            if (ok) {   
-
-                try {
-                    const res = await fhcApi.factory.Person.deletePersonMaterialExpenses(id);                    
-                    if (res.error == 0) {
-                        delete materialdataList.value[id];
-                        showDeletedToast();
-                    }
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                      isFetching.value = false
-                }   
-                
-            }
+            try {
+                const res = await $api.call(ApiPerson.deletePersonMaterialExpenses(id));
+                if (res.meta.status == "success") {
+                    delete materialdataList.value[id];
+                    showDeletedToast();
+                }
+            } catch (error) {
+                $fhcAlert.handleSystemError(error)             
+            } finally {
+                    isFetching.value = false
+            }   
         }
 
 
@@ -174,14 +177,14 @@ export const MaterialExpensesData = {
 					if(currentValue.value.betrag !== null) {
 						currentValue.value.betrag = (String(currentValue.value.betrag)).replace(',', '.');
 					}
-                    const r = await fhcApi.factory.Person.upsertPersonMaterialExpenses(currentValue.value);                    
-                    if (r.error == 0) {
-                        materialdataList.value[r.retval[0].sachaufwand_id] = r.retval[0];
+                    const r = await $api.call(ApiPerson.upsertPersonMaterialExpenses(currentValue.value));
+                    if (r.meta.status == "success") {
+                        materialdataList.value[r.data[0].sachaufwand_id] = r.data[0];
                         console.log('materialdata successfully saved');
                         showToast();
                     }  
                 } catch (error) {
-                    console.log(error)              
+                    $fhcAlert.handleSystemError(error)         
                 } finally {
                     isFetching.value = false
                 }
@@ -255,16 +258,12 @@ export const MaterialExpensesData = {
             return t.length > 0 ? t[0].bezeichnung : ''
         }
         
-        // Toast 
-        const toastRef = Vue.ref();
-        const deleteToastRef = Vue.ref();
-        
         const showToast = () => {
-            toastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','sachaufwandGespeichert'));
         }
 
         const showDeletedToast = () => {
-            deleteToastRef.value.show();
+            $fhcAlert.alertSuccess(t('person','sachaufwandGeloescht'));
         }
 
         return { 
@@ -273,7 +272,6 @@ export const MaterialExpensesData = {
             readonly,
             frmState,
             dialogRef,
-            toastRef, deleteToastRef,
             materialDataFrm,
             modalRef,
             types, 
@@ -286,19 +284,7 @@ export const MaterialExpensesData = {
          }
     },
     template: `
-    <div class="row">
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-          <Toast ref="toastRef">
-            <template #body><h4>{{ t('person','sachaufwandGespeichert') }}</h4></template>
-          </Toast>
-        </div>
-
-        <div class="toast-container position-absolute top-0 end-0 pt-4 pe-2">
-            <Toast ref="deleteToastRef">
-                <template #body><h4>{{ t('person', 'sachaufwandGeloescht') }}</h4></template>
-            </Toast>
-        </div>
+    <div class="row">        
     </div>
     <div class="row pt-md-4">      
          <div class="col">

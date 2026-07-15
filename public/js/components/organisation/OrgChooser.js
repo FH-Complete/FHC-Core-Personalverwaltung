@@ -1,4 +1,5 @@
-import {CoreRESTClient} from '../../../../../js/RESTClient.js';
+// import {CoreRESTClient} from '../../../../../js/RESTClient.js';
+import ApiOrgViewer from '../../api/factory/orgviewer.js';
 
 export const OrgChooser = {
 	name: 'OrgChooser',
@@ -14,13 +15,16 @@ export const OrgChooser = {
       const isFetching = Vue.ref(false);
       const oeRef = Vue.toRefs(props).oe
       const selected = Vue.ref();
+      const $api = Vue.inject('$api');
 
       const fetchHead = async () => {
         isFetching.value = true
         try {
-          const res = await CoreRESTClient.get(
+          /* const res = await CoreRESTClient.get(
             'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgHeads');
-          orgList.value = CoreRESTClient.getData(res.data);
+          orgList.value = CoreRESTClient.getData(res.data); */
+          const res = await $api.call(ApiOrgViewer.getOrgHeads());
+          orgList.value = res.data;
           if (orgList.value.length > 0)  {
             //orgList.value.reverse();
             if (props.oe == undefined || (props.oe != null && props.oe == '')) {

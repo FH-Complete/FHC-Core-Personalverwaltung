@@ -4,6 +4,8 @@
  */
 abstract class AbstractValorisationMethod implements IValorisationMethod
 {
+	const DEBUG = false;
+
 	// constants for mode (which Gehaltsbestandteile are applicable?)
 	const ALLE_GBS = 0; // all Gehaltsbestandteile
 	const NUR_ZU_VALORISIERENDE_GBS = 1; // only Gehaltsbestandteile with valorisaiton = true
@@ -29,6 +31,10 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 		$this->vertragsbestandteile = null;
 		$this->gehaltsbestandteile = null;
 		$this->params = null;
+
+		$this->wochenstunden = null;
+		$this->fulltimehours = $this->ci->config->item('VAL_FULLTIME_HOURS');
+		$this->scalefactor_fte2pt = 1;
 	}
 
 	/**
@@ -144,5 +150,59 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 			}
 		}
 		return $gehaltsbestandteile;
+	}
+
+	/**
+	 * Gets Wochenstunden, based on last Stunden Vertragsbetandteil.
+	 */
+	protected function fetchWochenstunden()
+	{
+		foreach($this->vertragsbestandteile as $vb)
+		{
+			if( $vb->getVertragsbestandteiltyp_kurzbz() === 'stunden' )
+			{
+				if( $vb->getTeilzeittyp_kurzbz() === 'altersteilzeit' )
+				{
+					$lvbbatz = $this->ci->VertragsbestandteilLib->fetchLastVertragsbestandteilStundenBeforeAltersteilzeit($vb->getDienstverhaeltnis_id());
+					if($lvbbatz)
+					{
+						$this->wochenstunden = $lvbbatz->getWochenstunden();
+					}
+					else
+					{
+						throw new Exception(__CLASS__ . ' can not determine ATZ Wochenstunden.');
+					}
+				}
+				else
+				{
+					$this->wochenstunden = $vb->getWochenstunden();
+				}
+			}
+		}
+
+		if(self::DEBUG)
+		{
+			echo "Wochenstunden: " . $this->wochenstunden . PHP_EOL;
+			echo "Vollzeitstunden: " . $this->fulltimehours . PHP_EOL;
+		}
+	}
+
+	/**
+	 * Gets scaling factor, important for non-full-time employees.
+	 */
+	protected function calcScaleFactor_FTE2PT()
+	{
+		if( $this->wochenstunden < floatval($this->fulltimehours)
+			&& $this->wochenstunden > 0
+			&& floatval($this->fulltimehours) > 0 )
+		{
+			// get scale factor if week hours are under fulltime hours
+			$this->scalefactor_fte2pt = floatval($this->wochenstunden) / floatval($this->fulltimehours);
+		}
+
+		if(self::DEBUG)
+		{
+			echo "ScaleFactor FTE2PT: " . $this->scalefactor_fte2pt . PHP_EOL;
+		}
 	}
 }
