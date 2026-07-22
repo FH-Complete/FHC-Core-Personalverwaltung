@@ -120,7 +120,7 @@ export const EmployeeTraining = {
                         kategorienList.value.map(k => [k.weiterbildungskategorie_kurzbz, k.bezeichnung])
                 )             
                 tabulator.value?.updateColumnDefinition("kategorien", {
-                    headerFilterParams: { values: filterListe,  clearable: true },
+                    headerFilterParams: { values: filterListe,  autocomplete: true, listOnEmpty: true, clearable: true },
                 });   
             }
 
@@ -182,7 +182,7 @@ export const EmployeeTraining = {
                         if(!headerValue) return true;  
                         return rowValue.includes(headerValue);
                     } },
-                { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", width: 140, headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+                { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", width: 140, headerFilter:"list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"} },
                 { title: 'Stunden', field: "stunden", hozAlign: "right", headerFilter:true },
                 { title: 'Von', field: "von", hozAlign: "center", 
                     formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },                
