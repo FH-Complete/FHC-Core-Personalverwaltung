@@ -1,4 +1,4 @@
-CREATE TABLE hr.tbl_weiterbildungskategorie
+CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildungskategorie
 (
     weiterbildungskategorie_kurzbz varchar(32) NOT NULL,
     bezeichnung character varying(32),
@@ -12,8 +12,8 @@ CREATE TABLE hr.tbl_weiterbildungskategorie
     updatevon varchar(32),
     CONSTRAINT tbl_weiterbildungskategorie_pk PRIMARY KEY (weiterbildungskategorie_kurzbz)
 );
-/
-CREATE TABLE hr.tbl_weiterbildungskategorietyp
+
+CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildungskategorietyp
 (
     weiterbildungskategorietyp_kurzbz  character varying(32) NOT NULL,
     bezeichnung character varying(32),  
@@ -26,7 +26,7 @@ CREATE TABLE hr.tbl_weiterbildungskategorietyp
     CONSTRAINT tbl_weiterbildungskategorietyp_pk PRIMARY KEY (weiterbildungskategorietyp_kurzbz)
 );
 
-CREATE TABLE hr.tbl_weiterbildung
+CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung
 (
     weiterbildung_id serial NOT NULL,
     mitarbeiter_uid character varying(32),
@@ -45,20 +45,20 @@ CREATE TABLE hr.tbl_weiterbildung
     CONSTRAINT tbl_weiterbildung_pk PRIMARY KEY (weiterbildung_id)
 );
 
-CREATE TABLE hr.tbl_weiterbildung_kategorie_rel 
+CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung_kategorie_rel 
 (
     weiterbildung_id int NOT NULL,
     weiterbildungskategorie_kurzbz  varchar(32) NOT NULL
 );
 
 
-CREATE TABLE hr.tbl_weiterbildung_dokument 
+CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung_dokument 
 (
     weiterbildung_id int NOT NULL,
     dms_id int NOT NULL
 );
 
-CREATE TABLE hr.tbl_weiterbildung_msg_log
+CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung_msg_log
 (
     weiterbildung_msg_log_id serial PRIMARY KEY,
     weiterbildung_id int NOT NULL,
@@ -70,32 +70,39 @@ CREATE TABLE hr.tbl_weiterbildung_msg_log
 
 
 -- tbl_weiterbildungskategorie->tbl_weiterbildungskategorietyp
+ALTER TABLE hr.tbl_weiterbildungskategorie DROP CONSTRAINT IF EXISTS tbl_weiterbildungskategorie_typ_kurzbz_fk;
 ALTER TABLE hr.tbl_weiterbildungskategorie ADD CONSTRAINT tbl_weiterbildungskategorie_typ_kurzbz_fk FOREIGN KEY (weiterbildungskategorietyp_kurzbz)
 REFERENCES hr.tbl_weiterbildungskategorietyp (weiterbildungskategorietyp_kurzbz) MATCH FULL
 ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- tbl_weiterbildung->tbl_mitarbeiter
+ALTER TABLE hr.tbl_weiterbildung DROP CONSTRAINT IF EXISTS tbl_weiterbildung_mitarbeiter_uid_fk;
 ALTER TABLE hr.tbl_weiterbildung ADD CONSTRAINT tbl_weiterbildung_mitarbeiter_uid_fk FOREIGN KEY (mitarbeiter_uid)
 REFERENCES public.tbl_mitarbeiter (mitarbeiter_uid) MATCH FULL
 ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- tbl_weiterbildung->tbl_weiterbildungskategorie  (m:n)
+ALTER TABLE hr.tbl_weiterbildung_kategorie_rel DROP CONSTRAINT IF EXISTS tbl_weiterbildung_kategorie_rel_weiterbildung_id_fk;
 ALTER TABLE hr.tbl_weiterbildung_kategorie_rel ADD CONSTRAINT tbl_weiterbildung_kategorie_rel_weiterbildung_id_fk FOREIGN KEY (weiterbildung_id)
 REFERENCES hr.tbl_weiterbildung (weiterbildung_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE hr.tbl_weiterbildung_kategorie_rel DROP CONSTRAINT IF EXISTS tbl_weiterbildung_kategorie_rel_kurzbz_fk;
 ALTER TABLE hr.tbl_weiterbildung_kategorie_rel ADD CONSTRAINT tbl_weiterbildung_kategorie_rel_kurzbz_fk FOREIGN KEY (weiterbildungskategorie_kurzbz)
 REFERENCES hr.tbl_weiterbildungskategorie (weiterbildungskategorie_kurzbz) MATCH FULL
 ON DELETE SET NULL ON UPDATE CASCADE;
 
+ALTER TABLE hr.tbl_weiterbildung_dokument DROP CONSTRAINT IF EXISTS tbl_weiterbildung_dokument_fk;
 ALTER TABLE hr.tbl_weiterbildung_dokument ADD CONSTRAINT tbl_weiterbildung_dokument_fk FOREIGN KEY (weiterbildung_id)
 REFERENCES hr.tbl_weiterbildung (weiterbildung_id) MATCH FULL
 ON DELETE RESTRICT ON UPDATE CASCADE;
 
+ALTER TABLE hr.tbl_weiterbildung_dokument DROP CONSTRAINT IF EXISTS tbl_weiterbildung_dokument__dms_fk;
 ALTER TABLE hr.tbl_weiterbildung_dokument ADD CONSTRAINT tbl_weiterbildung_dokument__dms_fk FOREIGN KEY (dms_id)
 REFERENCES campus.tbl_dms (dms_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- tbl_weiterbildung->tbl_weiterbildung_msg_log
+ALTER TABLE hr.tbl_weiterbildung_msg_log DROP CONSTRAINT IF EXISTS tbl_weiterbildung_msg_log_weiterbildung_id_fk;
 ALTER TABLE hr.tbl_weiterbildung_msg_log ADD CONSTRAINT tbl_weiterbildung_msg_log_weiterbildung_id_fk FOREIGN KEY (weiterbildung_id)
 REFERENCES hr.tbl_weiterbildung (weiterbildung_id) MATCH FULL
 ON DELETE CASCADE ON UPDATE CASCADE;
