@@ -1,4 +1,4 @@
--- Add the UDF definition for udf_studienrichtung in the "public"."tbl_mitarbeiter" table
+-- Add the UDF definitions for udf_studienrichtung and udf_institution in the "public"."tbl_mitarbeiter" table
 INSERT INTO system.tbl_udf ("schema", "table", "jsons")
 VALUES ('public', 'tbl_mitarbeiter', '
 [
@@ -9,6 +9,18 @@ VALUES ('public', 'tbl_mitarbeiter', '
 		"title": "Studienrichtung",
 		"description": "Studienrichtung",
 		"placeholder": "Studienrichtung",
+		"defaultValue": "",
+		"requiredPermissions": [
+			"basis/mitarbeiter"
+		]
+	},
+	{
+		"name": "udf_institution",
+		"sort": 1,
+		"type": "textfield",
+		"title": "Institution",
+		"description": "Institution",
+		"placeholder": "Institution",
 		"defaultValue": "",
 		"requiredPermissions": [
 			"basis/mitarbeiter"
