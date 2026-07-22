@@ -43,8 +43,8 @@ export const EditDialog = {
             if (dokumente != null)
             {
                 const files = dokumente.map(info => 
-                    new File([new Blob([""], { type: info.mimetype })], info.name, {
-                        type: info.mimetype,
+                    new File([JSON.stringify(info)], info.name, {
+                        type: 'application/x.fhc-dms+json',
                         lastModified: Date.now()
                     })
                 );
@@ -74,7 +74,7 @@ export const EditDialog = {
             
             schnellanlageRef.value.save().then(() => {
                 console.log("training successfully created")
-                currentValue.value = { surname: '', birthdate: null} 
+                // currentValue.value = { surname: '', birthdate: null} 
                 hideModal()                            
                 _resolve({type: 'CREATED', payload: { uid: 'dummy' }})
             })
@@ -156,7 +156,7 @@ export const EditDialog = {
                 const res = await $api.call(ApiWeiterbildung.updateDokumente(currentValue.value.weiterbildung_id, formData)); 
                 if (res?.meta?.status == 'success') {
                     $fhcAlert.alertSuccess('Dokumente gespeichert.');
-                    currentValue.value = res.data[0];
+                    currentValue.value.dokumente = res.data;
                     emit('changed');
                 } else {
                     //

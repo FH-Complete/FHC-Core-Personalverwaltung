@@ -269,46 +269,65 @@ class Weiterbildung extends FHCAPI_Controller
 			);
 		}
 
-		$files = $_FILES['files'];
-		$file_count = count($files['name']);
+		if (is_array($_FILES) && isset($_FILES['files']))
+		{
 
-		for ($i = 0; $i < $file_count; $i++) {
-			$_FILES['files']['name'] = $files['name'][$i];
-			$_FILES['files']['type'] = $files['type'][$i];
-			$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
-			$_FILES['files']['error'] = $files['error'][$i];
-			$_FILES['files']['size'] = $files['size'][$i];
+			$files = $_FILES['files'];
+			$file_count = is_countable($files['name']) ? count($files['name']) : 0;
 
-			$dms = [
-				"kategorie_kurzbz" => "weiterbildung",
-				"version" => 0,
-				"name" => $_FILES['files']['name'],
-				"mimetype" => $_FILES['files']['type'],
-				"beschreibung" => $uid . " Weiterbildung",
-				"insertvon" => $uid,
-				"insertamum" => "NOW()",
-			];
+			for ($i = 0; $i < $file_count; $i++) {
+				// ignore pre existing files
+				if($files["type"][$i] == 'application/x.fhc-dms+json')
+				{
+					$jsonFile = json_decode(file_get_contents($files['tmp_name'][$i]));
+					unset($dms_id_arr[$jsonFile->dms_id]);
+				}
+				else
+				{
+				
+					$_FILES['files']['name'] = $files['name'][$i];
+					$_FILES['files']['type'] = $files['type'][$i];
+					$_FILES['files']['tmp_name'] = $files['tmp_name'][$i];
+					$_FILES['files']['error'] = $files['error'][$i];
+					$_FILES['files']['size'] = $files['size'][$i];
 
-			$tmp_res = $this->dmslib->upload($dms, 'files', array('*'));
+					$dms = [
+						"kategorie_kurzbz" => "weiterbildung",
+						"version" => 0,
+						"name" => $_FILES['files']['name'],
+						"mimetype" => $_FILES['files']['type'],
+						"beschreibung" => $uid . " Weiterbildung",
+						"insertvon" => $uid,
+						"insertamum" => "NOW()",
+					];
 
-			$result = $this->getDataOrTerminateWithError($tmp_res);
-			$dms_id = $result['dms_id'];
+					$tmp_res = $this->dmslib->upload($dms, 'files', array('*'));
 
-			$result = $this->WeiterbildungdokumentModel->insert(array('weiterbildung_id' => $weiterbildung_id, 'dms_id' => $dms_id));
+					$result = $this->getDataOrTerminateWithError($tmp_res);
+					$dms_id = $result['dms_id'];
 
-			$this->getDataOrTerminateWithError($result);
-			
+					$result = $this->WeiterbildungdokumentModel->insert(array('weiterbildung_id' => $weiterbildung_id, 'dms_id' => $dms_id));
+
+					$this->getDataOrTerminateWithError($result);
+				}
+				
+			}
 		}
 
 		//update(3) check if all files have been deleted
 		foreach ($dms_id_arr as $file)
 		{
 			$result = $this->dmslib->removeAll($file['dms_id']);
-
 			$this->getDataOrTerminateWithError($result);
 		}
 
-		return $this->terminateWithSuccess($result);
+
+		$dokList = $this->WeiterbildungModel->getDokumente($weiterbildung_id);
+		if (isError($dokList)) 
+		{
+			$this->terminateWithError('failed to get documents');
+		}
+		return $this->terminateWithSuccess(getData($dokList) ?? []);
 	}
 
 	public function downloadDoc($dms_id)

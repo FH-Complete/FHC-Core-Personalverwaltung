@@ -16,25 +16,6 @@ export const TrainingFrm = {
 
         const { watch, ref, computed, onMounted, reactive } = Vue;
 
-        /* const createShape = () => {
-            return { 
-                "weiterbildung_id" : null, 
-                "mitarbeiter_uid": props.uid,
-                "intern": true,
-                "hauptkategorie_id":null, 
-                "statistikkategorie_id":null, 
-                "stunden":0, 
-                "intern": true,
-                "von":null, 
-                "bis":null, 
-                "hr_freigegeben":null, 
-                "beantragt":null,
-                "ablaufdatum":null,
-            } 
-        } */
-
-        /* const currentValue = ref(createShape());
-        const preservedValue = ref(createShape());    */
 
 
         const { t } = usePhrasen();
@@ -57,15 +38,7 @@ export const TrainingFrm = {
             emit('update:modelValue', { ...props.modelValue, [field]: value })
         }
 
-        // deprecated
-        const frmState = Vue.reactive({ mainCategoryBlurred: false, subCategoryBlurred: false, vonBlurred: false, bisBlurred: false, 
-            betragVonBlurred: false, betragBisBlurred: false, wasValidated: false });
-
-        const validInput = (input) => {
-            if (input === undefined || input === '')
-                return false;
-            return true;
-        }
+        const validInput = (input) => input !== undefined && input !== '';
 
         const validBezeichnung = (n) => {
             return !!n && n.trim() != "";
@@ -106,43 +79,17 @@ export const TrainingFrm = {
             return !errors.bezeichnung && !errors.kategorie && !errors.von && !errors.bis;
         }        
 
-       /*  const hasChanged = Vue.computed(() => {
-            return Object.keys(currentValue.value).some(field => currentValue.value[field] !== preservedValue.value[field])
-        }); */
-
-        /* const okHandler = async () => {
-            if (!validate()) {
-
-                console.log("form invalid");
-
-            } else {
-
-                // submit
-                try {
-                    _resolve({type: 'OK', payload: currentValue.value })
-                } catch (error) {
-                    console.log(error)              
-                } finally {
-                    isFetching.value = false
-                    hideModal()
-                }
-                
-                
-            }
-        } */
-
         const submit = () => {
             if (validate()) {
                 emit('submit', props.modelValue)
             }
         }
 
-        const reset = () => {
-
-        }
+        // currently not used
+        const reset = () => {}
 
         return { trainingDialogFrm,  t, update, kattest,
-            validInput, validDatum, validBezeichnung, frmState, errors, submit }
+            validInput, validDatum, validBezeichnung, errors, submit }
 
 
 
@@ -236,7 +183,7 @@ export const TrainingFrm = {
                     <label for="intern" class="form-label">Intern</label>
                     <div>
                         <input class="form-check-input" type="checkbox" id="intern" :checked="modelValue.intern"
-                            @change:modelValue="update('intern', $event.target.checked)">
+                            @change="update('intern', $event.target.checked)">
                     </div>    
                 </div> 
 
