@@ -46,6 +46,7 @@ export const EmployeeTraining = {
         const currentValue = ref();
         const editDialogRef = ref();   
         const isFetching = ref(false);
+        const jobRunning = ref(false);
         const interneChecked = ref(true);
         const trainingList = ref([]);                
         const employeeTrainingRef = ref(null); 
@@ -263,6 +264,7 @@ export const EmployeeTraining = {
 
         const runWeiterbildungExpireJob = async (uid) => {
             try {
+                jobRunning.value = true;
                 const res = await $api.call(ApiWeiterbildung.runWeiterbildungExpireJob(uid));                
                 if (res.meta.status == "success") {
                 //    trainingList.value = trainingList.value.filter(val => val.weiterbildung_id != id);
@@ -278,7 +280,7 @@ export const EmployeeTraining = {
             } catch (error) {
                 $fhcAlert.handleSystemError(error)             
             } finally {
-                isFetching.value = false
+                jobRunning.value = false
             }   
         }
 
@@ -317,7 +319,7 @@ export const EmployeeTraining = {
                 
         }
 
-        return {currentPersonID, currentUID, isFetching, t, employeeTrainingRef, editDialogRef, refreshList, runWeiterbildungExpireJob, kategorieFilterListe,
+        return {currentPersonID, currentUID, isFetching, t, employeeTrainingRef, editDialogRef, refreshList, runWeiterbildungExpireJob, jobRunning,
             readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorienList, kategorieTypen, tabulatorOptions}
     },
     template: `
@@ -339,7 +341,7 @@ export const EmployeeTraining = {
                                         <i class="fa fa-plus"></i> {{ t('person','weiterbildung') }}
                                     </button>
                                     <button type="button" class="btn btn-sm btn-primary me-3" @click="runWeiterbildungExpireJob(currentUID)">
-                                        <i class="fa fa-envelope"></i> Benachrichtigung
+                                        <i class="fa fa-envelope" ></i> Benachrichtigung
                                     </button>
                                     
                                 </div -->
@@ -358,8 +360,8 @@ export const EmployeeTraining = {
                                                 <button type="button" class="btn btn-sm btn-primary me-3" @click="showAddModal()">
                                                     <i class="fa fa-plus"></i> {{ t('person','weiterbildung') }}
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-primary me-3" @click="runWeiterbildungExpireJob(currentUID)">
-                                                    <i class="fa fa-envelope"></i> Benachrichtigung
+                                                <button type="button" class="btn btn-sm btn-primary me-3" @click="runWeiterbildungExpireJob(currentUID)" :disabled="jobRunning">
+                                                    <i :class="jobRunning ? 'fa fa-spinner fa-spin' : 'fa fa-envelope'"></i> Benachrichtigung
                                                 </button>
                                             
                                             </div>
