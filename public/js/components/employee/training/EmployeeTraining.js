@@ -140,31 +140,11 @@ export const EmployeeTraining = {
             nodeDiv.appendChild(nodeBtnDel);
         
             return nodeDiv;
-        }
-        const tabulatorEvents = Vue.computed(() => [
-            {
-                event: 'tableBuilt',
-                handler: () => {                    
-                    employeeTrainingRef.value?.tabulator?.updateColumnDefinition("kategorien", {
-                        headerFilterParams: {
-                            values: kategorieFilterListe,
-                            autocomplete: true,
-                            clearable: true,
-                        },
-                    });
-                }
-            },
-        ])
+        }        
 
         const fetchKategorien = async () => {
             const res = await $api.call(ApiWeiterbildung.getWeiterbildungkategorien());                 
-            kategorienList.value = res.data       
-            /* const filterListe = Object.fromEntries(
-                    kategorienList.value.map(k => [k.weiterbildungskategorie_kurzbz, k.bezeichnung])
-            )             
-            employeeTrainingRef.value.tabulator?.updateColumnDefinition("kategorien", {
-                headerFilterParams: { values: filterListe,  autocomplete: true, clearable: true },
-            });    */
+            kategorienList.value = res.data                   
         }
 
         const fetchKategorieTypen = async () => {
@@ -260,7 +240,7 @@ export const EmployeeTraining = {
         }
 
         watch(trainingListArray, (newVal, oldVal) => {
-                employeeTrainingRef.value.tabulator?.setData(trainingListArray.value);
+                employeeTrainingRef.value?.tabulator?.setData(trainingListArray.value);
         }, {deep: true})
 
         Promise.all([
@@ -328,7 +308,7 @@ export const EmployeeTraining = {
         }
 
         return {currentPersonID, currentUID, isFetching, t, employeeTrainingRef, editDialogRef, refreshList, runWeiterbildungExpireJob, kategorieFilterListe,
-            readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorienList, kategorieTypen, tabulatorOptions, tabulatorEvents}
+            readonly, showAddModal, showEditModal, showDeleteModal, interneChecked, kategorienList, kategorieTypen, tabulatorOptions}
     },
     template: `
     <div class="d-flex justify-content-between align-items-center ms-sm-auto col-lg-12 p-md-2">
