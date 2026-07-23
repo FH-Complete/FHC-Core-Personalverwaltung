@@ -155,12 +155,13 @@ export const EmployeeTraining = {
         
 
         const kategorieFilterListe = computed(() =>
-            Object.fromEntries(
-                kategorienList.value.map(k => [
+             Object.fromEntries([
+                ['', 'Alle'],
+                ...kategorienList.value.map(k => [
                     k.weiterbildungskategorie_kurzbz,
                     k.bezeichnung
                 ])
-            )
+            ])
         );
 
        watch(kategorieFilterListe, (filterListe) => {
