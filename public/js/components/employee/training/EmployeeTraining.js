@@ -174,6 +174,15 @@ export const EmployeeTraining = {
             });
         }, { deep: true }); 
 
+        const moneyFormatterParams = {
+            decimal: ",",
+            thousand: ".",
+            symbol: false,
+            symbolAfter: false,
+            negativeSign: true,
+            precision: 2
+        };
+
         const columnsDef = [
             { title: 'Kategorie', field: "kategorien", formatter: kategorieFormatter, width: 180, headerFilter: "list", headerSort:false,
                 headerFilterParams: { values: {} , autocomplete: false, clearable: true }, 
@@ -184,7 +193,7 @@ export const EmployeeTraining = {
                         }
             },
             { title: 'Bezeichnung', field: "bezeichnung", hozAlign: "left", width: 140, headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-            { title: 'Stunden', field: "stunden", hozAlign: "right", headerFilter:true },
+            { title: 'Stunden', field: "stunden", hozAlign: "right", formatter: "money",formatterParams:moneyFormatterParams, headerFilter:true },
             { title: 'Von', field: "von", hozAlign: "center", 
                 formatter: dateFormatter, width: 140, sorter:"string", headerFilter: dateFilter, headerFilterFunc:'dates' },                
             { title: 'Bis', field: "bis", hozAlign: "center", 
