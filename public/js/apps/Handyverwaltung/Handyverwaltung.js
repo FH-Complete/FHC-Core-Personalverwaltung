@@ -19,6 +19,7 @@ import pv21apifactory from "../../api/api.js";
 //import OldFhcApi from '../../../../../js/plugin/OldFhcApi.js';
 import ApiCommon from '../../api/factory/common.js';
 import ApiDV from  '../../api/factory/dv.js';
+import ApiEmployee from "../../api/factory/employee.js";
 
 import {CoreFilterCmpt} from '../../../../../js/components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../../../../js/components/navigation/Navigation.js';
@@ -31,9 +32,13 @@ import Betriebsmittel from "../../../../../js/components/Betriebsmittel/Betriebs
 
 import JobFunction from "../../components/employee/JobFunction.js";
 import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
+import CoreDetailsHeader from '../../../../../js/components/DetailHeader/DetailHeader.js';
 import { EmployeeContractInfo } from "../../components/employee/contract/EmployeeContractInfo.js";
 
+import { EmployeeStatus } from '../../components/employee/EmployeeStatus.js'
+
 import Phrasen from '../../../../../js/plugins/Phrasen.js';
+import employee from "../../api/employee.js";
 
 const sprache = Vue.ref([]);
 const nations = Vue.ref([]);
@@ -58,6 +63,10 @@ const handyVerwaltungApp = Vue.createApp({
 	data: function() {
 		return {
                     personid: null,
+                    personalnummer: null,
+                    employee: null,
+                    isFetching: false,
+                    isFetchingName: false,
                     personuid: 'keine',
 					betriebsmittelpersonapi: BetriebsmittelPersonApi
 		};
@@ -70,9 +79,14 @@ const handyVerwaltungApp = Vue.createApp({
         Betriebsmittel,
         JobFunction,
         EmployeeHeader,
+        CoreDetailsHeader,
+        EmployeeStatus,
         EmployeeContractInfo,                
 	},
     setup() {
+
+
+        const $api = Vue.inject('$api');
 
 		// init shared data        
 
@@ -100,13 +114,32 @@ const handyVerwaltungApp = Vue.createApp({
                 console.log('personselected', row)
                 this.personid = row.getData().PersonId;
                 this.personuid = row.getData().UID;
+                this.fetchHeaderData(this.personid, this.personuid);
                 
                 if( this.$refs['vsplit'].isCollapsed() !== false ) {
                     this.$refs['vsplit'].showBoth();
                 }
-            }
-	},
+            },
+            fetchHeaderData: async function (personid, personuid)  {
+                        this.isFetching = true;
+                        this.isFetchingName = true;
+                        try {
+                            // fetch header data
+                            const res = await this.$api.call(ApiEmployee.personHeaderData(personid, personuid));
+                            this.employee = res.data[0];
+                            this.personalnummer = this.employee.personalnummer;
+                            this.isFetchingName = false;
+                        } catch (error) {
+                            console.log(error);
+                        }
+                        finally {
+                            this.isFetching = false;
+                            this.isFetchingName = false;
+                        }
+                    }
+	    },
         computed: {
+            
             employeesTabulatorEvents: function() {
 		const employeesTabulatorEvents = [
 			{
@@ -194,7 +227,25 @@ const handyVerwaltungApp = Vue.createApp({
     
                             <template #bottom>
 
-                                <EmployeeHeader v-if="personid!=null" ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" restricted ></EmployeeHeader> 
+                                <CoreDetailsHeader
+                                    v-if="personid!=null"
+                                    ref="CoreDetailsHeaderRef"
+                                    :person_id="personid"
+                                    :mitarbeiter_uid="personuid"
+                                    typeHeader="mitarbeiter"
+                                    :domain="$fhcConfig.domain"
+                                    fotoEditable                                    
+                                    >
+                                        <template #titleAlphaTile>PNr</template>
+                                        <template #valueAlphaTile>{{ personalnummer }}</template>
+                                        <template #uid>
+                                            {{personuid}}
+                                        </template>
+                                        <template #tag>
+                                            <!-- no status in restricted mode -->
+                                        </template>
+                                </CoreDetailsHeader>
+
 
                                 <EmployeeContractInfo v-if="personid!=null" ref="contractInfoRef"  :personID="personid" :personUID="personuid" />
 
@@ -234,13 +285,16 @@ const handyVerwaltungApp = Vue.createApp({
 `
 });
 
+const configFHC = window.FHC_JS_CONFIG ?? {}
+
 handyVerwaltungApp.use(primevue.config.default);
 //handyVerwaltungApp.use(OldFhcApi, {factory: pv21apifactory});
 handyVerwaltungApp.use(Phrasen);
-handyVerwaltungApp.mount('#main');
+handyVerwaltungApp.provide('$api', handyVerwaltungApp.config.globalProperties.$api);
 handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 
-
+handyVerwaltungApp.config.globalProperties.$fhcConfig = configFHC
+handyVerwaltungApp.provide('fhcConfig', configFHC)
 handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getSprache()).then((r) => {
     sprache.value = r.data
 })
@@ -293,4 +347,6 @@ handyVerwaltungApp.config.globalProperties.$api.call(ApiDV.getUnternehmen()).the
 handyVerwaltungApp.config.globalProperties.$api.call(ApiDV.getDvEndeGruende()).then((r) => {
     beendigungsgruende.value = r.data
 }) 
+
+handyVerwaltungApp.mount('#main');
 
