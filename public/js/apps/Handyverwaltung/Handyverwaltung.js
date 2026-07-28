@@ -120,6 +120,11 @@ const handyVerwaltungApp = Vue.createApp({
                     this.$refs['vsplit'].showBoth();
                 }
             },
+            redirectToLeitung: function ({person_id, uid})  {
+                this.personid = person_id;
+                this.personuid = uid;
+                this.fetchHeaderData(this.personid, this.personuid);
+            },
             fetchHeaderData: async function (personid, personuid)  {
                         this.isFetching = true;
                         this.isFetchingName = true;
@@ -234,7 +239,7 @@ const handyVerwaltungApp = Vue.createApp({
                                     :mitarbeiter_uid="personuid"
                                     typeHeader="mitarbeiter"
                                     :domain="$fhcConfig.domain"
-                                    fotoEditable                                    
+                                    @redirectToLeitung="redirectToLeitung"                                    
                                     >
                                         <template #titleAlphaTile>PNr</template>
                                         <template #valueAlphaTile>{{ personalnummer }}</template>
