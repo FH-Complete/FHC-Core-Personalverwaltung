@@ -131,7 +131,7 @@ export default {
     	domain() {
     	    return window.FHC_JS_CONFIG?.domain;
     	}
-}	,
+	},
 	created()
 	{
 		this.$api.call(ApiCommon.getSprache())

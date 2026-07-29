@@ -3,12 +3,13 @@ import CoreBaseLayout from '../../../../../js/components/layout/BaseLayout.js';
 import CoreVerticalSplit from '../../../../../js/components/verticalsplit/verticalsplit.js';
 import {CoreFilterCmpt} from "../../../../../js/components/filter/Filter.js";
 import AppMenu from "../../../../../js/components/AppMenu.js";
-import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
+import CoreDetailsHeader from '../../../../../js/components/DetailHeader/DetailHeader.js';
 import { ContactData } from '../../components/employee/contact/ContactData.js';
 import { EmployeeContractInfo } from "../../components/employee/contract/EmployeeContractInfo.js";
 import JobFunction from "../../components/employee/JobFunction.js";
 import ApiCommon from '../../api/factory/common.js';
 import ApiDV from "../../api/factory/dv.js";
+import ApiEmployee from "../../api/factory/employee.js";
 
 export default {
 	name: "Kontaktdatenverwaltung",
@@ -18,7 +19,7 @@ export default {
 		CoreVerticalSplit,
 		CoreFilterCmpt,
 		AppMenu,
-		EmployeeHeader,
+		CoreDetailsHeader,
 		EmployeeContractInfo,
 		JobFunction,
 		ContactData
@@ -65,7 +66,12 @@ export default {
 			hourlyratetypes: {},
 			unternehmen: {},
 			beendigungsgruende: {},
+			personalnummer: null,
+			employee: null,
+			isFetching: false,
+			isFetchingName: false,
 			personid: null,
+			personuid: '',
 			tabulatorOptions:
 			{
 				persistenceID: "kontaktdatenverwaltung_20250724_v1",
@@ -106,6 +112,11 @@ export default {
 				}
 			],
 		}
+	},
+	computed: {
+    	domain() {
+    	    return window.FHC_JS_CONFIG?.domain;
+    	}
 	},
 	created()
 	{
@@ -220,6 +231,28 @@ export default {
 			this.personData = {
 				personID: this.personid,
 			}
+		},
+		redirectToLeitung: function ({person_id, uid})  {
+			this.personid = person_id;
+			this.personuid = uid;
+			this.fetchHeaderData(this.personid, this.personuid);
+		},
+		fetchHeaderData: async function (personid, personuid)  {
+			this.isFetching = true;
+			this.isFetchingName = true;
+			try {
+				// fetch header data
+				const res = await this.$api.call(ApiEmployee.personHeaderData(personid, personuid));
+				this.employee = res.data[0];
+				this.personalnummer = this.employee.personalnummer;
+				this.isFetchingName = false;
+			} catch (error) {
+				console.log(error);
+			}
+			finally {
+				this.isFetching = false;
+				this.isFetchingName = false;
+			}
 		}
 	},
 	template: /* html */`
@@ -267,7 +300,24 @@ export default {
 				</div>
 			</template>
 			<template #bottom>
-				<employee-header v-if="personid != null" ref="employeeHeaderRef"  :personID="personid" :personUID="personuid" restricted ></employee-header> 
+				<CoreDetailsHeader
+					v-if="personid!=null"
+					ref="CoreDetailsHeaderRef"
+					:person_id="personid"
+					:mitarbeiter_uid="personuid"
+					typeHeader="mitarbeiter"
+					:domain="domain"
+					@redirectToLeitung="redirectToLeitung"                                    
+					>
+						<template #titleAlphaTile>PNr</template>
+						<template #valueAlphaTile>{{ personalnummer }}</template>
+						<template #uid>
+							{{personuid}}
+						</template>
+						<template #tag>
+							<!-- no status in restricted mode -->
+						</template>
+				</CoreDetailsHeader>
 				<employee-contract-info v-if="personid != null" ref="contractInfoRef" :personID="personid" :personUID="personuid" />
 				 <div v-if="personid!=null">
 					<job-function :readonlyMode="true" :personID="personid" :personUID="personuid"></job-function>
