@@ -301,6 +301,7 @@ export default {
 			</template>
 			<template #bottom>
 				<CoreDetailsHeader
+					class="px-3"
 					v-if="personid!=null"
 					ref="CoreDetailsHeaderRef"
 					:person_id="personid"
