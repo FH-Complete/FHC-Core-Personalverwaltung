@@ -135,7 +135,11 @@ class WeiterbildungMessageLib
 			);
 
 			if (isError($result))
-				log_message('error',getError($result));
+			{
+				$error = getError($result);
+				$error_msg = ($error !== null && isset($error['message'])) ? $error['message'] : '';
+				log_message('error', $error_msg);
+			}
 			else
 			{
 				$this->generateMail($wb, $template);
