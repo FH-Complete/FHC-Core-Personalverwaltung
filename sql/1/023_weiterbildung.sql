@@ -118,6 +118,7 @@ COMMENT ON TABLE hr.tbl_weiterbildung IS E'Interne und externe Weiterbildung von
 COMMENT ON TABLE hr.tbl_weiterbildung_msg_log IS E'Log für die Benachrichtigung von Zertifikaten die in Kürze ablaufen';
 
 GRANT USAGE ON hr.tbl_weiterbildung_weiterbildung_id_seq TO vilesci;
+GRANT USAGE ON hr.tbl_weiterbildung_msg_log_weiterbildung_msg_log_id_seq TO vilesci;
 
 -- Anm: es existiert bereits eine Kategorie Weiterbildung => TODO check ob neue Kategorie notwendig ist
 -- INSERT INTO campus.tbl_dms_kategorie(kategorie_kurzbz, bezeichnung, beschreibung) VALUES('weiterbildung','Weiterbildung','Weiterbildung');
