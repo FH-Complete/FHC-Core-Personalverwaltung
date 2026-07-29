@@ -415,39 +415,45 @@ class Api_model extends DB_Model
     // PersonBaseData
     // -------------------------------------
 
+    /**
+     * NOTE: this has been changed to make usage of the DB_Model functionalities based on the Query Builder CI
+     * In this way the hidden mechanism of the DB_Model to get the UDFs are used
+     * The UDFs in this way are returned like other fields and not like a single field containing a JSON string
+     */
     function getPersonBaseData($person_id)
     {
-        $qry = "
-        SELECT tbl_benutzer.uid,
-            p.person_id,
-            p.aktiv,
-            p.anrede,
-            p.titelpost,
-            p.titelpre,
-            p.nachname,
-            p.vorname,
-            p.vornamen,
-            p.wahlname,
-            p.geschlecht,
-            p.sprache,
-            p.gebdatum,
-            p.svnr,
-            p.anmerkung,
-            p.ersatzkennzeichen,
-            p.staatsbuergerschaft,
-            p.geburtsnation,
-            p.insertamum,
-            p.insertvon,
-            p.updatevon,
-            p.updateamum,
-            p.unruly
-        FROM tbl_person p
-            LEFT JOIN tbl_benutzer on(p.person_id=tbl_benutzer.person_id)
-            LEFT JOIN tbl_mitarbeiter on(tbl_benutzer.uid=tbl_mitarbeiter.mitarbeiter_uid)
-        WHERE p.person_id=?
-        ";
+	$this->addSelect('
+		tbl_benutzer.uid,
+		tbl_person.person_id,
+		tbl_person.aktiv,
+		tbl_person.anrede,
+		tbl_person.titelpost,
+		tbl_person.titelpre,
+		tbl_person.nachname,
+		tbl_person.vorname,
+		tbl_person.vornamen,
+		tbl_person.wahlname,
+		tbl_person.geschlecht,
+		tbl_person.sprache, 
+		tbl_person.gebdatum,
+		tbl_person.svnr,
+		tbl_person.anmerkung,
+		tbl_person.ersatzkennzeichen,
+		tbl_person.staatsbuergerschaft,
+		tbl_person.geburtsnation,
+		tbl_person.insertamum,
+		tbl_person.insertvon,
+		tbl_person.updatevon,
+		tbl_person.updateamum,
+		tbl_person.unruly,
+		tbl_person.udf_values
+	');
+	$this->dbTable = 'public.tbl_person';
+	$this->pk = 'person_id';
+	$this->addJoin('public.tbl_benutzer', 'person_id');
+	$this->addJoin('public.tbl_mitarbeiter', 'tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid');
 
-        return $this->execQuery($qry, array($person_id));
+	return $this->loadWhere(array('tbl_person.person_id' => $person_id));
     }
 
 
@@ -480,14 +486,14 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $result = $this->getPersonBaseData($personJson['person_id']);
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return $result;
@@ -528,7 +534,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $person_id = $result->retval;
@@ -574,7 +580,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return success($userJson['uid']);
@@ -587,39 +593,43 @@ class Api_model extends DB_Model
     /**
      * get Mitarbeiterdaten by person_id
      * @param $person_id
+     * NOTE: this has been changed to make usage of the DB_Model functionalities based on the Query Builder CI
+     * In this way the hidden mechanism of the DB_Model to get the UDFs are used
+     * The UDFs in this way are returned like other fields and not like a single field containing a JSON string
      */
     function getPersonEmployeeData($person_id)
     {
-        $qry = "
-        SELECT
-            b.person_id,
-            p.mitarbeiter_uid,
-            p.personalnummer,
-            p.telefonklappe,
-            p.kurzbz,
-            p.lektor,
-            p.habilitation,
-            p.fixangestellt,
-            p.stundensatz,
-            p.ausbildungcode,
-            p.ort_kurzbz,
-            p.ext_id,
-            p.anmerkung,
-            p.bismelden,
-            p.standort_id,
-            p.kleriker,
-            b.alias,
-            b.aktiv,
-            p.insertamum,
-            p.insertvon,
-            p.updatevon,
-            p.updateamum
-        FROM tbl_mitarbeiter p join tbl_benutzer b on (p.mitarbeiter_uid=b.uid)
-        	JOIN tbl_person pp on (b.person_id=pp.person_id)
-        WHERE b.person_id=?
-        ";
+	$this->addSelect('
+            tbl_benutzer.person_id,
+            tbl_mitarbeiter.mitarbeiter_uid,
+            tbl_mitarbeiter.personalnummer,
+            tbl_mitarbeiter.telefonklappe,
+            tbl_mitarbeiter.kurzbz,
+            tbl_mitarbeiter.lektor,
+            tbl_mitarbeiter.habilitation,
+            tbl_mitarbeiter.fixangestellt,
+            tbl_mitarbeiter.stundensatz,
+            tbl_mitarbeiter.ausbildungcode,
+            tbl_mitarbeiter.ort_kurzbz,
+            tbl_mitarbeiter.ext_id,
+            tbl_mitarbeiter.anmerkung,
+            tbl_mitarbeiter.bismelden,
+            tbl_mitarbeiter.standort_id,
+            tbl_mitarbeiter.kleriker,
+            tbl_benutzer.alias,
+            tbl_benutzer.aktiv,
+            tbl_mitarbeiter.insertamum,
+            tbl_mitarbeiter.insertvon,
+            tbl_mitarbeiter.updatevon,
+	    tbl_mitarbeiter.updateamum,
+            tbl_mitarbeiter.udf_values
+	');
+	$this->dbTable = 'public.tbl_mitarbeiter';
+	$this->pk = 'mitarbeiter_uid';
+	$this->addJoin('public.tbl_benutzer', 'tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid');
+	$this->addJoin('public.tbl_person', 'person_id');
 
-        return $this->execQuery($qry, array($person_id));
+	return $this->loadWhere(array('tbl_benutzer.person_id' => $person_id));
     }
 
     function updatePersonEmployeeData($employeeDataJson)
@@ -643,7 +653,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         // update alias and aktiv flag
@@ -652,7 +662,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $userData = $result->retval[0];
@@ -666,7 +676,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return $result;
@@ -689,7 +699,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return success($employeeJson['personalnummer']);
@@ -710,7 +720,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $result = $this->BankverbindungModel->load($bankDataJson['bankverbindung_id']);
@@ -732,7 +742,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $record = $this->BankverbindungModel->load($result->retval);
@@ -746,7 +756,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return success($bankverbindung_id);
@@ -816,7 +826,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $record = $this->AdresseModel->load($result->retval);
@@ -838,7 +848,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $record = $this->AdresseModel->load($result->retval);
@@ -852,7 +862,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return success($adresse_id);
@@ -879,7 +889,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $record = $this->KontaktModel->load($result->retval);
@@ -923,7 +933,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         $record = $this->KontaktModel->load($result->retval);
@@ -937,7 +947,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return success($kontakt_id);
@@ -1079,7 +1089,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return $result;
@@ -1092,7 +1102,7 @@ class Api_model extends DB_Model
 
         if (isError($result))
         {
-            return error($result->msg, EXIT_ERROR);
+            return $result;
         }
 
         return $result;

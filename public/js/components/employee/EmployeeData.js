@@ -1,12 +1,14 @@
 import { ModalDialog } from '../ModalDialog.js';
 import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
-import ApiPerson from '../../api/factory/person.js';
+import CoreUdf from '../../../../../js/components/Udf/Udf.js';
 
+import ApiPerson from '../../api/factory/person.js';
 
 export const EmployeeData= {
 	name: 'EmployeeData',
     components: {
         ModalDialog,
+        CoreUdf
     },
     props: {
         modelValue: { type: Object, default: () => ({}), required: false},
@@ -77,7 +79,8 @@ export const EmployeeData= {
                 insertamum: "",
                 insertvon: "",
                 updatevon: "",
-                updateamum: ""
+                updateamum: "",
+                udf_values: {}
                 }
             }
 
@@ -346,6 +349,19 @@ export const EmployeeData= {
                                 
 
                             </div>
+
+			    <!-- UDFs -->
+                            <div class="col-lg-8">
+                                <core-udf
+                                    v-model="currentValue"
+                                    class="row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1"
+                                    ci-model="ressource/mitarbeiter"
+                                    :pk="{mitarbeiter_uid:currentValue.mitarbeiter_uid}"
+                                    :readonly="readonly"
+                                    >
+                                </core-udf>
+                            </div>
+
                             <!-- -->
                             
                             <div class="col-4">
