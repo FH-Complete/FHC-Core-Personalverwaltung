@@ -26,9 +26,16 @@ CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildungskategorietyp
     CONSTRAINT tbl_weiterbildungskategorietyp_pk PRIMARY KEY (weiterbildungskategorietyp_kurzbz)
 );
 
+CREATE SEQUENCE IF NOT EXISTS hr.tbl_weiterbildung_weiterbildung_id_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
 CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung
 (
-    weiterbildung_id serial NOT NULL,
+    weiterbildung_id integer NOT NULL DEFAULT nextval('hr.tbl_weiterbildung_weiterbildung_id_seq'::regclass),
     mitarbeiter_uid character varying(32),
     intern bool default true,
     bezeichnung varchar(100),
@@ -58,16 +65,28 @@ CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung_dokument
     dms_id int NOT NULL
 );
 
+CREATE SEQUENCE IF NOT EXISTS hr.tbl_weiterbildung_msg_log_weiterbildung_msg_log_id_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE
+    CACHE 1;
+
 CREATE TABLE IF NOT EXISTS hr.tbl_weiterbildung_msg_log
 (
-    weiterbildung_msg_log_id serial PRIMARY KEY,
+    weiterbildung_msg_log_id integer NOT NULL DEFAULT nextval('hr.tbl_weiterbildung_msg_log_weiterbildung_msg_log_id_seq'::regclass),
     weiterbildung_id int NOT NULL,
     ablaufdatum date,
     template varchar(255),
     insertamum timestamp,
-    insertvon varchar(32)
+    insertvon varchar(32),
+    CONSTRAINT tbl_weiterbildung_msg_log_pk PRIMARY KEY (weiterbildung_msg_log_id)
 );
 
+ALTER SEQUENCE hr.tbl_weiterbildung_weiterbildung_id_seq
+    OWNED BY hr.tbl_weiterbildung.weiterbildung_id;
+ALTER SEQUENCE hr.tbl_weiterbildung_msg_log_weiterbildung_msg_log_id_seq
+    OWNED BY hr.tbl_weiterbildung_msg_log.weiterbildung_msg_log_id;    
 
 -- tbl_weiterbildungskategorie->tbl_weiterbildungskategorietyp
 ALTER TABLE hr.tbl_weiterbildungskategorie DROP CONSTRAINT IF EXISTS tbl_weiterbildungskategorie_typ_kurzbz_fk;
