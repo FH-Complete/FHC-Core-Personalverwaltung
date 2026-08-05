@@ -162,9 +162,8 @@ class WeiterbildungMessageLib
 
 			if (isError($result))
 			{
-				$error = getError($result);
-				$error_msg = ($error !== null && isset($error['message'])) ? $error['message'] : '';
-				log_message('error', $error_msg);
+				$error = json_encode(getError($result));
+				log_message('error', __METHOD__ . ' WeiterbildungsMsgLogModel insert failed. ' . $error);
 			}
 			else
 			{
