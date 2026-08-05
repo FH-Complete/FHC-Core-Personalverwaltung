@@ -29,7 +29,20 @@ class WeiterbildungMessageLib
 		
 		if (isError($result))
 		{
-			log_message('error',getError($result));
+			$errors = getError($result);
+
+			// If it is NOT an array...
+			if (isEmptyArray($errors))
+			{
+				// ...then convert it to an array
+				$errors = array($errors);
+			}
+
+			// For each error found
+			foreach ($errors as $error)
+			{
+				log_message('error',$error);
+			}
 		}
 
 		$count = 0;
@@ -103,7 +116,20 @@ class WeiterbildungMessageLib
 		
 		if (isError($result))
 		{
-			log_message('error',getError($result));
+			$errors = getError($result);
+
+			// If it is NOT an array...
+			if (isEmptyArray($errors))
+			{
+				// ...then convert it to an array
+				$errors = array($errors);
+			}
+
+			// For each error found
+			foreach ($errors as $error)
+			{
+				log_message('error',$error);
+			}
 		}
 
 		$count = 0;
