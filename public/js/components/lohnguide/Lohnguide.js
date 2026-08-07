@@ -505,7 +505,7 @@ export const Lohnguide = {
 			table-only
 			:side-menu="false"
 			:tabulator-options="lohnguideTabulatorOptions"
-            :tabulator-events="lohnguideTabulatorEvents"		
+            :tabulator-events="lohnguideTabulatorEvents"
             :download="downloadconfig"	
 			>
 			<template #actions>				
