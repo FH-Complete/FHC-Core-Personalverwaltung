@@ -14,6 +14,7 @@ require_once __DIR__ . "/GUIGueltigkeit.php";
  *   },
  *   "data": {
  *     "gehaltstyp": "zulage",
+ *     "gehaltsanpassungtyp: "ersteinstufung",
  *     "betrag": "100",
  *     "gueltigkeit": {
  *       "guioptions": {
@@ -40,6 +41,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         $this->data = [ 
 						"id" => null,
 						"gehaltstyp" => "",
+                        "gehaltsanpassungtyp" => "",
                         "betrag" => "",
                         "gueltigkeit" => [
                             "guioptions" => ["sharedstatemode" => "reflect"],
@@ -77,6 +79,8 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         }
         $this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['gehaltstyp'], $decodedData, 'gehaltstyp');
+        // $this->getJSONDataString_EmptyNull($this->data['gehaltsanpassungtyp'], $decodedData, 'gehaltsanpassungtyp');
+        $this->getJSONDataString($this->data['gehaltsanpassungtyp'], $decodedData, 'gehaltsanpassungtyp');
         $this->getJSONDataFloat($this->data['betrag'], $decodedData, 'betrag');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
@@ -98,6 +102,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $gbs =  $handler->GehaltsbestandteilLib->fetchGehaltsbestandteil($id);
              // merge
             $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp']);
+            $gbs->setGehaltsanpassungtyp_kurzbz($this->data['gehaltsanpassungtyp'] === '' ? null : $this->data['gehaltsanpassungtyp']);
             $gbs->setGrundbetrag($this->data['betrag']);
 			// TODO take a look
             //$gbs->setBetrag_valorisiert($this->data['betrag']);
@@ -113,10 +118,11 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
             
             $data->gehaltstyp_kurzbz = $this->data['gehaltstyp'];
+            $data->gehaltsanpassungtyp_kurzbz = $this->data['gehaltsanpassungtyp'] === '' ? null : $this->data['gehaltsanpassungtyp'];
             $data->grundbetrag = $this->data['betrag'];
 			// TODO take a look
             $data->betrag_valorisiert = $this->data['betrag'];
-			$data->auszahlungen = $this->data['auszahlungen'];			
+			$data->auszahlungen = $this->data['auszahlungen'];
             $data->valorisierungssperre = $this->data['valorisierungssperre'];
             $data->valorisierung = $this->data['valorisierung'];
             
