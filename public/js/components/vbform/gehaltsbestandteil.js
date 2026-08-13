@@ -84,7 +84,9 @@ export default {
           </option>
         </select>
       </div>
-      <div class="col-4"></div>
+      <div class="col-4">
+        <textarea v-model="anmerkung" :disabled="isinputdisabled('anmerkung')" rows="1" class="form-control form-control-sm" placeholder="Anmerkung" aria-label="Anmerkung"></textarea>
+      </div>
       <div class="col-6"></div>
     </div>
   </div>
@@ -101,6 +103,7 @@ export default {
       valorisierung: true,
       valorisierungssperre: null,
       auszahlungen: 14,
+      anmerkung: '',
       db_delete: false
     };
   },
@@ -158,6 +161,9 @@ export default {
       if( this.config?.data?.auszahlungen !== undefined ) {
         this.auszahlungen = this.config.data.auszahlungen;
       }
+      if( this.config?.data?.anmerkung !== undefined ) {
+        this.anmerkung = this.config.data.anmerkung;
+      }
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
       }
@@ -174,12 +180,13 @@ export default {
           gehaltstyp: this.gehaltstyp,
           gehaltsanpassungtyp: this.gehaltsanpassungtyp,
           betrag: this.betrag.replace(',', '.'),
-          betrag_valorisiert: this.betrag.replace(',', '.'),
+          betrag_valorisiert: this.betrag_valorisiert.replace(',', '.'),
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
           valorisierung: Boolean(this.valorisierung),
           valorisierungssperre: this.valorisierungssperre, 
-          auszahlungen: this.auszahlungen
+          auszahlungen: this.auszahlungen,
+          anmerkung: this.anmerkung
         }
       };
     },
