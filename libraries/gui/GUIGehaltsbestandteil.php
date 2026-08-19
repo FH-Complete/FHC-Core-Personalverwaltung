@@ -14,6 +14,7 @@ require_once __DIR__ . "/GUIGueltigkeit.php";
  *   },
  *   "data": {
  *     "gehaltstyp": "zulage",
+ *     "gehaltsanpassungtyp: "ersteinstufung",
  *     "betrag": "100",
  *     "gueltigkeit": {
  *       "guioptions": {
@@ -40,7 +41,9 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         $this->data = [ 
 						"id" => null,
 						"gehaltstyp" => "",
+                        "gehaltsanpassungtyp" => "",
                         "betrag" => "",
+                        "anmerkung" => "",
                         "gueltigkeit" => [
                             "guioptions" => ["sharedstatemode" => "reflect"],
                             "data" =>       ["gueltig_ab"      => "", "gueltig_bis" => ""]
@@ -77,6 +80,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
         }
         $this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['gehaltstyp'], $decodedData, 'gehaltstyp');
+        $this->getJSONDataString($this->data['gehaltsanpassungtyp'], $decodedData, 'gehaltsanpassungtyp');
         $this->getJSONDataFloat($this->data['betrag'], $decodedData, 'betrag');
         $gueltigkeit = new GUIGueltigkeit();
         $gueltigkeit->mapJSON($decodedData['gueltigkeit']);
@@ -85,6 +89,7 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
 		$this->getJSONDataBool($this->data['db_delete'], $decodedData, 'db_delete');
 		$this->getJSONData($this->data['valorisierungssperre'], $decodedData, 'valorisierungssperre');
 		$this->getJSONDataInt($this->data['auszahlungen'], $decodedData, 'auszahlungen');
+        $this->getJSONDataString($this->data['anmerkung'], $decodedData, 'anmerkung');
     }
 
     public function generateGehaltsbestandteil()
@@ -98,12 +103,14 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $gbs =  $handler->GehaltsbestandteilLib->fetchGehaltsbestandteil($id);
              // merge
             $gbs->setGehaltstyp_kurzbz($this->data['gehaltstyp']);
+            $gbs->setGehaltsanpassungtyp_kurzbz($this->data['gehaltsanpassungtyp'] === '' ? null : $this->data['gehaltsanpassungtyp']);
             $gbs->setGrundbetrag($this->data['betrag']);
 			// TODO take a look
             //$gbs->setBetrag_valorisiert($this->data['betrag']);
             $gbs->setAuszahlungen($this->data['auszahlungen']);
 			$gbs->setValorisierungssperre($this->data['valorisierungssperre']);
             $gbs->setValorisierung($this->data['valorisierung']);
+            $gbs->setAnmerkung($this->data['anmerkung']);
             $gbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
             $gbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
         } else {
@@ -113,13 +120,15 @@ class GUIGehaltsbestandteil extends AbstractBestandteil {
             $data->bis = string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']);
             
             $data->gehaltstyp_kurzbz = $this->data['gehaltstyp'];
+            $data->gehaltsanpassungtyp_kurzbz = $this->data['gehaltsanpassungtyp'] === '' ? null : $this->data['gehaltsanpassungtyp'];
             $data->grundbetrag = $this->data['betrag'];
 			// TODO take a look
             $data->betrag_valorisiert = $this->data['betrag'];
-			$data->auszahlungen = $this->data['auszahlungen'];			
+			$data->auszahlungen = $this->data['auszahlungen'];
             $data->valorisierungssperre = $this->data['valorisierungssperre'];
             $data->valorisierung = $this->data['valorisierung'];
-            
+            $data->anmerkung = $this->data['anmerkung'];
+
             $gbs = new Gehaltsbestandteil();
             $gbs->hydrateByStdClass($data);
         }

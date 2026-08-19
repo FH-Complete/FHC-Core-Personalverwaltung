@@ -24,5 +24,11 @@ export default {
             method: 'post',
             url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltstypen',
         }
+    },
+    getGehaltsanpassungtypen() {
+        return {
+            method: 'post',
+            url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltsanpassungtypen',
+        }
     }
 };

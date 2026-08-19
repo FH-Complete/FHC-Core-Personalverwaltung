@@ -278,6 +278,9 @@ handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getVertragsarten(
 handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getGehaltstypen()).then((r) => {
     gehaltstypen.value = r.data
 })
+handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getGehaltsanpassungtypen()).then((r) => {
+    gehaltsanpassungtypen.value = r.data
+})
 handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getVertragsbestandteiltypen()).then((r) => {
     vertragsbestandteiltypen.value = r.data
 })
