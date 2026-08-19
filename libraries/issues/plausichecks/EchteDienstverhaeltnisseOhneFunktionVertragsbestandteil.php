@@ -66,7 +66,7 @@ class EchteDienstverhaeltnisseOhneFunktionVertragsbestandteil extends PlausiChec
 	{
 		$params = array($startDate, $startDate, $startDate, $startDate);
 
-		// there should be no day in Dienstverhaeltnis not covered by an Organisationseinheit Vertragsbestandteil
+		// there should be no day in Dienstverhaeltnis not covered by a Funktion Vertragsbestandteil
 		$qry = "
 			WITH vbs AS
 			(
