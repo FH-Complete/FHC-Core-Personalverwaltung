@@ -36,6 +36,7 @@ class CommonsAPI extends FHCAPI_Controller
 		'getAdressentyp' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
 		'getGehaltstypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getGehaltsanpassungtypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getVertragsarten' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getVertragsbestandteiltypen' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
@@ -67,6 +68,7 @@ class CommonsAPI extends FHCAPI_Controller
         $this->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 'DVModel');
         $this->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 'GBTModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltstyp_model', 'GehaltstypModel');
+		$this->load->model('extensions/FHC-Core-Personalverwaltung/Gehaltsanpassungtyp_model', 'GehaltsanpassungtypModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/LVA_model', 'LVAModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsart_model', 'VertragsartModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Vertragsbestandteiltyp_model', 'VertragsbestandteiltypModel');
@@ -359,6 +361,25 @@ class CommonsAPI extends FHCAPI_Controller
 		else
 		{
 			$this->terminateWithError('no contract types found');
+			return;
+		}
+	}
+
+	public function getGehaltsanpassungtypen()
+	{
+		$this->GehaltsanpassungtypModel->resetQuery();
+		$this->GehaltsanpassungtypModel->addSelect('gehaltsanpassungtyp_kurzbz AS value, '
+			. 'bezeichnung AS label, NOT(aktiv) AS disabled');
+		$this->GehaltsanpassungtypModel->addOrder('sort', 'ASC');
+		$gehaltsanpassungtypen = $this->GehaltsanpassungtypModel->load();
+		if( hasData($gehaltsanpassungtypen) )
+		{
+			$this->terminateWithSuccess(getData($gehaltsanpassungtypen));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no salary adaption types types found');
 			return;
 		}
 	}

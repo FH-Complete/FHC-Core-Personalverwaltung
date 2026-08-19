@@ -36,6 +36,11 @@ export const OffCanvasTimeline = {
         const gehaltstypen = Vue.inject('gehaltstypen'); 
         const modellstellen = Vue.inject('modellstellen');
         const fachrichtungen = Vue.inject('fachrichtungen');
+        const gehaltsanpassungtypen = Vue.inject('gehaltsanpassungtypen');
+
+        const gehaltsanpassungtypLabel = (kurzbz) => {
+            return gehaltsanpassungtypen.value?.find(option => option.value === kurzbz)?.label ?? ''
+        }
 
         const formatDate = (ds) => {
             if (!ds) return ""
@@ -244,8 +249,9 @@ export const OffCanvasTimeline = {
                                 typ: 'gbs', 
                                 start: true,
                                 status: getGehaltsbestandteilLabel(gbs.gehaltstyp_kurzbz), 
+                                anpassungtyp: (!!gbs.gehaltsanpassungtyp_kurzbz ? gehaltsanpassungtypLabel(gbs.gehaltsanpassungtyp_kurzbz) : ''),
                                 gbs, 
-                                kurzbz: gbs.gehaltstyp_kurzbz
+                                kurzbz: gbs.gehaltstyp_kurzbz 
                             })
                         
                             if (gbs.bis != null) {
@@ -288,6 +294,8 @@ export const OffCanvasTimeline = {
         const formatNumber = (num) => {
             return numberFormat.format(parseFloat(num));
         }
+
+
 
         // expose functions
         expose({show, hide, toggle});
@@ -366,6 +374,7 @@ export const OffCanvasTimeline = {
                                         <div class="card-body rounded-start pt-1 pb-1">
                                         {{bestandteil.status}}<br/>
                                         <span v-if="!bestandteil.start">(beendet)</span>
+                                        <span v-if="bestandteil.typ == 'gbs' && bestandteil.start && bestandteil.anpassungtyp !== ''" class="text-muted small">{{bestandteil.anpassungtyp}}</span>
                                         </div>
                                     </div>
                                     <div class="col-md-8">
