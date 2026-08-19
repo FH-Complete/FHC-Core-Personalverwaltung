@@ -339,9 +339,11 @@ class ValorisierungLib
 			$dvdata->sumsalarypreval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
 			$usedvalinstanz->calculateValorisation();
 			$dvdata->sumsalarypostval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
+			$gehaltsbestandteile = $usedvalinstanz->getBetraegeValorisiertForEachGehaltsbestandteil();
 
 			// store calculated valorisation to apply and finalize selected valorisation later
-			$this->_calculatedValorisation += $usedvalinstanz->getBetraegeValorisiertForEachGehaltsbestandteil();
+			$dvdata->gehaltsbestandteile = $gehaltsbestandteile;
+			$this->_calculatedValorisation += $gehaltsbestandteile;
 		}
 		else
 		{
@@ -358,6 +360,7 @@ class ValorisierungLib
 			$dvdata->valorisierungmethode = 'keine Valorisierung';
 			$dvdata->sumsalarypreval = round($noval->calcSummeGehaltsbestandteile(), 2);
 			$dvdata->sumsalarypostval = $dvdata->sumsalarypreval;
+			$dvdata->gehaltsbestandteile = [];
 		}
 	}
 
