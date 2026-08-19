@@ -10,7 +10,6 @@ class IssueProducer extends PlausiIssueProducer_Controller
 		parent::__construct();
 
 		// set fehler which can be produced by the job
-		// structure: fehler_kurzbz => class (library) name for resolving
 		$this->_fehlerKurzbz = array(
 			'paralelleDienstverhaeltnisseEinUnternehmen',
 			'undurchgaengigesDienstverhaeltnis',
@@ -31,7 +30,9 @@ class IssueProducer extends PlausiIssueProducer_Controller
 			'gehaltsbestandteilNichtImDienstverhaeltnisDatumsbereich',
 			'verschiedenesDienstverhaeltnisBeiGehaltUndVertragsbestandteil',
 			'funktionUidUngleichDienstverhaeltnisUid',
-			'funktionFaelltNichtInVertragsbestandteilZeitraum'
+			'funktionFaelltNichtInVertragsbestandteilZeitraum',
+			'lehrauftragOhneDienstverhaeltnis',
+			'echteDienstverhaeltnisseOhneFunktionVertragsbestandteil'
 		);
 	}
 }

@@ -222,5 +222,22 @@ $config['fehler'] = array(
 		'producerLibName' => 'FunktionFaelltNichtInVertragsbestandteilZeitraum',
 		'resolverLibName' => 'PERSONALVERWALTUNG_FUNKTION_0002',
 		'producerIsResolver' => false
-	)
+	),
+	array(
+		'fehlercode' => 'BIS_PERSONALMELDUNG_0006',
+		'fehler_kurzbz' => 'lehrauftragOhneDienstverhaeltnis',
+		'fehlertext' => 'Lehrauftrag ohne Dienstverhältnis; uid %s; Studiensemester %s',
+		'app' => array('personalverwaltung')
+	),
+	array(
+		'fehlercode' => 'PERSONALVERWALTUNG_DIENSTVERHAELTNIS_0009',
+		'fehler_kurzbz' => 'echteDienstverhaeltnisseOhneFunktionVertragsbestandteil',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Dienstverhaeltnis ohne Funktionszuordnung, gesamte Dauer des Dienstverhältnisses muss abgedeckt sein; dienstverhaeltnis_id %s',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => array('personalverwaltung'),
+		'producerLibName' => 'EchteDienstverhaeltnisseOhneFunktionVertragsbestandteil',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
 );
