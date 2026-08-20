@@ -90,7 +90,7 @@ export const ValorisationSelection = {
 								this.$api.call(ApiValorisierung.getValorisationDetails(dienstverhaeltnis_id))
 									.then((response) => {
 										this.selectedGehaltsbestandteile = response.data.filter(
-											function (el){ return selectedDv[0]?.gehaltsbestandteile?.hasOwnProperty(el.gehaltsbestandteil_id)}
+											function (el){ return selectedDv[0]?.all_gehaltsbestandteile?.hasOwnProperty(el.gehaltsbestandteil_id)}
 										);
 									})
 									.catch(this.handleErrors);
@@ -583,8 +583,8 @@ export const ValorisationSelection = {
 						<tr v-for="gehaltsbestandteil in selectedGehaltsbestandteile">
 							<td>{{ gehaltsbestandteil.gehaltstyp_bezeichnung }} ({{ gehaltsbestandteil.gehaltsbestandteil_id }})</td>
 							<td class="text-end">{{ formatter.formatCurrencyGerman(gehaltsbestandteil.betrag_valorisiert) }}</td>
-							<td class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis?.gehaltsbestandteile[gehaltsbestandteil.gehaltsbestandteil_id] - gehaltsbestandteil.betrag_valorisiert) }}</td>
-							<td class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis?.gehaltsbestandteile[gehaltsbestandteil.gehaltsbestandteil_id]) }}</td>
+							<td class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis?.all_gehaltsbestandteile[gehaltsbestandteil.gehaltsbestandteil_id] - gehaltsbestandteil.betrag_valorisiert) }}</td>
+							<td class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis?.all_gehaltsbestandteile[gehaltsbestandteil.gehaltsbestandteil_id]) }}</td>
 							<td>{{ gehaltsbestandteil.anmerkung }}</td>
 						</tr>
 						<!-- fallback row -->

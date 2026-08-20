@@ -339,11 +339,10 @@ class ValorisierungLib
 			$dvdata->sumsalarypreval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
 			$usedvalinstanz->calculateValorisation();
 			$dvdata->sumsalarypostval = round($usedvalinstanz->calcSummeGehaltsbestandteile(), 2);
-			$gehaltsbestandteile = $usedvalinstanz->getBetraegeValorisiertForEachGehaltsbestandteil();
 
 			// store calculated valorisation to apply and finalize selected valorisation later
-			$dvdata->gehaltsbestandteile = $gehaltsbestandteile;
-			$this->_calculatedValorisation += $gehaltsbestandteile;
+			$dvdata->all_gehaltsbestandteile = $usedvalinstanz->getBetraegeValorisiertForEachGehaltsbestandteil(AbstractValorisationMethod::ALLE_GBS);
+			$this->_calculatedValorisation += $usedvalinstanz->getBetraegeValorisiertForEachGehaltsbestandteil();
 		}
 		else
 		{

@@ -112,10 +112,10 @@ abstract class AbstractValorisationMethod implements IValorisationMethod
 	 * Get all Valorisation amounts (for all applicable Gehaltsbestandteile)
 	 * @return array with all amounts
 	 */
-	public function getBetraegeValorisiertForEachGehaltsbestandteil()
+	public function getBetraegeValorisiertForEachGehaltsbestandteil($mode=self::NUR_ZU_VALORISIERENDE_UND_UNGESPERRTE_GBS)
 	{
 		$betraege = [];
-		foreach( $this->getGehaltsbestandteileForValorisierung() as $gehaltsbestandteil )
+		foreach( $this->getGehaltsbestandteileForValorisierung($mode) as $gehaltsbestandteil )
 		{
 			$betraege[$gehaltsbestandteil->getGehaltsbestandteil_id()] = $gehaltsbestandteil->getBetrag_valorisiert();
 		}
