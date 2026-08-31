@@ -33,7 +33,11 @@ import JobFunction from "../../components/employee/JobFunction.js";
 import { EmployeeHeader } from '../../components/employee/EmployeeHeader.js';
 import { EmployeeContractInfo } from "../../components/employee/contract/EmployeeContractInfo.js";
 
+import ApiPerson from '../../api/factory/person.js';
+
 import Phrasen from '../../../../../js/plugins/Phrasen.js';
+import FhcAlert from '../../../../../js/plugins/FhcAlert.js';
+import FhcApi from "../../../../../js/plugins/Api.js";
 
 const sprache = Vue.ref([]);
 const nations = Vue.ref([]);
@@ -59,7 +63,10 @@ const handyVerwaltungApp = Vue.createApp({
 		return {
                     personid: null,
                     personuid: 'keine',
-					betriebsmittelpersonapi: BetriebsmittelPersonApi
+                    employeeData: null,
+					betriebsmittelpersonapi: BetriebsmittelPersonApi,
+                    isFetching: false,
+                    readonly: false,
 		};
 	},
 	components: {
@@ -93,6 +100,10 @@ const handyVerwaltungApp = Vue.createApp({
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
 		Vue.provide('beendigungsgruende',beendigungsgruende);
+
+        return {
+            standorte
+        };
 	},
 	methods: {
             // Tabulator handler for the rowClick event
@@ -100,11 +111,46 @@ const handyVerwaltungApp = Vue.createApp({
                 console.log('personselected', row)
                 this.personid = row.getData().PersonId;
                 this.personuid = row.getData().UID;
+
+                this.fetchEmployeeData(this.personid);
                 
                 if( this.$refs['vsplit'].isCollapsed() !== false ) {
                     this.$refs['vsplit'].showBoth();
                 }
-            }
+            },
+            fetchEmployeeData: async function(personID)  {
+                if (personID==null) {                
+                    return;
+                }
+                this.isFetching = true;
+                try {
+                    const res = await this.$api.call(ApiPerson.personEmployeeData(personID));
+                    this.employeeData = res.data[0];
+                } catch (error) {
+                    this.$fhcAlert.handleSystemError(error)         
+                } finally {
+                    this.isFetching = false
+                }   
+            },
+            saveEmployeeData: async function() {
+                // submit
+                try {
+                    const response = await this.$api.call(ApiPerson.updatePersonPhoneExtension(this.employeeData));
+                    this.showToast();
+                    this.employeeData = response.data[0];
+                    this.updateHeader();
+                } catch (error) {
+                    this.$fhcAlert.handleSystemError(error)              
+                } finally {
+                    this.isFetching = false
+                }
+                
+            },
+            showToast: function() {
+                this.$fhcAlert.alertSuccess(this.$p.t('person','mitarbeiterdatenGespeichert'))
+            },
+            updateHeader: function() { if (this.$refs.employeeHeaderRef) { this.$refs.employeeHeaderRef.refresh(); } },
+            
 	},
         computed: {
             employeesTabulatorEvents: function() {
@@ -171,7 +217,16 @@ const handyVerwaltungApp = Vue.createApp({
 			]
 		};
                 return employeesTabulatorOptions;
+            },
+
+            getStandortbez: function(standort_id) {
+                if (!standort_id) return '';
+                let result = this.standorte?.filter((item) => item.standort_id == standort_id);
+                if (result?.length > 0)
+                    return result[0].bezeichnung;
+                return '';
             }
+
         },
         template: `
 		<!-- Navigation component -->
@@ -201,6 +256,50 @@ const handyVerwaltungApp = Vue.createApp({
                                 <div v-if="personid!=null">
                                     <JobFunction :readonlyMode="true" :personID="personid" :personUID="personuid"></JobFunction>
                                 </div>
+
+                                <div class="row pt-md-4" v-if="personid!=null && employeeData!=null">      
+                                     <div class="col">
+                                         <div class="card">
+                                            <div class="card-header">
+                                                <div class="h5 mb-0"><h5>Durchwahl</h5></div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="col-md-12">
+                                                    <div class="row gy-3">    
+                                                        <div class="col-4">                 
+                                                            <label for="standort" class="form-label">{{ $p.t('person','standort') }}</label>
+                                                            <select  v-if="!readonly" id="standort" :readonly="readonly"  v-model="employeeData.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                                                <option value="0">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                                                <option v-for="(item, index) in standorte" :value="item.standort_id">
+                                                                    {{ item.bezeichnung }}
+                                                                </option>         
+                                                            </select>
+                                                            <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(employeeData.standort_id) ">
+                                                        </div>
+                                                        <div class="col-2">
+                                                            <label for="telefonklappe" class="form-label">{{ $p.t('person','telefonklappe') }}</label>
+                                                            <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="employeeData.telefonklappe">
+                                                        </div>
+                                                    
+                                                        <div class="col-6 d-flex justify-content-end align-items-end v-if="!readonly">
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-primary btn-sm"
+                                                                @click="saveEmployeeData"
+                                                            >
+                                                                Speichern
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>    
+
+
+
+                                            </div>
+                                         </div>
+                                     </div>
+                                </div>               
 
                                 <div class="row pt-md-4" v-if="personid!=null">      
                                      <div class="col">
@@ -236,7 +335,10 @@ const handyVerwaltungApp = Vue.createApp({
 
 handyVerwaltungApp.use(primevue.config.default);
 //handyVerwaltungApp.use(OldFhcApi, {factory: pv21apifactory});
-handyVerwaltungApp.use(Phrasen);
+handyVerwaltungApp
+    .use(Phrasen)
+    .use(FhcAlert)
+	.use(FhcApi);
 handyVerwaltungApp.mount('#main');
 handyVerwaltungApp.provide("cisRoot", CIS_ROOT);
 

@@ -208,7 +208,10 @@ export const EmployeeHeader = {
         const refresh = () => {
             fetchHeaderData(props.personID, props.personUID);
             checkPerson(props.personID);
-            statusRef.value.refresh();
+            if (!props.restricted) 
+            {
+                statusRef.value.refresh();
+            }
         }
 
         const getStatusTags = ()=> {
