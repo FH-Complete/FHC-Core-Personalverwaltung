@@ -3,6 +3,7 @@ $this->load->view(
     'templates/FHC-Header',
     array(
 	'title' => 'Valorisierung',
+	'favicon' => '/public/images/favicons/personalverwaltung.ico',
 	'bootstrap5' => true,
 	'fontawesome6' => true,
 	'tabulator5' => true,

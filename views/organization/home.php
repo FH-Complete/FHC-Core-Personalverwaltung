@@ -2,7 +2,8 @@
 	$this->load->view(
 		'templates/FHC-Header',
 		array(
-			'title' => 'Personalverwaltung',		
+			'title' => 'Personalverwaltung',
+			'favicon' => '/public/images/favicons/personalverwaltung.ico',		
 			'bootstrap5' => true,
 			'fontawesome6' => true,
       'axios027' => true,

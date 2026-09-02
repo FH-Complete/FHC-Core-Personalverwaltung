@@ -3,6 +3,7 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Personalverwaltung',
+			'favicon' => '/public/images/favicons/personalverwaltung.ico',
 			'jquery' => false,
 			'jqueryui' => false,
 			'bootstrap5' => true,

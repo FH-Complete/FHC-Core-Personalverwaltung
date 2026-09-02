@@ -1,6 +1,7 @@
 <?php
 	$includesArray = array(
 		'title' => 'Handyverwaltung',
+		'favicon' => '/public/images/favicons/personalverwaltung.ico',
 		'axios027' => true,
 		'bootstrap5' => true,
 		'fontawesome6' => true,
