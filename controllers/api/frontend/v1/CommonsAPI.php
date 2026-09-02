@@ -21,6 +21,7 @@ class CommonsAPI extends FHCAPI_Controller
 		'getOrte' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getGemeinden' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getOrtschaften' => [CommonsAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+		'getStudiensemester' => [CommonsAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		'getVertragsartAll' => [CommonsAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 
 		'getContractExpire' => CommonsAPI::DEFAULT_PERMISSION,
@@ -61,6 +62,7 @@ class CommonsAPI extends FHCAPI_Controller
         $this->load->model('system/sprache_model', 'SpracheModel');
         $this->load->model('ressource/ort_model', 'OrtModel');
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
+        $this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Organisationseinheit_model', 'OrganisationseinheitModel');
         $this->load->model('codex/bisverwendung_model', 'BisverwendungModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Statistik_model', 'StatistikModel');
@@ -183,7 +185,12 @@ class CommonsAPI extends FHCAPI_Controller
         $this->terminateWithSuccess(getData($data));
     }
 
-    
+    function getStudiensemester()
+    {
+        $this->StudiensemesterModel->addOrder("start", "DESC");
+        $data = $this->StudiensemesterModel->load();
+        $this->terminateWithSuccess(getData($data));
+    }
 
     // ----------------------------
     // Vertragart

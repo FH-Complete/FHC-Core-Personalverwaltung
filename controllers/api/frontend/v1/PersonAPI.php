@@ -54,10 +54,14 @@ class PersonAPI extends FHCAPI_Controller
             'personBankData' => PersonAPI::DEFAULT_PERMISSION,
             'upsertPersonBankData' => PersonAPI::DEFAULT_PERMISSION,
             'deletePersonBankData' => PersonAPI::DEFAULT_PERMISSION,
-            // hourly rate (Stundensatzy)
+            // hourly rate (Stundensatz)
             'getStundensaetze' => PersonAPI::DEFAULT_PERMISSION,
             'updateStundensatz' => PersonAPI::DEFAULT_PERMISSION,
 		    'deleteStundensatz' => PersonAPI::DEFAULT_PERMISSION,
+            // hour limit (Stundengrenzen)
+            'getStundengrenzen' => PersonAPI::DEFAULT_PERMISSION,
+            'updateStundengrenze' => PersonAPI::DEFAULT_PERMISSION,
+		    'deleteStundengrenze' => PersonAPI::DEFAULT_PERMISSION,
             // time recording
             'offTimeByPerson' => PersonAPI::DEFAULT_PERMISSION,
             'timeRecordingByPerson' => PersonAPI::DEFAULT_PERMISSION,
@@ -76,6 +80,7 @@ class PersonAPI extends FHCAPI_Controller
         $this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Sachaufwand_model', 'SachaufwandModel');
         $this->load->model('ressource/Stundensatz_model', 'StundensatzModel');
+        $this->load->model('ressource/Stundengrenze_model', 'StundengrenzeModel');
         $this->load->model('ressource/Zeitaufzeichnung_model', 'ZeitaufzeichnungModel');
 		$this->load->model("crm/Akte_model", "AkteModel");
 
@@ -1114,6 +1119,107 @@ class PersonAPI extends FHCAPI_Controller
 		if (hasData($stundensatz))
 		{
 			$result = $this->StundensatzModel->delete($data['stundensatz_id']);
+
+			if (isError($result))
+				return $this->terminateWithError('Fehler beim Löschen des Stundensatzes');
+
+			return $this->terminateWithSuccess($result);
+		}
+	}
+
+    // ----------------------------------------------
+    // Stundengrenzen
+    // ----------------------------------------------
+
+    public function getStundengrenzen()
+	{
+		$mitarbeiter_uid = $this->input->get('mitarbeiter_uid');
+
+		$args = [$mitarbeiter_uid];
+
+		$qry = "SELECT
+					hr.tbl_stundengrenze.*, oe.bezeichnung AS oe_bezeichnung
+				FROM
+					hr.tbl_stundengrenze
+					LEFT JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
+				WHERE
+					mitarbeiter_uid = ?
+				ORDER BY
+					stundengrenze_id DESC";
+
+		$data = $this->StundengrenzeModel->execReadOnlyQuery($qry, $args);
+		$this->_remapData('stundengrenze_id',$data);
+		return $this->terminateWithSuccess(getData($data));
+	}
+
+    public function updateStundengrenze()
+	{
+		$data = json_decode($this->input->raw_input_stream, true);
+
+		$grenzeData = [
+			'studiensemester_kurzbz' => $data['studiensemester_kurzbz'],
+			'oe_kurzbz' => $data['oe_kurzbz'],
+			'stundengrenze' => $data['stundengrenze']
+		];
+
+		$this->StundengrenzeModel->addSelect('stundengrenze_id');
+		$this->StundengrenzeModel->addLimit('1');
+		$existingStundengrenze = $this->StundengrenzeModel->loadWhere(
+			[
+				'mitarbeiter_uid' => $data['mitarbeiter_uid'],
+				'studiensemester_kurzbz' => $data['studiensemester_kurzbz'],
+				'oe_kurzbz' => $data['oe_kurzbz']
+			]
+		);
+
+		if (isError($existingStundengrenze))
+			return $this->terminateWithError('Fehler beim Holen der Stundengrenzen');
+
+		if ($data['stundengrenze_id'] === 0)
+		{
+			if (hasData($existingStundengrenze))
+				return $this->terminateWithError('Stundengrenze bereits festgelegt');
+
+			$grenzeData['mitarbeiter_uid'] = $data['mitarbeiter_uid'];
+			$grenzeData['insertamum'] = 'NOW()';
+			$grenzeData['insertvon'] = getAuthUID();
+
+			$result = $this->StundengrenzeModel->insert($grenzeData);
+		}
+		else
+		{
+			$stundengrenze_id = $data['stundengrenze_id'];
+
+			if (hasData($existingStundengrenze) && getData($existingStundengrenze)[0]->stundengrenze_id != $stundengrenze_id)
+				return $this->terminateWithError('Stundengrenze bereits festgelegt');
+
+			$grenzeData['updateamum'] = 'NOW()';
+			$grenzeData['updatevon'] = getAuthUID();
+			$result = $this->StundengrenzeModel->update(
+				$stundengrenze_id,
+				$grenzeData
+			);
+		}
+
+		if (isError($result))
+			return $this->terminateWithError('Fehler beim Speichern der Stundengrenze');
+
+		$this->StundengrenzeModel->addSelect('tbl_stundengrenze.*, oe.bezeichnung AS oe_bezeichnung');
+		$this->StundengrenzeModel->addJoin('public.tbl_organisationseinheit oe', 'oe_kurzbz', 'LEFT');
+		$stundengrenze = $this->StundengrenzeModel->load($result->retval);
+
+		if (hasData($stundengrenze))
+			$this->terminateWithSuccess($stundengrenze->retval);
+	}
+
+	public function deleteStundengrenze()
+	{
+		$data = json_decode($this->input->raw_input_stream, true);
+
+		$stundengrenze = $this->StundengrenzeModel->load($data['stundengrenze_id']);
+		if (hasData($stundengrenze))
+		{
+			$result = $this->StundengrenzeModel->delete($data['stundengrenze_id']);
 
 			if (isError($result))
 				return $this->terminateWithError('Fehler beim Löschen des Stundensatzes');

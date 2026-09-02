@@ -18,6 +18,7 @@ class OrgAPI extends FHCAPI_Controller
             'getCompanyByOrget'  => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
 		    'getOrgetsForCompany' => OrgAPI::DEFAULT_PERMISSION,
             'getUnternehmen' => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+            'getOrgetsWithStundengrenzen' => OrgAPI::DEFAULT_PERMISSION
             )
         );
         $this->load->library('AuthLib');
@@ -151,5 +152,23 @@ EOSQL;
 			return;
 		}
 	}
+
+   public function getOrgetsWithStundengrenzen()
+   {
+		$this->OrganisationseinheitModel->resetQuery();
+		$this->OrganisationseinheitModel->addSelect('oe_kurzbz AS value, bezeichnung AS label');
+		$this->OrganisationseinheitModel->addOrder('bezeichnung', 'ASC');
+		$org = $this->OrganisationseinheitModel->loadWhere('warn_semesterstunden_frei IS NOT NULL');
+		if( hasData($org) )
+		{
+			$this->terminateWithSuccess(getData($org));
+			return;
+		}
+		else
+		{
+			$this->terminateWithError('no orgs with Stundengrenzen found');
+			return;
+		}
+   }
 
 }

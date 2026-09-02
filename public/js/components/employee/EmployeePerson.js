@@ -4,6 +4,7 @@ import { BankData } from './BankData.js';
 import { ContactData } from './contact/ContactData.js';
 import { MaterialExpensesData } from './MaterialExpensesData.js';
 import { HourlyRateData } from './HourlyRateData.js';
+import { HourLimitData } from './HourLimitData.js';
 import { JobFunction } from './JobFunction.js';
 import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import FhcTabs from '../../../../../js/components/Tabs.js';
@@ -17,6 +18,7 @@ export const EmployeePerson = {
 		ContactData,
 		MaterialExpensesData,
 		HourlyRateData,
+		HourLimitData,
     JobFunction,
     FhcTabs,
 	},

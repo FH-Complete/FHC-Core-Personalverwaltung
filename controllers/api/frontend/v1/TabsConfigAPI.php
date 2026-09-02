@@ -67,6 +67,11 @@ class TabsConfigAPI extends FHCAPI_Controller
 				'component' => absoluteJsImportUrl('public/extensions/FHC-Core-Personalverwaltung/js/components/employee/HourlyRateData.js'),
 				'config' => null
 			),
+			'hourlimit' => array(
+				'title' => $this->p->t('person', 'stundengrenzen'),
+				'component' => absoluteJsImportUrl('public/extensions/FHC-Core-Personalverwaltung/js/components/employee/HourLimitData.js'),
+				'config' => null
+			),
 			'jobfunction' => array(
 				'title' => $this->p->t('person', 'funktionen'),
 				'component' => absoluteJsImportUrl('public/extensions/FHC-Core-Personalverwaltung/js/components/employee/JobFunction.js'),
