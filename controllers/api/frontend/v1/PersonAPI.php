@@ -62,6 +62,7 @@ class PersonAPI extends FHCAPI_Controller
             'getStundengrenzen' => PersonAPI::DEFAULT_PERMISSION,
             'updateStundengrenze' => PersonAPI::DEFAULT_PERMISSION,
 		    'deleteStundengrenze' => PersonAPI::DEFAULT_PERMISSION,
+		    'getStundengrenzeDefaults' => PersonAPI::DEFAULT_PERMISSION,
             // time recording
             'offTimeByPerson' => PersonAPI::DEFAULT_PERMISSION,
             'timeRecordingByPerson' => PersonAPI::DEFAULT_PERMISSION,
@@ -1135,12 +1136,15 @@ class PersonAPI extends FHCAPI_Controller
 	{
 		$mitarbeiter_uid = $this->input->get('mitarbeiter_uid');
 
+		if (!isset($mitarbeiter_uid)) return $this->terminateWithError('Ungültige Mitarbeiter Uid');
+
 		$args = [$mitarbeiter_uid];
 
 		$qry = "SELECT
-					hr.tbl_stundengrenze.*, oe.bezeichnung AS oe_bezeichnung
+					gr.stundengrenze_id, gr.mitarbeiter_uid, gr.studiensemester_kurzbz,
+					(gr.stundengrenze)::REAL, gr.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung
 				FROM
-					hr.tbl_stundengrenze
+					hr.tbl_stundengrenze gr
 					LEFT JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
 				WHERE
 					mitarbeiter_uid = ?
@@ -1204,7 +1208,10 @@ class PersonAPI extends FHCAPI_Controller
 		if (isError($result))
 			return $this->terminateWithError('Fehler beim Speichern der Stundengrenze');
 
-		$this->StundengrenzeModel->addSelect('tbl_stundengrenze.*, oe.bezeichnung AS oe_bezeichnung');
+		$this->StundengrenzeModel->addSelect(
+			'tbl_stundengrenze.stundengrenze_id, tbl_stundengrenze.mitarbeiter_uid, tbl_stundengrenze.studiensemester_kurzbz,
+			(tbl_stundengrenze.stundengrenze)::REAL,  tbl_stundengrenze.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung'
+		);
 		$this->StundengrenzeModel->addJoin('public.tbl_organisationseinheit oe', 'oe_kurzbz', 'LEFT');
 		$stundengrenze = $this->StundengrenzeModel->load($result->retval);
 
@@ -1226,6 +1233,62 @@ class PersonAPI extends FHCAPI_Controller
 
 			return $this->terminateWithSuccess($result);
 		}
+	}
+
+	public function getStundengrenzeDefaults()
+	{
+		$mitarbeiter_uid = $this->input->get('mitarbeiter_uid');
+		if (!isset($mitarbeiter_uid)) return $this->terminateWithError('Ungültige Mitarbeiter Uid');
+
+		$oe_kurzbz = $this->input->get('oe_kurzbz');
+
+		$defaults = ['studiensemester_kurzbz' => null, 'stundengrenze' => 0];
+
+		// current Studiensemester
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
+
+		if (isError($result))
+			return $this->terminateWithError('Fehler beim Holen des Studiensemester');
+
+		if (hasData($result))
+		{
+			$studiensemester = getData($result)[0];
+			$defaults['studiensemester_kurzbz'] = $studiensemester->studiensemester_kurzbz;
+			$studiensemester_start = $studiensemester->start;
+			$studiensemester_ende = $studiensemester->ende;
+		}
+
+		if (isset($oe_kurzbz) && isset($studiensemester_start))
+		{
+			$this->load->model('vertragsbestandteil/Dienstverhaeltnis_model', 'DienstverhaeltnisModel');
+			$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+
+			// default Stundengrenze
+			$echter_dv_result = $this->DienstverhaeltnisModel->existsDienstverhaeltnis(
+				$mitarbeiter_uid, $studiensemester_start, $studiensemester_ende, 'echterdv'
+			);
+
+			if (isError($echter_dv_result))
+				return $this->terminateWithError('Fehler beim Holen des Dienstverhaeltnisses');
+
+			$echter_dv = false;
+
+			if (hasData($echter_dv_result)) $echter_dv = true;
+
+			$result = $this->OrganisationseinheitModel->getStundengrenze($oe_kurzbz, $echter_dv);
+
+			if (isError($result))
+				return $this->terminateWithError('Fehler beim Holen der Stundengrenze');
+
+			if (hasData($result))
+			{
+				$defaults['stundengrenze'] = getData($result)[0]->stunden;
+			}
+		}
+
+		return $this->terminateWithSuccess($defaults);
 	}
 
     // -------------------------------------

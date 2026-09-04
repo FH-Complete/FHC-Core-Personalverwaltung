@@ -31,5 +31,12 @@ export default {
 			method: 'get',
 			url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/OrgAPI/getOrgetsWithStundengrenzen'
 		}
+	},
+	getStundengrenzeDefaults(mitarbeiter_uid, oe_kurzbz) {
+		return {
+			method: 'get',
+			url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/PersonAPI/getStundengrenzeDefaults',
+			params: { mitarbeiter_uid: mitarbeiter_uid, oe_kurzbz: oe_kurzbz}
+		}
 	}
 };

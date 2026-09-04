@@ -95,6 +95,25 @@ export const HourLimitData = {
 			}
 		}
 
+		const fetchDefaults = async () => {
+			isFetching.value = true
+
+			try
+			{
+				const response = await $api.call(ApiStundengrenze.getStundengrenzeDefaults(theModel.value.personUID, currentValue.value.oe_kurzbz));
+				currentValue.value.studiensemester_kurzbz = response.data.studiensemester_kurzbz;
+				if (currentValue.value.stundengrenze_id <= 0) currentValue.value.stundengrenze = Number(response.data.stundengrenze);
+			}
+			catch (error)
+			{
+				$fhcAlert.handleSystemError(error)
+			}
+			finally
+			{
+				isFetching.value = false;
+			}
+		}
+
 		const createShape = () => {
 			return {
 				stundengrenze_id: 0,
@@ -129,6 +148,9 @@ export const HourLimitData = {
 			frmState.semesterBlurred=false;
 			frmState.grenzeBlurred=false;
 			frmState.oeBlurred=false;
+
+			fetchDefaults();
+
 			// call bootstrap show function
 			modalRef.value.show();
 		}
@@ -178,6 +200,7 @@ export const HourLimitData = {
 						hourLimitdataList.value[r.data[0].stundengrenze_id] = r.data[0];
 						preservedValue.value = currentValue.value;
 						showToast();
+						hideModal();
 					}
 				}
 				catch (error)
@@ -189,7 +212,6 @@ export const HourLimitData = {
 					isFetching.value = false
 				}
 
-				hideModal();
 			}
 			else
 			{
@@ -255,6 +277,7 @@ export const HourLimitData = {
 			showToast, showDeletedToast,
 			showAddModal, hideModal, okHandler,
 			showDeleteModal, showEditModal, confirmDeleteRef, t,
+			fetchDefaults
 		}
 	},
 	template: `
@@ -324,7 +347,7 @@ export const HourLimitData = {
 
 				<div class="col-md-4">
 					<label for="oe_kurzbz" class="required form-label">{{ t('lehre','organisationseinheit') }}</label><br>
-					<select v-if="!readonly" id="oe_kurzbz" @blur="frmState.oeBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.oe_kurzbz) && frmState.oeBlurred}" v-model="currentValue.oe_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
+					<select v-if="!readonly" id="oe_kurzbz" @change="fetchDefaults" @blur="frmState.oeBlurred = true"  :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly, 'is-invalid': !validInput(currentValue.oe_kurzbz) && frmState.oeBlurred}" v-model="currentValue.oe_kurzbz" class="form-select form-select-sm" aria-label=".form-select-sm " >
 						<option :value="null">{{ t('core','alleOrganisationseinheiten') }}</option>
 						<option v-for="(item, index) in oeList" :value="item.value">
 							{{ item.label }}
