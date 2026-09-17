@@ -150,6 +150,13 @@ const handyVerwaltungApp = Vue.createApp({
                 this.$fhcAlert.alertSuccess(this.$p.t('person','mitarbeiterdatenGespeichert'))
             },
             updateHeader: function() { if (this.$refs.employeeHeaderRef) { this.$refs.employeeHeaderRef.refresh(); } },
+            getStandort: function(standort_id) {
+                if (!standort_id) return '';
+                let result = this.standorte?.filter((item) => item.standort_id == standort_id);
+                if (result?.length > 0)
+                    return result[0];
+                return '';
+            }
             
 	},
         computed: {
@@ -218,14 +225,18 @@ const handyVerwaltungApp = Vue.createApp({
 		};
                 return employeesTabulatorOptions;
             },
+            standortAnzeige: function() {
+                const standort = this.getStandort(this.employeeData?.standort_id);
+                if (!standort) return '';
+                return `${standort.bezeichnung} (${standort.kurzbz})`;
+            },
 
-            getStandortbez: function(standort_id) {
-                if (!standort_id) return '';
-                let result = this.standorte?.filter((item) => item.standort_id == standort_id);
-                if (result?.length > 0)
-                    return result[0].bezeichnung;
-                return '';
+            standortTelefon: function() {
+                const standort = this.getStandort(this.employeeData?.standort_id);
+                return standort?.telefon || '';
             }
+
+            
 
         },
         template: `
@@ -271,17 +282,21 @@ const handyVerwaltungApp = Vue.createApp({
                                                             <select  v-if="!readonly" id="standort" :readonly="readonly"  v-model="employeeData.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
                                                                 <option value="0">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
                                                                 <option v-for="(item, index) in standorte" :value="item.standort_id">
-                                                                    {{ item.bezeichnung }}
+                                                                    {{ item.bezeichnung || item.firma}} ({{ item.kurzbz }})
                                                                 </option>         
                                                             </select>
-                                                            <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(employeeData.standort_id) ">
+                                                            <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="standortAnzeige">
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="telefonnummer" class="form-label">{{ $p.t('person','telefon') }}</label>
+                                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="basenumber" :value="standortTelefon">
                                                         </div>
                                                         <div class="col-2">
                                                             <label for="telefonklappe" class="form-label">{{ $p.t('person','telefonklappe') }}</label>
                                                             <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="employeeData.telefonklappe">
                                                         </div>
                                                     
-                                                        <div class="col-6 d-flex justify-content-end align-items-end v-if="!readonly">
+                                                        <div class="col-5 d-flex justify-content-end align-items-end" v-if="!readonly">
                                                             <button
                                                                 type="button"
                                                                 class="btn btn-primary btn-sm"
