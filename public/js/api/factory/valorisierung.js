@@ -16,27 +16,34 @@ export default {
   getValorisierungsInstanzen() {
     return {
       method: 'get',
-      url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisierungsInstanzen',
+      url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisierungsInstanzen'
     }
   },
   getGehaelter(gehaelter_stichtag, gehaelter_oe_kurzbz) {
     return {
       method: 'get',
       url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getGehaelter',
-      params: {'gehaelter_stichtag': gehaelter_stichtag, 'gehaelter_oe_kurzbz': gehaelter_oe_kurzbz},
+      params: {'gehaelter_stichtag': gehaelter_stichtag, 'gehaelter_oe_kurzbz': gehaelter_oe_kurzbz}
     }
   },
   getValorisationInfo(valorisierunginstanz_kurzbz) {
     return {
       method: 'get',
       url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisationInfo',
-      params: {'valorisierunginstanz_kurzbz': valorisierunginstanz_kurzbz},
+      params: {'valorisierunginstanz_kurzbz': valorisierunginstanz_kurzbz}
     }
   },
   getAllUnternehmen() {
     return {
       method: 'get',
-      url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getAllUnternehmen',
+      url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getAllUnternehmen'
+    }
+  },
+  getValorisationDetails(dienstverhaeltnis_id) {
+    return {
+      method: 'get',
+      url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/getValorisationDetails',
+      params: {'dienstverhaeltnis_id': dienstverhaeltnis_id}
     }
   }
 }

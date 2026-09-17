@@ -21,6 +21,27 @@ trait JSONData {
         return false;
     }
 
+    /**
+     * Sanitize Strind and convert empty string to null. Workaround for 
+     * filter_var('', FILTER_VALIDATE_INT, FILTER_FLAG_EMPTY_STRING_NULL); which is only
+     * available in PHP >= 8.0
+     */
+    protected function getJSONDataString_EmptyNull(&$target, &$decoded, $attributeName)
+    {
+        if (isset($decoded[$attributeName]))
+        {
+            $target = filter_var($decoded[$attributeName], FILTER_SANITIZE_STRING);
+            if ($target == '')
+            {
+                $target = null;
+            }
+            return true;
+        }
+        $target = null;
+        return false;
+    }
+
+
     protected function getJSONDataInt(&$target, &$decoded, $attributeName)
     {
         if (isset($decoded[$attributeName]) && 

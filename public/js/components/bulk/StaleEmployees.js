@@ -3,6 +3,7 @@ import { usePhrasen } from '../../../../../js/mixins/Phrasen.js';
 import { progressbar } from '../Progressbar.js';
 import ApiEmployee from '../../api/factory/employee.js';
 import ApiDV from '../../api/factory/dv.js';
+import { CoreFilterCmpt } from "../../../../../js/components/filter/Filter.js";
 
 export const StaleEmployees = {
 	name: 'StaleEmployees',
@@ -10,6 +11,7 @@ export const StaleEmployees = {
         "datepicker": VueDatePicker,
         "p-skeleton": primevue.skeleton,
         'progressbar': progressbar,
+        CoreFilterCmpt,
         Modal,
     },
     props: {
@@ -53,12 +55,19 @@ export const StaleEmployees = {
             
             isFetching.value = true
             try {
-              const res = await $api.call(ApiEmployee.getEmployeesWithoutContract());                 
-              employeeList.value = res.data;
+                if (tableRef.value.tabulator != null) {
+                    tableRef.value.tabulator.dataLoader.alertLoader();
+                }
+                const res = await $api.call(ApiEmployee.getEmployeesWithoutContract());                 
+                employeeList.value = res.data;
             } catch (error) {
-              console.log(error)              
+                console.log(error)              
             } finally {
                 isFetching.value = false
+                if (tableRef.value.tabulator != null) {					
+                    tableRef.value.tabulator.setData(employeeList.value);
+                    tableRef.value.tabulator.dataLoader.clearAlert();
+                }
             }
         }
 
@@ -114,89 +123,119 @@ export const StaleEmployees = {
             // await fetchData();
         }
 
+
+        const dvFormatter = (cell) => {
+            const rowData = cell.getRow().getData()
+            const url = fullPath + rowData.person_id + '/' + rowData.uid + '/contract/' + rowData.dienstverhaeltnis_id;
+            return cell.getValue() != null ? 
+                `<a href="${url}">${cell.getValue()}</a> (${formatDateGerman(rowData.von)} - ${rowData.bis ? formatDateGerman(rowData.bis) : '?' })` 
+                : '' ;
+        }
+
         Vue.onMounted(async () => {
-
-            const dvFormatter = (cell) => {
-                const rowData = cell.getRow().getData()
-                const url = fullPath + rowData.person_id + '/' + rowData.uid + '/contract/' + rowData.dienstverhaeltnis_id;
-                return cell.getValue() != null ? 
-                    `<a href="${url}">${cell.getValue()}</a> (${formatDateGerman(rowData.von)} - ${rowData.bis ? formatDateGerman(rowData.bis) : '?' })` 
-                    : '' ;
-            }
-
-            await fetchData()
-            
-            const columnsDef = [
-                {
-                    formatter: 'rowSelection',
-                    titleFormatter: 'rowSelection',
-                    hozAlign: 'center',
-                    headerHozAlign: 'center',
-                    headerSort: false,
-                    width: 40,
-                    maxWidth: 40,
-                    minWidth: 40,
-                  },
-                { title: 'PNr', field: "personalnummer", sorter:"string", headerFilter:"list", width:80, headerFilterParams: {valuesLookup:true, autocomplete:true } },
-                { title: 'UID', field: "uid", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
-                { title: 'Vorname', field: "vorname", sorter:"string", headerFilter:"list", width:200, headerFilterParams: {valuesLookup:true, autocomplete:true} },
-                { title: 'Nachname', field: "nachname", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: 'Letzter Lehrauftrag', field: "letzter_lehrauftrag", headerFilter:"list", width:250, 
-                        sorter:function(a, b, aRow, bRow, column, dir, sorterParams){
-                            if (a === null || a === '') return ( b===0 || b === '') ? 0 : -1
-                            if (b === null || b === '') return 1
-                            try {
-                                const yearA = parseInt(a.substring(2))
-                                const yearB = parseInt(b.substring(2))
-                                const isSummerA = a.substring(0,2) == 'SS' 
-                                const isSummerB = b.substring(0,2) == 'SS' 
-                                if (yearA != yearB) {
-                                    return yearA - yearB
-                                } else if (isSummerA && !isSummerB) {
-                                    return -1
-                                } else if (!isSummerA && isSummerB) {
-                                    return 1
-                                }
-                            } catch(e)  {
-                                console.error(e)
-                            }
-                            return 0
-                        },
-                        headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                { title: 'DV/Unternehmen', field: "dv_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", width:380,
-                        cellClick:function(e, cell){
-                            // hack to prevent row selection
-                            let currRow = cell.getRow();
-                            if (currRow.isSelected()) {
-                                currRow.deselect();
-                            } else {
-                                currRow.select();
-                            }
-                        }, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
-                
-                
-              ];
-    
-            let tabulatorOptions = {
-                height:"100%",
-                width: "100%",
-                layout: "fitColumns",
-                movableColumns: true,
-                reactiveData: true,
-                selectable: true,
-                columns: columnsDef,
-                data: employeeList.value,
-            };
-    
-            tabulator.value = new Tabulator(
-                tableRef.value,
-                tabulatorOptions
-            );
-            tabulator.value.on("rowSelectionChanged", data => {
-				selectedData.value = data;
-			});
-
+            //await fetchData();
         })
+        
+        const columnsDef = [
+            {
+                formatter: 'rowSelection',
+                titleFormatter: 'rowSelection',
+                hozAlign: 'center',
+                headerHozAlign: 'center',
+                headerSort: false,
+                width: 40,
+                maxWidth: 40,
+                minWidth: 40,
+                },
+            { title: 'PNr', field: "personalnummer", sorter:"string", headerFilter:"list", width:80, headerFilterParams: {valuesLookup:true, autocomplete:true } },
+            { title: 'UID', field: "uid", sorter:"string", headerFilter:"list", width:100, headerFilterParams: {valuesLookup:true, autocomplete:true} },
+            { title: 'Vorname', field: "vorname", sorter:"string", headerFilter:"list", width:200, headerFilterParams: {valuesLookup:true, autocomplete:true} },
+            { title: 'Nachname', field: "nachname", sorter:"string", headerFilter:"list", headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+            { title: 'Letzter Lehrauftrag', field: "letzter_lehrauftrag", headerFilter:"list", width:250, 
+                    sorter:function(a, b, aRow, bRow, column, dir, sorterParams){
+                        if (a === null || a === '') return ( b===0 || b === '') ? 0 : -1
+                        if (b === null || b === '') return 1
+                        try {
+                            const yearA = parseInt(a.substring(2))
+                            const yearB = parseInt(b.substring(2))
+                            const isSummerA = a.substring(0,2) == 'SS' 
+                            const isSummerB = b.substring(0,2) == 'SS' 
+                            if (yearA != yearB) {
+                                return yearA - yearB
+                            } else if (isSummerA && !isSummerB) {
+                                return -1
+                            } else if (!isSummerA && isSummerB) {
+                                return 1
+                            }
+                        } catch(e)  {
+                            console.error(e)
+                        }
+                        return 0
+                    },
+                    headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+            { title: 'DV/Unternehmen', field: "dv_unternehmen", formatter: dvFormatter, sorter:"string", headerFilter:"list", width:380,
+                    cellClick:function(e, cell){
+                        // hack to prevent row selection
+                        let currRow = cell.getRow();
+                        if (currRow.isSelected()) {
+                            currRow.deselect();
+                        } else {
+                            currRow.select();
+                        }
+                    }, headerFilterParams: {valuesLookup:true, autocomplete:true, sort:"asc"} },
+            
+            
+            ];
+
+        const tabulatorOptions = {
+            height: "calc(100vh - 200px)",
+            width: "100%",
+            layout: "fitColumns",
+            footerElement: '<div>&sum; ausgewählt <span id="select_count"></span> / gefiltert <span id="search_count"></span> / gesamt <span id="total_count"></span></div>',
+            movableColumns: true,
+            reactiveData: true,
+            selectable: true,
+            columns: columnsDef,
+            data: employeeList.value,
+        };
+
+        const tabulatorEvents = Vue.computed(() => [
+            {
+                event: 'cellEdited',            
+            },
+            {
+                event: 'tableBuilt',
+                handler: () => {
+                    fetchData();
+                }
+            },
+            {
+                event: "dataFiltered",
+                handler: function(filters, rows) {
+                    const el = document.getElementById("search_count");
+                    el.innerHTML = rows.length;
+                }
+            },
+            {
+                event: "dataLoaded",
+                handler: function(data) {
+                    const el = document.getElementById("total_count");
+                    el.innerHTML = data.length;
+                    // init
+                    const el_select = document.getElementById("select_count");
+                    el_select.innerHTML = '0';
+                }
+            },
+            {
+                event : "rowSelectionChanged",
+                handler: function(data) {
+                    selectedData.value = data;
+                    const el = document.getElementById("select_count");
+                    el.innerHTML = data.length;
+                }
+            }
+        ]);
+
 
         // Workaround to update tabulator
         Vue.watch(employeeList, (newVal, oldVal) => {
@@ -204,7 +243,7 @@ export const StaleEmployees = {
             tabulator.value?.setData(employeeList.value);
         }, {deep: true})        
 
-        return { isFetching, tableRef, tabulator, currentDate, modalRef, finishContract, cancelHandler, progressValue }
+        return { isFetching, tableRef, tabulatorOptions, currentDate, modalRef, finishContract, cancelHandler, progressValue, tabulatorEvents }
 
     },
     template: `    
@@ -214,25 +253,36 @@ export const StaleEmployees = {
             </div>           
         </div>
        
-        <div class="flex-grow-1 d-flex flex-column" style="width:100%"  >
-            <div class="d-grid d-md-flex align-items-start pt-2 pb-3">
-                <datepicker id="currentDateSelect" 
-                    v-model="currentDate"
-                    v-bind:enable-time-picker="false"   
-                    :clearable="false"                                 
-                    six-weeks
-                    auto-apply 
-                    locale="de"
-                    format="dd.MM.yyyy"
-                    model-type="yyyy-MM-dd"
-                    input-class-name="dp-custom-input"
-                    style="max-width:140px;min-width:140px;margin-right:3px" >
-                </datepicker>
-                <button type="button" class="btn btn-sm btn-primary me-3" @click="finishContract()"><i class="fa fa-plus"></i> DV beenden</button>
-            </div>
-            <!-- TABULATOR -->
-            <div ref="tableRef" class="fhc-tabulator" style="height:300px"></div>
-        </div>
+
+        <core-filter-cmpt 
+			ref="tableRef"
+			table-only
+			:side-menu="false"
+			:tabulator-options="tabulatorOptions"
+            :tabulator-events="tabulatorEvents"
+			>
+			<template #actions>				
+			 	<div class="d-flex gap-2 align-items-baseline">					
+          
+                    <div class="d-grid d-sm-flex gap-1 mb-2 flex-nowrap">       
+                        <datepicker id="currentDateSelect" 
+                            v-model="currentDate"
+                            v-bind:enable-time-picker="false"   
+                            :clearable="false"                                 
+                            six-weeks
+                            auto-apply 
+                            locale="de"
+                            format="dd.MM.yyyy"
+                            model-type="yyyy-MM-dd"
+                            input-class-name="dp-custom-input"
+                            style="max-width:140px;min-width:140px;margin-right:3px" >
+                        </datepicker>
+                        <button type="button" class="btn btn-sm btn-primary me-3" @click="finishContract()"><i class="fa fa-plus"></i> DV beenden</button>                       
+                    </div>
+
+				</div>
+			</template>
+		</core-filter-cmpt>
 
         <Modal title="DV beenden" ref="modalRef">
             <template #body>

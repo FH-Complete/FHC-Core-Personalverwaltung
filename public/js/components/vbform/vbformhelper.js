@@ -41,14 +41,16 @@ export default {
       store: store,
       lists: {
           freitexttypen: [],
-          gehaltstypen: []
+          gehaltstypen: [],
+          gehaltsanpassungtypen: []
       }
     };
   },
   provide: function() {
     return {
         'freitexttypen': Vue.computed(() => this.lists.freitexttypen),
-        'gehaltstypen': Vue.computed(() => this.lists.gehaltstypen)
+        'gehaltstypen': Vue.computed(() => this.lists.gehaltstypen),
+        'gehaltsanpassungtypen': Vue.computed(() => this.lists.gehaltsanpassungtypen)
     }  
   },
   emits: [
@@ -57,6 +59,7 @@ export default {
   created: function() {
     this.getFreitexttypen();
     this.getGehaltstypen();
+    this.getGehaltsanpassungtypen();
     this.setScrollBarWidthCSSVar();
   },
   methods: {
@@ -97,6 +100,16 @@ export default {
         disabled: true
       });
       this.lists.gehaltstypen = gehaltstypen;
+    },
+    getGehaltsanpassungtypen: async function() {
+      const response = await this.$api.call(ApiGehaltsbestandteil.getGehaltsanpassungtypen());
+      const gehaltsanpassungtypen = response.data;
+      gehaltsanpassungtypen.unshift({
+        value: '',
+        label: 'Anpassungstyp wählen',
+        disabled: false
+      });
+      this.lists.gehaltsanpassungtypen = gehaltsanpassungtypen;
     },
     setScrollBarWidthCSSVar: function() {
         const scrollDiv = document.createElement('div');

@@ -284,6 +284,7 @@ export default {
       if( this.isEndable(gb) && !this.isFuture(gb) ) {
           disabled = [
             'gehaltstyp',
+            'gehaltsanpassungtyp',
             'anmerkung',
             'betrag',
             'valorisierung',
@@ -303,6 +304,7 @@ export default {
           data: {
               id: gb.gehaltsbestandteil_id,
               gehaltstyp: gb.gehaltstyp_kurzbz,
+              gehaltsanpassungtyp: gb.gehaltsanpassungtyp_kurzbz,
               anmerkung: gb.anmerkung,
               betrag: gb.grundbetrag,
               betrag_valorisiert: gb.betrag_valorisiert,
