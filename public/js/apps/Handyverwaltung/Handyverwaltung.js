@@ -49,6 +49,7 @@ const vertragsarten = Vue.ref([]);
 const vertragsbestandteiltypen = Vue.ref([]);
 const freitexttypen = Vue.ref([]);
 const gehaltstypen = Vue.ref([]);
+const gehaltsanpassungtypen = Vue.ref([]);
 const hourlyratetypes = Vue.ref([]);
 const unternehmen = Vue.ref([]);
 const beendigungsgruende = Vue.ref([]);
@@ -89,6 +90,7 @@ const handyVerwaltungApp = Vue.createApp({
 		Vue.provide("vertragsarten",vertragsarten);
 		Vue.provide("vertragsbestandteiltypen",vertragsbestandteiltypen);
 		Vue.provide("gehaltstypen",gehaltstypen);
+		Vue.provide("gehaltsanpassungtypen",gehaltsanpassungtypen);
 		Vue.provide("freitexttypen",freitexttypen);
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
