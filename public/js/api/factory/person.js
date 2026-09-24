@@ -51,6 +51,13 @@ export default {
           params: payload
         }
     },
+    updatePersonPhoneExtension(payload) {
+        return {
+          method: 'post',
+          url: '/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/PersonAPI/updatePersonPhoneExtension',
+          params: payload
+        }
+    },
     personEmployeeKurzbzExists(uid, kurzbz) {
         return {
           method: 'get',

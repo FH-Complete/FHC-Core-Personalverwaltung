@@ -39,6 +39,7 @@ import { EmployeeStatus } from '../../components/employee/EmployeeStatus.js'
 
 import Phrasen from '../../../../../js/plugins/Phrasen.js';
 import employee from "../../api/employee.js";
+import ApiPerson from '../../api/factory/person.js';
 
 const sprache = Vue.ref([]);
 const nations = Vue.ref([]);
@@ -69,7 +70,10 @@ const handyVerwaltungApp = Vue.createApp({
                     isFetching: false,
                     isFetchingName: false,
                     personuid: 'keine',
-					betriebsmittelpersonapi: BetriebsmittelPersonApi
+                    employeeData: null,
+					betriebsmittelpersonapi: BetriebsmittelPersonApi,
+                    isFetching: false,
+                    readonly: false,
 		};
 	},
 	components: {
@@ -109,6 +113,10 @@ const handyVerwaltungApp = Vue.createApp({
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
 		Vue.provide('beendigungsgruende',beendigungsgruende);
+
+        return {
+            standorte
+        };
 	},
 	methods: {
             // Tabulator handler for the rowClick event
@@ -117,6 +125,8 @@ const handyVerwaltungApp = Vue.createApp({
                 this.personid = row.getData().PersonId;
                 this.personuid = row.getData().UID;
                 this.fetchHeaderData(this.personid, this.personuid);
+
+                this.fetchEmployeeData(this.personid);
                 
                 if( this.$refs['vsplit'].isCollapsed() !== false ) {
                     this.$refs['vsplit'].showBoth();
@@ -126,6 +136,7 @@ const handyVerwaltungApp = Vue.createApp({
                 this.personid = person_id;
                 this.personuid = uid;
                 this.fetchHeaderData(this.personid, this.personuid);
+                this.fetchEmployeeData(this.personid);
             },
             fetchHeaderData: async function (personid, personuid)  {
                         this.isFetching = true;
@@ -143,8 +154,48 @@ const handyVerwaltungApp = Vue.createApp({
                             this.isFetching = false;
                             this.isFetchingName = false;
                         }
-                    }
-	    },
+                    },
+            fetchEmployeeData: async function(personID)  {
+                if (personID==null) {                
+                    return;
+                }
+                this.isFetching = true;
+                try {
+                    const res = await this.$api.call(ApiPerson.personEmployeeData(personID));
+                    this.employeeData = res.data[0];
+                } catch (error) {
+                    this.$fhcAlert.handleSystemError(error)         
+                } finally {
+                    this.isFetching = false
+                }   
+            },
+            saveEmployeeData: async function() {
+                // submit
+                try {
+                    const response = await this.$api.call(ApiPerson.updatePersonPhoneExtension(this.employeeData));
+                    this.showToast();
+                    this.employeeData = response.data[0];
+                    this.updateHeader();
+                } catch (error) {
+                    this.$fhcAlert.handleSystemError(error)              
+                } finally {
+                    this.isFetching = false
+                }
+                
+            },
+            showToast: function() {
+                this.$fhcAlert.alertSuccess(this.$p.t('person','mitarbeiterdatenGespeichert'))
+            },
+            updateHeader: function() { if (this.$refs.employeeHeaderRef) { this.$refs.employeeHeaderRef.refresh(); } },
+            getStandort: function(standort_id) {
+                if (!standort_id) return '';
+                let result = this.standorte?.filter((item) => item.standort_id == standort_id);
+                if (result?.length > 0)
+                    return result[0];
+                return '';
+            }
+            
+	},
         computed: {
             
             employeesTabulatorEvents: function() {
@@ -211,7 +262,20 @@ const handyVerwaltungApp = Vue.createApp({
 			]
 		};
                 return employeesTabulatorOptions;
+            },
+            standortAnzeige: function() {
+                const standort = this.getStandort(this.employeeData?.standort_id);
+                if (!standort) return '';
+                return `${standort.bezeichnung} (${standort.kurzbz})`;
+            },
+
+            standortTelefon: function() {
+                const standort = this.getStandort(this.employeeData?.standort_id);
+                return standort?.telefon || '';
             }
+
+            
+
         },
         template: `
 		<!-- Navigation component -->
@@ -259,6 +323,54 @@ const handyVerwaltungApp = Vue.createApp({
                                 <div v-if="personid!=null">
                                     <JobFunction :readonlyMode="true" :personID="personid" :personUID="personuid"></JobFunction>
                                 </div>
+
+                                <div class="row pt-md-4" v-if="personid!=null && employeeData!=null">      
+                                     <div class="col">
+                                         <div class="card">
+                                            <div class="card-header">
+                                                <div class="h5 mb-0"><h5>Durchwahl</h5></div>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="col-md-12">
+                                                    <div class="row gy-3">    
+                                                        <div class="col-4">                 
+                                                            <label for="standort" class="form-label">{{ $p.t('person','standort') }}</label>
+                                                            <select  v-if="!readonly" id="standort" :readonly="readonly"  v-model="employeeData.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
+                                                                <option value="0">-- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+                                                                <option v-for="(item, index) in standorte" :value="item.standort_id">
+                                                                    {{ item.bezeichnung || item.firma}} ({{ item.kurzbz }})
+                                                                </option>         
+                                                            </select>
+                                                            <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="standortAnzeige">
+                                                        </div>
+                                                        <div class="col-1">
+                                                            <label for="telefonnummer" class="form-label">{{ $p.t('person','telefon') }}</label>
+                                                            <input type="text" readonly class="form-control-sm form-control-plaintext" id="basenumber" :value="standortTelefon">
+                                                        </div>
+                                                        <div class="col-2">
+                                                            <label for="telefonklappe" class="form-label">{{ $p.t('person','telefonklappe') }}</label>
+                                                            <input type="text" :readonly="readonly" class="form-control-sm" maxlength="8" :class="{ 'form-control-plaintext': readonly, 'form-control': !readonly }" id="telefonklappe" v-model="employeeData.telefonklappe">
+                                                        </div>
+                                                    
+                                                        <div class="col-5 d-flex justify-content-end align-items-end" v-if="!readonly">
+                                                            <button
+                                                                type="button"
+                                                                class="btn btn-primary btn-sm"
+                                                                @click="saveEmployeeData"
+                                                            >
+                                                                Speichern
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>    
+
+
+
+                                            </div>
+                                         </div>
+                                     </div>
+                                </div>               
 
                                 <div class="row pt-md-4" v-if="personid!=null">      
                                      <div class="col">
