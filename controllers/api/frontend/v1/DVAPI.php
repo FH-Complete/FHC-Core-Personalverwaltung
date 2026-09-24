@@ -175,9 +175,6 @@ class DVAPI extends FHCAPI_Controller
         $dvList = array();
         if (is_array($dvData->retval) && count($dvData->retval) > 0) {
             $dvList = $dvData->retval;
-        } else {
-            //$this->terminateWithError('no DV found');
-            return;
         }
 
         $retval = array();
@@ -192,7 +189,7 @@ class DVAPI extends FHCAPI_Controller
             }));
 
             $retval[] = array('dv' => $value, 'vb' => $dbDataFiltered);            
-        }          
+        }
 
         return $this->terminateWithSuccess(array("dvList" => $retval ));
     }

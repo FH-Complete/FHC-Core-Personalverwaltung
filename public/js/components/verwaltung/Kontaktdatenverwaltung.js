@@ -38,6 +38,7 @@ export default {
 			sachaufwandtyp: Vue.computed(() => this.sachaufwandtyp),
 			karenztypen: Vue.computed(() => this.karenztypen),
 			gehaltstypen: Vue.computed(() => this.gehaltstypen),
+			gehaltsanpassungtypen: Vue.computed(() => this.gehaltsanpassungtypen),
 			vertragsbestandteiltypen: Vue.computed(() => this.vertragsbestandteiltypen),
 			freitexttypen: Vue.computed(() => this.freitexttypen),
 			teilzeittypen: Vue.computed(() => this.teilzeittypen),
@@ -60,6 +61,7 @@ export default {
 			sachaufwandtyp: {},
 			karenztypen: {},
 			gehaltstypen: {},
+			gehaltsanpassungtypen: {},
 			vertragsbestandteiltypen: {},
 			freitexttypen: {},
 			teilzeittypen: {},
@@ -191,6 +193,12 @@ export default {
 		this.$api.call(ApiCommon.getGehaltstypen())
 			.then(result => {
 				this.gehaltstypen = result.data
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+
+		this.$api.call(ApiCommon.getGehaltsanpassungtypen())
+			.then(result => {
+				this.gehaltsanpassungtypen = result.data
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 

@@ -520,7 +520,10 @@ export const EmployeeContract = {
         }
 
         const formatNumber = (num) => {
-            return numberFormat.format(parseFloat(num));
+            return Number(num).toLocaleString('de-AT', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         }
 
         const setDateHandler = (d) => {
@@ -663,7 +666,7 @@ export const EmployeeContract = {
             return va != undefined ? va.label : item;
         }
 
-        const truncate = (input) => input?.length > 8 ? `${input.substring(0, 8)}...` : input;
+        const truncate = (input) => input?.length > 14 ? `${input.substring(0, 14)}...` : input;
 
         const checkValorisation = async () => {
             if (currentDVID != null && currentDVID.value > 0) {
@@ -1142,26 +1145,33 @@ export const EmployeeContract = {
                                             <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item?.gehaltstyp_bezeichnung">
                                         </div>
 
-                                        <div class="col-md-2">
+                                        <div class="col-md-1">
                                             <label class="form-label" v-if="index==0" >Betrag</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatNumber(item.grund_betrag_decrypted)">
-                                        </div>
-
-                                        <div class="col-md-2">
-                                            <label class="form-label" v-if="index==0" >Betrag val.</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="formatNumber(item.betrag_val_decrypted)">
+                                            <input type="text" readonly 
+                                                class="form-control-sm form-control-plaintext text-end"  
+                                                :value="formatNumber(item.grund_betrag_decrypted)">
                                         </div>
 
                                         <div class="col-md-1">
+                                            <label class="form-label" v-if="index==0" >Betrag val.</label>
+                                            <input type="text" readonly 
+                                                class="form-control-sm form-control-plaintext text-end"  
+                                                :value="formatNumber(item.betrag_val_decrypted)">
+                                        </div>
+
+                                        <div class="col-auto text-center" style="width: 40px;">
                                             <label class="form-label" v-if="index==0" >Val.</label>
-                                            <div class="col-sm-8">
-                                                <input class="form-check-input" type="checkbox" :checked="item.valorisierung" disabled>
-                                            </div>
+                                            <input class="form-check-input" type="checkbox" :checked="item.valorisierung" disabled>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label" v-if="index==0" >Anpassungstyp</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="item.gehaltsanpassungtyp_bezeichnung">
                                         </div>
 
                                         <div class="col-md-2">
                                             <label class="form-label" v-if="index==0" >Anmerkung</label>
-                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="truncate(item.anmerkung)">
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext"  :value="truncate(item.anmerkung)" :title="item.anmerkung">
                                         </div>
 
                                     </template>

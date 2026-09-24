@@ -54,6 +54,7 @@ const vertragsarten = Vue.ref([]);
 const vertragsbestandteiltypen = Vue.ref([]);
 const freitexttypen = Vue.ref([]);
 const gehaltstypen = Vue.ref([]);
+const gehaltsanpassungtypen = Vue.ref([]);
 const hourlyratetypes = Vue.ref([]);
 const unternehmen = Vue.ref([]);
 const beendigungsgruende = Vue.ref([]);
@@ -103,6 +104,7 @@ const handyVerwaltungApp = Vue.createApp({
 		Vue.provide("vertragsarten",vertragsarten);
 		Vue.provide("vertragsbestandteiltypen",vertragsbestandteiltypen);
 		Vue.provide("gehaltstypen",gehaltstypen);
+		Vue.provide("gehaltsanpassungtypen",gehaltsanpassungtypen);
 		Vue.provide("freitexttypen",freitexttypen);
 		Vue.provide("hourlyratetypes",hourlyratetypes);
 		Vue.provide("unternehmen",unternehmen);
@@ -336,6 +338,9 @@ handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getVertragsarten(
 })
 handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getGehaltstypen()).then((r) => {
     gehaltstypen.value = r.data
+})
+handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getGehaltsanpassungtypen()).then((r) => {
+    gehaltsanpassungtypen.value = r.data
 })
 handyVerwaltungApp.config.globalProperties.$api.call(ApiCommon.getVertragsbestandteiltypen()).then((r) => {
     vertragsbestandteiltypen.value = r.data

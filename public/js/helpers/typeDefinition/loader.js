@@ -57,6 +57,11 @@ export const fetchGehaltstypen = async () => {
 		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltstypen');
 	return CoreRESTClient.getData(res.data);
 }
+export const fetchGehaltsanpassungtypen = async () => {
+	const res = await CoreRESTClient.get(
+		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getGehaltsanpassungtypen');
+	return CoreRESTClient.getData(res.data);
+}
 export const fetchVertragsarten = async () => {
 	const res = await CoreRESTClient.get(
 		'extensions/FHC-Core-Personalverwaltung/api/frontend/v1/CommonsAPI/getVertragsarten');

@@ -41,7 +41,7 @@ export default {
         <button v-if="isdeleteable" type="button" class="btn btn-sm p-2 float-end" @click="toggledelete" aria-label="Delete"><i v-if="db_delete" class="fas fa-trash-restore"></i><i v-else="" class="fas fa-trash"></i></button>
       </div>
     </div>
-    <div class="row g-2 mb-3">
+    <div class="row g-2 mb-1">
       <div class="col-2 ps-3">
         <select v-model="auszahlungen" :disabled="isinputdisabled('auszahlungen')" class="form-select form-select-sm" aria-label=".form-select-sm example">
           <option value="14" selected>14 Auszahlungen</option>
@@ -72,12 +72,30 @@ export default {
       </div>
       <div class="col-6">&nbsp;</div>
     </div>
+    <div class="row g-2 mb-3">
+      <div class="col-2 ps-3">
+        <select v-model="gehaltsanpassungtyp" :disabled="isinputdisabled('gehaltsanpassungtyp')" class="form-select form-select-sm" aria-label=".form-select-sm example">
+          <option
+            v-for="gt in gehaltsanpassungtypen"
+            :value="gt.value"
+            :selected="isselected(gt.value, this.gehaltsanpassungtyp)"
+            :disabled="gt.disabled">
+            {{ gt.label }}
+          </option>
+        </select>
+      </div>
+      <div class="col-4">
+        <textarea v-model="anmerkung" :disabled="isinputdisabled('anmerkung')" rows="1" class="form-control form-control-sm" placeholder="Anmerkung" aria-label="Anmerkung"></textarea>
+      </div>
+      <div class="col-6"></div>
+    </div>
   </div>
   `,
   data: function() {
     return {
       id: null,
       gehaltstyp : '',
+      gehaltsanpassungtyp: '',
       betrag: '',
       betrag_valorisiert: '',
       gueltig_ab: '',
@@ -85,11 +103,13 @@ export default {
       valorisierung: true,
       valorisierungssperre: null,
       auszahlungen: 14,
+      anmerkung: '',
       db_delete: false
     };
   },
   inject: [
-      'gehaltstypen'
+      'gehaltstypen',
+      'gehaltsanpassungtypen'
   ],
   components: {
     'gueltigkeit': gueltigkeit,
@@ -117,6 +137,9 @@ export default {
       if( this.config?.data?.gehaltstyp !== undefined ) {
         this.gehaltstyp = this.config.data.gehaltstyp;
       }
+      if( this.config?.data?.gehaltsanpassungtyp !== undefined ) {
+        this.gehaltsanpassungtyp = this.config.data.gehaltsanpassungtyp;
+      }
       if( this.config?.data?.betrag !== undefined ) {
         if(!isNaN(this.config.data.betrag)) {
             this.config.data.betrag = this.config.data.betrag.toString();
@@ -138,6 +161,9 @@ export default {
       if( this.config?.data?.auszahlungen !== undefined ) {
         this.auszahlungen = this.config.data.auszahlungen;
       }
+      if( this.config?.data?.anmerkung !== undefined ) {
+        this.anmerkung = this.config.data.anmerkung;
+      }
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
       }
@@ -152,13 +178,15 @@ export default {
         data: {
           id: this.id,
           gehaltstyp: this.gehaltstyp,
+          gehaltsanpassungtyp: this.gehaltsanpassungtyp,
           betrag: this.betrag.replace(',', '.'),
-          betrag_valorisiert: this.betrag.replace(',', '.'),
+          betrag_valorisiert: this.betrag_valorisiert.replace(',', '.'),
           db_delete: this.db_delete,
           gueltigkeit: this.$refs.gueltigkeit.getPayload(),
           valorisierung: Boolean(this.valorisierung),
           valorisierungssperre: this.valorisierungssperre, 
-          auszahlungen: this.auszahlungen
+          auszahlungen: this.auszahlungen,
+          anmerkung: this.anmerkung
         }
       };
     },
