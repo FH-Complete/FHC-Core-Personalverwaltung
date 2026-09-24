@@ -179,7 +179,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 
-		this.$api.call(ApiCommon.this.ApiCommon.getGehaltstypen())
+		this.$api.call(ApiCommon.getGehaltstypen())
 			.then(result => {
 				this.gehaltstypen = result.data
 			})

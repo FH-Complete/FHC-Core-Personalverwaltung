@@ -199,7 +199,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$api.call(ApiCommon.getGehaltanpassungstypen())
+		this.$api.call(ApiCommon.getGehaltsanpassungtypen())
 			.then(result => {
 				this.gehaltsanpassungtypen = result.data
 			})
