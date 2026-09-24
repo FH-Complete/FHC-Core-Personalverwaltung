@@ -12,7 +12,8 @@
 		'customCSSs' => [
 			'public/css/components/vue-datepicker.css',
 			'public/extensions/FHC-Core-Personalverwaltung/css/personalverwaltung.css',
-			'public/css/components/verticalsplit.css'
+			'public/css/components/verticalsplit.css',
+			'public/css/components/Detailheader.css'
 		],
 		'customJSs' => array(
 			'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'

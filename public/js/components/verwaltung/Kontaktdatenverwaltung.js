@@ -243,6 +243,9 @@ export default {
 		redirectToLeitung: function ({person_id, uid})  {
 			this.personid = person_id;
 			this.personuid = uid;
+			this.personData = {
+				personID: this.personid,
+			}
 			this.fetchHeaderData(this.personid, this.personuid);
 		},
 		fetchHeaderData: async function (personid, personuid)  {
