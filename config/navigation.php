@@ -102,6 +102,12 @@ $config['navigation_menu']['extensions/FHC-Core-Personalverwaltung/*'] = array(
 		'icon' => 'money-bill-wave',
 		'requiredPermissions' => 'extension/pv21_valorisierung:r'
 	),
+	'StaffTurnover' => array(
+		'link' => site_url('extensions/FHC-Core-Personalverwaltung/StaffTurnover'),
+		'description' => 'Fluktuation',
+		'icon' => 'left-right',
+		'requiredPermissions' => 'basis/mitarbeiter:r'
+	),
 	'Berichte' => array(
 		'link' => site_url('extensions/FHC-Core-Personalverwaltung/Reports'),
 		'description' => 'Berichte',
