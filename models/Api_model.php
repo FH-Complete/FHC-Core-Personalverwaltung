@@ -1144,7 +1144,10 @@ class Api_model extends DB_Model
 
 
     function getStandorteIntern() {
-        $qry = "SELECT * FROM public.tbl_standort JOIN public.tbl_firma USING(firma_id) WHERE tbl_firma.firmentyp_kurzbz='Intern' ORDER BY tbl_standort.kurzbz";
+        $qry = "
+        SELECT standort.*,firma.name as firma,tel.kontakt as telefon 
+        FROM public.tbl_standort standort JOIN public.tbl_firma firma USING(firma_id) LEFT JOIN (select * from public.tbl_kontakt where kontakttyp='telefon') as tel USING(standort_id) 
+        WHERE firma.firmentyp_kurzbz='Intern' ORDER BY standort.kurzbz;";
         return $this->execQuery($qry);
     }
 
