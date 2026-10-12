@@ -304,7 +304,7 @@ export const StaffTurnover = {
         
         const columnsDef = [
             //{ title: "OE", field: "oe_kurzbz" },
-            { title: 'OE', field: "bezeichnung", sorter:"string", width:180, headerFilterParams: {valuesLookup:true, autocomplete:true } },
+            { title: 'OE', field: "bezeichnung", sorter:"string", width:180 },
             { title: 'Anfangsbestand', field: "eigen_anfangsbestand", width:100 },
             { title: 'Zugänge', field: "eigen_zugaenge", width:100 },
             { title: 'Abgänge', field: "eigen_abgaenge", width:100 },
@@ -418,10 +418,22 @@ export const StaffTurnover = {
             }, 250)
         }
 
+        const downloadconfig = {
+            'csv': {
+                formatter:'csv',
+                file: 'fluktuation.csv',
+                options: {
+                    delimiter: ';',
+                    bom: true,
+                 //   rowGroups: true,
+                }
+            },            
+        }
+
         return { isFetching, tableRef, tabulatorOptions, currentDate, modalRef, updateReport, 
             cancelHandler, progressValue, tabulatorEvents, orgSelectedHandler, incFilter, decFilter, 
             filterDateHandler, filterDate, presetDates, orgetDropdownPlaceholder, searchOrgets,
-            autocompleteOrgets, selectedOrget }
+            autocompleteOrgets, selectedOrget, downloadconfig }
 
     },
     template: `    
@@ -438,6 +450,7 @@ export const StaffTurnover = {
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
             :tabulator-events="tabulatorEvents"
+            :download="downloadconfig"
 			>
 			<template #actions>				
 			 	<div class="d-flex gap-2 align-items-baseline">					
