@@ -303,22 +303,19 @@ export const StaffTurnover = {
         };
         
         const columnsDef = [
-            //{ title: "OE", field: "oe_kurzbz" },
-            { title: 'OE', field: "bezeichnung", sorter:"string", width:180 },
-            { title: 'Anfangsbestand', field: "eigen_anfangsbestand", width:100 },
-            { title: 'Zugänge', field: "eigen_zugaenge", width:100 },
-            { title: 'Abgänge', field: "eigen_abgaenge", width:100 },
-            { title: 'Fluktuation (%)', field: "eigen_fluktuation_prozent", width:120, formatter: "money", formatterParams:moneyFormatterParams},
-            { title: 'Kum. Anfangsbestand', field: "gesamt_anfangsbestand", width:100},
-            { title: 'Kum. Zugänge', field: "gesamt_zugaenge", width:100},
-            { title: 'Kum. Abgänge', field: "gesamt_abgaenge", width:100},
-            { title: 'Kum. Fluktuation (%)', field: "gesamt_fluktuation_prozent", width:120, formatter: "money", formatterParams:moneyFormatterParams },
-                        
+            { title: 'OE', field: "bezeichnung", sorter: "string", minWidth: 180, widthGrow: 3 },
+            { title: 'Anfangsbestand', field: "eigen_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Zugänge', field: "eigen_zugaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Abgänge', field: "eigen_abgaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Fluktuation (%)', field: "eigen_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams },
+            { title: 'Kum. Anfangsbestand', field: "gesamt_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Kum. Zugänge', field: "gesamt_zugaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Kum. Abgänge', field: "gesamt_abgaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Kum. Fluktuation (%)', field: "gesamt_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams },
         ];
 
         const tabulatorOptions = {
-            height: "calc(100vh - 200px)",
-            width: "100%",
+            height: "calc(100vh - 200px)",           
             layout: "fitColumns",
             dataTree: true,
             dataTreeStartExpanded: true,
@@ -433,17 +430,10 @@ export const StaffTurnover = {
         return { isFetching, tableRef, tabulatorOptions, currentDate, modalRef, updateReport, 
             cancelHandler, progressValue, tabulatorEvents, orgSelectedHandler, incFilter, decFilter, 
             filterDateHandler, filterDate, presetDates, orgetDropdownPlaceholder, searchOrgets,
-            autocompleteOrgets, selectedOrget, downloadconfig }
+            autocompleteOrgets, selectedOrget, downloadconfig, fetchData }
 
     },
     template: `    
-        <div v-if="isFetching" class="d-flex justify-content-center container-fluid px-0 " >
-            <div  class="spinner-border"  role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>           
-        </div>
-       
-
         <core-filter-cmpt 
 			ref="tableRef"
 			table-only
@@ -511,6 +501,13 @@ export const StaffTurnover = {
                             </template>
                         </datepicker>
                         <button type="button" class="btn btn-sm btn-primary me-2" @click="incFilter()" :disabled="filterDate==null"><i class="fa fa-plus"></i></button>  
+
+                        <button type="button" class="btn btn-sm btn-primary me-2"
+                                @click="fetchData()"
+                                :disabled="!selectedOrget"
+                            >
+                            <i class="fa fa-sync" :class="{ 'fa-spin': isFetching }"></i>
+                        </button>
                     </div>
 
 				</div>
