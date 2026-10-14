@@ -16,6 +16,7 @@ class StaffTurnover extends FHCAPI_Controller
 			array(
 				'index' => Self::DEFAULT_PERMISSION,
 				'getRateByOrget' => Self::DEFAULT_PERMISSION,
+                'getEmployeesByOrget' => Self::DEFAULT_PERMISSION,
 			)
 		);
 
@@ -37,6 +38,123 @@ class StaffTurnover extends FHCAPI_Controller
 		$this->terminateWithSuccess('not implemented');
 	}
 
+    public function getEmployeesByOrget() {
+        
+        $von = $this->input->get('von', null);
+		$bis = $this->input->get('bis', null);
+		$orgID = $this->input->get('orgID', null);
+		$orgetID = $this->input->get('orgetID', null);
+
+		// validate 
+		$date_von = DateTime::createFromFormat( 'Y-m-d', $von );
+		$date_bis = DateTime::createFromFormat( 'Y-m-d', $bis );
+        $von_datestring = $date_von->format("Y-m-d");
+		$bis_datestring = $date_bis->format("Y-m-d");
+
+		if ($date_von === false || $date_bis === false) {
+			$this->terminateWithError('no date range selected');
+			return;
+		}
+
+		if ($orgetID === null) {
+			$this->terminateWithError('no department selected');
+			return;
+		}
+
+        $dbModel = new DB_Model();
+
+        $qry = "
+WITH RECURSIVE params AS (
+    SELECT ?::date    AS periode_start,
+           ?::date    AS periode_ende,
+           ?::text    AS oe_kurzbz,
+           ?::boolean AS inkl_unter_oes      -- false = 'eigen', true = 'gesamt'
+),
+
+-- Gewählte OE, bei Bedarf samt aller Nachkommen
+oe_scope AS (
+    SELECT o.oe_kurzbz::text AS oe_kurzbz,
+           ARRAY[o.oe_kurzbz::text] AS pfad
+    FROM public.tbl_organisationseinheit o
+    JOIN params p ON o.oe_kurzbz = p.oe_kurzbz
+
+    UNION ALL
+
+    SELECT o.oe_kurzbz::text,
+           s.pfad || o.oe_kurzbz::text
+    FROM public.tbl_organisationseinheit o
+    JOIN oe_scope s ON o.oe_parent_kurzbz = s.oe_kurzbz
+    CROSS JOIN params p
+    WHERE p.inkl_unter_oes
+      AND NOT o.oe_kurzbz::text = ANY (s.pfad)
+),
+
+-- Disziplinäre Zuordnungen 
+funktionen AS (
+    SELECT bf.oe_kurzbz::text AS oe_kurzbz,
+           b.person_id,
+           b.uid,
+           bf.datum_von,
+           bf.datum_bis
+    FROM public.tbl_benutzerfunktion bf
+    JOIN public.tbl_benutzer b USING (uid)
+    JOIN public.tbl_mitarbeiter m ON m.mitarbeiter_uid::text = b.uid::text
+    WHERE bf.funktion_kurzbz = 'oezuordnung'
+      AND bf.oe_kurzbz IN (SELECT oe_kurzbz FROM oe_scope)
+),
+
+-- Pro Person verdichten (gleiche Logik wie in der Übersicht)
+personen AS (
+    SELECT f.person_id,
+           (ARRAY_AGG(f.uid ORDER BY f.datum_von DESC))[1] AS uid,
+           STRING_AGG(DISTINCT f.oe_kurzbz, ', ')
+               FILTER (WHERE f.datum_von <= p.periode_ende
+                         AND (f.datum_bis >= p.periode_start OR f.datum_bis IS NULL)) AS oe_im_zeitraum,
+           MIN(f.datum_von)                 AS erster_eintritt,
+           MAX(f.datum_bis)                 AS letzter_austritt,
+           BOOL_OR(f.datum_bis IS NULL)     AS hat_offene_zuordnung,
+           BOOL_OR(f.datum_von <= p.periode_start
+                   AND (f.datum_bis >= p.periode_start OR f.datum_bis IS NULL)) AS im_bestand_am_start,
+           BOOL_OR(f.datum_von <= p.periode_ende
+                   AND (f.datum_bis >= p.periode_start OR f.datum_bis IS NULL)) AS im_zeitraum_aktiv
+    FROM funktionen f
+    CROSS JOIN params p
+    GROUP BY f.person_id
+)
+
+SELECT
+    pe.person_id,
+    pe.uid,
+    ps.nachname,
+    ps.vorname,
+    pe.oe_im_zeitraum,
+    pe.erster_eintritt,
+    CASE WHEN pe.hat_offene_zuordnung THEN NULL ELSE pe.letzter_austritt END AS letzter_austritt,
+    pe.im_bestand_am_start AS anfangsbestand,
+    CASE WHEN pe.erster_eintritt BETWEEN p.periode_start AND p.periode_ende
+         THEN pe.erster_eintritt END AS zugang_datum,
+    CASE WHEN NOT pe.hat_offene_zuordnung
+              AND pe.letzter_austritt BETWEEN p.periode_start AND p.periode_ende
+         THEN pe.letzter_austritt END AS abgang_datum
+FROM personen pe
+JOIN public.tbl_person ps USING (person_id)
+CROSS JOIN params p
+WHERE pe.im_zeitraum_aktiv
+ORDER BY ps.nachname, ps.vorname
+        ";
+
+        $queryparam = array($von_datestring, $bis_datestring, $orgetID, false);
+        $result = $dbModel->execReadOnlyQuery($qry, $queryparam);
+
+		if (isError($result))
+		{
+			$this->terminateWithError(getError($result));
+			return;
+		}
+		
+		return $this->terminateWithSuccess(getData($result));
+
+    }
 
     public function getRateByOrget() {
         $von = $this->input->get('von', null);
@@ -259,8 +377,6 @@ ORDER BY b.pfad;
 		}
 		
 		return $this->terminateWithSuccess(getData($result));
-
-
     }
 
 }
