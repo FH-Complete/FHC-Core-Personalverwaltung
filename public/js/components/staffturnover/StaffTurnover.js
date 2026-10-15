@@ -19,7 +19,7 @@ export const StaffTurnover = {
         Modal,
     },
     props: {
-       
+
     },
     setup( props, context ) {
 
@@ -40,29 +40,19 @@ export const StaffTurnover = {
         const tabulator = ref(null); // variable to hold your table
         const selectedData = ref([]);
 
-        // detail table
+        // detail modal
+        const detailModalRef = ref(null);
         const detailTableRef = ref(null);
         const detailList = ref([]);
         const isDetailFetching = ref(false);
-        // { oe_kurzbz, bezeichnung } 
-        const detailSelection = ref(null);        
-        let selectedRowComponent = null;
-
-        //
-        const layoutRef = ref(null);
-        const TOP_SHARE = 0.55;      // tree height in %
-        const MIN_TABLE_HEIGHT = 150;
-        const BOTTOM_MARGIN = 16;   
-        let topBuilt = false;
-        let detailBuilt = false;
-
-
+        // { oe_kurzbz, bezeichnung }
+        const detailSelection = ref(null);
 
         const $api = Vue.inject('$api');
         const fhcAlert = inject('$fhcAlert');
 
 
-        
+
         const formatDateISO = (ds) => {
             let padNum = (n) => {
                 if (n<10) return '0' + n;
@@ -78,12 +68,12 @@ export const StaffTurnover = {
         const currentDate = ref(formatDateISO(new Date()));
         const filterDate = ref();
 
-        
+
 
         const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
         const fullPath = `/${ciPath}/extensions/FHC-Core-Personalverwaltung/Employees/`;
 
-        const filterDateHandler = (d) => {            
+        const filterDateHandler = (d) => {
             console.log('filter date set: ', d);
             if (d == null) {
                 filterDate.value = null;
@@ -117,30 +107,30 @@ export const StaffTurnover = {
                 if (tableRef.value.tabulator != null) {
                     tableRef.value.tabulator.dataLoader.alertLoader();
                 }
-                const res = await $api.call(ApiStaffTurnover.getRateByOrget(filterDate.value, currentOrgID.value, selectedOrget.value.value));     
-                const tableDataNested = buildTree(res.data);            
+                const res = await $api.call(ApiStaffTurnover.getRateByOrget(filterDate.value, currentOrgID.value, selectedOrget.value.value));
+                const tableDataNested = buildTree(res.data);
                 departmentList.value = tableDataNested;
             } catch (error) {
-                console.log(error)              
+                console.log(error)
             } finally {
                 isFetching.value = false
-                if (tableRef.value.tabulator != null) {					
+                if (tableRef.value.tabulator != null) {
                     tableRef.value.tabulator.setData(departmentList.value);
                     tableRef.value.tabulator.dataLoader.clearAlert();
                 }
-                selectedRowComponent = null;
             }
+        }
 
-            if (detailSelection.value) {
-                fetchDetailData();
-            }
-
+        // Tabulator im Modal neu zeichnen: wurde die Tabelle aufgebaut, während
+        // das Modal versteckt war, hat sie sonst Spaltenbreite 0
+        const redrawDetail = () => {
+            try { detailTableRef.value?.tabulator?.redraw(true); } catch (err) { }
         }
 
         const fetchDetailData = async () => {
- 
+
             if (!detailSelection.value) return
- 
+
             isDetailFetching.value = true
             try {
                 if (detailTableRef.value?.tabulator != null) {
@@ -149,20 +139,42 @@ export const StaffTurnover = {
                 const res = await $api.call(ApiStaffTurnover.getEmployeesByOrget(
                     filterDate.value,
                     currentOrgID.value,
-                    detailSelection.value.oe_kurzbz                    
+                    detailSelection.value.oe_kurzbz
                 ));
                 detailList.value = res.data;
             } catch (error) {
-                console.log(error)              
+                console.log(error)
             } finally {
                 isDetailFetching.value = false
-                if (detailTableRef.value?.tabulator != null) {					
+                if (detailTableRef.value?.tabulator != null) {
                     detailTableRef.value.tabulator.setData(detailList.value);
                     detailTableRef.value.tabulator.dataLoader.clearAlert();
+                    redrawDetail();
                 }
             }
         }
- 
+
+        const openDetail = (data) => {
+            detailSelection.value = {
+                oe_kurzbz: data.oe_kurzbz,
+                bezeichnung: data.bezeichnung,
+            };
+            // alte Daten sofort leeren, damit nicht kurz die vorige Abteilung erscheint
+            detailList.value = [];
+            detailTableRef.value?.tabulator?.setData([]);
+
+            detailModalRef.value.show();
+            fetchDetailData();
+
+            // Fallback, falls das 'shown'-Event des Modals nicht greift
+            // (Bootstrap-Fade dauert ca. 300 ms)
+            setTimeout(redrawDetail, 350);
+        }
+
+        const closeDetail = () => {
+            detailModalRef.value?.hide();
+        }
+
         const resetDetail = () => {
             detailSelection.value = null;
             detailList.value = [];
@@ -174,7 +186,6 @@ export const StaffTurnover = {
             orgets.value = [];
             autocompleteOrgets.value = [];
             departmentList.value = [];
-            selectedRowComponent = null;
             tableRef.value?.tabulator?.setData([]);
             resetDetail();
         }
@@ -248,7 +259,7 @@ export const StaffTurnover = {
                     dayOfMonth,
                   );
                 return _date;
-            }            
+            }
         }
 
         const decFilter = () => {
@@ -295,39 +306,39 @@ export const StaffTurnover = {
 
         const presetDates = ref([
             { label: 'Heute', value: [new Date(), new Date()] },
-            { label: 'Aktuelles Monat', value: [startOfMonth(new Date()), endOfMonth(new Date())] },                  
+            { label: 'Aktuelles Monat', value: [startOfMonth(new Date()), endOfMonth(new Date())] },
             { label: 'Aktuelles Jahr', value: [startOfYear(new Date()), endOfYear(new Date())] },
           ]);
 
-        const updateReport = async () => {                 
-            progressValue.value = 0;            
+        const updateReport = async () => {
+            progressValue.value = 0;
             modalRef.value.show();
             //await sleep(500);
             cancelAction.value = false;
             let promises = [];
             for (let index = 1; index <= selectedData.value.length; index++) {
                 progressValue.value = Math.round(index/selectedData.value.length*100);
-                const payload = { 
+                const payload = {
                     dienstverhaeltnis_id: selectedData.value[index-1].dienstverhaeltnis_id,
-                    gueltig_bis: currentDate.value 
+                    gueltig_bis: currentDate.value
                 }
-                
+
                 // API call
                 try {
                     promises.push(
-                        $api.call(ApiDV.deactivateDV(payload))                            
-                    );	 
-                    //await sleep(20); 
-                    
-                    
+                        $api.call(ApiDV.deactivateDV(payload))
+                    );
+                    //await sleep(20);
+
+
                     if (cancelAction.value) {
                         await fetchData();
                         return;
                     }
                 } catch (error) {
-                  console.log(error)              
-                } 
-                
+                  console.log(error)
+                }
+
             }
             Promise.all(promises).then(result => {
                 if (result.error === 1) {
@@ -351,19 +362,19 @@ export const StaffTurnover = {
         const dvFormatter = (cell) => {
             const rowData = cell.getRow().getData()
             const url = fullPath + rowData.person_id + '/' + rowData.uid + '/contract/' + rowData.dienstverhaeltnis_id;
-            return cell.getValue() != null ? 
-                `<a href="${url}">${cell.getValue()}</a> (${formatDateGerman(rowData.von)} - ${rowData.bis ? formatDateGerman(rowData.bis) : '?' })` 
+            return cell.getValue() != null ?
+                `<a href="${url}">${cell.getValue()}</a> (${formatDateGerman(rowData.von)} - ${rowData.bis ? formatDateGerman(rowData.bis) : '?' })`
                 : '' ;
         }
 
 
-        Vue.onMounted(async () => {
-             window.addEventListener('resize', onWindowResize);
-        })
-
-        Vue.onUnmounted(() => {
-            window.removeEventListener('resize', onWindowResize);
-            clearTimeout(resizeTimer);
+        Vue.onMounted(() => {
+            // Detail-Modal: breiter machen und nach dem Einblenden die Tabelle neu zeichnen.
+            // Setzt voraus, dass Modal.js ein Bootstrap-Modal rendert.
+            const root = detailModalRef.value?.$el;
+            const modalEl = root?.classList?.contains('modal') ? root : root?.querySelector?.('.modal');
+            modalEl?.querySelector('.modal-dialog')?.classList.add('modal-xl');
+            modalEl?.addEventListener('shown.bs.modal', redrawDetail);
         })
 
         const moneyFormatterParams = {
@@ -374,39 +385,6 @@ export const StaffTurnover = {
             precision: 1,
         };
 
-
-
-        const layoutTables = () => {
-
-            if (!topBuilt || !detailBuilt) return;
-
-            const top = tableRef.value?.tabulator;
-            const bottom = detailTableRef.value?.tabulator;
-            const wrapper = layoutRef.value;
-            if (!top || !bottom || !wrapper) return;
-
-            // Platz vom oberen Rand des Wrappers bis zum unteren Fensterrand
-            const wrapperTop = wrapper.getBoundingClientRect().top + window.scrollY;
-            const available = window.innerHeight - wrapperTop - BOTTOM_MARGIN;
-
-            // Höhe von allem, was nicht Tabelle ist (Actions-Leisten, Überschrift, Abstände)
-            const overhead = wrapper.offsetHeight - top.element.offsetHeight - bottom.element.offsetHeight;
-
-            const tableSpace = available - overhead;
-            const topHeight = Math.max(MIN_TABLE_HEIGHT, Math.floor(tableSpace * TOP_SHARE));
-            const bottomHeight = Math.max(MIN_TABLE_HEIGHT, tableSpace - topHeight);
-
-            top.setHeight(topHeight);
-            bottom.setHeight(bottomHeight);
-        }
-
-        let resizeTimer = null;
-
-        const onWindowResize = () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(layoutTables, 100);
-        }
-        
         const columnsDef = [
             { title: 'OE', field: "bezeichnung", sorter: "string", minWidth: 180, widthGrow: 3 },
             { title: 'Anfangsbestand', field: "eigen_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
@@ -421,12 +399,11 @@ export const StaffTurnover = {
 
         const tabulatorOptions = {
             selectableRows: 1,
-            height: "calc(50vh - 140px)",           
+            height: "calc(100vh - 200px)",
             layout: "fitColumns",
             dataTree: true,
             dataTreeStartExpanded: true,
             dataTreeChildField: "_children",
-            // footerElement: '<div>&sum; ausgewählt <span id="select_count"></span> / gefiltert <span id="search_count"></span> / gesamt <span id="total_count"></span></div>',
             movableColumns: true,
             reactiveData: true,
             selectable: true,
@@ -436,41 +413,31 @@ export const StaffTurnover = {
 
         const tabulatorEvents = Vue.computed(() => [
             {
-                event: 'cellEdited',            
+                event: 'cellEdited',
             },
             {
                 event: 'tableBuilt',
                 handler: () => {
-                    topBuilt = true;
                     fetchData();
-                    Vue.nextTick(layoutTables);
                 }
             },
             {
                 event: 'cellClick',
-                handler: function(e, cell) {         
+                handler: function(e, cell) {
                     // ignore +/- click
                     if (e.target.closest('.tabulator-data-tree-control')) return;
-        
+
                     const row = cell.getRow();
-                    const data = row.getData();
-        
-                    detailSelection.value = {
-                        oe_kurzbz: data.oe_kurzbz,
-                        bezeichnung: data.bezeichnung,
-                    };
 
                     setTimeout(() => {
                         row.getTable().deselectRow();   // ohne Argument: alle abwählen
                         row.select();
                     });
 
-                    selectedRowComponent = row;
-        
-                    fetchDetailData();
+                    openDetail(row.getData());
                 }
             },
-            
+
         ]);
 
         // detail table
@@ -481,14 +448,14 @@ export const StaffTurnover = {
         }
 
         const isTrue = (v) => v === true || v === 't' || v === 'true' || v === 1 || v === '1';
- 
+
         const boolFormatter = (cell) => {
             return isTrue(cell.getValue())
                 ? '<i class="fa fa-check text-success"></i>'
                 : '';
         }
 
-        
+
         const employeeFormatter = (cell) => {
             const d = cell.getRow().getData();
             const url = fullPath + d.person_id + '/' + d.uid;
@@ -517,59 +484,38 @@ export const StaffTurnover = {
             const fluktuation = basis > 0 ? abgaenge / basis * 100 : null;
             return { anfangsbestand, zugaenge, abgaenge, fluktuation };
         });
- 
+
         const formatPercent = (v) => v == null
             ? '–'
             : v.toLocaleString('de-AT', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
- 
-        const updateDetailFooter = () => {
-            const el = detailTableRef.value?.tabulator?.element?.querySelector('.st-detail-footer');
-            if (!el) return;
-            if (!detailSelection.value) {
-                el.innerHTML = '';
-                return;
-            }
-            const s = detailSummary.value;
-            el.innerHTML =
-                `Anfangsbestand: <b>${s.anfangsbestand}</b>` +
-                ` &nbsp;·&nbsp; Zugänge: <b>${s.zugaenge}</b>` +
-                ` &nbsp;·&nbsp; Abgänge: <b>${s.abgaenge}</b>` +
-                ` &nbsp;·&nbsp; Fluktuation: <b>${formatPercent(s.fluktuation)}</b>`;
-        }
- 
-        Vue.watch([detailSummary, detailSelection], updateDetailFooter);
 
+        const detailTabulatorEvents = Vue.computed(() => []);
 
-        const detailTabulatorEvents = Vue.computed(() => [
-            {
-                event: 'tableBuilt',
-                handler: () => {
-                    detailBuilt = true;
-                    updateDetailFooter();
-                    Vue.nextTick(layoutTables);
-                }
-            },
-        ]);
- 
         const detailTabulatorOptions = {
-            height: "calc(50vh - 140px)",
+            height: "60vh",
             layout: "fitColumns",
             movableColumns: true,
-            placeholder: "Bitte oben eine Abteilung anklicken",
+            placeholder: "Keine Mitarbeiter:innen im Zeitraum",
             columns: detailColumnsDef,
             data: detailList.value,
-            footerElement: '<div class="st-detail-footer text-start w-100 px-1"></div>',
             rowFormatter: (row) => {
+
                 const d = row.getData();
-                const el = row.getElement();
+                let bgColor = '';
+
                 if (d.abgang_datum) {
-                    el.style.backgroundColor = '#f8d7da';
+                    bgColor = '#f8d7da';
                 } else if (d.zugang_datum) {
-                    el.style.backgroundColor = '#d1e7dd';
-                } else {
-                    el.style.backgroundColor = '';
+                    bgColor = '#d1e7dd';
+                } 
+                
+                if (bgColor != '') {
+                    const cells = row.getCells();
+                    cells.forEach((c) => {
+                        c.getElement().style.backgroundColor = bgColor;
+                    });
                 }
-            },
+            },       
         };
 
         const detailTitle = Vue.computed(() => {
@@ -577,7 +523,7 @@ export const StaffTurnover = {
             if (!sel) return 'Mitarbeiter:innen';
             return `Mitarbeiter:innen – ${sel.bezeichnung}`;
         });
- 
+
         const detailDownloadconfig = {
             'csv': {
                 formatter:'csv',
@@ -599,12 +545,12 @@ export const StaffTurnover = {
         Vue.watch(departmentList, (newVal, oldVal) => {
             console.log('departmentList changed');
             tabulator.value?.setData(departmentList.value);
-        }, {deep: true})  
-        
+        }, {deep: true})
+
         Vue.watch(currentOrgID, () => {
             getOrgetsForCompany()
         })
-        
+
         const setAutocompleteOrget = () => {
             if (orget.value.length > 0 && autocompleteOrgets.value.length > 0) {
                 selectedOrget.value = autocompleteOrgets.value.find((item) => orget.value === item.value)
@@ -629,8 +575,8 @@ export const StaffTurnover = {
             autocompleteOrgets.value = [...orgets.value]
             setAutocompleteOrget()
         }
-        
-        const orgetDropdownPlaceholder = Vue.computed(() => 
+
+        const orgetDropdownPlaceholder = Vue.computed(() =>
             currentOrgID.value ? 'OrgEinheit wählen' : 'Bitte zuerst ein Unternehmen auswählen'
         )
 
@@ -653,103 +599,100 @@ export const StaffTurnover = {
                     bom: true,
                  //   rowGroups: true,
                 }
-            },            
+            },
         }
 
-        return { isFetching, tableRef, tabulatorOptions, currentDate, modalRef, updateReport, 
-            cancelHandler, progressValue, tabulatorEvents, orgSelectedHandler, incFilter, decFilter, 
+        return { isFetching, tableRef, tabulatorOptions, currentDate, modalRef, updateReport,
+            cancelHandler, progressValue, tabulatorEvents, orgSelectedHandler, incFilter, decFilter,
             filterDateHandler, filterDate, presetDates, orgetDropdownPlaceholder, searchOrgets,
             autocompleteOrgets, selectedOrget, downloadconfig, fetchData,
-            detailTableRef, detailTabulatorOptions, detailDownloadconfig, detailTabulatorEvents,
-            detailTitle, isDetailFetching, layoutRef }
+            detailModalRef, detailTableRef, detailTabulatorOptions, detailDownloadconfig, detailTabulatorEvents,
+            detailTitle, isDetailFetching, detailSummary, formatPercent, closeDetail }
 
     },
-    template: `    
-        <div ref="layoutRef">
-            <core-filter-cmpt 
-                ref="tableRef"
-                table-only
-                :side-menu="false"
-                :tabulator-options="tabulatorOptions"
-                :tabulator-events="tabulatorEvents"
-                :download="downloadconfig"
-                >
-                <template #actions>				
-                    <div class="d-flex gap-2 align-items-baseline">					
-                            
-                        <label for="orgchooser" class="ms-1">Organisation: </label>
-                        <org-chooser  @org-selected="orgSelectedHandler" class="form-control form-select-sm" id="orgchooser"></org-chooser>
+    template: `
+        <core-filter-cmpt
+            ref="tableRef"
+            table-only
+            :side-menu="false"
+            :tabulator-options="tabulatorOptions"
+            :tabulator-events="tabulatorEvents"
+            :download="downloadconfig"
+            >
+            <template #actions>
+                <div class="d-flex gap-2 align-items-baseline">
 
-                        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">
-                            <label class="ms-1">Abteilung: </label>                        
-                            <p-autocomplete 
-                                v-model="selectedOrget" 
-                                dropdown 
-                                dropdownMode="current" 
-                                :suggestions="autocompleteOrgets" 
-                                @complete="searchOrgets"
-                                optionLabel="label"
-                                optionDisabled="disabled"
-                                forceSelection                     
-                                :placeholder="orgetDropdownPlaceholder"
-                                style="max-width:240px;min-width:240px" 
-                                :input-style="{ height: 'calc(1.5em + .5rem + 2px)', paddingTop: '.25rem', paddingBottom: '.25rem', fontSize: '.875rem' }"
-                                input-class="p-inputtext-sm form-control form-control-sm"
-                                :pt="{
-                                    root: { style: 'display: flex; align-items: stretch;' },
-                                    dropdownButton: {
-                                    root: { style: 'height: auto; padding: 0; width: 2rem; line-height: 1; box-sizing: border-box;' },
-                                    label: { style: 'display: none;' }
-                                    }
-                                }"
-                            ></p-autocomplete>                        
-                        </div>
+                    <label for="orgchooser" class="ms-1">Organisation: </label>
+                    <org-chooser  @org-selected="orgSelectedHandler" class="form-control form-select-sm" id="orgchooser"></org-chooser>
 
-
-                        <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">      
-                            <label for="filter" class="ms-1">Zeitraum: </label>
-                            <button type="button" class="btn btn-sm btn-primary" @click="decFilter()"  :disabled="filterDate==null"><i class="fa fa-minus"></i></button>  
-                            <datepicker id="filter" :modelValue="filterDate" 
-                                @update:model-value="filterDateHandler"
-                                v-bind:enable-time-picker="false"   
-                                :clearable="true"                                 
-                                range :preset-dates="presetDates"
-                                auto-apply 
-                                locale="de"
-                                format="dd.MM.yyyy"
-                                model-type="yyyy-MM-dd"
-                                input-class-name="dp-custom-input"
-                                style="max-width:240px;min-width:240px" >
-                                
-                                <template #preset-date-range-button="{ label, value, presetDate }">
-                                    <span 
-                                        role="button"
-                                        :tabindex="0"
-                                        @click="presetDate(value)"
-                                        @keyup.enter.prevent="presetDate(value)"
-                                        @keyup.space.prevent="presetDate(value)">
-                                    {{ label }}
-                                    </span>
-                                </template>
-                            </datepicker>
-                            <button type="button" class="btn btn-sm btn-primary me-2" @click="incFilter()" :disabled="filterDate==null"><i class="fa fa-plus"></i></button>  
-
-                            <button type="button" class="btn btn-sm btn-primary me-2"
-                                    @click="fetchData()"
-                                    :disabled="!selectedOrget"
-                                >
-                                <i class="fa fa-sync" :class="{ 'fa-spin': isFetching }"></i>
-                            </button>
-                        </div>
-
+                    <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">
+                        <label class="ms-1">Abteilung: </label>
+                        <p-autocomplete
+                            v-model="selectedOrget"
+                            dropdown
+                            dropdownMode="current"
+                            :suggestions="autocompleteOrgets"
+                            @complete="searchOrgets"
+                            optionLabel="label"
+                            optionDisabled="disabled"
+                            forceSelection
+                            :placeholder="orgetDropdownPlaceholder"
+                            style="max-width:240px;min-width:240px"
+                            :input-style="{ height: 'calc(1.5em + .5rem + 2px)', paddingTop: '.25rem', paddingBottom: '.25rem', fontSize: '.875rem' }"
+                            input-class="p-inputtext-sm form-control form-control-sm"
+                            :pt="{
+                                root: { style: 'display: flex; align-items: stretch;' },
+                                dropdownButton: {
+                                root: { style: 'height: auto; padding: 0; width: 2rem; line-height: 1; box-sizing: border-box;' },
+                                label: { style: 'display: none;' }
+                                }
+                            }"
+                        ></p-autocomplete>
                     </div>
-                </template>
-            </core-filter-cmpt>
 
-            <div class="mt-5">
-                <h6 class="mb-2 ms-1">
-                    {{ detailTitle }}                
-                </h6>
+
+                    <div class="d-grid d-sm-flex gap-2 mb-2 flex-nowrap">
+                        <label for="filter" class="ms-1">Zeitraum: </label>
+                        <button type="button" class="btn btn-sm btn-primary" @click="decFilter()"  :disabled="filterDate==null"><i class="fa fa-minus"></i></button>
+                        <datepicker id="filter" :modelValue="filterDate"
+                            @update:model-value="filterDateHandler"
+                            v-bind:enable-time-picker="false"
+                            :clearable="true"
+                            range :preset-dates="presetDates"
+                            auto-apply
+                            locale="de"
+                            format="dd.MM.yyyy"
+                            model-type="yyyy-MM-dd"
+                            input-class-name="dp-custom-input"
+                            style="max-width:240px;min-width:240px" >
+
+                            <template #preset-date-range-button="{ label, value, presetDate }">
+                                <span
+                                    role="button"
+                                    :tabindex="0"
+                                    @click="presetDate(value)"
+                                    @keyup.enter.prevent="presetDate(value)"
+                                    @keyup.space.prevent="presetDate(value)">
+                                {{ label }}
+                                </span>
+                            </template>
+                        </datepicker>
+                        <button type="button" class="btn btn-sm btn-primary me-2" @click="incFilter()" :disabled="filterDate==null"><i class="fa fa-plus"></i></button>
+
+                        <button type="button" class="btn btn-sm btn-primary me-2"
+                                @click="fetchData()"
+                                :disabled="!selectedOrget"
+                            >
+                            <i class="fa fa-sync" :class="{ 'fa-spin': isFetching }"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </template>
+        </core-filter-cmpt>
+
+        <Modal :title="detailTitle" ref="detailModalRef">
+            <template #body>
                 <core-filter-cmpt
                     ref="detailTableRef"
                     table-only
@@ -759,9 +702,22 @@ export const StaffTurnover = {
                     :download="detailDownloadconfig"
                     >
                 </core-filter-cmpt>
-            </div>
-        </div>
-
+            </template>
+            <template #footer>
+                <div class="me-auto">
+                    <template v-if="isDetailFetching">
+                        <i class="fa fa-sync fa-spin"></i> wird geladen …
+                    </template>
+                    <template v-else>
+                        Anfangsbestand: <b>{{ detailSummary.anfangsbestand }}</b>
+                        &nbsp;·&nbsp; Zugänge: <b>{{ detailSummary.zugaenge }}</b>
+                        &nbsp;·&nbsp; Abgänge: <b>{{ detailSummary.abgaenge }}</b>
+                        &nbsp;·&nbsp; Fluktuation: <b>{{ formatPercent(detailSummary.fluktuation) }}</b>
+                    </template>
+                </div>
+                <button type="button" class="btn btn-secondary" @click="closeDetail()">Schließen</button>
+            </template>
+        </Modal>
 
         <Modal title="DV beenden" ref="modalRef">
             <template #body>
@@ -769,7 +725,7 @@ export const StaffTurnover = {
                     <progressbar :percent="progressValue" bgType="bg-info"></progressbar>
                 </div>
             </template>
-            <template #footer>                
+            <template #footer>
                 <button class="btn btn-primary"  @click="cancelHandler()">Abbrechen</button>
             </template>
         </Modal>
