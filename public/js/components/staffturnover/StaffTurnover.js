@@ -393,11 +393,15 @@ export const StaffTurnover = {
             { title: 'Anfangsbestand', field: "eigen_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Zugänge', field: "eigen_zugaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Abgänge', field: "eigen_abgaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Abgänge relevant', field: "eigen_abgaenge_relevant", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Fluktuation (%)', field: "eigen_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams, accessorDownload: decimalCommaDownload },
+            { title: 'Fluktuation relevant (%)', field: "eigen_fluktuation_relevant_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams, accessorDownload: decimalCommaDownload },
             { title: 'Kum. Anfangsbestand', field: "gesamt_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Kum. Zugänge', field: "gesamt_zugaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Kum. Abgänge', field: "gesamt_abgaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
+            { title: 'Kum. Abgänge relevant', field: "gesamt_abgaenge_relevant", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Kum. Fluktuation (%)', field: "gesamt_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams, accessorDownload: decimalCommaDownload },
+            { title: 'Kum. Fluktuation relevant (%)', field: "gesamt_fluktuation_relevant_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams, accessorDownload: decimalCommaDownload },
         ];
 
         const tabulatorOptions = {
@@ -433,7 +437,7 @@ export const StaffTurnover = {
                     const row = cell.getRow();
 
                     setTimeout(() => {
-                        row.getTable().deselectRow();   // ohne Argument: alle abwählen
+                        row.getTable().deselectRow();   
                         row.select();
                     });
 
@@ -470,11 +474,13 @@ export const StaffTurnover = {
             { title: 'Vorname', field: "vorname", sorter: "string", minWidth: 120, widthGrow: 2 },
             // { title: 'UID', field: "uid", minWidth: 90, widthGrow: 1 },
             // { title: 'OE im Zeitraum', field: "oe_im_zeitraum", minWidth: 140, widthGrow: 2 },
-            // { title: 'Erster Eintritt', field: "erster_eintritt", minWidth: 110, widthGrow: 1, formatter: dateFormatter },
-            // { title: 'Letzter Austritt', field: "letzter_austritt", minWidth: 110, widthGrow: 1, formatter: dateFormatter },
+            { title: 'Erster Eintritt', field: "erster_eintritt", minWidth: 110, widthGrow: 1, formatter: dateFormatter, accessorDownload: dateDownload },
+            { title: 'Letzter Austritt', field: "letzter_austritt", minWidth: 110, widthGrow: 1, formatter: dateFormatter, accessorDownload: dateDownload },
             { title: 'Anfangsbestand', field: "anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "center", formatter: boolFormatter },
             { title: 'Zugang', field: "zugang_datum", minWidth: 110, widthGrow: 1, formatter: dateFormatter, accessorDownload: dateDownload },
             { title: 'Abgang', field: "abgang_datum", minWidth: 110, widthGrow: 1, formatter: dateFormatter, accessorDownload: dateDownload },
+            { title: 'Endegrund', field: "endegrund", sorter: "string", minWidth: 120, widthGrow: 2 },            
+            { title: 'Endegrund', field: "endegrund_anmerkung", sorter: "string", minWidth: 120, widthGrow: 2 },            
         ];
 
         const detailSummary = Vue.computed(() => {
@@ -620,6 +626,7 @@ export const StaffTurnover = {
             :tabulator-options="tabulatorOptions"
             :tabulator-events="tabulatorEvents"
             :download="downloadconfig"
+            :useSelectionSpan="false"
             >
             <template #actions>
                 <div class="d-flex gap-2 align-items-baseline">

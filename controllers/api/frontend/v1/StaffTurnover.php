@@ -63,7 +63,8 @@ class StaffTurnover extends FHCAPI_Controller
 
         $dbModel = new DB_Model();
 
-        $qry = "
+        
+        /*$qry = "
 WITH RECURSIVE params AS (
     SELECT ?::date    AS periode_start,
            ?::date    AS periode_ende,
@@ -141,6 +142,131 @@ JOIN public.tbl_person ps USING (person_id)
 CROSS JOIN params p
 WHERE pe.im_zeitraum_aktiv
 ORDER BY ps.nachname, ps.vorname
+        ";*/
+
+
+        $qry = "
+WITH RECURSIVE params AS (
+    SELECT ?::date    AS periode_start,
+           ?::date    AS periode_ende,
+           ?::text    AS oe_kurzbz,
+           ?::boolean AS inkl_unter_oes      -- false = 'eigen', true = 'gesamt'
+),
+
+-- Gewählte OE, bei Bedarf samt aller Nachkommen
+oe_scope AS (
+    SELECT o.oe_kurzbz::text AS oe_kurzbz,
+           ARRAY[o.oe_kurzbz::text] AS pfad
+    FROM public.tbl_organisationseinheit o
+    JOIN params p ON o.oe_kurzbz = p.oe_kurzbz
+
+    UNION ALL
+
+    SELECT o.oe_kurzbz::text,
+           s.pfad || o.oe_kurzbz::text
+    FROM public.tbl_organisationseinheit o
+    JOIN oe_scope s ON o.oe_parent_kurzbz = s.oe_kurzbz
+    CROSS JOIN params p
+    WHERE p.inkl_unter_oes
+      AND NOT o.oe_kurzbz::text = ANY (s.pfad)
+),
+
+-- Disziplinäre Zuordnungen 
+funktionen AS (
+    SELECT bf.oe_kurzbz::text AS oe_kurzbz,
+           b.person_id,
+           b.uid,
+           bf.datum_von,
+           bf.datum_bis
+    FROM public.tbl_benutzerfunktion bf
+    JOIN public.tbl_benutzer b USING (uid)
+    JOIN public.tbl_mitarbeiter m ON m.mitarbeiter_uid::text = b.uid::text
+    WHERE bf.funktion_kurzbz = 'oezuordnung'
+      AND bf.oe_kurzbz IN (SELECT oe_kurzbz FROM oe_scope)
+),
+
+-- Pro Person verdichten (gleiche Logik wie in der Übersicht)
+personen AS (
+    SELECT f.person_id,
+           (ARRAY_AGG(f.uid ORDER BY f.datum_von DESC))[1] AS uid,
+           STRING_AGG(DISTINCT f.oe_kurzbz, ', ')
+               FILTER (WHERE f.datum_von <= p.periode_ende
+                         AND (f.datum_bis >= p.periode_start OR f.datum_bis IS NULL)) AS oe_im_zeitraum,
+           MIN(f.datum_von)                 AS erster_eintritt,
+           MAX(f.datum_bis)                 AS letzter_austritt,
+           BOOL_OR(f.datum_bis IS NULL)     AS hat_offene_zuordnung,
+           BOOL_OR(f.datum_von <= p.periode_start
+                   AND (f.datum_bis >= p.periode_start OR f.datum_bis IS NULL)) AS im_bestand_am_start,
+           BOOL_OR(f.datum_von <= p.periode_ende
+                   AND (f.datum_bis >= p.periode_start OR f.datum_bis IS NULL)) AS im_zeitraum_aktiv
+    FROM funktionen f
+    CROSS JOIN params p
+    GROUP BY f.person_id
+),
+
+-- Zugang / Abgang je Person
+basis AS (
+    SELECT pe.*,
+           CASE WHEN pe.erster_eintritt BETWEEN p.periode_start AND p.periode_ende
+                THEN pe.erster_eintritt END AS zugang_datum,
+           CASE WHEN NOT pe.hat_offene_zuordnung
+                     AND pe.letzter_austritt BETWEEN p.periode_start AND p.periode_ende
+                THEN pe.letzter_austritt END AS abgang_datum
+    FROM personen pe
+    CROSS JOIN params p
+    WHERE pe.im_zeitraum_aktiv
+),
+
+-- Dienstverhältnisse der abgegangenen Personen (über alle ihre UIDs)
+dvs AS (
+    SELECT b.person_id, dv.von, dv.bis, dv.dvendegrund_kurzbz, dv.dvendegrund_anmerkung
+    FROM hr.tbl_dienstverhaeltnis dv
+    JOIN public.tbl_benutzer b ON b.uid::text = dv.mitarbeiter_uid::text
+    WHERE b.person_id IN (SELECT person_id FROM basis WHERE abgang_datum IS NOT NULL)
+)
+
+SELECT
+    ba.person_id,
+    ba.uid,
+    ps.nachname,
+    ps.vorname,
+    ba.oe_im_zeitraum,
+    ba.erster_eintritt,
+    CASE WHEN ba.hat_offene_zuordnung THEN NULL ELSE ba.letzter_austritt END AS letzter_austritt,
+    ba.im_bestand_am_start AS anfangsbestand,
+    ba.zugang_datum,
+    ba.abgang_datum,
+    dvende.dvendegrund_kurzbz      AS endegrund_kurzbz,
+    eg.bezeichnung                 AS endegrund,
+    dvende.dvendegrund_anmerkung   AS endegrund_anmerkung,
+    COALESCE(dvende.dvendegrund_kurzbz IN ('kuendigung_arbeitnehmer',
+                                           'kuendigung_arbeitgeber',
+                                           'entlassung',
+                                           'einvernehmlich'), false)
+                                   AS abgang_relevant
+FROM basis ba
+JOIN public.tbl_person ps USING (person_id)
+
+-- Das zum Abgang gehörende, beendete Dienstverhältnis (gleiche Logik wie in der Übersicht)
+LEFT JOIN LATERAL (
+    SELECT d.dvendegrund_kurzbz, d.dvendegrund_anmerkung
+    FROM dvs d
+    WHERE ba.abgang_datum IS NOT NULL
+      AND d.person_id = ba.person_id
+      AND d.bis IS NOT NULL
+      -- läuft nach dem Abgang noch ein DV weiter, ist es kein Austritt aus dem Unternehmen
+      AND NOT EXISTS (
+          SELECT 1 FROM dvs f
+          WHERE f.person_id = ba.person_id
+            AND f.von <= ba.abgang_datum + 1
+            AND (f.bis IS NULL OR f.bis > ba.abgang_datum)
+      )
+    ORDER BY abs(d.bis - ba.abgang_datum), d.bis DESC
+    LIMIT 1
+) dvende ON true
+LEFT JOIN hr.tbl_dvendegrund eg ON eg.dvendegrund_kurzbz = dvende.dvendegrund_kurzbz
+
+ORDER BY ps.nachname, ps.vorname;
         ";
 
         $queryparam = array($von_datestring, $bis_datestring, $orgetID, false);
@@ -179,7 +305,7 @@ ORDER BY ps.nachname, ps.vorname
 		}
 
         $dbModel = new DB_Model();
-
+/*
         $qry = "
         
 WITH params AS (
@@ -250,6 +376,9 @@ SELECT
     ) AS fluktuationsrate_prozent
 FROM anfangsbestand a, zugaenge z, abgaenge ab;
         ";
+
+*/
+
 
         $qry="
 WITH RECURSIVE params AS (
@@ -342,6 +471,59 @@ stat AS (
     FROM personen pe
     CROSS JOIN params p
     GROUP BY pe.oe_kurzbz, pe.scope
+),
+
+-- ---------- NEU: Abgänge nach Endegrund ----------
+
+-- Abgänge im Zeitraum je OE, Sicht und Person (gleiche Bedingung wie in stat)
+abgaenge AS (
+    SELECT pe.oe_kurzbz, pe.scope, pe.person_id, pe.letzter_austritt
+    FROM personen pe
+    CROSS JOIN params p
+    WHERE NOT pe.hat_offene_zuordnung
+      AND pe.letzter_austritt BETWEEN p.periode_start AND p.periode_ende
+),
+
+-- Dienstverhältnisse der abgegangenen Personen (über alle ihre UIDs)
+dvs AS (
+    SELECT b.person_id, dv.von, dv.bis, dv.dvendegrund_kurzbz
+    FROM hr.tbl_dienstverhaeltnis dv
+    JOIN public.tbl_benutzer b ON b.uid::text = dv.mitarbeiter_uid::text
+    WHERE b.person_id IN (SELECT person_id FROM abgaenge)
+),
+
+-- Endegrund je Person und Austrittsdatum, einmal ermittelt,
+-- auch wenn die Person in mehreren OEs/Sichten vorkommt
+abgang_endegrund AS (
+    SELECT a.person_id, a.letzter_austritt, dvende.dvendegrund_kurzbz
+    FROM (SELECT DISTINCT person_id, letzter_austritt FROM abgaenge) a
+    LEFT JOIN LATERAL (
+        SELECT d.dvendegrund_kurzbz
+        FROM dvs d
+        WHERE d.person_id = a.person_id
+          AND d.bis IS NOT NULL
+          -- läuft nach dem Abgang noch ein DV weiter, ist es kein Austritt aus dem Unternehmen
+          AND NOT EXISTS (
+              SELECT 1 FROM dvs f
+              WHERE f.person_id = a.person_id
+                AND f.von <= a.letzter_austritt + 1
+                AND (f.bis IS NULL OR f.bis > a.letzter_austritt)
+          )
+        ORDER BY abs(d.bis - a.letzter_austritt), d.bis DESC
+        LIMIT 1
+    ) dvende ON true
+),
+
+-- Nur Abgänge mit den gewünschten Endegründen zählen
+abgaenge_relevant AS (
+    SELECT a.oe_kurzbz, a.scope, COUNT(*) AS anzahl
+    FROM abgaenge a
+    JOIN abgang_endegrund e USING (person_id, letzter_austritt)
+    WHERE e.dvendegrund_kurzbz IN ('kuendigung_arbeitnehmer',
+                                   'kuendigung_arbeitgeber',
+                                   'entlassung',
+                                   'einvernehmlich')
+    GROUP BY a.oe_kurzbz, a.scope
 )
 
 SELECT
@@ -353,17 +535,24 @@ SELECT
     COALESCE(e.anfangsbestand, 0) AS eigen_anfangsbestand,
     COALESCE(e.zugaenge, 0)       AS eigen_zugaenge,
     COALESCE(e.abgaenge, 0)       AS eigen_abgaenge,
+    COALESCE(er.anzahl, 0)        AS eigen_abgaenge_relevant,
     ROUND(e.abgaenge::numeric / NULLIF(e.anfangsbestand + e.zugaenge, 0) * 100, 2)
                                   AS eigen_fluktuation_prozent,
-
+    ROUND(COALESCE(er.anzahl, 0)::numeric / NULLIF(e.anfangsbestand + e.zugaenge, 0) * 100, 2)
+                                  AS eigen_fluktuation_relevant_prozent,
     COALESCE(g.anfangsbestand, 0) AS gesamt_anfangsbestand,
     COALESCE(g.zugaenge, 0)       AS gesamt_zugaenge,
     COALESCE(g.abgaenge, 0)       AS gesamt_abgaenge,
+    COALESCE(gr.anzahl, 0)        AS gesamt_abgaenge_relevant,
     ROUND(g.abgaenge::numeric / NULLIF(g.anfangsbestand + g.zugaenge, 0) * 100, 2)
-                                  AS gesamt_fluktuation_prozent
+                                  AS gesamt_fluktuation_prozent,
+    ROUND(COALESCE(gr.anzahl, 0)::numeric / NULLIF(g.anfangsbestand + g.zugaenge, 0) * 100, 2)
+                                  AS gesamt_fluktuation_relevant_prozent
 FROM oe_baum b
-LEFT JOIN stat e ON e.oe_kurzbz = b.oe_kurzbz AND e.scope = 'eigen'
-LEFT JOIN stat g ON g.oe_kurzbz = b.oe_kurzbz AND g.scope = 'gesamt'
+LEFT JOIN stat e  ON e.oe_kurzbz  = b.oe_kurzbz AND e.scope  = 'eigen'
+LEFT JOIN stat g  ON g.oe_kurzbz  = b.oe_kurzbz AND g.scope  = 'gesamt'
+LEFT JOIN abgaenge_relevant er ON er.oe_kurzbz = b.oe_kurzbz AND er.scope = 'eigen'
+LEFT JOIN abgaenge_relevant gr ON gr.oe_kurzbz = b.oe_kurzbz AND gr.scope = 'gesamt'
 ORDER BY b.pfad;
         ";
 
