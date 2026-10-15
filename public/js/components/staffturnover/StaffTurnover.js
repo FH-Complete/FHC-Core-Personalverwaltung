@@ -367,6 +367,9 @@ export const StaffTurnover = {
                 : '' ;
         }
 
+        const decimalCommaDownload = (value) =>
+            value == null || value === '' ? '' : String(value).replace('.', ',');
+
 
         Vue.onMounted(() => {
             // Detail-Modal: breiter machen und nach dem Einblenden die Tabelle neu zeichnen.
@@ -390,11 +393,11 @@ export const StaffTurnover = {
             { title: 'Anfangsbestand', field: "eigen_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Zugänge', field: "eigen_zugaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Abgänge', field: "eigen_abgaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
-            { title: 'Fluktuation (%)', field: "eigen_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams },
+            { title: 'Fluktuation (%)', field: "eigen_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams, accessorDownload: decimalCommaDownload },
             { title: 'Kum. Anfangsbestand', field: "gesamt_anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Kum. Zugänge', field: "gesamt_zugaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
             { title: 'Kum. Abgänge', field: "gesamt_abgaenge", minWidth: 100, widthGrow: 1, hozAlign: "right" },
-            { title: 'Kum. Fluktuation (%)', field: "gesamt_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams },
+            { title: 'Kum. Fluktuation (%)', field: "gesamt_fluktuation_prozent", minWidth: 120, widthGrow: 1, hozAlign: "right", formatter: "money", formatterParams: moneyFormatterParams, accessorDownload: decimalCommaDownload },
         ];
 
         const tabulatorOptions = {
@@ -442,10 +445,9 @@ export const StaffTurnover = {
 
         // detail table
 
-        const dateFormatter = (cell) => {
-            const v = cell.getValue();
-            return v ? formatDateGerman(v) : '';
-        }
+        const toGermanDate = (v) => v ? formatDateGerman(v) : '';
+        const dateFormatter = (cell) => toGermanDate(cell.getValue());
+        const dateDownload = (value) => toGermanDate(value);
 
         const isTrue = (v) => v === true || v === 't' || v === 'true' || v === 1 || v === '1';
 
@@ -471,8 +473,8 @@ export const StaffTurnover = {
             // { title: 'Erster Eintritt', field: "erster_eintritt", minWidth: 110, widthGrow: 1, formatter: dateFormatter },
             // { title: 'Letzter Austritt', field: "letzter_austritt", minWidth: 110, widthGrow: 1, formatter: dateFormatter },
             { title: 'Anfangsbestand', field: "anfangsbestand", minWidth: 100, widthGrow: 1, hozAlign: "center", formatter: boolFormatter },
-            { title: 'Zugang', field: "zugang_datum", minWidth: 110, widthGrow: 1, formatter: dateFormatter },
-            { title: 'Abgang', field: "abgang_datum", minWidth: 110, widthGrow: 1, formatter: dateFormatter },
+            { title: 'Zugang', field: "zugang_datum", minWidth: 110, widthGrow: 1, formatter: dateFormatter, accessorDownload: dateDownload },
+            { title: 'Abgang', field: "abgang_datum", minWidth: 110, widthGrow: 1, formatter: dateFormatter, accessorDownload: dateDownload },
         ];
 
         const detailSummary = Vue.computed(() => {
