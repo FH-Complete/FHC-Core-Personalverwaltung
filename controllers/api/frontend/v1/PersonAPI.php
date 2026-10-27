@@ -12,38 +12,39 @@ class PersonAPI extends FHCAPI_Controller
     const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
     const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
 	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
-	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
+	const KONTAKTDATENVERWALTUNG_RW_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
+    const KONTAKTDATENVERWALTUNG_R_PERMISSION = 'extension/pv21_kontaktdatenver:r';
 
     // code igniter
     protected $CI;
 
     public function __construct() {
         parent::__construct(array(
-            'headerData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'personAbteilung' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'uidByPerson' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'filterPerson' => PersonAPI::DEFAULT_PERMISSION,
-            'createEmployee' => PersonAPI::DEFAULT_PERMISSION,
+            'headerData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'personAbteilung' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'uidByPerson' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'filterPerson' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'createEmployee' => [PersonAPI::DEFAULT_PERMISSION],
             // base data (Stammdaten)
-            'personBaseData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'updatePersonBaseData' => PersonAPI::DEFAULT_PERMISSION,
+            'personBaseData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'updatePersonBaseData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
             // foto
-            'foto' => PersonAPI::DEFAULT_PERMISSION,
-            'uploadPersonEmployeeFoto' => PersonAPI::DEFAULT_PERMISSION,
-            'deletePersonEmployeeFoto' => PersonAPI::DEFAULT_PERMISSION,
+            'foto' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'uploadPersonEmployeeFoto' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'deletePersonEmployeeFoto' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
             // employee data (MA-Daten)
-            'personEmployeeKurzbzExists' => PersonAPI::DEFAULT_PERMISSION,
-            'personEmployeeData' => PersonAPI::DEFAULT_PERMISSION,
-            'updatePersonEmployeeData' => PersonAPI::DEFAULT_PERMISSION,
-            'updatePersonPhoneExtension' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
+            'personEmployeeKurzbzExists' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'personEmployeeData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'updatePersonEmployeeData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
+            'updatePersonPhoneExtension' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
             // address
-            'personAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'upsertPersonAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'deletePersonAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+            'personAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'upsertPersonAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
+            'deletePersonAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
             // contact
-            'personContactData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'upsertPersonContactData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            'deletePersonContactData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
+            'personContactData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_R_PERMISSION],
+            'upsertPersonContactData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
+            'deletePersonContactData' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_RW_PERMISSION],
             // material expenses (Sachaufwand)
             'personMaterialExpenses' => PersonAPI::DEFAULT_PERMISSION,
             'upsertPersonMaterialExpenses' => PersonAPI::DEFAULT_PERMISSION,
