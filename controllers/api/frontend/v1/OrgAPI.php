@@ -5,21 +5,32 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class OrgAPI extends FHCAPI_Controller
 {
 
-    const DEFAULT_PERMISSION = 'basis/mitarbeiter:rw';
-    const HANDYVERWALTUNG_PERMISSION = 'extension/pv21_handyverwaltung:rw';
-	const SCHLUESSELVERWALTUNG_PERMISSION = 'extension/pv21_schluesselver:rw';
-	const KONTAKTDATENVERWALTUNG_PERMISSION = 'extension/pv21_kontaktdatenver:rw';
+	const DEFAULT_PERMISSION_READ = 'basis/mitarbeiter:r';
+	const HANDYVERWALTUNG_PERMISSION_READ = 'extension/pv21_handyverwaltung:r';
+	const SCHLUESSELVERWALTUNG_PERMISSION_READ = 'extension/pv21_schluesselver:r';
+	const KONTAKTDATENVERWALTUNG_PERMISSION_READ = 'extension/pv21_kontaktdatenver:r';
 
 	public function __construct() {
-        parent::__construct(array(
-            'getOrgHeads' => OrgAPI::DEFAULT_PERMISSION,
-            'getOrgStructure' => OrgAPI::DEFAULT_PERMISSION,
-            'getOrgPersonen' => OrgAPI::DEFAULT_PERMISSION,
-            'getCompanyByOrget'  => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-		    'getOrgetsForCompany' => OrgAPI::DEFAULT_PERMISSION,
-            'getUnternehmen' => [OrgAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION, self::SCHLUESSELVERWALTUNG_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
-            )
-        );
+		parent::__construct(
+			array(
+				'getOrgHeads' => OrgAPI::DEFAULT_PERMISSION_READ,
+				'getOrgStructure' => OrgAPI::DEFAULT_PERMISSION_READ,
+				'getOrgPersonen' => OrgAPI::DEFAULT_PERMISSION_READ,
+				'getCompanyByOrget'  => [
+					OrgAPI::DEFAULT_PERMISSION_READ,
+					self::HANDYVERWALTUNG_PERMISSION_READ,
+					self::SCHLUESSELVERWALTUNG_PERMISSION_READ,
+					self::KONTAKTDATENVERWALTUNG_PERMISSION_READ
+				],
+				'getOrgetsForCompany' => OrgAPI::DEFAULT_PERMISSION_READ,
+				'getUnternehmen' => [
+					OrgAPI::DEFAULT_PERMISSION_READ,
+					self::HANDYVERWALTUNG_PERMISSION_READ,
+					self::SCHLUESSELVERWALTUNG_PERMISSION_READ,
+					self::KONTAKTDATENVERWALTUNG_PERMISSION_READ
+				],
+			)
+		);
         $this->load->library('AuthLib');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Organisationseinheit_model', 'OrganisationseinheitModel');
         $this->load->model('extensions/FHC-Core-Personalverwaltung/Api_model','ApiModel');
