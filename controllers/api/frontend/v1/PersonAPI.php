@@ -35,6 +35,7 @@ class PersonAPI extends FHCAPI_Controller
             'personEmployeeKurzbzExists' => PersonAPI::DEFAULT_PERMISSION,
             'personEmployeeData' => PersonAPI::DEFAULT_PERMISSION,
             'updatePersonEmployeeData' => PersonAPI::DEFAULT_PERMISSION,
+            'updatePersonPhoneExtension' => [PersonAPI::DEFAULT_PERMISSION, self::HANDYVERWALTUNG_PERMISSION],
             // address
             'personAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
             'upsertPersonAddressData' => [PersonAPI::DEFAULT_PERMISSION, self::KONTAKTDATENVERWALTUNG_PERMISSION],
@@ -659,6 +660,52 @@ class PersonAPI extends FHCAPI_Controller
 
             $result = $this->ApiModel->getPersonEmployeeData($person_id);
 
+
+            if (isSuccess($result))
+            {
+			    $this->terminateWithSuccess($result->retval);
+            } else
+			    $this->terminateWithError('Error when updating employee data');
+        } else {
+            $this->output->set_status_header('405');
+        }
+    }
+
+    function updatePersonPhoneExtension()
+    {
+        if($this->input->method() === 'post'){
+
+            $payload = json_decode($this->input->raw_input_stream, TRUE);
+
+            if (isset($payload['person_id']) && !is_numeric($payload['person_id']))
+            {
+                $this->terminateWithError('person id is not numeric!');
+                exit();
+            }
+
+            $person_id = $payload['person_id'];
+            $payload['updatevon'] = getAuthUID();
+            $payload['updateamum'] = 'NOW()';
+                       
+            if ($payload['standort_id'] == 0)
+            {
+                $payload['standort_id'] = null;
+            }
+
+            // make sure to update only relevant information
+            $payload = array_intersect_key(
+                $payload, 
+                array_flip(['mitarbeiter_uid','standort_id', 'telefonklappe', 'updatevon','updateamum'])
+            );
+
+            $result = $this->EmployeeModel->update($payload['mitarbeiter_uid'], $payload);
+
+            if (isError($result))
+            {
+                return error($result->msg, EXIT_ERROR);
+            }            
+           
+            $result = $this->ApiModel->getPersonEmployeeData($person_id);
 
             if (isSuccess($result))
             {

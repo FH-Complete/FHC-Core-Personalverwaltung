@@ -29,6 +29,8 @@ export const ValorisationSelection = {
 				valorisierungsdatum: '',
 				gehaelter_oe_kurzbz: '',
 				gehaelter_stichtag: '',
+				selectedGehaltsbestandteile: [],
+				selectedDienstverhaeltnis: {},
 				ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 					FHC_JS_DATA_STORAGE_OBJECT.ci_router +
 					'/extensions/FHC-Core-Personalverwaltung/api/frontend/v1/Valorisierung/calculateValorisation',
@@ -78,6 +80,24 @@ export const ValorisationSelection = {
 					.then((response) => {
 						this.$refs.valorisationTabulator.tabulator.setData(response.data);
 						this.$refs.valorisationTabulator.tabulator.dataLoader.clearAlert();
+						this.$refs.valorisationTabulator.tabulator.on("rowClick", (e, row) => {
+							let dienstverhaeltnis_id = row.getData().dienstverhaeltnis_id;
+							let selectedDv = response.data.filter(function (el) { return el.dienstverhaeltnis_id == dienstverhaeltnis_id });
+							if (selectedDv.length > 0)
+							{
+								this.selectedDienstverhaeltnis = selectedDv[0];
+
+								this.$api.call(ApiValorisierung.getValorisationDetails(dienstverhaeltnis_id))
+									.then((response) => {
+										this.selectedGehaltsbestandteile = response.data.filter(
+											function (el){ return selectedDv[0]?.gehaltsbestandteile?.hasOwnProperty(el.gehaltsbestandteil_id)}
+										);
+									})
+									.catch(this.handleErrors);
+									
+									this.$refs.valorisationBreakdownModalRef.show();
+							}
+						});
 					})
 					.catch(this.handleErrors);
 			},
@@ -541,6 +561,44 @@ export const ValorisationSelection = {
 							</td>
 						</tr>
 					</tbody>
+				</table>
+			</template>
+		</Modal>
+		<!-- breakdown modal -->
+		<Modal
+			:title="'Valorisierung '+selectedDienstverhaeltnis.mitarbeiter+' (DV id '+selectedDienstverhaeltnis.dienstverhaeltnis_id+')'"
+			ref="valorisationBreakdownModalRef">
+			<template #body>
+				<table class="table table-bordered">
+					<thead class="border-2">
+						<tr>
+							<th>Gehaltsbestandteil</th>
+							<th>Betrag vor Valorisierung</th>
+							<th>Valorisierung</th>
+							<th>Betrag nach Valorisierung</th>
+							<th>Anmerkung</th>
+						</tr>
+					</thead>
+					<tbody class="border-2">
+						<tr v-for="gehaltsbestandteil in selectedGehaltsbestandteile">
+							<td>{{ gehaltsbestandteil.gehaltstyp_bezeichnung }} ({{ gehaltsbestandteil.gehaltsbestandteil_id }})</td>
+							<td class="text-end">{{ formatter.formatCurrencyGerman(gehaltsbestandteil.betrag_valorisiert) }}</td>
+							<td class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis?.gehaltsbestandteile[gehaltsbestandteil.gehaltsbestandteil_id] - gehaltsbestandteil.betrag_valorisiert) }}</td>
+							<td class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis?.gehaltsbestandteile[gehaltsbestandteil.gehaltsbestandteil_id]) }}</td>
+							<td>{{ gehaltsbestandteil.anmerkung }}</td>
+						</tr>
+						<!-- fallback row -->
+						<tr v-if="!selectedGehaltsbestandteile.length"></tr>
+					</tbody>
+					<tfoot class="border-2">
+						<tr>
+							<th>&sum;</th>
+							<th class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis.sumsalarypreval) }}</th>
+							<th class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis.sumsalarypostval - selectedDienstverhaeltnis.sumsalarypreval) }}</th>
+							<th class="text-end">{{ formatter.formatCurrencyGerman(selectedDienstverhaeltnis.sumsalarypostval) }}</th>
+							<th>&nbsp;</th>
+						</tr>
+					</tfoot>
 				</table>
 			</template>
 		</Modal>

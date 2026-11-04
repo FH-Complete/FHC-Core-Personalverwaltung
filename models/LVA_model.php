@@ -9,14 +9,14 @@ class LVA_model extends DB_Model
         $result = null;
 
 		$qry = "
-        select ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id,lehreinheit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,sum(b.stunden) as semesterstunden, b.stundensatz,b.faktor 
+        select ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id,tbl_projektarbeit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,sum(b.stunden) as semesterstunden, b.stundensatz,b.faktor 
         from lehre.tbl_projektbetreuer as b join lehre.tbl_projektarbeit using(projektarbeit_id)  
-                join lehre.tbl_lehreinheit as lehreinheit using(lehreinheit_id) join lehre.tbl_lehrveranstaltung as lehrveranstaltung using(lehrveranstaltung_id) 
+                join lehre.tbl_lehrveranstaltung as lehrveranstaltung using(lehrveranstaltung_id) 
                 join public.tbl_studiengang as studiengang using(studiengang_kz), 
                  tbl_person as p join tbl_benutzer as benutzer on(p.person_id=benutzer.person_id) join tbl_mitarbeiter as ma on (ma.mitarbeiter_uid=benutzer.uid) 
-        where b.person_id=p.person_id and b.stundensatz is not null and ma.mitarbeiter_uid=? and ma.lehreinheit.studiensemester_kurzbz=?
-        group by ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id, lehreinheit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,b.stundensatz,b.faktor 
-        order by lehreinheit.studiensemester_kurzbz 
+        where b.person_id=p.person_id and b.stundensatz is not null and ma.mitarbeiter_uid=? and tbl_projektarbeit.studiensemester_kurzbz=?
+        group by ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id, tbl_projektarbeit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,b.stundensatz,b.faktor 
+        order by tbl_projektarbeit.studiensemester_kurzbz 
         ";
 
         return $this->execQuery($qry, array($uid, $semester_kurzbz));
@@ -30,13 +30,13 @@ class LVA_model extends DB_Model
 		$qry = "
         SELECT studiensemester_kurzbz, sum(semesterstunden)::float  semesterstunden FROM
             (  
-                select ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id,lehreinheit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,sum(b.stunden) as semesterstunden, b.stundensatz,b.faktor 
+                select ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id,tbl_projektarbeit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,sum(b.stunden) as semesterstunden, b.stundensatz,b.faktor 
                 from lehre.tbl_projektbetreuer as b join lehre.tbl_projektarbeit using(projektarbeit_id)  
-                        join lehre.tbl_lehreinheit as lehreinheit using(lehreinheit_id) join lehre.tbl_lehrveranstaltung as lehrveranstaltung using(lehrveranstaltung_id) 
+                        join lehre.tbl_lehrveranstaltung as lehrveranstaltung using(lehrveranstaltung_id) 
                         join public.tbl_studiengang as studiengang using(studiengang_kz), 
                          tbl_person as p join tbl_benutzer as benutzer on(p.person_id=benutzer.person_id) join tbl_mitarbeiter as ma on (ma.mitarbeiter_uid=benutzer.uid) 
-                where b.person_id=p.person_id and b.stundensatz is not null and ma.mitarbeiter_uid=? 
-                group by ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id, lehreinheit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,b.stundensatz,b.faktor 
+                where b.person_id=p.person_id and ma.mitarbeiter_uid=? 
+                group by ma.mitarbeiter_uid,lehrveranstaltung.lehrveranstaltung_id, tbl_projektarbeit.studiensemester_kurzbz,lehrveranstaltung.studiengang_kz,b.stundensatz,b.faktor 
             ) q
         GROUP BY studiensemester_kurzbz            
         ORDER BY substr(studiensemester_kurzbz,3) asc,substr(studiensemester_kurzbz,1,2) desc

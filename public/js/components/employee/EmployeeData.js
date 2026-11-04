@@ -130,8 +130,10 @@ export const EmployeeData= {
         const getStandortbez = (standort_id) => {
             if (!standort_id) return '';
             let result = standorte.value?.filter((item) => item.standort_id == standort_id);
-            if (result?.length > 0)
-                return result[0].bezeichnung;
+            if (result?.length > 0) {
+                const s = result[0];
+                return `${s.bezeichnung || s.firma} (${s.kurzbz})`;
+            }
             return '';
         }
 
@@ -311,7 +313,7 @@ export const EmployeeData= {
                                         <select v-if="!readonly" id="standort" :readonly="readonly"  v-model="currentValue.standort_id" class="form-select form-select-sm" aria-label=".form-select-sm " >
                                             <option value="0">-- {{ t('fehlermonitoring', 'keineAuswahl') }} --</option>
                                             <option v-for="(item, index) in standorte" :value="item.standort_id">
-                                                {{ item.bezeichnung }}
+                                                {{ item.bezeichnung || item.firma}} ({{ item.kurzbz }})
                                             </option>         
                                         </select>
                                         <input v-else type="text" readonly class="form-control-sm form-control-plaintext" id="standort" :value="getStandortbez(currentValue.standort_id) ">

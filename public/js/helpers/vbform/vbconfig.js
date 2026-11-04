@@ -32,6 +32,7 @@ export default {
         ],
         'gehaltsbestandteil': [
             'gehaltstyp',
+            'gehaltsanpassungtyp',
             'anmerkung',
             'betrag',
             'valorisierung',
