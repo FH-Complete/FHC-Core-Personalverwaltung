@@ -562,7 +562,8 @@ export const EmployeeContract = {
                     if (vbs.benutzerfunktiondata.funktion_kurzbz.match(/.*zuordnung/)) {
                         zuordnung.push(vbs.benutzerfunktiondata);
                     } else {
-                        taetigkeit.push(vbs.benutzerfunktiondata);
+                        // hauptfunktion 
+                        taetigkeit.push({ ...vbs.benutzerfunktiondata, hauptfunktion: vbs.hauptfunktion === true });
                     }
                 } else if (vbs.vertragsbestandteiltyp_kurzbz == 'freitext') {
                     if (vbs.freitexttyp_kurzbz == 'allin') {
@@ -1108,6 +1109,8 @@ export const EmployeeContract = {
                                         </div>
 
                                         <div class="col-md-2">
+                                            <label class="form-label" v-if="index == 0">&nbsp;</label>
+                                            <input type="text" readonly class="form-control-sm form-control-plaintext" :value="item.hauptfunktion ? 'Hauptfunktion' : ''">
                                         </div>
 
                                     </template>
