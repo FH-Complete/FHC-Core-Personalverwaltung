@@ -41,7 +41,8 @@ class GUIValidationHelper
 		$this->sieveVBsByType($vbs);
 		$this->checkSievedList($this->vbsbytype);
 		$this->checkSievedList($this->vbfreitextbytype);
-		
+		$this->checkHauptfunktionen($formdata);
+
 		$formdata->getDv()->validate();
 		$dv = $formdata->getDv()->getDienstverhaeltnis();
 		foreach( $vbs as $vbmapper )
@@ -90,7 +91,8 @@ class GUIValidationHelper
 		}
 	}
 
-	protected function checkForOverlap($a, $b)
+	protected function checkForOverlap($a, $b,
+		$errmsg = 'Überlappt mit einem Bestandteil gleichen Typs.')
 	{
 		if( (!$a->getVon() && !$a->getBis()) 
 			|| (!$b->getVon() && !$b->getBis()) )
@@ -106,18 +108,94 @@ class GUIValidationHelper
 		
 		if( ($a_von <= $b_bis) && ($a_bis >= $b_von ) )
 		{
-			$a->addValidationError('Überlappt mit einem Bestandteil gleichen Typs.');
-			$b->addValidationError('Überlappt mit einem Bestandteil gleichen Typs.');
+			$a->addValidationError($errmsg);
+			$b->addValidationError($errmsg);
 		}
 	}
 	
-	protected function checkListForOverlaps($listofsametype)
+	/**
+	 * Per employment (Dienstverhältnis), at most one function
+	 * may be marked as the main function (Hauptfunktion) at any point in time.
+	 * The check covers
+	 *  1. the functions submitted with the form, and
+	 *  2. the saved functions of the employment relationship that are not part of the form
+	 *     (VBs contained in the form are compared with their new status).
+	 */
+	protected function checkHauptfunktionen(FormData $formdata)
+	{
+		$hauptfunktionen = array();
+		$vbidsInForm = array();
+
+		foreach( $formdata->getVbs() as $vbmapper )
+		{
+			$vb = $vbmapper->getVbsinstance();
+			if( $vb->getVertragsbestandteiltyp_kurzbz()
+				!== vertragsbestandteil\VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FUNKTION )
+			{
+				continue;
+			}
+
+			if( intval($vb->getVertragsbestandteil_id()) > 0 )
+			{
+				$vbidsInForm[] = intval($vb->getVertragsbestandteil_id());
+			}
+
+			if( $vbmapper->hasToBeDeleted() || $vb->getHauptfunktion() !== true )
+			{
+				continue;
+			}
+			$hauptfunktionen[] = $vb;
+		}
+
+		if( count($hauptfunktionen) === 0 )
+		{
+			return;
+		}
+
+		// check overlap (form only)
+		$errmsg = 'Pro Dienstverhältnis darf es zu jedem Zeitpunkt nur eine Hauptfunktion geben.';
+		$this->checkListForOverlaps($hauptfunktionen, $errmsg);
+
+		// check overlap against existing data
+		$dvid = intval($formdata->getDv()->getDienstverhaeltnis()->getDienstverhaeltnis_id());
+		if( $dvid < 1 )
+		{
+			return;
+		}
+
+		$this->CI->load->model('vertragsbestandteil/VertragsbestandteilFunktion_model',
+			'VertragsbestandteilFunktionModel');
+
+		foreach( $hauptfunktionen as $vb )
+		{
+			$overlapping = $this->CI->VertragsbestandteilFunktionModel->getOverlappingHauptfunktionen(
+				$dvid, $vb->getVon(), $vb->getBis(), $vbidsInForm);
+
+			foreach( $overlapping as $other )
+			{
+				$vb->addValidationError('Überschneidet sich mit einer bestehenden Hauptfunktion ('
+					. $this->formatPeriod($other->von, $other->bis) . '). '
+					. $errmsg);
+			}
+		}
+	}
+
+	protected function formatPeriod($von, $bis)
+	{
+		$fmt = function($d) {
+			return $d ? date('d.m.Y', strtotime($d)) : 'offen';
+		};
+		return $fmt($von) . ' - ' . $fmt($bis);
+	}
+
+	protected function checkListForOverlaps($listofsametype,
+		$errmsg = 'Überlappt mit einem Bestandteil gleichen Typs.')
 	{
 		for($i=0; $i < (count($listofsametype)-1); $i++)
 		{
 			for($j=($i+1); $j < count($listofsametype); $j++)
 			{
-				$this->checkForOverlap($listofsametype[$i], $listofsametype[$j]);
+				$this->checkForOverlap($listofsametype[$i], $listofsametype[$j], $errmsg);
 			}
 		}
 	}
