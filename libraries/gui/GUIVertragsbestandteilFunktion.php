@@ -21,7 +21,8 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
                        "gueltigkeit" => [
                            "guioptions" => ["sharedstatemode" => "reflect"],
                            "data" =>       ["gueltig_ab"      => "", "gueltig_bis" => ""]
-                       ]
+                       ],
+                        "hauptfunktion" => false
                       ];
         $this->gbs = [];
     }
@@ -51,6 +52,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 		$this->getJSONDataInt($this->data['id'], $decodedData, 'id');
         $this->getJSONData($this->data['funktion'], $decodedData, 'funktion');
         $this->getJSONData($this->data['orget'], $decodedData, 'orget');
+        $this->getJSONDataBool($this->data['hauptfunktion'], $decodedData, 'hauptfunktion');
 		$this->getJSONData($this->data['mitarbeiter_uid'], $decodedData, 'mitarbeiter_uid');
         $this->getJSONData($this->data['benutzerfunktionid'], $decodedData, 'benutzerfunktionid');
 		$this->getJSONData($this->data['mode'], $decodedData, 'mode');
@@ -76,7 +78,8 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 			 */
 			if( intval($this->data['benutzerfunktionid']) > 0 )
 			{
-				$vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);			
+				$vbs->setBenutzerfunktion_id($this->data['benutzerfunktionid']);
+                $vbs->setHauptfunktion($this->data['hauptfunktion']);
 				$vbs->setVon(string2Date($this->data['gueltigkeit']->getData()['gueltig_ab']));
 				$vbs->setBis(string2Date($this->data['gueltigkeit']->getData()['gueltig_bis']));
 			}
@@ -88,6 +91,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 
 				$data->funktion = $this->data['funktion'];
 				$data->orget = $this->data['orget'];
+                $data->hauptfunktion = $this->data['hauptfunktion'];
 				$data->mitarbeiter_uid = $this->data['mitarbeiter_uid'];
 				$data->benutzerfunktionid = $this->data['benutzerfunktionid'];
 			
@@ -102,6 +106,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
             
             $data->funktion = $this->data['funktion'];
             $data->orget = $this->data['orget'];
+            $data->hauptfunktion = $this->data['hauptfunktion'];
 			$data->mitarbeiter_uid = $this->data['mitarbeiter_uid'];
             $data->benutzerfunktionid = $this->data['benutzerfunktionid'];
             $data->vertragsbestandteiltyp_kurzbz = VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_FUNKTION;
@@ -125,6 +130,7 @@ class GUIVertragsbestandteilFunktion extends AbstractGUIVertragsbestandteil  imp
 			{
 				$this->data['benutzerfunktionid'] = $this->vbsinstance->getBenutzerfunktion_id();
 				$this->data['mode'] = 'bestehende';
+                $this->data['hauptfunktion'] = $this->vbsinstance->getHauptfunktion();
 			}
 		}
 	}

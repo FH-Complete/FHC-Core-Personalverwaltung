@@ -28,7 +28,14 @@ export default {
           <label class="form-check-label" :for="'vbfunktionmode2_' + config.guioptions.id">Bestehende Funktion</label>
         </div>
       </div>
-      <div class="col-7">&nbsp;</div>
+      <div class="col-2">
+        <div v-if="showHauptfunktion" class="form-check form-check-inline">
+          <input v-model="hauptfunktion" :disabled="isinputdisabled('hauptfunktion')" class="form-check-input form-check-input-sm" type="checkbox"                      
+            :name="'hauptfunktion_' + config.guioptions.id" :id="'hauptfunktion_' + config.guioptions.id" value="">
+          <label class="form-check-label" :for="'hauptfunktion_' + config.guioptions.id">Hauptfunktion</label>
+        </div>        
+      </div>
+      <div class="col-5">&nbsp;</div>
     </div>
     <div class="row g-2">
     <template v-if="mode === 'neu'">
@@ -133,6 +140,7 @@ export default {
       funktion: '',
       orget: '',
       benutzerfunktionid: '',
+      hauptfunktion: false,
       db_delete: false,
       mode: 'neu',
       lists: {
@@ -215,6 +223,9 @@ export default {
       if( this.config?.data?.mode !== undefined ) {
         this.mode = this.config.data.mode;
       }
+      if( this.config?.data?.hauptfunktion !== undefined ) {
+        this.hauptfunktion = this.config.data.hauptfunktion;
+      }
       if( this.config?.data?.db_delete !== undefined ) {
         this.db_delete = this.config.data.db_delete;
       }
@@ -277,6 +288,7 @@ export default {
           benutzerfunktionid: this.benutzerfunktionid,
           mitarbeiter_uid: this.store.mitarbeiter_uid,
           mode: this.mode,
+          hauptfunktion: this.showHauptfunktion ? this.hauptfunktion : false,
           db_delete: this.db_delete,          
           gueltigkeit: this.$refs.gueltigkeit.getPayload()
         },
@@ -327,6 +339,14 @@ export default {
     }
   },
   computed: {
+      isZuordnung: function() {
+        // if true do not show checkbox for primary job function (Hauptfunktion) 
+        return this.config?.guioptions?.filter === 'zuordnung'
+          || /zuordnung/.test(this.funktion);
+      },
+      showHauptfunktion: function() {
+        return !this.isZuordnung && this.showinput('hauptfunktion');
+      },
       getFunktionDropdownPlaceholder: function() {
           if( this.store.unternehmen === '' ) {
             return 'Bitte zuerst ein Unternehmen auswählen';

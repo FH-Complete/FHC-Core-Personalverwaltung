@@ -9,6 +9,7 @@ export default {
             'funktion',
             'orget',
             'benutzerfunktionid',
+            'hauptfunktion',
             'mode'
         ],
        'vertragsbestandteilkarenz': [

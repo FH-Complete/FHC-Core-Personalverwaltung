@@ -162,6 +162,7 @@ export default {
           funktion: vb.benutzerfunktiondata.funktion_kurzbz,
           orget: vb.benutzerfunktiondata.oe_kurzbz,
           benutzerfunktionid: vb.benutzerfunktion_id,
+          hauptfunktion: vb.hauptfunktion ?? false,
           mitarbeiter_uid: this.store.mitarbeiter_uid,
           mode: 'bestehende',
           gueltigkeit: this.gueltigkeit2gui(vb, mode)
@@ -171,6 +172,7 @@ export default {
             'funktion',
             'orget',
             'benutzerfunktionid',
+            'hauptfunktion',
             'mode'
         ];
       }

@@ -172,6 +172,7 @@ EOSQL;
 				'[' || oet.bezeichnung || '] ' || oe.bezeichnung AS funktion_oebezeichnung,
 				f.beschreibung AS funktion_beschreibung,
 				bf.*,
+				vf.hauptfunktion,
 				fb.bezeichnung AS fachbereich_bezeichnung,
 			    CASE
 					WHEN
